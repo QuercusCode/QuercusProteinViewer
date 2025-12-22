@@ -4,7 +4,10 @@ import { Controls } from './components/Controls';
 import type { ChainInfo, CustomColorRule, StructureInfo } from './types';
 
 function App() {
-  const [pdbId, setPdbId] = useState('4hhb'); // Hemoglobin
+  const [pdbId, setPdbId] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('pdb') || '4hhb'; // Default to Hemoglobin
+  });
   const [file, setFile] = useState<File | null>(null);
   const [representation, setRepresentation] = useState<RepresentationType>('cartoon');
   const [coloring, setColoring] = useState<ColoringType>('chainid');
