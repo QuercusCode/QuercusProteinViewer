@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera } from 'lucide-react';
+import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera, Ruler } from 'lucide-react';
 import type { RepresentationType, ColoringType } from './ProteinViewer';
 import type { ChainInfo, CustomColorRule } from '../types';
 
@@ -14,8 +14,10 @@ interface ControlsProps {
     onResetView: () => void;
     chains: ChainInfo[];
     customColors: CustomColorRule[];
-    setCustomColors: (rules: CustomColorRule[]) => void;
+    setCustomColors: (colors: CustomColorRule[]) => void;
     onExport: () => void;
+    isMeasurementMode: boolean;
+    setIsMeasurementMode: (enabled: boolean) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -30,7 +32,9 @@ export const Controls: React.FC<ControlsProps> = ({
     chains,
     customColors,
     setCustomColors,
-    onExport
+    onExport,
+    isMeasurementMode,
+    setIsMeasurementMode
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [localPdbId, setLocalPdbId] = React.useState(pdbId);
@@ -400,6 +404,24 @@ export const Controls: React.FC<ControlsProps> = ({
                             <span>Export</span>
                         </button>
                     </div>
+
+                    <button
+                        onClick={() => setIsMeasurementMode(!isMeasurementMode)}
+                        className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${isMeasurementMode
+                            ? 'bg-amber-500/20 border-amber-500/50 text-amber-400 font-medium'
+                            : 'bg-neutral-800 hover:bg-neutral-750 border-neutral-700 text-neutral-300'
+                            }`}
+                        title="Measure distance between 2 atoms"
+                    >
+                        <Ruler className="w-4 h-4" />
+                        <span>{isMeasurementMode ? 'Measurement Active' : 'Measure Distance'}</span>
+                    </button>
+
+                    {isMeasurementMode && (
+                        <div className="text-[10px] text-amber-400/80 text-center bg-amber-950/30 p-2 rounded border border-amber-500/20">
+                            Click any two atoms to measure distance
+                        </div>
+                    )}
                 </div>
 
                 <div className="mt-auto pt-4 text-[10px] text-neutral-600 flex justify-center">

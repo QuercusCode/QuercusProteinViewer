@@ -7,12 +7,13 @@ import type { ChainInfo, CustomColorRule, StructureInfo } from './types';
 function App() {
   const [pdbId, setPdbId] = useState(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('pdb') || '4hhb'; // Default to Hemoglobin
+    return params.get('pdb') || '1crn'; // Default to Crambin (stable)
   });
   const [file, setFile] = useState<File | null>(null);
   const [representation, setRepresentation] = useState<RepresentationType>('cartoon');
   const [coloring, setColoring] = useState<ColoringType>('chainid');
   const [resetKey, setResetKey] = useState(0);
+  const [isMeasurementMode, setIsMeasurementMode] = useState(false);
 
   const [chains, setChains] = useState<ChainInfo[]>([]);
   const [customColors, setCustomColors] = useState<CustomColorRule[]>([]);
@@ -60,6 +61,8 @@ function App() {
         customColors={customColors}
         setCustomColors={setCustomColors}
         onExport={handleExport}
+        isMeasurementMode={isMeasurementMode}
+        setIsMeasurementMode={setIsMeasurementMode}
       />
 
       <ProteinViewer
@@ -71,6 +74,7 @@ function App() {
         customColors={customColors}
         onStructureLoaded={handleStructureLoaded}
         resetCamera={resetKey}
+        isMeasurementMode={isMeasurementMode}
         className="w-full h-full"
       />
 

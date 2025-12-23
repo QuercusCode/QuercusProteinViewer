@@ -23,6 +23,7 @@ interface ProteinViewerProps {
     onStructureLoaded?: (info: StructureInfo) => void;
     resetCamera?: number;
     className?: string;
+    isMeasurementMode?: boolean;
 }
 
 export interface ProteinViewerRef {
@@ -37,7 +38,8 @@ export const ProteinViewer = React.forwardRef<ProteinViewerRef, ProteinViewerPro
     customColors,
     onStructureLoaded,
     resetCamera,
-    className
+    className,
+    isMeasurementMode
 }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const stageRef = useRef<any>(null); // NGL state is now 'any'
@@ -134,9 +136,12 @@ export const ProteinViewer = React.forwardRef<ProteinViewerRef, ProteinViewerPro
             try {
                 let component;
                 if (file) {
+                    console.log("Loading from file:", file.name);
                     component = await stage.loadFile(file, { defaultRepresentation: false });
                 } else if (pdbId) {
-                    const cleanId = pdbId.trim().toLowerCase();
+                    console.log("Processing PDB ID:", pdbId);
+                    const cleanId = String(pdbId).trim().toLowerCase();
+                    console.log("Clean ID:", cleanId);
                     if (cleanId.length < 3) {
                         console.warn("PDB ID too short, skipping load");
                         setLoading(false);
@@ -146,60 +151,79 @@ export const ProteinViewer = React.forwardRef<ProteinViewerRef, ProteinViewerPro
                     const url = `https://files.rcsb.org/download/${cleanId}.pdb`;
                     console.log(`Fetching from: ${url}`);
                     component = await stage.loadFile(url, { defaultRepresentation: false, ext: 'pdb' });
+                } else {
+                    console.log("No file or pdbId provided.");
+                    setLoading(false);
+                    return;
                 }
 
                 if (component) {
                     console.log("Component loaded. Structure type:", component.type);
+                    // ... (keep chains logic logging) ...
                     if (component.structure) {
-                        console.log("Atom count:", component.structure.atomCount);
+                        try {
+                            // Extract Chain Info
+                            const chains: { name: string; min: number; max: number; sequence: string }[] = [];
+                            const seenChains = new Set<string>();
 
-                        // Extract Chain Info
-                        const chains: { name: string; min: number; max: number; sequence: string }[] = [];
-                        const seenChains = new Set<string>();
+                            console.log("Iterating chains...");
+                            component.structure.eachChain((c: any) => {
+                                if (!c || !c.chainname) return;
+                                if (seenChains.has(c.chainname)) return;
+                                seenChains.add(c.chainname);
 
-                        component.structure.eachChain((c: any) => {
-                            if (seenChains.has(c.chainname)) return;
-                            seenChains.add(c.chainname);
-
-                            let min = Infinity;
-                            let max = -Infinity;
-                            let seq = "";
-                            c.eachResidue((r: any) => {
-                                if (r.resno < min) min = r.resno;
-                                if (r.resno > max) max = r.resno;
-                                // Use NGL's internal getResname1 if available, or simple logic
-                                seq += r.getResname1 ? r.getResname1() : (r.resname[0] || 'X');
+                                let min = Infinity;
+                                let max = -Infinity;
+                                let seq = "";
+                                try {
+                                    c.eachResidue((r: any) => {
+                                        if (r.resno < min) min = r.resno;
+                                        if (r.resno > max) max = r.resno;
+                                        seq += r.getResname1 ? r.getResname1() : (r.resname ? r.resname[0] : 'X');
+                                    });
+                                } catch (chainErr) {
+                                    console.error("Error parsing chain residues:", chainErr);
+                                }
+                                chains.push({
+                                    name: c.chainname,
+                                    min: min === Infinity ? 0 : min,
+                                    max: max === -Infinity ? 0 : max,
+                                    sequence: seq
+                                });
                             });
-                            chains.push({
-                                name: c.chainname,
-                                min: min === Infinity ? 0 : min,
-                                max: max === -Infinity ? 0 : max,
-                                sequence: seq
-                            });
-                        });
 
-                        console.log("Chains found with residue ranges:", chains);
+                            console.log("Chains found:", chains.length);
 
-                        if (onStructureLoaded) {
-                            onStructureLoaded({ chains });
+                            if (onStructureLoaded) {
+                                onStructureLoaded({ chains });
+                            }
+                        } catch (chainLoopErr) {
+                            console.warn("Error iterating chains (non-fatal):", chainLoopErr);
                         }
                     }
 
+                    // Safe component assignment
                     componentRef.current = component;
                     try {
-                        component.autoView();
+                        console.log("AutoView...");
+                        try {
+                            component.autoView();
+                        } catch (avErr) {
+                            console.warn("AutoView failed:", avErr);
+                        }
+
+                        console.log("Calling updateRepresentation...");
                         updateRepresentation();
 
                         // Force render
                         stage.handleResize();
-                        // CDN version might handle requestRender differently, but usually safe
                         if (stage.viewer) stage.viewer.requestRender();
                     } catch (reprError) {
                         console.error("AutoView/Repr error:", reprError);
                     }
                 }
             } catch (err) {
-                console.error("Failed to load structure:", err);
+                console.error("Failed to load structure (Detailed):", err);
                 setError(`Failed to load structure: ${err instanceof Error ? err.message : String(err)}`);
             } finally {
                 setLoading(false);
@@ -207,10 +231,10 @@ export const ProteinViewer = React.forwardRef<ProteinViewerRef, ProteinViewerPro
         };
 
         // Load if we have a file OR a valid PDB ID
-        if (file || (pdbId && pdbId.length >= 3)) {
+        if (file || (pdbId && String(pdbId).length >= 3)) {
             loadStructure();
         } else {
-            // If nothing to load, clear stage
+            // ... existing clear stage logic ...
             try {
                 if (stageRef.current) {
                     stageRef.current.removeAllComponents();
@@ -221,77 +245,146 @@ export const ProteinViewer = React.forwardRef<ProteinViewerRef, ProteinViewerPro
         }
     }, [pdbId, file]);
 
-    // Update Representation/Coloring
+    // --- Distance Measurement Logic ---
+    const [selectedAtoms, setSelectedAtoms] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (!stageRef.current) return;
+        const stage = stageRef.current;
+
+        const handleClick = (pickingProxy: any) => {
+            if (!isMeasurementMode || !pickingProxy || !pickingProxy.atom) return;
+
+            const atom = pickingProxy.atom;
+            console.log("Atom clicked:", atom);
+
+            // Access global NGL for Vector3
+            const Vector3 = window.NGL.Vector3;
+
+            setSelectedAtoms(prev => {
+                const newSelection = [...prev, atom];
+
+                // If we have 2 atoms, add measurement
+                if (newSelection.length === 2) {
+                    const atom1 = newSelection[0];
+                    const atom2 = newSelection[1];
+
+                    try {
+                        // Calculate distance
+                        const v1 = new Vector3(atom1.x, atom1.y, atom1.z);
+                        const v2 = new Vector3(atom2.x, atom2.y, atom2.z);
+                        const distance = v1.distanceTo(v2).toFixed(2);
+
+                        console.log(`Measured distance: ${distance} A`);
+
+                        // Add distance representation
+                        const shape = new window.NGL.Shape("distance-shape");
+                        shape.addCylinder(
+                            [atom1.x, atom1.y, atom1.z],
+                            [atom2.x, atom2.y, atom2.z],
+                            [1, 0.8, 0], // Amber/Orange color
+                            0.2 // Radius
+                        );
+                        shape.addText(
+                            [(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2],
+                            [1, 1, 1], // White text
+                            1.5, // Size
+                            `${distance} A`
+                        );
+
+                        const shapeComp = stage.addComponentFromObject(shape);
+                        shapeComp.addRepresentation("buffer");
+                        shapeComp.autoView();
+
+                        // Clear selection after drawing
+                        setTimeout(() => setSelectedAtoms([]), 100);
+                        return [];
+
+                    } catch (e) {
+                        console.error("Distance error:", e);
+                        return [];
+                    }
+                }
+
+                return newSelection;
+            });
+        };
+
+        // Attach/Detach Signal
+        if (isMeasurementMode) {
+            stage.signals.clicked.add(handleClick);
+        } else {
+            stage.signals.clicked.remove(handleClick);
+            setSelectedAtoms([]);
+        }
+
+        return () => {
+            stage.signals.clicked.remove(handleClick);
+        };
+    }, [isMeasurementMode]);
+    // ----------------------------------
+
     const updateRepresentation = () => {
         if (!componentRef.current) return;
+        const component = componentRef.current;
+
+        // Extra safety check for NGL structure
+        if (!component.structure) {
+            console.warn("updateRepresentation: Component has no structure yet.");
+            return;
+        }
 
         try {
-            const component = componentRef.current;
             component.removeAllRepresentations();
 
-            let actualColor: string = coloring;
-            if (coloring === 'chainid') actualColor = 'chainindex';
-            if (coloring === 'structure') actualColor = 'sstruc';
+            const allCustomSelections: string[] = [];
 
-            let repName = representation;
-            if (representation === 'cartoon') repName = 'cartoon';
-            if (representation === 'ball+stick') repName = 'ball+stick';
-            if (representation === 'spacefill') repName = 'spacefill';
-            if (representation === 'surface') repName = 'surface';
-            if (representation === 'ribbon') repName = 'ribbon';
+            // 1. Apply Custom Colors
+            if (customColors && customColors.length > 0) {
+                console.log(`Applying ${customColors.length} custom color rules...`);
+                customColors.forEach((rule, index) => {
+                    if (!rule.color || !rule.selection) return;
 
-            // 1. Prepare Rules with Selections
-            const activeRules = customColors.map(rule => {
-                let sel = "";
-                if (rule.type === 'chain') {
-                    sel = `:${rule.target}`;
-                } else if (rule.type === 'residue') {
-                    sel = rule.target;
-                }
-                return { ...rule, selection: sel };
-            }).filter(r => r.selection);
+                    try {
+                        // NGL selection string
+                        const selection = rule.selection.trim();
+                        if (!selection) return;
 
-            // 2. Add Representations with Layer Subtraction
-            // We iterate strictly; each rule rep includes its selection,
-            // MINUS the selection of all *subsequent* rules (which sit "on top").
-            activeRules.forEach((rule, index) => {
-                // Gather selections of all rules that come AFTER this one
-                const higherLayerSelections = activeRules.slice(index + 1).map(r => r.selection);
+                        console.log(`Custom Rule ${index + 1}: ${rule.color} on "${selection}"`);
 
-                let finalSelection = rule.selection;
-                if (higherLayerSelections.length > 0) {
-                    finalSelection = `(${rule.selection}) and not (${higherLayerSelections.join(' or ')})`;
-                }
+                        // Add representation for this custom part
+                        component.addRepresentation(representation, {
+                            color: rule.color,
+                            sele: selection,
+                            name: `custom-${index}`
+                        });
 
-                console.log(`Layer ${index} (${rule.type}): ${finalSelection}`);
-
-                if (finalSelection) {
-                    const params: any = {
-                        color: rule.color,
-                        sele: finalSelection
-                    };
-                    if (representation === 'surface') params.opacity = 0.7;
-                    component.addRepresentation(repName, params);
-                }
-            });
-
-            // 3. Add Base Representation
-            // Base excludes ALL custom rule selections
-            const allCustomSelections = activeRules.map(r => r.selection);
-            const baseParams: any = {
-                color: actualColor
-            };
-            if (representation === 'surface') baseParams.opacity = 0.7;
-
-            if (allCustomSelections.length > 0) {
-                const exclusionString = `not (${allCustomSelections.join(' or ')})`;
-                baseParams.sele = exclusionString;
-                console.log(`Base Layer: ${exclusionString}`);
-            } else {
-                console.log(`Base Layer: All`);
+                        allCustomSelections.push(selection);
+                    } catch (ruleErr) {
+                        console.error(`Failed to apply rule ${index}:`, ruleErr);
+                    }
+                });
             }
 
-            component.addRepresentation(repName, baseParams);
+            // 2. Apply Base Representation (for everything else)
+            // If custom colors cover everything, this might be empty, but usually we show the rest.
+            let baseParams: any = {
+                color: coloring, // chainid, element, etc.
+                name: "base-structure"
+            };
+
+            // Calculate exclusion if needed
+            if (allCustomSelections.length > 0) {
+                const exclusionString = `not (${allCustomSelections.join(' or ')})`;
+                console.log(`Base Layer Selection: ${exclusionString}`);
+                baseParams.sele = exclusionString;
+            } else {
+                console.log(`Base Layer: All (*)`);
+                baseParams.sele = "*";
+            }
+
+            console.log(`Adding Base Representation (${representation}) with params:`, baseParams);
+            component.addRepresentation(representation, baseParams);
 
         } catch (e) {
             console.error("Error updating representation:", e);
