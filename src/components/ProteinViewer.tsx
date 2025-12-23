@@ -365,8 +365,9 @@ export const ProteinViewer = React.forwardRef<ProteinViewerRef, ProteinViewerPro
                 });
             }
 
-            // Register scheme
-            NGL.ColormakerRegistry.addScheme(function (this: any, _params: any) {
+            // Register scheme and capture the ACTUAL ID NGL assigns
+            // (Some NGL versions prefix UUIDs)
+            const registeredSchemeId = NGL.ColormakerRegistry.addScheme(function (this: any, _params: any) {
                 this.atomColor = (atom: any) => {
                     // 1. Check Custom Overrides
                     if (colorMap.has(atom.index)) {
@@ -418,12 +419,15 @@ export const ProteinViewer = React.forwardRef<ProteinViewerRef, ProteinViewerPro
                 };
             }, schemeId);
 
-            console.log(`Applying single representation with custom scheme: ${schemeId}`);
+            console.log(`Applying single representation with custom scheme: ${registeredSchemeId}`);
 
             // Apply ONE representation to the WHOLE structure ("*")
             // This ensures seamless mesh interpolation
-            component.addRepresentation(representation, {
-                color: schemeId,
+            // Ensure representation is valid string
+            const repType = representation || 'cartoon';
+
+            component.addRepresentation(repType, {
+                color: registeredSchemeId,
                 sele: "*"
             });
 
