@@ -338,54 +338,72 @@ export const ProteinViewer = React.forwardRef<ProteinViewerRef, ProteinViewerPro
         try {
             component.removeAllRepresentations();
 
-            const allCustomSelections: string[] = [];
+            // Generate a unique scheme ID
+            const schemeId = `custom-scheme-${Date.now()}`;
 
-            // 1. Apply Custom Colors
+            // Register the custom scheme
+            const NGL = window.NGL;
+
+            // Prepare data for the scheme closure
+            const colorMap = new Map<number, number>();
+
             if (customColors && customColors.length > 0) {
-                console.log(`Applying ${customColors.length} custom color rules...`);
-                customColors.forEach((rule, index) => {
+                console.log(`Preparing ${customColors.length} custom color rules...`);
+                customColors.forEach(rule => {
                     if (!rule.color || !rule.target) return;
-
                     try {
-                        // NGL selection string
-                        const selection = rule.target.trim();
-                        if (!selection) return;
-
-                        console.log(`Custom Rule ${index + 1}: ${rule.color} on "${selection}"`);
-
-                        // Add representation for this custom part
-                        component.addRepresentation(representation, {
-                            color: rule.color,
-                            sele: selection,
-                            name: `custom-${index}`
-                        });
-
-                        allCustomSelections.push(selection);
-                    } catch (ruleErr) {
-                        console.error(`Failed to apply rule ${index}:`, ruleErr);
+                        const colorHex = new NGL.Color(rule.color).getHex();
+                        // NGL Selection might be slow if created repeatedly, but fine here
+                        // Pre-calculate which atoms match
+                        const selection = new NGL.Selection(rule.target);
+                        component.structure.eachAtom((atom: any) => {
+                            colorMap.set(atom.index, colorHex);
+                        }, selection);
+                    } catch (e) {
+                        console.error("Rule prep error:", e);
                     }
                 });
             }
 
-            // 2. Apply Base Representation (for everything else)
-            // If custom colors cover everything, this might be empty, but usually we show the rest.
-            let baseParams: any = {
-                color: coloring, // chainid, element, etc.
-                name: "base-structure"
-            };
+            // Register scheme
+            NGL.ColormakerRegistry.addScheme(function (this: any, params: any) {
+                this.atomColor = (atom: any) => {
+                    // Check custom map first
+                    if (colorMap.has(atom.index)) {
+                        return colorMap.get(atom.index);
+                    }
 
-            // Calculate exclusion if needed
-            if (allCustomSelections.length > 0) {
-                const exclusionString = `not (${allCustomSelections.join(' or ')})`;
-                console.log(`Base Layer Selection: ${exclusionString}`);
-                baseParams.sele = exclusionString;
-            } else {
-                console.log(`Base Layer: All (*)`);
-                baseParams.sele = "*";
-            }
+                    // Fallback to base scheme
+                    // We can't easily instantiate the base scheme inside here without access to the registry types
+                    // But we can approximate common standard schemes if needed, or use NGL helpers
 
-            console.log(`Adding Base Representation (${representation}) with params:`, baseParams);
-            component.addRepresentation(representation, baseParams);
+                    // ACTUALLY: We can just return the numeric value if we knew it.
+                    // But we can try to use standard logic:
+                    if (coloring === 'element') {
+                        return atom.elementColor();
+                    } else if (coloring === 'resname') {
+                        return atom.resnameColor();
+                    } else if (coloring === 'structure') {
+                        return atom.structureColor();
+                    } else if (coloring === 'chainid') {
+                        // NGL doesn't expose a direct atom.chainidColor(), so we manually map
+                        // Standard NGL chain colors
+                        // Hash or cycle? NGL usually cycles via chainIndex
+                        return NGL.ChainColors[atom.chainIndex % NGL.ChainColors.length];
+                    }
+
+                    return 0xCCCCCC; // Default grey
+                };
+            }, schemeId);
+
+            console.log(`Applying single representation with custom scheme: ${schemeId}`);
+
+            // Apply ONE representation to the WHOLE structure ("*")
+            // This ensures seamless mesh interpolation
+            component.addRepresentation(representation, {
+                color: schemeId,
+                sele: "*"
+            });
 
         } catch (e) {
             console.error("Error updating representation:", e);
