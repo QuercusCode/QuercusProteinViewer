@@ -365,34 +365,37 @@ export const ProteinViewer = React.forwardRef<ProteinViewerRef, ProteinViewerPro
                 });
             }
 
+            // 2. Identify Base Scheme
+            // Map our internal names to NGL scheme names if they differ
+            let baseSchemeId: string = coloring;
+            if (coloring === 'structure') baseSchemeId = 'sstruc';
+
+            // Get the constructor for the base scheme
+            const BaseSchemeConstructor = NGL.ColormakerRegistry.schemes[baseSchemeId];
+
+            if (!BaseSchemeConstructor) {
+                console.warn(`Base scheme '${baseSchemeId}' not found, falling back to uniform.`);
+            }
+
             // Register scheme
-            NGL.ColormakerRegistry.addScheme(function (this: any, _params: any) {
+            NGL.ColormakerRegistry.addScheme(function (this: any, params: any) {
+                // Instantiate the base scheme (e.g. Element, ChainID, etc.)
+                // Pass params through so it respects options like scaling/domains
+                const baseMaker = BaseSchemeConstructor ? new BaseSchemeConstructor(params) : null;
+
                 this.atomColor = (atom: any) => {
-                    // Check custom map first
+                    // 1. Check Custom Overrides
                     if (colorMap.has(atom.index)) {
                         return colorMap.get(atom.index);
                     }
 
-                    // Fallback to base scheme
-                    // We can't easily instantiate the base scheme inside here without access to the registry types
-                    // But we can approximate common standard schemes if needed, or use NGL helpers
-
-                    // ACTUALLY: We can just return the numeric value if we knew it.
-                    // But we can try to use standard logic:
-                    if (coloring === 'element') {
-                        return atom.elementColor();
-                    } else if (coloring === 'resname') {
-                        return atom.resnameColor();
-                    } else if (coloring === 'structure') {
-                        return atom.structureColor();
-                    } else if (coloring === 'chainid') {
-                        // NGL doesn't expose a direct atom.chainidColor(), so we manually map
-                        // Standard NGL chain colors
-                        // Hash or cycle? NGL usually cycles via chainIndex
-                        return NGL.ChainColors[atom.chainIndex % NGL.ChainColors.length];
+                    // 2. Delegate to Base Scheme
+                    if (baseMaker) {
+                        return baseMaker.atomColor(atom);
                     }
 
-                    return 0xCCCCCC; // Default grey
+                    // 3. Last Resort Fallback
+                    return 0xCCCCCC;
                 };
             }, schemeId);
 
