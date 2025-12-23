@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useImperativeHandle } from 'react';
 import { clsx } from 'clsx';
 import { Loader2 } from 'lucide-react';
 import type { CustomColorRule, StructureInfo } from '../types';
@@ -25,7 +25,11 @@ interface ProteinViewerProps {
     className?: string;
 }
 
-export const ProteinViewer: React.FC<ProteinViewerProps> = ({
+export interface ProteinViewerRef {
+    captureImage: () => Promise<void>;
+}
+
+export const ProteinViewer = React.forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     pdbId,
     file,
     representation,
@@ -34,12 +38,40 @@ export const ProteinViewer: React.FC<ProteinViewerProps> = ({
     onStructureLoaded,
     resetCamera,
     className
-}) => {
+}, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const stageRef = useRef<any>(null); // NGL state is now 'any'
     const componentRef = useRef<any>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Expose captureImage method to parent
+    useImperativeHandle(ref, () => ({
+        captureImage: async () => {
+            if (!stageRef.current) return;
+            try {
+                // Generate snapshot blob
+                const blob = await stageRef.current.makeImage({
+                    factor: 2, // High resolution (2x scaling)
+                    antialias: true,
+                    transparent: true,
+                    trim: false
+                });
+
+                // Create download link
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `protein_${pdbId || 'structure'}_snapshot.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            } catch (err) {
+                console.error('Failed to capture image:', err);
+            }
+        }
+    }));
 
     // Initialize NGL Stage
     useEffect(() => {
@@ -300,4 +332,5 @@ export const ProteinViewer: React.FC<ProteinViewerProps> = ({
             )}
         </div>
     );
-};
+});
+ProteinViewer.displayName = 'ProteinViewer';

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X } from 'lucide-react';
+import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera } from 'lucide-react';
 import type { RepresentationType, ColoringType } from './ProteinViewer';
 import type { ChainInfo, CustomColorRule } from '../types';
 
@@ -15,6 +15,7 @@ interface ControlsProps {
     chains: ChainInfo[];
     customColors: CustomColorRule[];
     setCustomColors: (rules: CustomColorRule[]) => void;
+    onExport: () => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -28,7 +29,8 @@ export const Controls: React.FC<ControlsProps> = ({
     onResetView,
     chains,
     customColors,
-    setCustomColors
+    setCustomColors,
+    onExport
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [localPdbId, setLocalPdbId] = React.useState(pdbId);
@@ -381,13 +383,23 @@ export const Controls: React.FC<ControlsProps> = ({
                         </select>
                     </div>
 
-                    <button
-                        onClick={onResetView}
-                        className="w-full flex items-center justify-center gap-2 bg-neutral-800 hover:bg-neutral-750 border border-neutral-700 text-neutral-300 py-2 rounded-lg mt-4 transition-all"
-                    >
-                        <RotateCcw className="w-4 h-4" />
-                        <span>Reset Camera</span>
-                    </button>
+                    <div className="flex gap-2">
+                        <button
+                            onClick={onResetView}
+                            className="flex-1 flex items-center justify-center gap-2 bg-neutral-800 hover:bg-neutral-750 border border-neutral-700 text-neutral-300 py-2 rounded-lg transition-all"
+                        >
+                            <RotateCcw className="w-4 h-4" />
+                            <span>Reset</span>
+                        </button>
+                        <button
+                            onClick={onExport}
+                            className="flex-1 flex items-center justify-center gap-2 bg-neutral-800 hover:bg-blue-600/20 hover:text-blue-400 hover:border-blue-500/50 border border-neutral-700 text-neutral-300 py-2 rounded-lg transition-all"
+                            title="Export High-Res Image"
+                        >
+                            <Camera className="w-4 h-4" />
+                            <span>Export</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div className="mt-auto pt-4 text-[10px] text-neutral-600 flex justify-center">

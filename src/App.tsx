@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { ProteinViewer, type RepresentationType, type ColoringType } from './components/ProteinViewer';
+import { useState, useRef } from 'react';
+import { ProteinViewer, type RepresentationType, type ColoringType, type ProteinViewerRef } from './components/ProteinViewer';
 import { Controls } from './components/Controls';
 import { HelpGuide } from './components/HelpGuide';
 import type { ChainInfo, CustomColorRule, StructureInfo } from './types';
@@ -35,6 +35,12 @@ function App() {
     setCustomColors([]);
   };
 
+  const viewerRef = useRef<ProteinViewerRef>(null);
+
+  const handleExport = () => {
+    viewerRef.current?.captureImage();
+  };
+
   const handleStructureLoaded = (info: StructureInfo) => {
     setChains(info.chains);
   };
@@ -53,9 +59,11 @@ function App() {
         chains={chains}
         customColors={customColors}
         setCustomColors={setCustomColors}
+        onExport={handleExport}
       />
 
       <ProteinViewer
+        ref={viewerRef}
         pdbId={pdbId}
         file={file}
         representation={representation}
