@@ -147,11 +147,13 @@ export const ProteinViewer = React.forwardRef<ProteinViewerRef, ProteinViewerPro
                         setLoading(false);
                         return;
                     }
-                    // Fallback for default 1crn to use local file (bypassing network/DNS issues in test env)
+                    // Fallback for known local PDBs (bypassing network/DNS issues in test env)
+                    const AVAILABLE_LOCAL_PDBS = ['1crn', '2b3p', '4hhb'];
                     let url;
-                    if (cleanId === '1crn') {
-                        url = './1crn.pdb'; // Served from public folder, relative to base
-                        console.log("Using local fallback for 1crn");
+
+                    if (AVAILABLE_LOCAL_PDBS.includes(cleanId)) {
+                        url = `./${cleanId}.pdb`; // Served from public folder, relative to base
+                        console.log(`Using local fallback for ${cleanId}`);
                     } else {
                         url = `rcsb://${cleanId}`;
                     }
