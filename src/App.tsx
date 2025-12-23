@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ProteinViewer, type RepresentationType, type ColoringType } from './components/ProteinViewer';
 import { Controls } from './components/Controls';
+import { HelpGuide } from './components/HelpGuide';
 import type { ChainInfo, CustomColorRule, StructureInfo } from './types';
 
 function App() {
@@ -64,6 +65,8 @@ function App() {
         resetCamera={resetKey}
         className="w-full h-full"
       />
+
+      <HelpGuide />
 
       {/* Background Gradient */}
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_50%,rgba(50,50,80,0.2),rgba(0,0,0,0))]" />
