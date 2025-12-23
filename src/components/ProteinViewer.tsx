@@ -365,37 +365,56 @@ export const ProteinViewer = React.forwardRef<ProteinViewerRef, ProteinViewerPro
                 });
             }
 
-            // 2. Identify Base Scheme
-            // Map our internal names to NGL scheme names if they differ
-            let baseSchemeId: string = coloring;
-            if (coloring === 'structure') baseSchemeId = 'sstruc';
-
-            // Get the constructor for the base scheme
-            const BaseSchemeConstructor = NGL.ColormakerRegistry.schemes[baseSchemeId];
-
-            if (!BaseSchemeConstructor) {
-                console.warn(`Base scheme '${baseSchemeId}' not found, falling back to uniform.`);
-            }
-
             // Register scheme
-            NGL.ColormakerRegistry.addScheme(function (this: any, params: any) {
-                // Instantiate the base scheme (e.g. Element, ChainID, etc.)
-                // Pass params through so it respects options like scaling/domains
-                const baseMaker = BaseSchemeConstructor ? new BaseSchemeConstructor(params) : null;
-
+            NGL.ColormakerRegistry.addScheme(function (this: any, _params: any) {
                 this.atomColor = (atom: any) => {
                     // 1. Check Custom Overrides
                     if (colorMap.has(atom.index)) {
                         return colorMap.get(atom.index);
                     }
 
-                    // 2. Delegate to Base Scheme
-                    if (baseMaker) {
-                        return baseMaker.atomColor(atom);
+                    // 2. Manual Fallback for Standard Schemes
+                    // (NGL constants are not exposed in this build, so we map manually)
+
+                    if (coloring === 'element') {
+                        // CPK coloring
+                        const elem = atom.element;
+                        if (elem === 'C') return 0x909090;
+                        if (elem === 'O') return 0xFF0000;
+                        if (elem === 'N') return 0x0000FF;
+                        if (elem === 'S') return 0xFFFF00;
+                        if (elem === 'H') return 0xFFFFFF;
+                        return 0xCCCCCC;
                     }
 
-                    // 3. Last Resort Fallback
-                    return 0xCCCCCC;
+                    else if (coloring === 'chainid') {
+                        // Cycle through a standard set of colors
+                        const colors = [
+                            0x1f77b4, 0xff7f0e, 0x2ca02c, 0xd62728, 0x9467bd,
+                            0x8c564b, 0xe377c2, 0x7f7f7f, 0xbcbd22, 0x17becf
+                        ];
+                        return colors[atom.chainIndex % colors.length];
+                    }
+
+                    else if (coloring === 'structure') {
+                        // h=helix, s=sheet, c=coil/turn, etc.
+                        const s = atom.sstruc;
+                        if (s === 'h') return 0xFF0080; // Magenta for Helix
+                        if (s === 's') return 0xFFC800; // Yellow/Orange for Sheet
+                        return 0xFFFFFF; // White for Coil
+                    }
+
+                    else if (coloring === 'resname') {
+                        // Fallback: simplified polarity coloring could go here, 
+                        // but defaulting to Element coloring is often a safe backup.
+                        const elem = atom.element;
+                        if (elem === 'C') return 0x909090;
+                        if (elem === 'O') return 0xFF0000;
+                        if (elem === 'N') return 0x0000FF;
+                        return 0xCCCCCC;
+                    }
+
+                    return 0xCCCCCC; // Default grey
                 };
             }, schemeId);
 
