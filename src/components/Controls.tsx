@@ -89,10 +89,11 @@ export const Controls: React.FC<ControlsProps> = ({
         let target = '';
         if (targetType === 'chain') {
             if (!selectedChain) return;
-            target = selectedChain;
+            // NGL chain selection requires a colon prefix (e.g. ":A")
+            target = `:${selectedChain}`;
         } else {
             if (!residueRange.trim()) return;
-            // Combine residue range with chain if selected (e.g. "10-20:A")
+            // Combine residue range with chain if selected (e.g. "10-20:A") or just range "10-20"
             target = selectedChain
                 ? `${residueRange.trim()}:${selectedChain}`
                 : residueRange.trim();
