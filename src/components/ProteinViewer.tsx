@@ -246,7 +246,7 @@ export const ProteinViewer = React.forwardRef<ProteinViewerRef, ProteinViewerPro
     }, [pdbId, file]);
 
     // --- Distance Measurement Logic ---
-    const [selectedAtoms, setSelectedAtoms] = useState<any[]>([]);
+    const selectedAtomsRef = useRef<any[]>([]);
 
     useEffect(() => {
         if (!stageRef.current) return;
@@ -258,56 +258,56 @@ export const ProteinViewer = React.forwardRef<ProteinViewerRef, ProteinViewerPro
             const atom = pickingProxy.atom;
             console.log("Atom clicked:", atom);
 
+
             // Access global NGL for Vector3
             const Vector3 = window.NGL.Vector3;
 
-            setSelectedAtoms(prev => {
-                const newSelection = [...prev, atom];
+            // Use ref for atomic updates without re-renders
+            selectedAtomsRef.current.push(atom);
+            const currentSelection = selectedAtomsRef.current;
 
-                // If we have 2 atoms, add measurement
-                if (newSelection.length === 2) {
-                    const atom1 = newSelection[0];
-                    const atom2 = newSelection[1];
+            // If we have 2 atoms, add measurement
+            if (currentSelection.length === 2) {
+                const atom1 = currentSelection[0];
+                const atom2 = currentSelection[1];
 
-                    try {
-                        // Calculate distance
-                        const v1 = new Vector3(atom1.x, atom1.y, atom1.z);
-                        const v2 = new Vector3(atom2.x, atom2.y, atom2.z);
-                        const distance = v1.distanceTo(v2).toFixed(2);
+                try {
+                    // Calculate distance
+                    const v1 = new Vector3(atom1.x, atom1.y, atom1.z);
+                    const v2 = new Vector3(atom2.x, atom2.y, atom2.z);
+                    const distance = v1.distanceTo(v2).toFixed(2);
 
-                        console.log(`Measured distance: ${distance} A`);
+                    console.log(`Measured distance: ${distance} A`);
 
-                        // Add distance representation
-                        const shape = new window.NGL.Shape("distance-shape");
-                        shape.addCylinder(
-                            [atom1.x, atom1.y, atom1.z],
-                            [atom2.x, atom2.y, atom2.z],
-                            [1, 0.8, 0], // Amber/Orange color
-                            0.2 // Radius
-                        );
-                        shape.addText(
-                            [(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2],
-                            [1, 1, 1], // White text
-                            1.5, // Size
-                            `${distance} A`
-                        );
+                    // Add distance representation
+                    const shape = new window.NGL.Shape("distance-shape");
+                    shape.addCylinder(
+                        [atom1.x, atom1.y, atom1.z],
+                        [atom2.x, atom2.y, atom2.z],
+                        [1, 0.8, 0], // Amber/Orange color
+                        0.2 // Radius
+                    );
+                    shape.addText(
+                        [(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2],
+                        [1, 1, 1], // White text
+                        1.5, // Size
+                        `${distance} A`
+                    );
 
-                        const shapeComp = stage.addComponentFromObject(shape);
-                        shapeComp.addRepresentation("buffer");
-                        shapeComp.autoView();
+                    const shapeComp = stage.addComponentFromObject(shape);
+                    shapeComp.addRepresentation("buffer");
+                    shapeComp.autoView();
 
-                        // Clear selection after drawing
-                        setTimeout(() => setSelectedAtoms([]), 100);
-                        return [];
+                    // Clear selection after drawing
+                    selectedAtomsRef.current = [];
+                    return;
 
-                    } catch (e) {
-                        console.error("Distance error:", e);
-                        return [];
-                    }
+                } catch (e) {
+                    console.error("Distance error:", e);
+                    selectedAtomsRef.current = [];
+                    return;
                 }
-
-                return newSelection;
-            });
+            }
         };
 
         // Attach/Detach Signal
@@ -315,7 +315,8 @@ export const ProteinViewer = React.forwardRef<ProteinViewerRef, ProteinViewerPro
             stage.signals.clicked.add(handleClick);
         } else {
             stage.signals.clicked.remove(handleClick);
-            setSelectedAtoms([]);
+            stage.signals.clicked.remove(handleClick);
+            selectedAtomsRef.current = [];
         }
 
         return () => {
@@ -343,11 +344,11 @@ export const ProteinViewer = React.forwardRef<ProteinViewerRef, ProteinViewerPro
             if (customColors && customColors.length > 0) {
                 console.log(`Applying ${customColors.length} custom color rules...`);
                 customColors.forEach((rule, index) => {
-                    if (!rule.color || !rule.selection) return;
+                    if (!rule.color || !rule.target) return;
 
                     try {
                         // NGL selection string
-                        const selection = rule.selection.trim();
+                        const selection = rule.target.trim();
                         if (!selection) return;
 
                         console.log(`Custom Rule ${index + 1}: ${rule.color} on "${selection}"`);
