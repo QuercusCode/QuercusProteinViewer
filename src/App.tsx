@@ -10,8 +10,8 @@ function App() {
     return params.get('pdb') || '1crn'; // Default to Crambin (stable)
   });
   const [file, setFile] = useState<File | null>(null);
-  const [representation, setRepresentation] = useState<RepresentationType>('licorice');
-  const [coloring, setColoring] = useState<ColoringType>('chainid');
+  const [representation, setRepresentation] = useState<RepresentationType>('cartoon');
+  const [coloring, setColoring] = useState<ColoringType>('element');
   const [resetKey, setResetKey] = useState(0);
   const [isMeasurementMode, setIsMeasurementMode] = useState(false);
 
