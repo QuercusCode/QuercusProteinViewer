@@ -126,14 +126,15 @@ export const Controls: React.FC<ControlsProps> = ({
             {/* Mobile Toggle Button */}
             <button
                 onClick={() => setIsOpen(true)}
-                className="absolute top-4 left-4 z-20 md:hidden p-2 bg-neutral-900/90 text-white rounded-lg border border-white/10 shadow-lg backdrop-blur-md"
+                className="absolute top-4 left-4 z-40 md:hidden p-2 bg-neutral-900/90 text-white rounded-lg border border-white/10 shadow-lg backdrop-blur-md transition-opacity hover:opacity-80"
+                aria-label="Open Menu"
             >
                 <Menu className="w-6 h-6" />
             </button>
 
             {/* Sidebar Container */}
             <div className={`
-                absolute top-0 left-0 z-30
+                absolute top-0 left-0 z-50
                 h-[100dvh] w-full sm:w-80 
                 bg-neutral-900/95 backdrop-blur-xl border-r border-white/10 shadow-2xl
                 transition-transform duration-300 ease-in-out
