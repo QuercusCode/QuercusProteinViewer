@@ -366,7 +366,7 @@ export const ProteinViewer = React.forwardRef<ProteinViewerRef, ProteinViewerPro
             }
 
             // Register scheme
-            NGL.ColormakerRegistry.addScheme(function (this: any, params: any) {
+            NGL.ColormakerRegistry.addScheme(function (this: any, _params: any) {
                 this.atomColor = (atom: any) => {
                     // Check custom map first
                     if (colorMap.has(atom.index)) {
