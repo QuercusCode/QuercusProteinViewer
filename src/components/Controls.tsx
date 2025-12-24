@@ -1,5 +1,5 @@
-import React, { useRef, useState } from 'react';
-import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera, Ruler } from 'lucide-react';
+import React, { useRef, useState, useEffect } from 'react';
+import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera, Ruler, Sun, Moon } from 'lucide-react';
 import type { RepresentationType, ColoringType } from './ProteinViewer';
 import type { ChainInfo, CustomColorRule } from '../types';
 
@@ -18,6 +18,10 @@ interface ControlsProps {
     onExport: () => void;
     isMeasurementMode: boolean;
     setIsMeasurementMode: (enabled: boolean) => void;
+    isLightMode: boolean;
+    setIsLightMode: (enabled: boolean) => void;
+    highlightedResidue: { chain: string; resNo: number; resName?: string } | null;
+    onResidueClick: (chain: string, resNo: number) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -34,14 +38,17 @@ export const Controls: React.FC<ControlsProps> = ({
     setCustomColors,
     onExport,
     isMeasurementMode,
-    setIsMeasurementMode
+    setIsMeasurementMode,
+    isLightMode,
+    setIsLightMode,
+    highlightedResidue,
+    onResidueClick
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [localPdbId, setLocalPdbId] = React.useState(pdbId);
 
     // Custom Color State
     const [targetType, setTargetType] = useState<'chain' | 'residue'>('chain');
-    // Initialize default to first chain name if available
     const [selectedChain, setSelectedChain] = useState(chains[0]?.name || '');
     const [viewSequenceChain, setViewSequenceChain] = useState('');
     const [residueRange, setResidueRange] = useState('');
@@ -50,27 +57,44 @@ export const Controls: React.FC<ControlsProps> = ({
     // Mobile Sidebar State
     const [isOpen, setIsOpen] = useState(false);
 
+    // Refs for scrolling
+    const sequenceContainerRef = useRef<HTMLDivElement>(null);
+    const residueRefs = useRef<Map<string, HTMLSpanElement>>(new Map());
+
     // Update local input when prop changes (external change)
-    React.useEffect(() => {
+    useEffect(() => {
         setLocalPdbId(pdbId);
     }, [pdbId]);
 
     // Update selected chain default logic
-    React.useEffect(() => {
+    useEffect(() => {
         const chainNames = chains.map(c => c.name);
-        // If we have chains, and the current selection is NOT valid
-        const isValid = chainNames.includes(selectedChain);
-
-        // If it's invalid
-        if (chains.length > 0 && !isValid) {
-            // If we are in 'residue' mode, empty string is valid (All)
-            if (targetType === 'residue' && selectedChain === '') {
-                return;
-            }
-            // Otherwise reset to first chain
+        if (chains.length > 0 && selectedChain && !chainNames.includes(selectedChain)) {
+            if (chains.length > 0) setSelectedChain(chains[0].name);
+        } else if (chains.length > 0 && !selectedChain) {
             setSelectedChain(chains[0].name);
         }
-    }, [chains, selectedChain, targetType]);
+    }, [chains, selectedChain]);
+
+    // Auto-scroll to highlighted residue
+    useEffect(() => {
+        if (highlightedResidue && residueRefs.current) {
+            // Expand the correct chain view if filters are used? 
+            // For now assuming all chains are visible or user has selected one.
+            // Actually, we should force view to 'All' or the specific chain if getting a click from 3D.
+            if (viewSequenceChain && viewSequenceChain !== highlightedResidue.chain) {
+                // If viewing a different chain, maybe switch view?
+                setViewSequenceChain(highlightedResidue.chain);
+            }
+
+            const key = `${highlightedResidue.chain}-${highlightedResidue.resNo}`;
+            const element = residueRefs.current.get(key);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    }, [highlightedResidue, viewSequenceChain]);
+
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -85,15 +109,12 @@ export const Controls: React.FC<ControlsProps> = ({
 
     const addCustomRule = (e: React.FormEvent) => {
         e.preventDefault();
-
         let target = '';
         if (targetType === 'chain') {
             if (!selectedChain) return;
-            // NGL chain selection requires a colon prefix (e.g. ":A")
             target = `:${selectedChain}`;
         } else {
             if (!residueRange.trim()) return;
-            // Combine residue range with chain if selected (e.g. "10-20:A") or just range "10-20"
             target = selectedChain
                 ? `${residueRange.trim()}:${selectedChain}`
                 : residueRange.trim();
@@ -107,114 +128,109 @@ export const Controls: React.FC<ControlsProps> = ({
         };
 
         setCustomColors([...customColors, newRule]);
-        setResidueRange(''); // Clear text input after adding
+        setResidueRange('');
     };
 
     const removeRule = (id: string) => {
         setCustomColors(customColors.filter(r => r.id !== id));
     };
 
-    // Helper to get range for selected chain
     const getSelectedChainRange = () => {
         if (!selectedChain) return null;
         const chain = chains.find(c => c.name === selectedChain);
         return chain ? `${chain.min} - ${chain.max}` : null;
     };
 
+    // Theme Classes
+    const cardBg = isLightMode ? 'bg-white/80 border-neutral-200 text-neutral-800' : 'bg-neutral-900/90 border-white/10 text-neutral-300';
+    const inputBg = isLightMode ? 'bg-white border-neutral-300 text-neutral-900 focus:ring-blue-500' : 'bg-neutral-800 border-neutral-700 text-white focus:ring-blue-500';
+    const subtleText = isLightMode ? 'text-neutral-500' : 'text-neutral-400';
+
     return (
         <>
-            {/* Mobile Toggle Button */}
             <button
                 onClick={() => setIsOpen(true)}
-                className="absolute top-4 left-4 z-40 md:hidden p-2 bg-neutral-900/90 text-white rounded-lg border border-white/10 shadow-lg backdrop-blur-md transition-opacity hover:opacity-80"
-                aria-label="Open Menu"
+                className={`absolute top-4 left-4 z-40 md:hidden p-2 rounded-lg backdrop-blur-md shadow-lg transition-opacity hover:opacity-80 border ${isLightMode ? 'bg-white/90 border-neutral-200 text-neutral-800' : 'bg-neutral-900/90 border-white/10 text-white'}`}
             >
                 <Menu className="w-6 h-6" />
             </button>
 
-            {/* Sidebar Container */}
             <div className={`
                 absolute top-0 left-0 z-50
                 h-[100dvh] w-full sm:w-80 
-                bg-neutral-900/95 backdrop-blur-xl border-r border-white/10 shadow-2xl
+                backdrop-blur-xl border-r shadow-2xl
                 transition-transform duration-300 ease-in-out
                 flex flex-col gap-4 p-4
-                overflow-y-auto scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent
+                overflow-y-auto scrollbar-thin
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-                md:translate-x-0 md:top-4 md:left-4 md:h-[calc(100vh-2rem)] md:bg-neutral-900/90 md:backdrop-blur-md md:border md:rounded-xl md:shadow-2xl md:z-10
+                md:translate-x-0 md:top-4 md:left-4 md:h-[calc(100vh-2rem)] md:rounded-xl md:shadow-2xl md:z-10
+                ${isLightMode ? 'bg-white/90 border-neutral-200 scrollbar-thumb-neutral-300' : 'bg-neutral-900/95 border-white/10 scrollbar-thumb-neutral-700'}
             `}>
-                {/* Mobile Close Button */}
                 <button
                     onClick={() => setIsOpen(false)}
-                    className="absolute top-4 right-4 p-1 text-neutral-400 hover:text-white md:hidden"
+                    className={`absolute top-4 right-4 p-1 md:hidden ${subtleText}`}
                 >
                     <X className="w-6 h-6" />
                 </button>
 
-                <div className="flex-none space-y-3 pt-8 md:pt-0">
-                    <h1 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-teal-400 bg-clip-text text-transparent mb-1">
-                        Protein Viewer
-                    </h1>
-                    <p className="text-neutral-400 text-xs">Visualize 3D structures with NGL</p>
+                <div className="flex-none flex items-center justify-between pt-8 md:pt-0">
+                    <div>
+                        <h1 className="text-xl font-bold bg-gradient-to-r from-blue-500 to-teal-500 bg-clip-text text-transparent mb-1">
+                            Protein Viewer
+                        </h1>
+                        <p className={`text-xs ${subtleText}`}>Visualize 3D structures</p>
+                    </div>
+
+                    <button
+                        onClick={() => setIsLightMode(!isLightMode)}
+                        className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-neutral-100 text-amber-500 hover:bg-neutral-200' : 'bg-neutral-800 text-blue-300 hover:bg-neutral-700'}`}
+                        title="Toggle Theme"
+                    >
+                        {isLightMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                    </button>
                 </div>
 
-                {/* Data Loading */}
+                {/* Load */}
                 <div className="space-y-3">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
-                        Load Structure
-                    </label>
-
+                    <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Load Structure</label>
                     <form onSubmit={handleSubmit} className="flex gap-2">
                         <div className="relative flex-1">
-                            <Search className="absolute left-2.5 top-2.5 w-4 h-4 text-neutral-500" />
+                            <Search className={`absolute left-2.5 top-2.5 w-4 h-4 ${subtleText}`} />
                             <input
                                 type="text"
                                 value={localPdbId}
                                 onChange={(e) => setLocalPdbId(e.target.value)}
                                 placeholder="PDB ID (e.g. 4hhb)"
-                                className="w-full bg-neutral-800 border border-neutral-700 rounded-lg pl-9 pr-3 py-2 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-neutral-600"
+                                className={`w-full rounded-lg pl-9 pr-3 py-2 border outline-none transition-all ${inputBg}`}
                             />
                         </div>
-                        <button
-                            type="submit"
-                            className="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors font-medium"
-                        >
+                        <button type="submit" className="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors font-medium">
                             Load
                         </button>
                     </form>
-
                     <div className="relative">
-                        <input
-                            type="file"
-                            accept=".pdb,.cif,.ent"
-                            className="hidden"
-                            ref={fileInputRef}
-                            onChange={handleFileChange}
-                        />
+                        <input type="file" accept=".pdb,.cif,.ent" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
                         <button
                             onClick={() => fileInputRef.current?.click()}
-                            className="w-full flex items-center justify-center gap-2 bg-neutral-800 hover:bg-neutral-750 border border-neutral-700 text-neutral-300 py-2 rounded-lg transition-all group"
+                            className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all group ${cardBg} hover:opacity-80`}
                         >
-                            <Upload className="w-4 h-4 group-hover:text-blue-400 transition-colors" />
+                            <Upload className="w-4 h-4 group-hover:text-blue-500 transition-colors" />
                             <span>Upload File</span>
                         </button>
                     </div>
                 </div>
 
-                <div className="h-px bg-neutral-800" />
+                <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
 
-                {/* Custom Coloring Section */}
+                {/* Colors */}
                 <div className="space-y-3">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
-                        Custom Colors
-                    </label>
-
-                    <form onSubmit={addCustomRule} className="space-y-2 bg-neutral-800/50 p-3 rounded-lg border border-neutral-800">
+                    <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Custom Colors</label>
+                    <form onSubmit={addCustomRule} className={`space-y-2 p-3 rounded-lg border ${cardBg}`}>
                         <div className="grid grid-cols-2 gap-2">
                             <select
                                 value={targetType}
                                 onChange={(e) => setTargetType(e.target.value as any)}
-                                className="w-full bg-neutral-800 border border-neutral-700 rounded px-2 py-1.5 text-xs text-white outline-none"
+                                className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
                             >
                                 <option value="chain">Chain</option>
                                 <option value="residue">Residues</option>
@@ -232,7 +248,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                 value={selectedChain}
                                 onChange={(e) => setSelectedChain(e.target.value)}
                                 disabled={chains.length === 0}
-                                className="w-full bg-neutral-800 border border-neutral-700 rounded px-2 py-1.5 text-xs text-white outline-none"
+                                className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
                             >
                                 {chains.length === 0 && <option>No chains loaded</option>}
                                 {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
@@ -244,7 +260,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                         value={selectedChain || ""}
                                         onChange={(e) => setSelectedChain(e.target.value)}
                                         disabled={chains.length === 0}
-                                        className="w-1/3 bg-neutral-800 border border-neutral-700 rounded px-2 py-1.5 text-xs text-white outline-none"
+                                        className={`w-1/3 border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
                                     >
                                         <option value="">All</option>
                                         {chains.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
@@ -254,96 +270,80 @@ export const Controls: React.FC<ControlsProps> = ({
                                         placeholder="e.g. 10-20"
                                         value={residueRange}
                                         onChange={(e) => setResidueRange(e.target.value)}
-                                        className="w-2/3 bg-neutral-800 border border-neutral-700 rounded px-2 py-1.5 text-xs text-white outline-none placeholder:text-neutral-600"
+                                        className={`w-2/3 border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
                                     />
                                 </div>
-                                {/* Range Helper */}
-                                {selectedChain ? (
-                                    getSelectedChainRange() && (
-                                        <div className="text-[10px] text-neutral-500 px-1">
-                                            Valid range: {getSelectedChainRange()}
-                                        </div>
-                                    )
-                                ) : (
-                                    chains.length > 0 && (
-                                        <div className="text-[10px] text-neutral-500 px-1 max-h-20 overflow-y-auto border border-neutral-800 rounded bg-neutral-900/50 p-1.5 space-y-0.5 scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent">
-                                            <div className="font-medium text-neutral-400 mb-1 sticky top-0 bg-neutral-900/95 pb-0.5 text-[9px] uppercase tracking-wider">Valid Ranges</div>
-                                            {chains.map(c => (
-                                                <div key={c.name} className="flex justify-between items-center hover:bg-white/5 rounded px-1 -mx-1 transition-colors">
-                                                    <span className="font-semibold text-blue-400 w-4">{c.name}</span>
-                                                    <span className="text-neutral-400">{c.min} - {c.max}</span>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )
+                                {selectedChain && getSelectedChainRange() && (
+                                    <div className={`text-[10px] px-1 ${subtleText}`}>Valid range: {getSelectedChainRange()}</div>
                                 )}
                             </div>
                         )}
-
-                        <button
-                            type="submit"
-                            disabled={targetType === 'chain' && !selectedChain}
-                            className="w-full flex items-center justify-center gap-1.5 bg-neutral-700 hover:bg-neutral-600 text-white text-xs py-1.5 rounded transition-colors disabled:opacity-50"
-                        >
-                            <Plus className="w-3 h-3" />
-                            Add Rule
+                        <button type="submit" disabled={targetType === 'chain' && !selectedChain} className="w-full flex items-center justify-center gap-1.5 bg-neutral-600 hover:bg-neutral-500 text-white text-xs py-1.5 rounded transition-colors disabled:opacity-50">
+                            <Plus className="w-3 h-3" /> Add Rule
                         </button>
                     </form>
 
-                    {/* Rules List */}
                     {customColors.length > 0 && (
-                        <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1 custom-scrollbar">
+                        <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
                             {customColors.map(rule => (
-                                <div key={rule.id} className="flex items-center justify-between text-xs bg-neutral-800 px-2 py-1.5 rounded border-l-2" style={{ borderLeftColor: rule.color }}>
-                                    {rule.type === 'chain'
-                                        ? `Chain ${rule.target}`
-                                        : rule.target.includes(':')
-                                            ? `Res ${rule.target.split(':')[0]} : Chain ${rule.target.split(':')[1]}`
-                                            : `Res ${rule.target} (All Chains)`
-                                    }
-                                    <button
-                                        onClick={() => removeRule(rule.id)}
-                                        className="text-neutral-500 hover:text-red-400 transition-colors"
-                                    >
-                                        <Trash2 className="w-3.5 h-3.5" />
-                                    </button>
+                                <div key={rule.id} className={`flex items-center justify-between text-xs px-2 py-1.5 rounded border-l-2 ${cardBg}`} style={{ borderLeftColor: rule.color }}>
+                                    {rule.type === 'chain' ? `Chain ${rule.target}` : `Res ${rule.target}`}
+                                    <button onClick={() => removeRule(rule.id)} className={`${subtleText} hover:text-red-500`}><Trash2 className="w-3.5 h-3.5" /></button>
                                 </div>
                             ))}
                         </div>
                     )}
                 </div>
 
-                <div className="h-px bg-neutral-800" />
+                <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
 
-                {/* Sequence View */}
-                <div className="space-y-3 flex flex-col">
+                {/* Sequence */}
+                <div className="space-y-3 flex flex-col min-h-0 flex-1 md:flex-none">
                     <div className="flex items-center justify-between">
-                        <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
-                            Sequence
-                        </label>
+                        <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Sequence</label>
                         <select
                             value={viewSequenceChain}
                             onChange={(e) => setViewSequenceChain(e.target.value)}
-                            className="bg-neutral-800 border border-neutral-700 rounded px-2 py-0.5 text-[10px] text-white outline-none"
+                            className={`border rounded px-2 py-0.5 text-[10px] outline-none ${inputBg}`}
                         >
                             <option value="">All Chains</option>
                             {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
                         </select>
                     </div>
 
-                    <div className="h-48 min-h-[10rem] bg-neutral-800/50 rounded-lg border border-neutral-800 p-3 flex flex-col resize-y overflow-hidden">
-                        <div className="flex-1 min-h-0 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent">
+                    <div className={`flex-1 min-h-[10rem] md:h-48 rounded-lg border p-3 flex flex-col resize-y overflow-hidden ${cardBg}`}>
+                        <div ref={sequenceContainerRef} className="flex-1 min-h-0 overflow-y-auto pr-1 scrollbar-thin">
                             {chains.length === 0 ? (
-                                <p className="text-neutral-500 italic text-xs">No sequence data</p>
+                                <p className={`italic text-xs ${subtleText}`}>No sequence data</p>
                             ) : (
                                 chains.filter(c => viewSequenceChain ? c.name === viewSequenceChain : true).map(c => (
                                     <div key={c.name} className="mb-4 last:mb-0">
-                                        <div className="flex items-center gap-2 mb-1 sticky top-0 bg-neutral-900/95 py-1">
-                                            <span className="text-xs font-bold text-blue-400">Chain {c.name}</span>
-                                            <span className="text-[10px] text-neutral-500">({c.sequence.length} res)</span>
+                                        <div className={`flex items-center gap-2 mb-1 sticky top-0 py-1 z-10 ${isLightMode ? 'bg-white/95' : 'bg-neutral-900/95'}`}>
+                                            <span className="text-xs font-bold text-blue-500">Chain {c.name}</span>
+                                            <span className={`text-[10px] ${subtleText}`}>({c.max - c.min + 1} residues)</span>
                                         </div>
-                                        <div className="font-mono text-[10px] break-all leading-relaxed text-neutral-300 select-text">
-                                            {c.sequence}
+                                        <div className="flex flex-wrap text-[10px] font-mono leading-none content-start">
+                                            {c.sequence.split('').map((char, idx) => {
+                                                const resNo = c.min + idx;
+                                                const isHighlighted = highlightedResidue?.chain === c.name && highlightedResidue.resNo === resNo;
+                                                return (
+                                                    <span
+                                                        key={idx}
+                                                        ref={(el) => { if (el) residueRefs.current.set(`${c.name}-${resNo}`, el); }}
+                                                        onClick={() => onResidueClick(c.name, resNo)}
+                                                        className={`
+                                                            inline-block w-[1.2em] h-[1.4em] flex items-center justify-center cursor-pointer transition-colors rounded-sm
+                                                            ${isHighlighted
+                                                                ? 'bg-blue-500 text-white font-bold scale-110 shadow-sm z-10 ring-1 ring-blue-300'
+                                                                : `hover:bg-blue-500/20 text-opacity-80 ${isLightMode ? 'text-neutral-700 hover:text-blue-700' : 'text-neutral-300 hover:text-blue-300'}`
+                                                            }
+                                                        `}
+                                                        title={`${char}${resNo}`}
+                                                    >
+                                                        {char}
+                                                    </span>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 ))
@@ -352,20 +352,16 @@ export const Controls: React.FC<ControlsProps> = ({
                     </div>
                 </div>
 
-                <div className="h-px bg-neutral-800" />
+                <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
 
-                {/* Controls */}
+                {/* Visualization */}
                 <div className="space-y-4">
-                    <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
-                        Visualization
-                    </label>
-
                     <div className="space-y-1.5">
-                        <span className="text-neutral-300 text-xs">Representation</span>
+                        <span className={`text-xs ${subtleText}`}>Representation</span>
                         <select
                             value={representation}
                             onChange={(e) => setRepresentation(e.target.value as RepresentationType)}
-                            className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                            className={`w-full border rounded-lg px-3 py-2 outline-none appearance-none ${inputBg}`}
                         >
                             <option value="cartoon">Cartoon</option>
                             <option value="ball+stick">Ball & Stick</option>
@@ -374,13 +370,12 @@ export const Controls: React.FC<ControlsProps> = ({
                             <option value="ribbon">Ribbon</option>
                         </select>
                     </div>
-
                     <div className="space-y-1.5">
-                        <span className="text-neutral-300 text-xs">Base Color</span>
+                        <span className={`text-xs ${subtleText}`}>Base Color</span>
                         <select
                             value={coloring}
                             onChange={(e) => setColoring(e.target.value as ColoringType)}
-                            className="w-full bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+                            className={`w-full border rounded-lg px-3 py-2 outline-none appearance-none ${inputBg}`}
                         >
                             <option value="chainid">Chain (Chain Index)</option>
                             <option value="element">Element</option>
@@ -390,44 +385,24 @@ export const Controls: React.FC<ControlsProps> = ({
                     </div>
 
                     <div className="flex gap-2">
-                        <button
-                            onClick={onResetView}
-                            className="flex-1 flex items-center justify-center gap-2 bg-neutral-800 hover:bg-neutral-750 border border-neutral-700 text-neutral-300 py-2 rounded-lg transition-all"
-                        >
-                            <RotateCcw className="w-4 h-4" />
-                            <span>Reset</span>
+                        <button onClick={onResetView} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}>
+                            <RotateCcw className="w-4 h-4" /> Reset
                         </button>
-                        <button
-                            onClick={onExport}
-                            className="flex-1 flex items-center justify-center gap-2 bg-neutral-800 hover:bg-blue-600/20 hover:text-blue-400 hover:border-blue-500/50 border border-neutral-700 text-neutral-300 py-2 rounded-lg transition-all"
-                            title="Export High-Res Image"
-                        >
-                            <Camera className="w-4 h-4" />
-                            <span>Export</span>
+                        <button onClick={onExport} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:text-blue-500 hover:border-blue-500/50`}>
+                            <Camera className="w-4 h-4" /> Export
                         </button>
                     </div>
 
                     <button
                         onClick={() => setIsMeasurementMode(!isMeasurementMode)}
                         className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${isMeasurementMode
-                            ? 'bg-amber-500/20 border-amber-500/50 text-amber-400 font-medium'
-                            : 'bg-neutral-800 hover:bg-neutral-750 border-neutral-700 text-neutral-300'
+                            ? 'bg-amber-500/20 border-amber-500/50 text-amber-500 font-medium'
+                            : `${cardBg} hover:opacity-80`
                             }`}
-                        title="Measure distance between 2 atoms"
                     >
                         <Ruler className="w-4 h-4" />
-                        <span>{isMeasurementMode ? 'Measurement Active' : 'Measure Distance'}</span>
+                        <span>{isMeasurementMode ? 'Active' : 'Measure Distance'}</span>
                     </button>
-
-                    {isMeasurementMode && (
-                        <div className="text-[10px] text-amber-400/80 text-center bg-amber-950/30 p-2 rounded border border-amber-500/20">
-                            Click any two atoms to measure distance
-                        </div>
-                    )}
-                </div>
-
-                <div className="mt-auto pt-4 text-[10px] text-neutral-600 flex justify-center">
-                    Powered by NGL.js
                 </div>
             </div>
         </>

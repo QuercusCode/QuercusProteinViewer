@@ -27,10 +27,13 @@ interface ProteinViewerProps {
     setError?: (error: string | null) => void;
     resetCamera?: number;
     isMeasurementMode?: boolean;
+    onAtomClick?: (info: { chain: string; resNo: number; resName: string; atomIndex: number } | null) => void;
+    backgroundColor?: string;
 }
 
 export interface ProteinViewerRef {
     captureImage: () => void;
+    highlightResidue: (chain: string, resNo: number) => void;
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
@@ -46,11 +49,14 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     error: externalError,
     setError: setExternalError,
     resetCamera,
-    isMeasurementMode = false
+    isMeasurementMode = false,
+    onAtomClick,
+    backgroundColor = "black"
 }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const stageRef = useRef<any>(null);
     const componentRef = useRef<any>(null);
+    const highlightComponentRef = useRef<any>(null); // Track highlight representation
     const isMounted = useRef(true);
 
     const [internalLoading, setInternalLoading] = React.useState(false);
@@ -80,8 +86,47 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     URL.revokeObjectURL(url);
                 });
             }
+        },
+        highlightResidue: (chain: string, resNo: number) => {
+            if (!componentRef.current || !stageRef.current) return;
+            const component = componentRef.current;
+
+            try {
+                // Remove previous highlight
+                if (highlightComponentRef.current) {
+                    component.removeRepresentation(highlightComponentRef.current);
+                    highlightComponentRef.current = null;
+                }
+
+                if (!chain || resNo === undefined) return;
+
+                // Add new highlight
+                const selection = `:${chain} and ${resNo}`;
+                console.log(`Highlighting selection: ${selection}`);
+
+                // Ball+Stick representation for the selected residue
+                highlightComponentRef.current = component.addRepresentation('ball+stick', {
+                    sele: selection,
+                    color: 'element',
+                    radius: 0.3
+                });
+
+                // Zoom to residue
+                const duration = 1000;
+                component.autoView(selection, duration);
+
+            } catch (e) {
+                console.warn("Highlight residue failed:", e);
+            }
         }
     }));
+
+    // Handle Background Color Change
+    useEffect(() => {
+        if (stageRef.current) {
+            stageRef.current.setParameters({ backgroundColor });
+        }
+    }, [backgroundColor]);
 
     useEffect(() => {
         isMounted.current = true;
@@ -93,7 +138,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
         try {
             const stage = new window.NGL.Stage(containerRef.current, {
-                backgroundColor: "black",
+                backgroundColor: backgroundColor,
                 tooltip: true,
             });
             stageRef.current = stage;
@@ -241,41 +286,57 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     const selectedAtomsRef = useRef<any[]>([]);
 
+    // Interaction Handlers (Click)
     useEffect(() => {
         if (!stageRef.current) return;
         const stage = stageRef.current;
+
         const handleClick = (pickingProxy: any) => {
-            if (!isMeasurementMode || !pickingProxy || !pickingProxy.atom) return;
+            if (!pickingProxy || !pickingProxy.atom) {
+                if (onAtomClick) onAtomClick(null);
+                return;
+            }
             const atom = pickingProxy.atom;
-            console.log("Atom clicked:", atom);
-            const Vector3 = window.NGL.Vector3;
-            selectedAtomsRef.current.push(atom);
-            const currentSelection = selectedAtomsRef.current;
-            if (currentSelection.length === 2) {
-                const atom1 = currentSelection[0];
-                const atom2 = currentSelection[1];
-                try {
-                    const v1 = new Vector3(atom1.x, atom1.y, atom1.z);
-                    const v2 = new Vector3(atom2.x, atom2.y, atom2.z);
-                    const distance = v1.distanceTo(v2).toFixed(2);
-                    console.log(`Measured distance: ${distance} A`);
-                    const shape = new window.NGL.Shape("distance-shape");
-                    shape.addCylinder([atom1.x, atom1.y, atom1.z], [atom2.x, atom2.y, atom2.z], [1, 0.8, 0], 0.2);
-                    shape.addText([(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2], [1, 1, 1], 1.5, `${distance} A`);
-                    const shapeComp = stage.addComponentFromObject(shape);
-                    shapeComp.addRepresentation("buffer");
-                    shapeComp.autoView();
-                    selectedAtomsRef.current = [];
-                } catch (e) { selectedAtomsRef.current = []; }
+
+            // Emit Detailed Click Event
+            if (onAtomClick) {
+                onAtomClick({
+                    chain: atom.chainname,
+                    resNo: atom.resno,
+                    resName: atom.resname,
+                    atomIndex: atom.index
+                });
+            }
+
+            // Measurement Mode Logic
+            if (isMeasurementMode) {
+                console.log("Atom clicked (Measure):", atom);
+                const Vector3 = window.NGL.Vector3;
+                selectedAtomsRef.current.push(atom);
+                const currentSelection = selectedAtomsRef.current;
+                if (currentSelection.length === 2) {
+                    const atom1 = currentSelection[0];
+                    const atom2 = currentSelection[1];
+                    try {
+                        const v1 = new Vector3(atom1.x, atom1.y, atom1.z);
+                        const v2 = new Vector3(atom2.x, atom2.y, atom2.z);
+                        const distance = v1.distanceTo(v2).toFixed(2);
+                        console.log(`Measured distance: ${distance} A`);
+                        const shape = new window.NGL.Shape("distance-shape");
+                        shape.addCylinder([atom1.x, atom1.y, atom1.z], [atom2.x, atom2.y, atom2.z], [1, 0.8, 0], 0.2);
+                        shape.addText([(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2], [1, 1, 1], 1.5, `${distance} A`);
+                        const shapeComp = stage.addComponentFromObject(shape);
+                        shapeComp.addRepresentation("buffer");
+                        shapeComp.autoView();
+                        selectedAtomsRef.current = [];
+                    } catch (e) { selectedAtomsRef.current = []; }
+                }
             }
         };
-        if (isMeasurementMode) stage.signals.clicked.add(handleClick);
-        else {
-            stage.signals.clicked.remove(handleClick);
-            selectedAtomsRef.current = [];
-        }
+
+        stage.signals.clicked.add(handleClick);
         return () => { stage.signals.clicked.remove(handleClick); };
-    }, [isMeasurementMode]);
+    }, [isMeasurementMode, onAtomClick]);
 
 
     const updateRepresentation = (specificComponent?: any) => {
@@ -286,6 +347,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
         try {
             component.removeAllRepresentations();
+            highlightComponentRef.current = null; // Reset highlight tracker
 
             // Custom Colors Map
             const schemeId = `custom-scheme-${Date.now()}`;
