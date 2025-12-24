@@ -156,26 +156,49 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                 if (component && isMounted.current) {
                     console.log("Component loaded. Type:", component.type);
-                    if (component.structure) {
-                        console.log("Atom Count:", component.structure.atomCount);
-                        console.log("Model Count:", component.structure.modelStore.count);
-                    }
                     componentRef.current = component;
 
                     if (component.structure && onStructureLoaded) {
                         try {
                             const chains: ChainInfo[] = [];
                             const seenChains = new Set<string>();
+
                             component.structure.eachChain((c: any) => {
                                 if (seenChains.has(c.chainname)) return;
                                 seenChains.add(c.chainname);
+
                                 let seq = "";
+                                let minSeq = Infinity;
+                                let maxSeq = -Infinity;
+
                                 try {
                                     c.eachResidue((r: any) => {
-                                        seq += r.getResname1 ? r.getResname1() : (r.resname ? r.resname[0] : 'X');
+                                        // Robust Residue Access
+                                        let resNo = r.resno;
+                                        if (resNo === undefined && typeof r.getResno === 'function') {
+                                            resNo = r.getResno();
+                                        }
+
+                                        if (typeof resNo === 'number') {
+                                            if (resNo < minSeq) minSeq = resNo;
+                                            if (resNo > maxSeq) maxSeq = resNo;
+                                        }
+
+                                        // Sequence Extraction
+                                        let resName = 'X';
+                                        if (r.getResname1) resName = r.getResname1();
+                                        else if (r.resname) resName = r.resname[0];
+                                        seq += resName;
                                     });
-                                } catch (e) { }
-                                chains.push({ name: c.chainname, min: 0, max: 0, sequence: seq });
+                                } catch (eRes) {
+                                    console.warn(`Residue iteration failed for chain ${c.chainname}`, eRes);
+                                }
+
+                                if (minSeq === Infinity) minSeq = 0;
+                                if (maxSeq === -Infinity) maxSeq = 0;
+
+                                console.log(`Chain ${c.chainname}: Range ${minSeq}-${maxSeq}, SeqLen: ${seq.length}`);
+                                chains.push({ name: c.chainname, min: minSeq, max: maxSeq, sequence: seq });
                             });
                             onStructureLoaded({ chains });
                         } catch (e) { console.warn("Chain parsing error", e); }
@@ -218,7 +241,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     const selectedAtomsRef = useRef<any[]>([]);
 
-    // Distance Measurement Logic
     useEffect(() => {
         if (!stageRef.current) return;
         const stage = stageRef.current;
@@ -265,7 +287,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         try {
             component.removeAllRepresentations();
 
-            // Custom Colors
+            // Custom Colors Map
             const schemeId = `custom-scheme-${Date.now()}`;
             const colorMap = new Map<number, number>();
             if (customColors?.length > 0) {
@@ -297,13 +319,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             if (customColors.length === 0) {
                 let effectiveColoring = coloring;
                 if (coloring === 'chainid') {
-                    // 1crn Fix: detected by ID.
                     if (pdbId && pdbId.toLowerCase().includes('1crn')) {
-                        console.log("1crn special override: forcing 'licorice' + 'element'.");
                         effectiveColoring = 'element';
                         repType = 'licorice';
                     } else {
-                        // Generic fallbacks
                         try {
                             if (component.structure.chainStore.count <= 1) {
                                 effectiveColoring = 'chainname';
@@ -324,10 +343,30 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     const registeredSchemeId = NGL.ColormakerRegistry.addScheme(function (this: any) {
                         this.atomColor = (atom: any) => {
                             if (colorMap.has(atom.index)) return colorMap.get(atom.index);
+
+                            // Fallbacks for Base Color
+                            if (coloring === 'element') {
+                                const elem = atom.element;
+                                if (elem === 'C') return 0x909090; // Carbon
+                                if (elem === 'O') return 0xFF0D0D; // Oxygen
+                                if (elem === 'N') return 0x3050F8; // Nitrogen
+                                if (elem === 'S') return 0xFFFF30; // Sulfur
+                                if (elem === 'P') return 0xFFA500; // Phosphorus
+                                if (elem === 'H') return 0xFFFFFF; // Hydrogen
+                                return 0xCCCCCC;
+                            }
+
                             if (coloring === 'chainid') {
-                                const colors = [0x1f77b4, 0xff7f0e, 0x2ca02c, 0xd62728, 0x9467bd];
+                                // Enhanced Palette matching NGL default visually
+                                const colors = [
+                                    0x1f77b4, 0xff7f0e, 0x2ca02c, 0xd62728, 0x9467bd,
+                                    0x8c564b, 0xe377c2, 0x7f7f7f, 0xbcbd22, 0x17becf,
+                                    0xFA8072, 0x00FF7F, 0xFFD700, 0x4B0082, 0xFF1493,
+                                    0x008080, 0xCD5C5C, 0x000080, 0xDAA520, 0x32CD32
+                                ];
                                 return colors[(atom.chainIndex || 0) % colors.length];
                             }
+
                             return 0xCCCCCC;
                         };
                     }, schemeId);
