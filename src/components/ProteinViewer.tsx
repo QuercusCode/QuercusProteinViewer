@@ -29,11 +29,14 @@ interface ProteinViewerProps {
     isMeasurementMode?: boolean;
     onAtomClick?: (info: { chain: string; resNo: number; resName: string; atomIndex: number } | null) => void;
     backgroundColor?: string;
+    showSurface?: boolean;
+    showLigands?: boolean;
 }
 
 export interface ProteinViewerRef {
     captureImage: () => void;
     highlightResidue: (chain: string, resNo: number) => void;
+    focusLigands: () => void;
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
@@ -51,12 +54,14 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     resetCamera,
     isMeasurementMode = false,
     onAtomClick,
-    backgroundColor = "black"
+    backgroundColor = "black",
+    showSurface = false,
+    showLigands = false
 }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const stageRef = useRef<any>(null);
     const componentRef = useRef<any>(null);
-    const highlightComponentRef = useRef<any>(null); // Track highlight representation
+    const highlightComponentRef = useRef<any>(null);
     const isMounted = useRef(true);
 
     const [internalLoading, setInternalLoading] = React.useState(false);
@@ -92,7 +97,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             const component = componentRef.current;
 
             try {
-                // Remove previous highlight
                 if (highlightComponentRef.current) {
                     component.removeRepresentation(highlightComponentRef.current);
                     highlightComponentRef.current = null;
@@ -100,28 +104,42 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                 if (!chain || resNo === undefined) return;
 
-                // Add new highlight
                 const selection = `:${chain} and ${resNo}`;
                 console.log(`Highlighting selection: ${selection}`);
 
-                // Ball+Stick representation for the selected residue
                 highlightComponentRef.current = component.addRepresentation('ball+stick', {
                     sele: selection,
                     color: 'element',
                     radius: 0.3
                 });
 
-                // Zoom to residue
                 const duration = 1000;
                 component.autoView(selection, duration);
 
             } catch (e) {
                 console.warn("Highlight residue failed:", e);
             }
+        },
+        focusLigands: () => {
+            if (!componentRef.current || !stageRef.current) return;
+            const component = componentRef.current;
+            try {
+                // "ligand" selector usually works for hetatms not water
+                const selection = "ligand and not (water or ion)";
+                // Check if any atom matches
+                let count = 0;
+                component.structure.eachAtom(() => { count++; }, new window.NGL.Selection(selection));
+
+                if (count > 0) {
+                    console.log(`Focusing on ${count} ligand atoms`);
+                    component.autoView(selection, 1000);
+                } else {
+                    console.log("No ligands found to focus on.");
+                }
+            } catch (e) { console.warn("Focus ligands failed", e); }
         }
     }));
 
-    // Handle Background Color Change
     useEffect(() => {
         if (stageRef.current) {
             stageRef.current.setParameters({ backgroundColor });
@@ -218,7 +236,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                                 try {
                                     c.eachResidue((r: any) => {
-                                        // Robust Residue Access
                                         let resNo = r.resno;
                                         if (resNo === undefined && typeof r.getResno === 'function') {
                                             resNo = r.getResno();
@@ -229,7 +246,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                             if (resNo > maxSeq) maxSeq = resNo;
                                         }
 
-                                        // Sequence Extraction
                                         let resName = 'X';
                                         if (r.getResname1) resName = r.getResname1();
                                         else if (r.resname) resName = r.resname[0];
@@ -286,7 +302,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     const selectedAtomsRef = useRef<any[]>([]);
 
-    // Interaction Handlers (Click)
     useEffect(() => {
         if (!stageRef.current) return;
         const stage = stageRef.current;
@@ -298,7 +313,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             }
             const atom = pickingProxy.atom;
 
-            // Emit Detailed Click Event
             if (onAtomClick) {
                 onAtomClick({
                     chain: atom.chainname,
@@ -308,7 +322,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 });
             }
 
-            // Measurement Mode Logic
             if (isMeasurementMode) {
                 console.log("Atom clicked (Measure):", atom);
                 const Vector3 = window.NGL.Vector3;
@@ -347,9 +360,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
         try {
             component.removeAllRepresentations();
-            highlightComponentRef.current = null; // Reset highlight tracker
+            highlightComponentRef.current = null;
 
-            // Custom Colors Map
             const schemeId = `custom-scheme-${Date.now()}`;
             const colorMap = new Map<number, number>();
             if (customColors?.length > 0) {
@@ -367,10 +379,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             let repType = representation || 'cartoon';
 
-            const tryApply = (r: string, c: string) => {
+            const tryApply = (r: string, c: string, params: any = {}) => {
                 try {
                     console.log(`Attempting rep: ${r}, color: ${c}`);
-                    component.addRepresentation(r, { color: c });
+                    component.addRepresentation(r, { color: c, ...params });
                     return true;
                 } catch (e) {
                     console.warn(`Failed: ${r} + ${c}`, e);
@@ -378,6 +390,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 }
             };
 
+            // Main Representation
             if (customColors.length === 0) {
                 let effectiveColoring = coloring;
                 if (coloring === 'chainid') {
@@ -406,20 +419,18 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         this.atomColor = (atom: any) => {
                             if (colorMap.has(atom.index)) return colorMap.get(atom.index);
 
-                            // Fallbacks for Base Color
                             if (coloring === 'element') {
                                 const elem = atom.element;
-                                if (elem === 'C') return 0x909090; // Carbon
-                                if (elem === 'O') return 0xFF0D0D; // Oxygen
-                                if (elem === 'N') return 0x3050F8; // Nitrogen
-                                if (elem === 'S') return 0xFFFF30; // Sulfur
-                                if (elem === 'P') return 0xFFA500; // Phosphorus
-                                if (elem === 'H') return 0xFFFFFF; // Hydrogen
+                                if (elem === 'C') return 0x909090;
+                                if (elem === 'O') return 0xFF0D0D;
+                                if (elem === 'N') return 0x3050F8;
+                                if (elem === 'S') return 0xFFFF30;
+                                if (elem === 'P') return 0xFFA500;
+                                if (elem === 'H') return 0xFFFFFF;
                                 return 0xCCCCCC;
                             }
 
                             if (coloring === 'chainid') {
-                                // Enhanced Palette matching NGL default visually
                                 const colors = [
                                     0x1f77b4, 0xff7f0e, 0x2ca02c, 0xd62728, 0x9467bd,
                                     0x8c564b, 0xe377c2, 0x7f7f7f, 0xbcbd22, 0x17becf,
@@ -438,6 +449,22 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 }
             }
 
+            // --- Visualization Overlays ---
+
+            // Surface Overlay
+            if (showSurface) {
+                console.log("Adding Surface Overlay...");
+                tryApply('surface', 'white', { opacity: 0.4, depthWrite: false, side: 'front' });
+            }
+
+            // Ligand Highlight
+            if (showLigands) {
+                console.log("Adding Ligand Highlight...");
+                // "ligand" keyword in NGL (non-polymer)
+                // Filter out Water/Ions if wanted: ligand and not (water or ion)
+                tryApply('ball+stick', 'element', { sele: 'ligand and not (water or ion)', scale: 2.0 });
+            }
+
             if (stageRef.current?.viewer) {
                 stageRef.current.viewer.requestRender();
             }
@@ -449,7 +476,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     useEffect(() => {
         updateRepresentation();
-    }, [representation, coloring, customColors]);
+    }, [representation, coloring, customColors, showSurface, showLigands]);
 
     useEffect(() => {
         if (stageRef.current && resetCamera) {

@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera, Ruler, Sun, Moon } from 'lucide-react';
+import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera, Ruler, Sun, Moon, Layers, Hexagon, Crosshair } from 'lucide-react';
 import type { RepresentationType, ColoringType } from './ProteinViewer';
 import type { ChainInfo, CustomColorRule } from '../types';
 
@@ -22,6 +22,11 @@ interface ControlsProps {
     setIsLightMode: (enabled: boolean) => void;
     highlightedResidue: { chain: string; resNo: number; resName?: string } | null;
     onResidueClick: (chain: string, resNo: number) => void;
+    showSurface: boolean;
+    setShowSurface: (show: boolean) => void;
+    showLigands: boolean;
+    setShowLigands: (show: boolean) => void;
+    onFocusLigands: () => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -42,7 +47,12 @@ export const Controls: React.FC<ControlsProps> = ({
     isLightMode,
     setIsLightMode,
     highlightedResidue,
-    onResidueClick
+    onResidueClick,
+    showSurface,
+    setShowSurface,
+    showLigands,
+    setShowLigands,
+    onFocusLigands
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [localPdbId, setLocalPdbId] = React.useState(pdbId);
@@ -79,11 +89,7 @@ export const Controls: React.FC<ControlsProps> = ({
     // Auto-scroll to highlighted residue
     useEffect(() => {
         if (highlightedResidue && residueRefs.current) {
-            // Expand the correct chain view if filters are used? 
-            // For now assuming all chains are visible or user has selected one.
-            // Actually, we should force view to 'All' or the specific chain if getting a click from 3D.
             if (viewSequenceChain && viewSequenceChain !== highlightedResidue.chain) {
-                // If viewing a different chain, maybe switch view?
                 setViewSequenceChain(highlightedResidue.chain);
             }
 
@@ -222,6 +228,73 @@ export const Controls: React.FC<ControlsProps> = ({
 
                 <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
 
+                {/* Visualization */}
+                <div className="space-y-3">
+                    <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Visualization</label>
+
+                    <div className="space-y-2">
+                        <button
+                            onClick={() => setShowSurface(!showSurface)}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${showSurface ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
+                        >
+                            <div className="flex items-center gap-2">
+                                <Layers className="w-4 h-4" />
+                                <span className="text-xs font-medium">Show Surface</span>
+                            </div>
+                            <div className={`w-3 h-3 rounded-full ${showSurface ? 'bg-blue-500' : 'bg-neutral-500'}`} />
+                        </button>
+
+                        <button
+                            onClick={() => setShowLigands(!showLigands)}
+                            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${showLigands ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
+                        >
+                            <div className="flex items-center gap-2">
+                                <Hexagon className="w-4 h-4" />
+                                <span className="text-xs font-medium">Show Ligands</span>
+                            </div>
+                            <div className={`w-3 h-3 rounded-full ${showLigands ? 'bg-blue-500' : 'bg-neutral-500'}`} />
+                        </button>
+
+                        {showLigands && (
+                            <button
+                                onClick={onFocusLigands}
+                                className="w-full flex items-center justify-center gap-1.5 bg-neutral-600 hover:bg-neutral-500 text-white text-xs py-1.5 rounded transition-colors animate-in fade-in slide-in-from-top-2"
+                            >
+                                <Crosshair className="w-3 h-3" /> Focus Ligands
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="space-y-1.5 pt-2">
+                        <span className={`text-xs ${subtleText}`}>Style</span>
+                        <div className="grid grid-cols-2 gap-2">
+                            <select
+                                value={representation}
+                                onChange={(e) => setRepresentation(e.target.value as RepresentationType)}
+                                className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
+                            >
+                                <option value="cartoon">Cartoon</option>
+                                <option value="ball+stick">Ball & Stick</option>
+                                <option value="spacefill">Spacefill</option>
+                                <option value="surface">Surface</option>
+                                <option value="ribbon">Ribbon</option>
+                            </select>
+                            <select
+                                value={coloring}
+                                onChange={(e) => setColoring(e.target.value as ColoringType)}
+                                className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
+                            >
+                                <option value="chainid">Chain</option>
+                                <option value="element">Element</option>
+                                <option value="resname">Residue</option>
+                                <option value="structure">Structure</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
+
                 {/* Colors */}
                 <div className="space-y-3">
                     <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Custom Colors</label>
@@ -354,36 +427,8 @@ export const Controls: React.FC<ControlsProps> = ({
 
                 <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
 
-                {/* Visualization */}
+                {/* Footer Tools */}
                 <div className="space-y-4">
-                    <div className="space-y-1.5">
-                        <span className={`text-xs ${subtleText}`}>Representation</span>
-                        <select
-                            value={representation}
-                            onChange={(e) => setRepresentation(e.target.value as RepresentationType)}
-                            className={`w-full border rounded-lg px-3 py-2 outline-none appearance-none ${inputBg}`}
-                        >
-                            <option value="cartoon">Cartoon</option>
-                            <option value="ball+stick">Ball & Stick</option>
-                            <option value="spacefill">Spacefill</option>
-                            <option value="surface">Surface</option>
-                            <option value="ribbon">Ribbon</option>
-                        </select>
-                    </div>
-                    <div className="space-y-1.5">
-                        <span className={`text-xs ${subtleText}`}>Base Color</span>
-                        <select
-                            value={coloring}
-                            onChange={(e) => setColoring(e.target.value as ColoringType)}
-                            className={`w-full border rounded-lg px-3 py-2 outline-none appearance-none ${inputBg}`}
-                        >
-                            <option value="chainid">Chain (Chain Index)</option>
-                            <option value="element">Element</option>
-                            <option value="resname">Residue Type</option>
-                            <option value="structure">Secondary Structure</option>
-                        </select>
-                    </div>
-
                     <div className="flex gap-2">
                         <button onClick={onResetView} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}>
                             <RotateCcw className="w-4 h-4" /> Reset

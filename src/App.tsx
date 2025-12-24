@@ -16,7 +16,10 @@ function App() {
   const [isMeasurementMode, setIsMeasurementMode] = useState(false);
   const [isLightMode, setIsLightMode] = useState(false);
 
-  // Interaction State
+  // Visualization Toggles
+  const [showSurface, setShowSurface] = useState(false);
+  const [showLigands, setShowLigands] = useState(false);
+
   const [highlightedResidue, setHighlightedResidue] = useState<{ chain: string; resNo: number; resName?: string } | null>(null);
 
   const [chains, setChains] = useState<ChainInfo[]>([]);
@@ -48,6 +51,10 @@ function App() {
     viewerRef.current?.captureImage();
   };
 
+  const handleFocusLigands = () => {
+    viewerRef.current?.focusLigands();
+  };
+
   const handleStructureLoaded = (info: StructureInfo) => {
     setChains(info.chains);
   };
@@ -56,7 +63,6 @@ function App() {
     if (info) {
       console.log("App: Atom Clicked", info);
       setHighlightedResidue({ chain: info.chain, resNo: info.resNo, resName: info.resName });
-      // Also modify representation via Viewer Ref
       viewerRef.current?.highlightResidue(info.chain, info.resNo);
     } else {
       setHighlightedResidue(null);
@@ -90,6 +96,11 @@ function App() {
         setIsLightMode={setIsLightMode}
         highlightedResidue={highlightedResidue}
         onResidueClick={handleSequenceResidueClick}
+        showSurface={showSurface}
+        setShowSurface={setShowSurface}
+        showLigands={showLigands}
+        setShowLigands={setShowLigands}
+        onFocusLigands={handleFocusLigands}
       />
 
       <ProteinViewer
@@ -104,6 +115,8 @@ function App() {
         isMeasurementMode={isMeasurementMode}
         onAtomClick={handleAtomClick}
         backgroundColor={isLightMode ? "white" : "black"}
+        showSurface={showSurface}
+        showLigands={showLigands}
         className="w-full h-full"
       />
 
