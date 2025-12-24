@@ -7,11 +7,11 @@ import type { ChainInfo, CustomColorRule, StructureInfo } from './types';
 function App() {
   const [pdbId, setPdbId] = useState(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('pdb') || '1crn'; // Default to Crambin (stable)
+    return params.get('pdb') || '2b3p'; // Default to 2b3p (more stable)
   });
   const [file, setFile] = useState<File | null>(null);
   const [representation, setRepresentation] = useState<RepresentationType>('cartoon');
-  const [coloring, setColoring] = useState<ColoringType>('element');
+  const [coloring, setColoring] = useState<ColoringType>('chainid');
   const [resetKey, setResetKey] = useState(0);
   const [isMeasurementMode, setIsMeasurementMode] = useState(false);
 
