@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
-import { Stage } from 'ngl';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 import type { CustomColorRule, ChainInfo } from '../types';
@@ -9,6 +8,9 @@ declare global {
         NGL: any;
     }
 }
+
+export type RepresentationType = 'cartoon' | 'licorice' | 'backbone' | 'spacefill' | 'surface' | 'ribbon';
+export type ColoringType = 'chainid' | 'element' | 'residue' | 'secondary' | 'hydrophobicity' | 'structure';
 
 interface ProteinViewerProps {
     pdbId?: string;
@@ -27,11 +29,11 @@ interface ProteinViewerProps {
     isMeasurementMode?: boolean;
 }
 
-export interface ProteinViewerHandle {
+export interface ProteinViewerRef {
     captureImage: () => void;
 }
 
-export const ProteinViewer = forwardRef<ProteinViewerHandle, ProteinViewerProps>(({
+export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     pdbId,
     file,
     representation = 'cartoon',
@@ -39,7 +41,6 @@ export const ProteinViewer = forwardRef<ProteinViewerHandle, ProteinViewerProps>
     customColors = [],
     className,
     onStructureLoaded,
-    onError,
     loading: externalLoading,
     setLoading: setExternalLoading,
     error: externalError,

@@ -68,7 +68,7 @@ function App() {
       <ProteinViewer
         ref={viewerRef}
         pdbId={pdbId}
-        file={file}
+        file={file || undefined}
         representation={representation}
         coloring={coloring}
         customColors={customColors}
