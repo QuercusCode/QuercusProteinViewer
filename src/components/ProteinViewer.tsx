@@ -308,20 +308,13 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
         const handleClick = (pickingProxy: any) => {
             if (!pickingProxy || !pickingProxy.atom) {
-                if (onAtomClick) onAtomClick(null);
+                // Only clear highlight if we are NOT in measurement mode and clicked background
+                if (!isMeasurementMode && onAtomClick) onAtomClick(null);
                 return;
             }
             const atom = pickingProxy.atom;
 
-            if (onAtomClick) {
-                onAtomClick({
-                    chain: atom.chainname,
-                    resNo: atom.resno,
-                    resName: atom.resname,
-                    atomIndex: atom.index
-                });
-            }
-
+            // Measurement Mode Logic takes precedence
             if (isMeasurementMode) {
                 console.log("Atom clicked (Measure):", atom);
                 const Vector3 = window.NGL.Vector3;
@@ -344,6 +337,18 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         selectedAtomsRef.current = [];
                     } catch (e) { selectedAtomsRef.current = []; }
                 }
+                // Do NOT trigger onAtomClick
+                return;
+            }
+
+            // Standard Interaction (Bi-directional Sync)
+            if (onAtomClick) {
+                onAtomClick({
+                    chain: atom.chainname,
+                    resNo: atom.resno,
+                    resName: atom.resname,
+                    atomIndex: atom.index
+                });
             }
         };
 
