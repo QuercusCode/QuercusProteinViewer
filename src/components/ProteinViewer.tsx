@@ -74,8 +74,52 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     useImperativeHandle(ref, () => ({
         captureImage: () => {
+            const fixPngBlob = async (blob: Blob): Promise<Blob> => {
+                try {
+                    const arrayBuffer = await blob.arrayBuffer();
+                    const uint8Array = new Uint8Array(arrayBuffer);
+
+                    // Standard PNG Signature
+                    const pngSignature = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+
+                    // Check if signature is missing
+                    let isMissingSignature = false;
+                    for (let i = 0; i < pngSignature.length; i++) {
+                        if (uint8Array[i] !== pngSignature[i]) {
+                            isMissingSignature = true;
+                            break;
+                        }
+                    }
+
+                    if (isMissingSignature) {
+                        console.warn("Detected missing PNG signature. Repairing file...");
+                        const newBuffer = new Uint8Array(pngSignature.length + uint8Array.length);
+                        newBuffer.set(pngSignature, 0);
+                        newBuffer.set(uint8Array, pngSignature.length);
+                        return new Blob([newBuffer], { type: 'image/png' });
+                    }
+
+                    return blob;
+                } catch (e) {
+                    console.error("Error checking PNG signature:", e);
+                    return blob;
+                }
+            };
+
+            const downloadBlob = async (blob: Blob, suffix: string = '') => {
+                const fixedBlob = await fixPngBlob(blob);
+                const url = URL.createObjectURL(fixedBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `snapshot-${pdbId || 'structure'}${suffix}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            };
+
             if (stageRef.current) {
-                // High Quality Export (3x resolution - safer than 4x)
+                // High Quality Export (3x resolution)
                 stageRef.current.makeImage({
                     factor: 3,
                     type: 'png',
@@ -83,14 +127,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     trim: false,
                     transparent: false
                 }).then((blob: Blob) => {
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = `snapshot-${pdbId || 'structure'}.png`;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(url);
+                    downloadBlob(blob);
                 }).catch((err: any) => {
                     console.warn("High-res export failed, trying low-res fallback...", err);
                     // Fallback to standard resolution
@@ -101,14 +138,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         trim: false,
                         transparent: false
                     }).then((blob: Blob) => {
-                        const url = URL.createObjectURL(blob);
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.download = `snapshot-${pdbId || 'structure'}-lowres.png`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        URL.revokeObjectURL(url);
+                        downloadBlob(blob, '-lowres');
                     }).catch((err2: any) => {
                         console.error("Export definitely failed:", err2);
                         setError("Failed to export image.");
