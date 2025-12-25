@@ -37,6 +37,7 @@ export interface ProteinViewerRef {
     captureImage: () => void;
     highlightResidue: (chain: string, resNo: number) => void;
     focusLigands: () => void;
+    clearHighlight: () => void;
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
@@ -191,6 +192,18 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     console.log("No ligands found to focus on.");
                 }
             } catch (e) { console.warn("Focus ligands failed", e); }
+        },
+        clearHighlight: () => {
+            if (!componentRef.current) return;
+            const component = componentRef.current;
+            try {
+                if (highlightComponentRef.current) {
+                    component.removeRepresentation(highlightComponentRef.current);
+                    highlightComponentRef.current = null;
+                }
+            } catch (e) {
+                console.warn("Clear highlight failed:", e);
+            }
         }
     }));
 

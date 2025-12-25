@@ -61,11 +61,23 @@ function App() {
 
   const handleAtomClick = (info: { chain: string; resNo: number; resName: string; atomIndex: number } | null) => {
     if (info) {
-      console.log("App: Atom Clicked", info);
-      setHighlightedResidue({ chain: info.chain, resNo: info.resNo, resName: info.resName });
-      viewerRef.current?.highlightResidue(info.chain, info.resNo);
+      if (highlightedResidue &&
+        highlightedResidue.chain === info.chain &&
+        highlightedResidue.resNo === info.resNo) {
+        // Toggle off (Deselect)
+        console.log("App: Deselecting residue", info);
+        setHighlightedResidue(null);
+        viewerRef.current?.clearHighlight();
+      } else {
+        // Select new
+        console.log("App: Atom Clicked", info);
+        setHighlightedResidue({ chain: info.chain, resNo: info.resNo, resName: info.resName });
+        viewerRef.current?.highlightResidue(info.chain, info.resNo);
+      }
     } else {
+      // Background click
       setHighlightedResidue(null);
+      viewerRef.current?.clearHighlight();
     }
   };
 
