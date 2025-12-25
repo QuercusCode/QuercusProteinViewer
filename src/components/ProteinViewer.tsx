@@ -75,10 +75,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     useImperativeHandle(ref, () => ({
         captureImage: () => {
             if (stageRef.current) {
-                // High Quality Export (4x resolution)
+                // High Quality Export (3x resolution - safer than 4x)
                 stageRef.current.makeImage({
-                    factor: 4,
-                    type: 'image/png',
+                    factor: 3,
+                    type: 'png',
                     antialias: true,
                     trim: false,
                     transparent: false
@@ -92,8 +92,27 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     document.body.removeChild(link);
                     URL.revokeObjectURL(url);
                 }).catch((err: any) => {
-                    console.error("Export failed:", err);
-                    setError("Failed to export image. See console for details.");
+                    console.warn("High-res export failed, trying low-res fallback...", err);
+                    // Fallback to standard resolution
+                    stageRef.current.makeImage({
+                        factor: 1,
+                        type: 'png',
+                        antialias: true,
+                        trim: false,
+                        transparent: false
+                    }).then((blob: Blob) => {
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `snapshot-${pdbId || 'structure'}-lowres.png`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                    }).catch((err2: any) => {
+                        console.error("Export definitely failed:", err2);
+                        setError("Failed to export image.");
+                    });
                 });
             }
         },
