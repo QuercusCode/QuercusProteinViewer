@@ -78,6 +78,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 // High Quality Export (4x resolution)
                 stageRef.current.makeImage({
                     factor: 4,
+                    type: 'image/png',
                     antialias: true,
                     trim: false,
                     transparent: false
