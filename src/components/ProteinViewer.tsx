@@ -75,8 +75,9 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     useImperativeHandle(ref, () => ({
         captureImage: () => {
             if (stageRef.current) {
+                // High Quality Export (4x resolution)
                 stageRef.current.makeImage({
-                    factor: 1,
+                    factor: 4,
                     antialias: true,
                     trim: false,
                     transparent: false
@@ -89,6 +90,9 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     link.click();
                     document.body.removeChild(link);
                     URL.revokeObjectURL(url);
+                }).catch((err: any) => {
+                    console.error("Export failed:", err);
+                    setError("Failed to export image. See console for details.");
                 });
             }
         },
