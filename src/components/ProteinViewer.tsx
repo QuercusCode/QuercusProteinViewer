@@ -361,97 +361,84 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         if (!isMounted.current) return;
         const component = specificComponent || componentRef.current;
         if (!component || !component.structure) return;
-        const NGL = window.NGL;
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 
         try {
             component.removeAllRepresentations();
             highlightComponentRef.current = null;
 
-            const schemeId = `custom-scheme-${Date.now()}`;
-            const colorMap = new Map<number, number>();
-            if (customColors?.length > 0) {
-                customColors.forEach(rule => {
-                    if (!rule.color || !rule.target) return;
-                    try {
-                        const colorHex = new NGL.Color(rule.color).getHex();
-                        const selection = new NGL.Selection(rule.target);
-                        component.structure.eachAtom((atom: any) => {
-                            colorMap.set(atom.index, colorHex);
-                        }, selection);
-                    } catch (e) { }
-                });
-            }
-
             let repType = representation || 'cartoon';
 
-            const tryApply = (r: string, c: string, params: any = {}) => {
+            // 1. Determine "Effective" Default Coloring
+            // This logic preserves your existing "smart defaults" 
+            let effectiveColoring = coloring;
+            if (coloring === 'chainid') {
+                if (pdbId && pdbId.toLowerCase().includes('1crn')) {
+                    effectiveColoring = 'element';
+                    repType = 'licorice';
+                } else {
+                    try {
+                        // If only one chain, coloring by chain isn't very useful, but we keep it if requested
+                        // logic here was: if (component.structure.chainStore.count <= 1) effectiveColoring = 'chainname';
+                        // But NGL 'chainid' usually works fine. Let's stick to user choice unless critical.
+                    } catch (e) { }
+                }
+            }
+
+            // 2. Define Base Selection (Everything NOT in custom colors)
+            let baseSelection = "*";
+            if (customColors?.length > 0) {
+                // Collect all custom targets to exclude them from the base layer
+                const exclusionList = customColors
+                    .filter(c => c.target)
+                    .map(c => `(${c.target})`)
+                    .join(" or ");
+
+                if (exclusionList) {
+                    baseSelection = `not (${exclusionList})`;
+                }
+            }
+
+            const tryApply = (r: string, c: string, sele: string, params: any = {}) => {
                 try {
-                    console.log(`Attempting rep: ${r}, color: ${c}`);
-                    component.addRepresentation(r, { color: c, ...params });
+                    // Don't add representation if selection is empty (e.g. if custom colors cover everything)
+                    if (sele === "not ()") return true;
+
+                    console.log(`Applying rep: ${r}, color: ${c}, sel: ${sele}`);
+                    component.addRepresentation(r, { color: c, sele: sele, ...params });
                     return true;
                 } catch (e) {
-                    console.warn(`Failed: ${r} + ${c}`, e);
+                    console.warn(`Failed: ${r} + ${c} on ${sele}`, e);
                     return false;
                 }
             };
 
-            // Main Representation
-            if (customColors.length === 0) {
-                let effectiveColoring = coloring;
-                if (coloring === 'chainid') {
-                    if (pdbId && pdbId.toLowerCase().includes('1crn')) {
-                        effectiveColoring = 'element';
-                        repType = 'licorice';
-                    } else {
-                        try {
-                            if (component.structure.chainStore.count <= 1) {
-                                effectiveColoring = 'chainname';
-                            }
-                        } catch (e) { }
+            // 3. Apply Base Layer
+            // We use the same fallback logic as before (Cartoon -> Licorice -> Backbone)
+            // but constrained to 'baseSelection'
+            if (!tryApply(repType, effectiveColoring, baseSelection)) {
+                if (!tryApply(repType, 'element', baseSelection)) {
+                    if (!tryApply('licorice', 'element', baseSelection)) {
+                        tryApply('backbone', 'element', baseSelection);
                     }
                 }
+            }
 
-                if (!tryApply(repType, effectiveColoring)) {
-                    if (!tryApply(repType, 'element')) {
-                        if (!tryApply('licorice', 'element')) {
-                            tryApply('backbone', 'element');
-                        }
+            // 4. Apply Custom Layers
+            if (customColors?.length > 0) {
+                customColors.forEach(rule => {
+                    if (!rule.color || !rule.target) return;
+                    try {
+                        // Apply the SAME representation type, but with the specific color and selection
+                        component.addRepresentation(repType, {
+                            color: rule.color,
+                            sele: rule.target
+                        });
+                    } catch (e) {
+                        console.warn(`Failed to apply custom color for ${rule.target}`, e);
                     }
-                }
-            } else {
-                try {
-                    const registeredSchemeId = NGL.ColormakerRegistry.addScheme(function (this: any) {
-                        this.atomColor = (atom: any) => {
-                            if (colorMap.has(atom.index)) return colorMap.get(atom.index);
-
-                            if (coloring === 'element') {
-                                const elem = atom.element;
-                                if (elem === 'C') return 0x909090;
-                                if (elem === 'O') return 0xFF0D0D;
-                                if (elem === 'N') return 0x3050F8;
-                                if (elem === 'S') return 0xFFFF30;
-                                if (elem === 'P') return 0xFFA500;
-                                if (elem === 'H') return 0xFFFFFF;
-                                return 0xCCCCCC;
-                            }
-
-                            if (coloring === 'chainid') {
-                                const colors = [
-                                    0x1f77b4, 0xff7f0e, 0x2ca02c, 0xd62728, 0x9467bd,
-                                    0x8c564b, 0xe377c2, 0x7f7f7f, 0xbcbd22, 0x17becf,
-                                    0xFA8072, 0x00FF7F, 0xFFD700, 0x4B0082, 0xFF1493,
-                                    0x008080, 0xCD5C5C, 0x000080, 0xDAA520, 0x32CD32
-                                ];
-                                return colors[(atom.chainIndex || 0) % colors.length];
-                            }
-
-                            return 0xCCCCCC;
-                        };
-                    }, schemeId);
-                    component.addRepresentation(repType, { color: registeredSchemeId, sele: "*" });
-                } catch (e) {
-                    tryApply('licorice', 'element');
-                }
+                });
             }
 
             // --- Visualization Overlays ---
@@ -459,7 +446,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             // Surface Overlay
             if (showSurface) {
                 console.log("Adding Surface Overlay...");
-                tryApply('surface', 'white', { opacity: 0.4, depthWrite: false, side: 'front' });
+                tryApply('surface', 'white', "*", { opacity: 0.4, depthWrite: false, side: 'front' });
             }
 
             // Ligand Highlight
@@ -467,7 +454,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 console.log("Adding Ligand Highlight...");
                 // "ligand" keyword in NGL (non-polymer)
                 // Filter out Water/Ions if wanted: ligand and not (water or ion)
-                tryApply('ball+stick', 'element', { sele: 'ligand and not (water or ion)', scale: 2.0 });
+                tryApply('ball+stick', 'element', 'ligand and not (water or ion)', { scale: 2.0 });
             }
 
             if (stageRef.current?.viewer) {
