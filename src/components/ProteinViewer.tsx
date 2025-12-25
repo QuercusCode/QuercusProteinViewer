@@ -361,85 +361,127 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         if (!isMounted.current) return;
         const component = specificComponent || componentRef.current;
         if (!component || !component.structure) return;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
+        const NGL = window.NGL;
+
+        // Stable Color Palettes
+        const CHAIN_COLORS = [
+            0x1f77b4, 0xff7f0e, 0x2ca02c, 0xd62728, 0x9467bd,
+            0x8c564b, 0xe377c2, 0x7f7f7f, 0xbcbd22, 0x17becf,
+            0xFA8072, 0x00FF7F, 0xFFD700, 0x4B0082, 0xFF1493,
+            0x008080, 0xCD5C5C, 0x000080, 0xDAA520, 0x32CD32
+        ];
+
+        const ELEMENT_COLORS: { [key: string]: number } = {
+            'C': 0x909090,
+            'O': 0xFF0D0D,
+            'N': 0x3050F8,
+            'S': 0xFFFF30,
+            'P': 0xFFA500,
+            'H': 0xFFFFFF,
+            'DEFAULT': 0xCCCCCC
+        };
 
         try {
             component.removeAllRepresentations();
             highlightComponentRef.current = null;
 
             let repType = representation || 'cartoon';
+            let currentColoring = coloring;
 
-            // 1. Determine "Effective" Default Coloring
-            // This logic preserves your existing "smart defaults" 
-            let effectiveColoring = coloring;
-            if (coloring === 'chainid') {
-                if (pdbId && pdbId.toLowerCase().includes('1crn')) {
-                    effectiveColoring = 'element';
-                    repType = 'licorice';
-                } else {
-                    try {
-                        // If only one chain, coloring by chain isn't very useful, but we keep it if requested
-                        // logic here was: if (component.structure.chainStore.count <= 1) effectiveColoring = 'chainname';
-                        // But NGL 'chainid' usually works fine. Let's stick to user choice unless critical.
-                    } catch (e) { }
-                }
+            // Handle special 1crn case (legacy support)
+            if (coloring === 'chainid' && pdbId && pdbId.toLowerCase().includes('1crn')) {
+                currentColoring = 'element';
+                repType = 'licorice';
             }
 
-            // 2. Define Base Selection (Everything NOT in custom colors)
-            let baseSelection = "*";
-            if (customColors?.length > 0) {
-                // Collect all custom targets to exclude them from the base layer
-                const exclusionList = customColors
-                    .filter(c => c.target)
-                    .map(c => `(${c.target})`)
-                    .join(" or ");
+            // Strategy: Unified Custom Scheme
+            // For simple coloring modes (chainid, element), we use a purely manual scheme
+            // This ensures that "base" colors are identical whether a custom rule exists or not.
 
-                if (exclusionList) {
-                    baseSelection = `not (${exclusionList})`;
+            if (currentColoring === 'chainid' || currentColoring === 'element') {
+                const schemeId = `unified-scheme-${Date.now()}`;
+
+                // Pre-calculate custom colors for fast lookup
+                const customColorMap = new Map<number, number>();
+                if (customColors?.length > 0) {
+                    customColors.forEach(rule => {
+                        if (!rule.color || !rule.target) return;
+                        try {
+                            const colorHex = new NGL.Color(rule.color).getHex();
+                            const selection = new NGL.Selection(rule.target);
+                            component.structure.eachAtom((atom: any) => {
+                                customColorMap.set(atom.index, colorHex);
+                            }, selection);
+                        } catch (e) { }
+                    });
+                }
+
+                try {
+                    const registeredSchemeId = NGL.ColormakerRegistry.addScheme(function (this: any) {
+                        this.atomColor = (atom: any) => {
+                            // 1. Custom Override (Highest Priority)
+                            if (customColorMap.has(atom.index)) {
+                                return customColorMap.get(atom.index);
+                            }
+
+                            // 2. Base Coloring (Stable)
+                            if (currentColoring === 'element') {
+                                return ELEMENT_COLORS[atom.element] || ELEMENT_COLORS['DEFAULT'];
+                            }
+
+                            // Default: Chain ID
+                            return CHAIN_COLORS[(atom.chainIndex || 0) % CHAIN_COLORS.length];
+                        };
+                    }, schemeId);
+
+                    console.log(`Applying Unified Scheme: ${repType}, ID: ${registeredSchemeId}`);
+                    component.addRepresentation(repType, { color: registeredSchemeId, sele: "*" });
+
+                } catch (e) {
+                    console.warn("Unified Scheme failed, falling back to standard", e);
+                    component.addRepresentation(repType, { color: currentColoring, sele: "*" });
+                }
+
+            } else {
+                // FALLBACK: Layered Strategy for complex types (structure, hydrophobicity, etc.)
+                // These are harder to replicate manually, so we accept minor shifts or use the layered approach.
+                // We'll stick to the "Base + Custom Layers" approach from Attempt 1 for these edge cases.
+
+                // 1. Define Base Selection
+                let baseSelection = "*";
+                if (customColors?.length > 0) {
+                    const exclusionList = customColors
+                        .filter(c => c.target)
+                        .map(c => `(${c.target})`)
+                        .join(" or ");
+                    if (exclusionList) baseSelection = `not (${exclusionList})`;
+                }
+
+                // 2. Apply Base
+                try {
+                    if (baseSelection !== "not ()") { // Only if something remains
+                        component.addRepresentation(repType, { color: currentColoring, sele: baseSelection });
+                    }
+                } catch (e) { }
+
+                // 3. Apply Custom Layers
+                if (customColors?.length > 0) {
+                    customColors.forEach(rule => {
+                        if (rule.color && rule.target) {
+                            try {
+                                component.addRepresentation(repType, { color: rule.color, sele: rule.target });
+                            } catch (e) { }
+                        }
+                    });
                 }
             }
 
             const tryApply = (r: string, c: string, sele: string, params: any = {}) => {
                 try {
-                    // Don't add representation if selection is empty (e.g. if custom colors cover everything)
-                    if (sele === "not ()") return true;
-
-                    console.log(`Applying rep: ${r}, color: ${c}, sel: ${sele}`);
                     component.addRepresentation(r, { color: c, sele: sele, ...params });
-                    return true;
-                } catch (e) {
-                    console.warn(`Failed: ${r} + ${c} on ${sele}`, e);
-                    return false;
-                }
+                } catch (e) { }
             };
-
-            // 3. Apply Base Layer
-            // We use the same fallback logic as before (Cartoon -> Licorice -> Backbone)
-            // but constrained to 'baseSelection'
-            if (!tryApply(repType, effectiveColoring, baseSelection)) {
-                if (!tryApply(repType, 'element', baseSelection)) {
-                    if (!tryApply('licorice', 'element', baseSelection)) {
-                        tryApply('backbone', 'element', baseSelection);
-                    }
-                }
-            }
-
-            // 4. Apply Custom Layers
-            if (customColors?.length > 0) {
-                customColors.forEach(rule => {
-                    if (!rule.color || !rule.target) return;
-                    try {
-                        // Apply the SAME representation type, but with the specific color and selection
-                        component.addRepresentation(repType, {
-                            color: rule.color,
-                            sele: rule.target
-                        });
-                    } catch (e) {
-                        console.warn(`Failed to apply custom color for ${rule.target}`, e);
-                    }
-                });
-            }
 
             // --- Visualization Overlays ---
 
