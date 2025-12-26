@@ -68,3 +68,13 @@ Contributions are welcome! Feel free to open an issue or submit a pull request.
 
 This project is licensed under the [MIT License](LICENSE).
 
+## 📢 Acknowledgments & Attribution
+
+This project relies on the following open-source libraries and data sources:
+
+-   **Data Source**: Protein structures are fetched from the [RCSB PDB](https://www.rcsb.org/).
+    -   *Berman, H.M., Westbrook, J., Feng, Z., Gilliland, G., Bhat, T.N., Weissig, H., Shindyalov, I.N., Bourne, P.E. (2000) The Protein Data Bank Nucleic Acids Research, 28: 235-242.*
+-   **Visualization**: Molecular visualization is powered by [NGL Viewer](http://nglviewer.org/).
+    -   *H. Rose, A.S. Rose, (2019) NGL Viewer: web-based molecular graphics for large complexes. Bioinformatics doi:10.1093/bioinformatics/btz031*
+    -   *A.S. Rose, A.R. Bradley, Y. Valasatava, J.M. Duarte, A. Prlić and P.W. Rose. NGL viewer: web-based molecular graphics for large complexes. Bioinformatics (2018) 34 (21): 3755–3758. doi:10.1093/bioinformatics/bty419*
+

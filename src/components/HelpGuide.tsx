@@ -82,6 +82,19 @@ export const HelpGuide: React.FC = () => {
                                     </li>
                                 </ul>
                             </div>
+
+                            {/* Attribution */}
+                            <div className="pt-4 border-t border-neutral-800">
+                                <h3 className="text-[10px] font-semibold uppercase tracking-wider text-neutral-600 mb-2">Powered By</h3>
+                                <div className="flex gap-4 text-[10px] text-neutral-500">
+                                    <a href="https://www.rcsb.org/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">
+                                        RCSB PDB Data
+                                    </a>
+                                    <a href="http://nglviewer.org/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400 transition-colors">
+                                        NGL Viewer
+                                    </a>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Footer */}
