@@ -75,7 +75,11 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     useImperativeHandle(ref, () => ({
         getSnapshotBlob: async () => {
-            if (!stageRef.current) return null;
+            console.log("ProteinViewer: getSnapshotBlob called");
+            if (!stageRef.current) {
+                console.error("ProteinViewer: Stage is null");
+                return null;
+            }
             try {
                 // High Quality Export (3x)
                 return await stageRef.current.makeImage({
