@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ProteinViewer, type RepresentationType, type ColoringType, type ProteinViewerRef } from './components/ProteinViewer';
 import { Controls } from './components/Controls';
 import { HelpGuide } from './components/HelpGuide';
@@ -37,9 +37,33 @@ function App() {
     setHighlightedResidue(null);
   };
 
+  const [proteinTitle, setProteinTitle] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!pdbId || pdbId.length < 4) {
+      setProteinTitle(null);
+      return;
+    }
+
+    const fetchTitle = async () => {
+      try {
+        const response = await fetch(`https://data.rcsb.org/rest/v1/core/entry/${pdbId.toLowerCase()}`);
+        if (!response.ok) throw new Error('Failed to fetch metadata');
+        const data = await response.json();
+        setProteinTitle(data.struct?.title || null);
+      } catch (error) {
+        console.error("Failed to fetch protein title:", error);
+        setProteinTitle(null);
+      }
+    };
+
+    fetchTitle();
+  }, [pdbId]);
+
   const handlePdbIdChange = (id: string) => {
     setPdbId(id);
     setFile(null); // Clear file when PDB ID is set
+    setProteinTitle(null); // Reset title while fetching
     setChains([]);
     setCustomColors([]);
     setHighlightedResidue(null);
@@ -113,6 +137,7 @@ function App() {
         showLigands={showLigands}
         setShowLigands={setShowLigands}
         onFocusLigands={handleFocusLigands}
+        proteinTitle={proteinTitle}
       />
 
       <ProteinViewer

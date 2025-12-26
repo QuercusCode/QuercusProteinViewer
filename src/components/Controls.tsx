@@ -27,6 +27,7 @@ interface ControlsProps {
     showLigands: boolean;
     setShowLigands: (show: boolean) => void;
     onFocusLigands: () => void;
+    proteinTitle?: string | null;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -52,7 +53,8 @@ export const Controls: React.FC<ControlsProps> = ({
     setShowSurface,
     showLigands,
     setShowLigands,
-    onFocusLigands
+    onFocusLigands,
+    proteinTitle
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [localPdbId, setLocalPdbId] = React.useState(pdbId);
@@ -184,7 +186,9 @@ export const Controls: React.FC<ControlsProps> = ({
                         <h1 className="text-xl font-bold bg-gradient-to-r from-blue-500 to-teal-500 bg-clip-text text-transparent mb-1">
                             Protein Viewer
                         </h1>
-                        <p className={`text-xs ${subtleText}`}>Visualize 3D structures</p>
+                        <p className={`text-xs ${subtleText} ${proteinTitle ? 'line-clamp-2 leading-tight' : ''}`} title={proteinTitle || "Visualize 3D structures"}>
+                            {proteinTitle || "Visualize 3D structures"}
+                        </p>
                     </div>
 
                     <button
