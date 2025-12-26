@@ -374,8 +374,8 @@ export const Controls: React.FC<ControlsProps> = ({
 
                 {/* Sequence */}
                 <div className="space-y-3 flex flex-col min-h-0 flex-1 md:flex-none">
-                    {proteinTitle && (
-                        <div className={`p-3 rounded-lg border ${cardBg} mb-1 animate-in fade-in slide-in-from-top-2`}>
+                    {proteinTitle && typeof proteinTitle === 'string' && (
+                        <div className={`p-3 rounded-lg border ${cardBg} mb-1`}>
                             <h3 className={`text-xs font-semibold uppercase tracking-wider mb-1 ${subtleText}`}>Structure</h3>
                             <p className={`text-xs font-medium leading-relaxed ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
                                 {proteinTitle}
