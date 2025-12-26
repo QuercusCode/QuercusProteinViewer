@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ProteinViewer, type RepresentationType, type ColoringType, type ProteinViewerRef } from './components/ProteinViewer';
 import { Controls } from './components/Controls';
 import { HelpGuide } from './components/HelpGuide';
-import type { ChainInfo, CustomColorRule, StructureInfo } from './types';
+import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot } from './types';
 
 function App() {
   const [pdbId, setPdbId] = useState(() => {
@@ -15,6 +15,9 @@ function App() {
   const [resetKey, setResetKey] = useState(0);
   const [isMeasurementMode, setIsMeasurementMode] = useState(false);
   const [isLightMode, setIsLightMode] = useState(false);
+
+  // Snapshot Gallery State
+  const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
 
   // Visualization Toggles
   const [showSurface, setShowSurface] = useState(false);
@@ -83,10 +86,6 @@ function App() {
 
   const viewerRef = useRef<ProteinViewerRef>(null);
 
-  const handleExport = () => {
-    viewerRef.current?.captureImage();
-  };
-
   const handleFocusLigands = () => {
     viewerRef.current?.focusLigands();
   };
@@ -123,6 +122,41 @@ function App() {
     viewerRef.current?.highlightResidue(chain, resNo);
   };
 
+  // Snapshot Handlers
+  const handleSnapshot = async () => {
+    if (!viewerRef.current) return;
+    const blob = await viewerRef.current.getSnapshotBlob();
+    if (blob) {
+      const url = URL.createObjectURL(blob);
+      const newSnapshot: Snapshot = {
+        id: crypto.randomUUID(),
+        url,
+        timestamp: Date.now()
+      };
+      setSnapshots(prev => [newSnapshot, ...prev]);
+    }
+  };
+
+  const handleDownloadSnapshot = (id: string) => {
+    const snapshot = snapshots.find(s => s.id === id);
+    if (snapshot) {
+      const link = document.createElement('a');
+      link.href = snapshot.url;
+      link.download = `snapshot-${pdbId || 'structure'}-${snapshot.id.slice(0, 4)}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
+  const handleDeleteSnapshot = (id: string) => {
+    const snapshot = snapshots.find(s => s.id === id);
+    if (snapshot) {
+      URL.revokeObjectURL(snapshot.url);
+      setSnapshots(prev => prev.filter(s => s.id !== id));
+    }
+  };
+
   return (
     <main className={`w-full h-full relative overflow-hidden transition-colors duration-300 ${isLightMode ? 'bg-neutral-100 text-neutral-900' : 'bg-neutral-950 text-white'}`}>
       <Controls
@@ -137,7 +171,11 @@ function App() {
         chains={chains}
         customColors={customColors}
         setCustomColors={setCustomColors}
-        onExport={handleExport}
+        // Snapshots
+        snapshots={snapshots}
+        onSnapshot={handleSnapshot}
+        onDownloadSnapshot={handleDownloadSnapshot}
+        onDeleteSnapshot={handleDeleteSnapshot}
         isMeasurementMode={isMeasurementMode}
         setIsMeasurementMode={setIsMeasurementMode}
         isLightMode={isLightMode}

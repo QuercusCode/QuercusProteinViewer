@@ -34,7 +34,7 @@ interface ProteinViewerProps {
 }
 
 export interface ProteinViewerRef {
-    captureImage: () => void;
+    getSnapshotBlob: () => Promise<Blob | null>;
     highlightResidue: (chain: string, resNo: number) => void;
     focusLigands: () => void;
     clearHighlight: () => void;
@@ -74,7 +74,34 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     const setError = setExternalError || setInternalError;
 
     useImperativeHandle(ref, () => ({
-        captureImage: () => {
+        getSnapshotBlob: async () => {
+            if (!stageRef.current) return null;
+            try {
+                // High Quality Export (3x)
+                return await stageRef.current.makeImage({
+                    factor: 3,
+                    type: 'png',
+                    antialias: true,
+                    trim: false,
+                    transparent: false
+                });
+            } catch (err) {
+                console.warn("High-res export failed, trying low-res fallback...", err);
+                try {
+                    return await stageRef.current.makeImage({
+                        factor: 1,
+                        type: 'png',
+                        antialias: true,
+                        trim: false,
+                        transparent: false
+                    });
+                } catch (err2) {
+                    console.error("Snapshot failed:", err2);
+                    return null;
+                }
+            }
+        },
+        captureImage: async () => {
             const fixPngBlob = async (blob: Blob): Promise<Blob> => {
                 try {
                     const arrayBuffer = await blob.arrayBuffer();

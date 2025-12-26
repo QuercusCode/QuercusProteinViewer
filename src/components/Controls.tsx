@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera, Ruler, Sun, Moon, Layers, Hexagon, Crosshair } from 'lucide-react';
+import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera, Ruler, Sun, Moon, Layers, Hexagon, Crosshair, Download, Image as ImageIcon } from 'lucide-react';
 import type { RepresentationType, ColoringType } from './ProteinViewer';
-import type { ChainInfo, CustomColorRule } from '../types';
+import type { ChainInfo, CustomColorRule, Snapshot } from '../types';
 
 interface ControlsProps {
     pdbId: string;
@@ -15,7 +15,6 @@ interface ControlsProps {
     chains: ChainInfo[];
     customColors: CustomColorRule[];
     setCustomColors: (colors: CustomColorRule[]) => void;
-    onExport: () => void;
     isMeasurementMode: boolean;
     setIsMeasurementMode: (enabled: boolean) => void;
     isLightMode: boolean;
@@ -28,6 +27,10 @@ interface ControlsProps {
     setShowLigands: (show: boolean) => void;
     onFocusLigands: () => void;
     proteinTitle?: string | null;
+    snapshots: Snapshot[];
+    onSnapshot: () => void;
+    onDownloadSnapshot: (id: string) => void;
+    onDeleteSnapshot: (id: string) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -42,7 +45,6 @@ export const Controls: React.FC<ControlsProps> = ({
     chains,
     customColors,
     setCustomColors,
-    onExport,
     isMeasurementMode,
     setIsMeasurementMode,
     isLightMode,
@@ -54,7 +56,11 @@ export const Controls: React.FC<ControlsProps> = ({
     showLigands,
     setShowLigands,
     onFocusLigands,
-    proteinTitle
+    proteinTitle,
+    snapshots,
+    onSnapshot,
+    onDownloadSnapshot,
+    onDeleteSnapshot
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [localPdbId, setLocalPdbId] = React.useState(pdbId);
@@ -443,10 +449,45 @@ export const Controls: React.FC<ControlsProps> = ({
                         <button onClick={onResetView} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}>
                             <RotateCcw className="w-4 h-4" /> Reset
                         </button>
-                        <button onClick={onExport} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:text-blue-500 hover:border-blue-500/50`}>
-                            <Camera className="w-4 h-4" /> Export
+                        <button onClick={onResetView} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}>
+                            <RotateCcw className="w-4 h-4" /> Reset
+                        </button>
+                        <button onClick={onSnapshot} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:text-blue-500 hover:border-blue-500/50`}>
+                            <Camera className="w-4 h-4" /> Snapshot
                         </button>
                     </div>
+
+                    {/* Snapshot Gallery */}
+                    {snapshots.length > 0 && (
+                        <div className={`space-y-2 pt-2 border-t ${isLightMode ? 'border-neutral-200' : 'border-neutral-800'}`}>
+                            <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText} flex items-center gap-2`}>
+                                <ImageIcon className="w-3.5 h-3.5" /> Gallery ({snapshots.length})
+                            </label>
+                            <div className="grid grid-cols-2 gap-2">
+                                {snapshots.map(snap => (
+                                    <div key={snap.id} className="group relative aspect-video rounded-lg overflow-hidden border border-neutral-700/50 bg-neutral-900">
+                                        <img src={snap.url} alt="Snapshot" className="w-full h-full object-cover" />
+                                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                            <button
+                                                onClick={() => onDownloadSnapshot(snap.id)}
+                                                className="p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-full transition-colors"
+                                                title="Download"
+                                            >
+                                                <Download className="w-3 h-3" />
+                                            </button>
+                                            <button
+                                                onClick={() => onDeleteSnapshot(snap.id)}
+                                                className="p-1.5 bg-red-600/80 hover:bg-red-500/80 text-white rounded-full transition-colors"
+                                                title="Delete"
+                                            >
+                                                <Trash2 className="w-3 h-3" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
 
                     <button
                         onClick={() => setIsMeasurementMode(!isMeasurementMode)}

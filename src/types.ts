@@ -16,3 +16,9 @@ export interface ChainInfo {
 export interface StructureInfo {
     chains: ChainInfo[];
 }
+
+export interface Snapshot {
+    id: string;
+    url: string;
+    timestamp: number;
+}
