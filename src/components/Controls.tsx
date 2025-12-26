@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera, Ruler, Sun, Moon, Layers, Hexagon, Crosshair, Download, Image as ImageIcon } from 'lucide-react';
+import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera, Ruler, Sun, Moon, Layers, Hexagon, Crosshair, Download, Image as ImageIcon, Eye } from 'lucide-react';
 import type { RepresentationType, ColoringType } from './ProteinViewer';
 import type { ChainInfo, CustomColorRule, Snapshot } from '../types';
 
@@ -64,6 +64,7 @@ export const Controls: React.FC<ControlsProps> = ({
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [localPdbId, setLocalPdbId] = React.useState(pdbId);
+    const [previewSnapshot, setPreviewSnapshot] = useState<Snapshot | null>(null);
 
     // Custom Color State
     const [targetType, setTargetType] = useState<'chain' | 'residue'>('chain');
@@ -465,18 +466,25 @@ export const Controls: React.FC<ControlsProps> = ({
                             </label>
                             <div className="grid grid-cols-2 gap-2">
                                 {snapshots.map(snap => (
-                                    <div key={snap.id} className="group relative aspect-video rounded-lg overflow-hidden border border-neutral-700/50 bg-neutral-900">
+                                    <div key={snap.id} className="group relative aspect-video rounded-lg overflow-hidden border border-neutral-700/50 bg-neutral-900 cursor-pointer" onClick={() => setPreviewSnapshot(snap)}>
                                         <img src={snap.url} alt="Snapshot" className="w-full h-full object-cover" />
                                         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                             <button
-                                                onClick={() => onDownloadSnapshot(snap.id)}
+                                                onClick={(e) => { e.stopPropagation(); setPreviewSnapshot(snap); }}
+                                                className="p-1.5 bg-neutral-600 hover:bg-neutral-500 text-white rounded-full transition-colors"
+                                                title="Preview"
+                                            >
+                                                <Eye className="w-3 h-3" />
+                                            </button>
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); onDownloadSnapshot(snap.id); }}
                                                 className="p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-full transition-colors"
                                                 title="Download"
                                             >
                                                 <Download className="w-3 h-3" />
                                             </button>
                                             <button
-                                                onClick={() => onDeleteSnapshot(snap.id)}
+                                                onClick={(e) => { e.stopPropagation(); onDeleteSnapshot(snap.id); }}
                                                 className="p-1.5 bg-red-600/80 hover:bg-red-500/80 text-white rounded-full transition-colors"
                                                 title="Delete"
                                             >
@@ -501,6 +509,29 @@ export const Controls: React.FC<ControlsProps> = ({
                     </button>
                 </div>
             </div>
+
+            {/* Snapshot Preview Modal */}
+            {previewSnapshot && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setPreviewSnapshot(null)}>
+                    <div className="relative max-w-4xl max-h-[90vh] w-full rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+                        <button
+                            onClick={() => setPreviewSnapshot(null)}
+                            className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
+                        >
+                            <X className="w-6 h-6" />
+                        </button>
+                        <img src={previewSnapshot.url} alt="Preview" className="w-full h-full object-contain bg-neutral-900" />
+                        <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-center gap-4">
+                            <button
+                                onClick={() => onDownloadSnapshot(previewSnapshot.id)}
+                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
+                            >
+                                <Download className="w-4 h-4" /> Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 };
