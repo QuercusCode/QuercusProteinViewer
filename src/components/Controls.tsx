@@ -186,7 +186,7 @@ export const Controls: React.FC<ControlsProps> = ({
                         <h1 className="text-xl font-bold bg-gradient-to-r from-blue-500 to-teal-500 bg-clip-text text-transparent mb-1">
                             Protein Viewer
                         </h1>
-                        <p className={`text-xs ${subtleText} ${proteinTitle ? 'line-clamp-2 leading-tight' : ''}`} title={proteinTitle || "Visualize 3D structures"}>
+                        <p className={`text-sm font-medium ${isLightMode ? 'text-neutral-600' : 'text-neutral-300'} leading-tight mt-0.5`} title={proteinTitle || "Visualize 3D structures"}>
                             {proteinTitle || "Visualize 3D structures"}
                         </p>
                     </div>
