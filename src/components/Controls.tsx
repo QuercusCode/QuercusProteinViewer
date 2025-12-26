@@ -186,9 +186,7 @@ export const Controls: React.FC<ControlsProps> = ({
                         <h1 className="text-xl font-bold bg-gradient-to-r from-blue-500 to-teal-500 bg-clip-text text-transparent mb-1">
                             Protein Viewer
                         </h1>
-                        <p className={`text-sm font-medium ${isLightMode ? 'text-neutral-600' : 'text-neutral-300'} leading-tight mt-0.5`} title={proteinTitle || "Visualize 3D structures"}>
-                            {proteinTitle || "Visualize 3D structures"}
-                        </p>
+                        <p className={`text-xs ${subtleText}`}>Visualize 3D structures</p>
                     </div>
 
                     <button
@@ -376,6 +374,14 @@ export const Controls: React.FC<ControlsProps> = ({
 
                 {/* Sequence */}
                 <div className="space-y-3 flex flex-col min-h-0 flex-1 md:flex-none">
+                    {proteinTitle && (
+                        <div className={`p-3 rounded-lg border ${cardBg} mb-1 animate-in fade-in slide-in-from-top-2`}>
+                            <h3 className={`text-xs font-semibold uppercase tracking-wider mb-1 ${subtleText}`}>Structure</h3>
+                            <p className={`text-xs font-medium leading-relaxed ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                {proteinTitle}
+                            </p>
+                        </div>
+                    )}
                     <div className="flex items-center justify-between">
                         <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Sequence</label>
                         <select
