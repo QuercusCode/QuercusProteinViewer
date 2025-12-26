@@ -1,32 +1,70 @@
-# QuercusProteinViewer
+# QuercusProteinViewer 🧬
 
-A 3D Protein Structure Viewer built with React, TypeScript, Vite, and NGL.js.
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-## Features
-- Search and load structures from PDB.
-- Upload local PDB/CIF files.
-- Multiple representations (Cartoon, Ball & Stick, Spacefill, etc.).
-- Custom coloring by Chain or Residues.
-- **Mobile Responsive Design** with sidebar toggle.
-- Sequence view with resize capability.
+A high-performance, modern 3D Protein Structure Viewer built for speed and usability. Visualize PDB structures with advanced rendering, custom coloring, and molecular analysis tools directly in your browser.
 
-## Development
+## ✨ Features
 
-This project uses React + TypeScript + Vite.
+- **📂 Dual Loading Modes**: Instantly fetch structures from the **RCSB PDB** by ID or upload your own `.pdb` / `.cif` files locally.
+- **🎨 Rich Representations**: Switch between **Cartoon**, **Ball & Stick**, **Spacefill**, **Licorice**, **Surface**, and **Backbone** views.
+- **🌈 Advanced Coloring**: Color by **Chain ID**, **Element**, **Residue**, **Secondary Structure**, **Hydrophobicity**, or define **Custom Color Rules**.
+- **📏 Molecular Analysis**:
+  - **Distance Measurement**: Click any two atoms to measure the distance in Angstroms (Å) with visual indicators.
+  - **Ligand Focus**: Automatically detect and zoom into ligand binding sites.
+  - **Sequence Viewer**: Interactive protein sequence bar—hover to identify residues, click to highlight them in 3D.
+- **💡 Visual Enhancements**:
+  - **Light/Dark Mode**: Toggle between a sleek dark interface and a clean light theme.
+  - **Surface Overlay**: Toggle transparent molecular surfaces.
+  - **High-Res Export**: Capture publication-quality renders (PNG) at 3x resolution.
+- **📱 Responsive Design**: Fully responsive UI with a collapsible sidebar for seamless use on tablets and desktops.
 
-### Running Locally
+## 🚀 Getting Started
 
-```bash
-npm install
-npm run dev
-```
+Follow these steps to set up the project locally.
 
-### Building
+### Prerequisites
+
+- **Node.js** (v16 or higher)
+- **npm** (comes with Node.js)
+
+### Installation
+
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/YOUR_USERNAME/QuercusProteinViewer.git
+    cd QuercusProteinViewer
+    ```
+
+2.  **Install dependencies**
+    ```bash
+    npm install
+    ```
+
+3.  **Run the development server**
+    ```bash
+    npm run dev
+    ```
+    Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+## 🛠️ Building for Production
+
+To create a production-ready build:
 
 ```bash
 npm run build
 ```
 
-## License
+The output will be in the `dist/` directory, ready to be deployed to Vercel, Netlify, or GitHub Pages.
 
-MIT
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to open an issue or submit a pull request.
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
