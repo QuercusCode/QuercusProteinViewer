@@ -124,9 +124,15 @@ function App() {
 
   // Snapshot Handlers
   const handleSnapshot = async () => {
-    if (!viewerRef.current) return;
+    console.log("App: Snapshot button clicked");
+    if (!viewerRef.current) {
+      console.error("App: viewerRef is null");
+      return;
+    }
+    console.log("App: Calling getSnapshotBlob...");
     const blob = await viewerRef.current.getSnapshotBlob();
     if (blob) {
+      console.log("App: Blob received, creating URL...");
       const url = URL.createObjectURL(blob);
       const newSnapshot: Snapshot = {
         id: crypto.randomUUID(),
@@ -134,6 +140,8 @@ function App() {
         timestamp: Date.now()
       };
       setSnapshots(prev => [newSnapshot, ...prev]);
+    } else {
+      console.error("App: No blob returned from viewer");
     }
   };
 
