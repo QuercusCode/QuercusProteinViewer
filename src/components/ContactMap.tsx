@@ -267,10 +267,10 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm animate-in fade-in">
-            <div className="relative w-full max-w-5xl h-[90vh] bg-white rounded-xl shadow-2xl flex flex-col overflow-hidden text-neutral-900">
+            <div className={`relative w-full max-w-5xl h-[90vh] rounded-xl shadow-2xl flex flex-col overflow-hidden ${isLightMode ? 'bg-white text-neutral-900' : 'bg-neutral-900 text-white border border-neutral-800'}`}>
 
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100 bg-white">
+                <div className={`flex items-center justify-between px-6 py-4 border-b ${isLightMode ? 'bg-white border-neutral-100' : 'bg-neutral-900 border-neutral-800'}`}>
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
                             <Maximize className="w-5 h-5" />
@@ -284,18 +284,18 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <div className="flex items-center bg-neutral-100 rounded-lg p-1">
-                            <button onClick={() => setScale(s => Math.max(1, s - 1))} className="p-2 hover:bg-white rounded-md transition-all shadow-sm"><ZoomOut className="w-4 h-4 text-neutral-600" /></button>
+                        <div className={`flex items-center rounded-lg p-1 ${isLightMode ? 'bg-neutral-100' : 'bg-neutral-800'}`}>
+                            <button onClick={() => setScale(s => Math.max(1, s - 1))} className={`p-2 rounded-md transition-all shadow-sm ${isLightMode ? 'hover:bg-white text-neutral-600' : 'hover:bg-neutral-700 text-neutral-300'}`}><ZoomOut className="w-4 h-4" /></button>
                             <span className="w-12 text-center text-xs font-mono font-medium">{scale}x</span>
-                            <button onClick={() => setScale(s => Math.min(20, s + 1))} className="p-2 hover:bg-white rounded-md transition-all shadow-sm"><ZoomIn className="w-4 h-4 text-neutral-600" /></button>
+                            <button onClick={() => setScale(s => Math.min(20, s + 1))} className={`p-2 rounded-md transition-all shadow-sm ${isLightMode ? 'hover:bg-white text-neutral-600' : 'hover:bg-neutral-700 text-neutral-300'}`}><ZoomIn className="w-4 h-4" /></button>
                         </div>
-                        <div className="w-px h-6 bg-neutral-200 mx-2" />
+                        <div className={`w-px h-6 mx-2 ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-700'}`} />
                         <button onClick={onClose} className="p-2 hover:bg-red-50 text-neutral-400 hover:text-red-500 rounded-lg transition-colors"><X className="w-6 h-6" /></button>
                     </div>
                 </div>
 
                 {/* Main Content Area - Grid Layout */}
-                <div className="flex-1 overflow-auto bg-neutral-50 relative flex justify-center p-8">
+                <div className={`flex-1 overflow-auto relative flex justify-center p-8 ${isLightMode ? 'bg-neutral-50' : 'bg-black/20'}`}>
                     {loading ? (
                         <div className="absolute inset-0 flex items-center justify-center z-10 bg-white/80">
                             <div className="flex flex-col items-center gap-3">
@@ -304,7 +304,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                             </div>
                         </div>
                     ) : distanceData && (
-                        <div className="relative inline-block bg-white shadow-sm p-4 rounded-lg border border-neutral-200">
+                        <div className={`relative inline-block shadow-sm p-4 rounded-lg border ${isLightMode ? 'bg-white border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`}>
                             {/* Y Axis */}
                             <div className="absolute top-4 bottom-4 left-0 w-8" style={{ height: distanceData.size * scale }}>
                                 {Axes?.y}
