@@ -374,15 +374,45 @@ export const Controls: React.FC<ControlsProps> = ({
                     {/* Analysis */}
                     <div className="space-y-3">
                         <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Analysis</label>
-                        <button
-                            onClick={onToggleContactMap}
-                            className={`w-full flex items-center justify-between px-2 py-1.5 rounded border transition-all ${cardBg} hover:opacity-80`}
-                        >
-                            <div className="flex items-center gap-2">
-                                <Maximize className="w-4 h-4" />
-                                <span className="text-xs font-medium">Contact Map</span>
-                            </div>
-                        </button>
+                        <div className="space-y-2">
+                            <button
+                                onClick={onToggleContactMap}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Maximize className="w-4 h-4" />
+                                    <span className="text-xs font-medium">Contact Map</span>
+                                </div>
+                            </button>
+
+                            <button
+                                onClick={() => setIsMeasurementMode(!isMeasurementMode)}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isMeasurementMode
+                                    ? 'bg-amber-500/10 border-amber-500 text-amber-500'
+                                    : `${cardBg} hover:opacity-80`
+                                    }`}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Ruler className="w-4 h-4" />
+                                    <span className="text-xs font-medium">{isMeasurementMode ? 'Measurement Active' : 'Measure Distance'}</span>
+                                </div>
+                                <div className={`w-3 h-3 rounded-full ${isMeasurementMode ? 'bg-amber-500' : 'bg-neutral-500'}`} />
+                            </button>
+
+                            <button
+                                onClick={() => setIsAnnotationMode(!isAnnotationMode)}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isAnnotationMode
+                                    ? 'bg-purple-500/10 border-purple-500 text-purple-500'
+                                    : `${cardBg} hover:opacity-80`
+                                    }`}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Crosshair className="w-4 h-4" />
+                                    <span className="text-xs font-medium">{isAnnotationMode ? 'Annotation Active' : 'Annotate Residues'}</span>
+                                </div>
+                                <div className={`w-3 h-3 rounded-full ${isAnnotationMode ? 'bg-purple-500' : 'bg-neutral-500'}`} />
+                            </button>
+                        </div>
                     </div>
 
                     {/* Session */}
@@ -625,27 +655,6 @@ export const Controls: React.FC<ControlsProps> = ({
                             </button>
                         </div>
 
-                        <button
-                            onClick={() => setIsMeasurementMode(!isMeasurementMode)}
-                            className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${isMeasurementMode
-                                ? 'bg-amber-500/20 border-amber-500/50 text-amber-500 font-medium'
-                                : `${cardBg} hover:opacity-80`
-                                }`}
-                        >
-                            <Ruler className="w-4 h-4" />
-                            <span>{isMeasurementMode ? 'Active' : 'Measure Distance'}</span>
-                        </button>
-
-                        <button
-                            onClick={() => setIsAnnotationMode(!isAnnotationMode)}
-                            className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${isAnnotationMode
-                                ? 'bg-purple-500/20 border-purple-500/50 text-purple-500 font-medium'
-                                : `${cardBg} hover:opacity-80`
-                                }`}
-                        >
-                            <Crosshair className="w-4 h-4" />
-                            <span>{isAnnotationMode ? 'Annotation Active' : 'Annotate Residues'}</span>
-                        </button>
                     </div>
                 </div>
             </div >
