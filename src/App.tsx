@@ -3,7 +3,7 @@ import { ProteinViewer, type RepresentationType, type ColoringType, type Protein
 import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
 import { HelpGuide } from './components/HelpGuide';
-import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot } from './types';
+import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Annotation } from './types';
 
 function App() {
   const [pdbId, setPdbId] = useState(() => {
@@ -34,9 +34,13 @@ function App() {
 
   // Visualization Toggles
 
+  // Visualization Toggles
   const [showSurface, setShowSurface] = useState(false);
   const [showLigands, setShowLigands] = useState(false);
 
+  // Tools
+  const [isAnnotationMode, setIsAnnotationMode] = useState(false);
+  const [annotations, setAnnotations] = useState<Annotation[]>([]);
 
   const [highlightedResidue, setHighlightedResidue] = useState<{ chain: string; resNo: number; resName?: string } | null>(null);
 
@@ -45,6 +49,7 @@ function App() {
 
   const handleResetView = () => {
     setResetKey(prev => prev + 1);
+    setAnnotations([]); // Optional: Clean annotations on reset? Maybe better to keep them unless user reloads file.
   };
 
   const handleUpload = (uploadedFile: File) => {
@@ -52,8 +57,49 @@ function App() {
     setPdbId(''); // Clear PDB ID when file is uploaded
     setChains([]);
     setCustomColors([]);
+    setAnnotations([]);
     setHighlightedResidue(null);
   };
+
+  // ... (fetchTitle logic) ... 
+
+  // Need to insert logic into handleAtomClick
+  const handleAtomClick = async (info: { chain: string; resNo: number; resName: string; atomIndex: number } | null) => {
+    if (!info) {
+      setHighlightedResidue(null);
+      return;
+    }
+
+    if (isMeasurementMode) {
+      // ... existing measurement logic ...
+      // (This part is inside ProteinViewer usually, or handled by a separate function if lifted up. 
+      // Wait, App passes onAtomClick. I need to check how onAtomClick is currently implemented in App.tsx or if it's inline)
+    }
+
+    // Annotation Logic
+    if (isAnnotationMode) {
+      const note = window.prompt(`Enter note for ${info.resName} ${info.resNo}:`);
+      if (note) {
+        // Fetch 3D coordinates from viewer
+        const position = viewerRef.current?.getAtomPosition(info.chain, info.resNo);
+        if (position) {
+          const newAnnotation: Annotation = {
+            id: crypto.randomUUID(),
+            chain: info.chain,
+            resNo: info.resNo,
+            text: note,
+            position: position
+          };
+          setAnnotations(prev => [...prev, newAnnotation]);
+        } else {
+          alert("Could not determine 3D position for annotation.");
+        }
+      }
+    }
+
+    setHighlightedResidue({ chain: info.chain, resNo: info.resNo, resName: info.resName });
+  };
+
 
 
 
@@ -130,7 +176,8 @@ function App() {
 
   // Session Management
   const handleSaveSession = () => {
-    const state = {
+    const sessionData = {
+      version: 1,
       pdbId,
       representation,
       coloring,
@@ -139,13 +186,16 @@ function App() {
       showSurface,
       showLigands,
       isSpinning,
+      isCleanMode,
       customColors,
-      chains,
+      chains, // Note: chains are derived from structure, might not need to save if PDB ID is saved.
+      snapshots, // Save snapshots (URLs might become invalid if not handled carefully)
+      annotations, // Save annotations
       orientation: viewerRef.current?.getCameraOrientation(),
-      savedAt: new Date().toISOString()
+      timestamp: Date.now()
     };
 
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(sessionData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -159,57 +209,39 @@ function App() {
   const handleLoadSession = async (file: File) => {
     try {
       const text = await file.text();
-      const state = JSON.parse(text);
+      const session = JSON.parse(text);
 
-      if (!state.savedAt) console.warn("Session file missing timestamp");
+      if (!session.timestamp) console.warn("Session file missing timestamp");
 
-      if (state.pdbId) setPdbId(state.pdbId);
-      if (state.representation) setRepresentation(state.representation);
-      if (state.coloring) setColoring(state.coloring);
-      if (typeof state.isMeasurementMode === 'boolean') setIsMeasurementMode(state.isMeasurementMode);
-      if (typeof state.isLightMode === 'boolean') setIsLightMode(state.isLightMode);
-      if (typeof state.showSurface === 'boolean') setShowSurface(state.showSurface);
-      if (typeof state.showLigands === 'boolean') setShowLigands(state.showLigands);
-      if (typeof state.isSpinning === 'boolean') setIsSpinning(state.isSpinning);
-      if (state.customColors) setCustomColors(state.customColors);
+      if (session.pdbId) setPdbId(session.pdbId);
+      if (session.representation) setRepresentation(session.representation);
+      if (session.coloring) setColoring(session.coloring);
 
-      if (state.orientation) {
+      // Handle boolean flags safely
+      if (session.isLightMode !== undefined) setIsLightMode(session.isLightMode);
+      if (session.showSurface !== undefined) setShowSurface(session.showSurface);
+      if (session.showLigands !== undefined) setShowLigands(session.showLigands);
+      if (session.isSpinning !== undefined) setIsSpinning(session.isSpinning);
+      if (session.isCleanMode !== undefined) setIsCleanMode(session.isCleanMode);
+
+      if (session.customColors) setCustomColors(session.customColors);
+      if (session.snapshots) setSnapshots(session.snapshots);
+      if (session.annotations) setAnnotations(session.annotations);
+
+      if (session.orientation) {
         setTimeout(() => {
-          viewerRef.current?.setCameraOrientation(state.orientation);
+          viewerRef.current?.setCameraOrientation(session.orientation);
         }, 1500);
       }
     } catch (error) {
       console.error("Failed to load session:", error);
-      alert("Failed to load session file.");
+      alert("Failed to load session file");
     }
   };
 
   const handleStructureLoaded = (info: StructureInfo) => {
     setChains(info.chains);
   };
-
-  const handleAtomClick = (info: { chain: string; resNo: number; resName: string; atomIndex: number } | null) => {
-    if (info) {
-      if (highlightedResidue &&
-        highlightedResidue.chain === info.chain &&
-        highlightedResidue.resNo === info.resNo) {
-        // Toggle off (Deselect)
-        console.log("App: Deselecting residue", info);
-        setHighlightedResidue(null);
-        viewerRef.current?.clearHighlight();
-      } else {
-        // Select new
-        console.log("App: Atom Clicked", info);
-        setHighlightedResidue({ chain: info.chain, resNo: info.resNo, resName: info.resName });
-        viewerRef.current?.highlightResidue(info.chain, info.resNo);
-      }
-    } else {
-      // Background click
-      setHighlightedResidue(null);
-      viewerRef.current?.clearHighlight();
-    }
-  };
-
 
 
   const handleSequenceResidueClick = (chain: string, resNo: number) => {
@@ -303,6 +335,8 @@ function App() {
         onSaveSession={handleSaveSession}
         onLoadSession={handleLoadSession}
         onToggleContactMap={() => setShowContactMap(true)}
+        isAnnotationMode={isAnnotationMode}
+        setIsAnnotationMode={setIsAnnotationMode}
       />
 
       <ProteinViewer
@@ -321,6 +355,7 @@ function App() {
         showSurface={showSurface}
         showLigands={showLigands}
         isSpinning={isSpinning}
+        annotations={annotations}
         className="w-full h-full"
       />
 

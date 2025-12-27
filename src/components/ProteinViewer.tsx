@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import type { CustomColorRule, ChainInfo } from '../types';
+import type { CustomColorRule, ChainInfo, Annotation } from '../types';
 
 declare global {
     interface Window {
@@ -18,6 +18,7 @@ interface ProteinViewerProps {
     representation?: string;
     coloring?: string;
     customColors?: CustomColorRule[];
+    annotations?: Annotation[];
     className?: string;
     onStructureLoaded?: (info: { chains: ChainInfo[] }) => void;
     onError?: (error: string) => void;
@@ -42,6 +43,7 @@ export interface ProteinViewerRef {
     getCameraOrientation: () => any;
     setCameraOrientation: (orientation: any) => void;
     getAtomCoordinates: () => Promise<{ x: number[], y: number[], z: number[], labels: string[] }[]>;
+    getAtomPosition: (chain: string, resNo: number, atomName?: string) => { x: number, y: number, z: number } | null;
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
@@ -62,7 +64,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     backgroundColor = "black",
     showSurface = false,
     showLigands = false,
-    isSpinning = false
+    isSpinning = false,
+    annotations = []
 }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const stageRef = useRef<any>(null);
@@ -77,6 +80,48 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     const setLoading = setExternalLoading || setInternalLoading;
     const error = externalError !== undefined ? externalError : internalError;
     const setError = setExternalError || setInternalError;
+
+    // Render Annotations
+    useEffect(() => {
+        if (!stageRef.current) return;
+
+        // Clean up previous annotations
+        stageRef.current.eachComponent((comp: any) => {
+            if (comp.name === "annotation-component") {
+                stageRef.current.removeComponent(comp);
+            }
+        });
+
+        if (annotations.length === 0) return;
+
+        // Create new shape for annotations
+        const shape = new window.NGL.Shape("annotations");
+
+        annotations.forEach(note => {
+            // Add text: position, text, color, size
+            // NGL.Shape.addText(position, text, color, size)
+            // Color is [r,g,b] array 0-1
+            shape.addText(
+                [note.position.x, note.position.y, note.position.z],
+                note.text,
+                [1, 1, 1], // White text
+                2.0 // Size
+            );
+
+            // Optional: Draw a small sphere or line to anchor it
+            shape.addSphere(
+                [note.position.x, note.position.y, note.position.z],
+                [1, 0.5, 0], // Orange dot
+                0.5
+            );
+        });
+
+        const shapeComp = stageRef.current.addComponentFromObject(shape);
+        shapeComp.addRepresentation("buffer");
+        shapeComp.setName("annotation-component");
+        shapeComp.autoView(); // Optional: might disrupt user view, better remove it.
+
+    }, [annotations]);
 
     useImperativeHandle(ref, () => ({
         getSnapshotBlob: async () => {
@@ -105,6 +150,27 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     return null;
                 }
             }
+        },
+        getAtomPosition: (chain: string, resNo: number, atomName: string = 'CA') => {
+            // Helper to get 3D coordinates for a residue
+            if (!componentRef.current) return null;
+            let position: { x: number, y: number, z: number } | null = null;
+
+            componentRef.current.structure.eachResidue((res: any) => {
+                if (res.chain.name === chain && res.resno === resNo) {
+                    res.eachAtom((atom: any) => {
+                        if (atom.atomname === atomName) {
+                            position = { x: atom.x, y: atom.y, z: atom.z };
+                        }
+                    });
+                    // Fallback if CA not found
+                    if (!position) {
+                        const atom = res.getAtom((res.atomCount / 2) | 0); // Pick simple middle atom
+                        if (atom) position = { x: atom.x, y: atom.y, z: atom.z };
+                    }
+                }
+            });
+            return position;
         },
         captureImage: async () => {
             const fixPngBlob = async (blob: Blob): Promise<Blob> => {

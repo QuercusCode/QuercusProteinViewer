@@ -30,3 +30,11 @@ export interface Snapshot {
     url: string;
     timestamp: number;
 }
+
+export interface Annotation {
+    id: string;
+    chain: string;
+    resNo: number;
+    text: string;
+    position: { x: number; y: number; z: number };
+}

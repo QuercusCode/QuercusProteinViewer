@@ -38,6 +38,8 @@ interface ControlsProps {
     onSaveSession: () => void;
     onLoadSession: (file: File) => void;
     onToggleContactMap: () => void;
+    isAnnotationMode: boolean;
+    setIsAnnotationMode: (mode: boolean) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -74,7 +76,9 @@ export const Controls: React.FC<ControlsProps> = ({
     setIsCleanMode,
     onSaveSession,
     onLoadSession,
-    onToggleContactMap
+    onToggleContactMap,
+    isAnnotationMode,
+    setIsAnnotationMode
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const sessionInputRef = useRef<HTMLInputElement>(null);
@@ -630,6 +634,17 @@ export const Controls: React.FC<ControlsProps> = ({
                         >
                             <Ruler className="w-4 h-4" />
                             <span>{isMeasurementMode ? 'Active' : 'Measure Distance'}</span>
+                        </button>
+
+                        <button
+                            onClick={() => setIsAnnotationMode(!isAnnotationMode)}
+                            className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${isAnnotationMode
+                                ? 'bg-purple-500/20 border-purple-500/50 text-purple-500 font-medium'
+                                : `${cardBg} hover:opacity-80`
+                                }`}
+                        >
+                            <Crosshair className="w-4 h-4" />
+                            <span>{isAnnotationMode ? 'Annotation Active' : 'Annotate Residues'}</span>
                         </button>
                     </div>
                 </div>
