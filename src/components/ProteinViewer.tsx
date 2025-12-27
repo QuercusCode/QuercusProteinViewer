@@ -28,7 +28,7 @@ interface ProteinViewerProps {
     setError?: (error: string | null) => void;
     resetCamera?: number;
     isMeasurementMode?: boolean;
-    onAtomClick: (info: { chain: string; resNo: number; resName: string; atomIndex: number } | null) => void;
+    onAtomClick: (info: { chain: string; resNo: number; resName: string; atomIndex: number; position?: { x: number, y: number, z: number } } | null) => void;
     backgroundColor?: string;
     showSurface?: boolean;
     showLigands?: boolean;
@@ -659,7 +659,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     chain: atom.chainname,
                     resNo: atom.resno,
                     resName: atom.resname,
-                    atomIndex: atom.index
+                    atomIndex: atom.index,
+                    position: { x: atom.x, y: atom.y, z: atom.z }
                 });
             }
         };

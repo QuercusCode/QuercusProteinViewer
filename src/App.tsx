@@ -64,7 +64,7 @@ function App() {
   // ... (fetchTitle logic) ... 
 
   // Need to insert logic into handleAtomClick
-  const handleAtomClick = async (info: { chain: string; resNo: number; resName: string; atomIndex: number } | null) => {
+  const handleAtomClick = async (info: { chain: string; resNo: number; resName: string; atomIndex: number; position?: { x: number, y: number, z: number } } | null) => {
     if (!info) {
       setHighlightedResidue(null);
       return;
@@ -72,16 +72,21 @@ function App() {
 
     if (isMeasurementMode) {
       // ... existing measurement logic ...
-      // (This part is inside ProteinViewer usually, or handled by a separate function if lifted up. 
-      // Wait, App passes onAtomClick. I need to check how onAtomClick is currently implemented in App.tsx or if it's inline)
     }
 
     // Annotation Logic
     if (isAnnotationMode) {
       const note = window.prompt(`Enter note for ${info.resName} ${info.resNo}:`);
       if (note) {
-        // Fetch 3D coordinates from viewer
-        const position = viewerRef.current?.getAtomPosition(info.chain, info.resNo);
+        // Use coordinates directly from the click event if available
+        let position = info.position;
+
+        // Fallback: If not passed (shouldn't happen with new logic), try to query
+        if (!position) {
+          const fallbackPos = viewerRef.current?.getAtomPosition(info.chain, info.resNo);
+          if (fallbackPos) position = fallbackPos;
+        }
+
         if (position) {
           const newAnnotation: Annotation = {
             id: crypto.randomUUID(),
@@ -97,7 +102,22 @@ function App() {
       }
     }
 
-    setHighlightedResidue({ chain: info.chain, resNo: info.resNo, resName: info.resName });
+    if (info) {
+      // ... highlight logic ...
+      if (highlightedResidue &&
+        highlightedResidue.chain === info.chain &&
+        highlightedResidue.resNo === info.resNo) {
+        // Toggle off (Deselect)
+        console.log("App: Deselecting residue", info);
+        setHighlightedResidue(null);
+        viewerRef.current?.clearHighlight();
+      } else {
+        // Select new
+        console.log("App: Atom Clicked", info);
+        setHighlightedResidue({ chain: info.chain, resNo: info.resNo, resName: info.resName });
+        viewerRef.current?.highlightResidue(info.chain, info.resNo);
+      }
+    }
   };
 
 
