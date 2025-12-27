@@ -42,7 +42,7 @@ export interface ProteinViewerRef {
     getCameraOrientation: () => any;
     setCameraOrientation: (orientation: any) => void;
     getAtomCoordinates: () => Promise<{ x: number[], y: number[], z: number[], labels: string[] }[]>;
-    getTorsionData: () => Promise<{ phi: number | null, psi: number | null, chain: string, resNo: number, resName: string }[]>;
+
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({

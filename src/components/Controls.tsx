@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera, Ruler, Sun, Moon, Layers, Hexagon, Crosshair, Download, Image as ImageIcon, Eye, RefreshCw, Maximize, Minimize, Activity } from 'lucide-react';
+import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera, Ruler, Sun, Moon, Layers, Hexagon, Crosshair, Download, Image as ImageIcon, Eye, RefreshCw, Maximize, Minimize } from 'lucide-react';
 import type { RepresentationType, ColoringType } from './ProteinViewer';
 import type { ChainInfo, CustomColorRule, Snapshot } from '../types';
 
@@ -38,7 +38,6 @@ interface ControlsProps {
     onSaveSession: () => void;
     onLoadSession: (file: File) => void;
     onToggleContactMap: () => void;
-    onToggleRamachandran: () => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -75,8 +74,7 @@ export const Controls: React.FC<ControlsProps> = ({
     setIsCleanMode,
     onSaveSession,
     onLoadSession,
-    onToggleContactMap,
-    onToggleRamachandran
+    onToggleContactMap
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const sessionInputRef = useRef<HTMLInputElement>(null);
@@ -381,15 +379,6 @@ export const Controls: React.FC<ControlsProps> = ({
                             <div className="flex items-center gap-2">
                                 <Maximize className="w-4 h-4" />
                                 <span className="text-xs font-medium">Contact Map</span>
-                            </div>
-                        </button>
-                        <button
-                            onClick={onToggleRamachandran}
-                            className={`w-full flex items-center justify-between px-2 py-1.5 rounded border transition-all ${cardBg} hover:opacity-80`}
-                        >
-                            <div className="flex items-center gap-2">
-                                <Activity className="w-4 h-4" />
-                                <span className="text-xs font-medium">Ramachandran Plot</span>
                             </div>
                         </button>
                     </div>
