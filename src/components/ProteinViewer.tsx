@@ -104,9 +104,9 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             // Color is [r,g,b] array 0-1
             shape.addText(
                 [note.position.x, note.position.y, note.position.z],
-                note.text,
                 [1, 1, 1], // White text
-                2.0 // Size
+                2.0, // Size
+                note.text
             );
 
             // Optional: Draw a small sphere or line to anchor it
@@ -662,12 +662,22 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             // Standard Interaction (Bi-directional Sync)
             if (onAtomClick) {
+                // Try to get exact click position, or fall back to atom center
+                let pos = null;
+                if (pickingProxy.position) {
+                    pos = { x: pickingProxy.position.x, y: pickingProxy.position.y, z: pickingProxy.position.z };
+                } else if (atom) {
+                    pos = { x: atom.x, y: atom.y, z: atom.z };
+                }
+
+                console.log("DEBUG: Final Position for Click:", pos);
+
                 onAtomClick({
                     chain: atom.chainname,
                     resNo: atom.resno,
                     resName: atom.resname,
                     atomIndex: atom.index,
-                    position: { x: atom.x, y: atom.y, z: atom.z }
+                    position: pos || undefined
                 });
             }
         };
