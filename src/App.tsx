@@ -106,7 +106,23 @@ function App() {
               const normalizedType = feat.type.toLowerCase();
 
               // Filter for interesting features (supports both 'active site' and 'active_site')
-              if (['active site', 'binding site', 'domain', 'site', 'mutagenesis site', 'active_site', 'binding_site'].includes(normalizedType)) {
+              // Broadened list to catch GFP features (Mutagenesis, Modified residue) and others
+              const interestingTypes = [
+                'active site', 'active_site',
+                'binding site', 'binding_site',
+                'domain',
+                'site',
+                'mutagenesis', 'mutagenesis site',
+                'modified residue', 'modified_residue',
+                'region',
+                'coiled-coil',
+                'short sequence motif',
+                'zinc finger',
+                'transmembrane region',
+                'intramembrane region'
+              ];
+
+              if (interestingTypes.includes(normalizedType)) {
                 features.push({
                   type: feat.type, // Keep original standard name
                   description: feat.description,
