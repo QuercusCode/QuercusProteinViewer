@@ -101,20 +101,25 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         annotations.forEach(note => {
             // Add text: position, text, color, size
             // NGL.Shape.addText(position, text, color, size)
-            // Color is [r,g,b] array 0-1
-            shape.addText(
-                [note.position.x, note.position.y, note.position.z],
-                [1, 1, 1], // White text
-                2.0, // Size
-                note.text
-            );
+            const pos = [note.position.x, note.position.y, note.position.z];
+            const color = [1, 1, 1];
+            const size = 2.0;
 
-            // Optional: Draw a small sphere or line to anchor it
-            shape.addSphere(
-                [note.position.x, note.position.y, note.position.z],
-                [1, 0.5, 0], // Orange dot
-                0.5
-            );
+            try {
+                // Attempt 1: (pos, color, size, text) - Modern NGL
+                shape.addText(pos, color, size, note.text);
+            } catch (e) {
+                try {
+                    // Attempt 2: (pos, text, color, size) - Older NGL
+                    shape.addText(pos, note.text, color, size);
+                } catch (e2) {
+                    console.error("Failed to add annotation text:", e2);
+                }
+            }
+
+            try {
+                shape.addSphere(pos, [1, 0.5, 0], 0.5);
+            } catch (e) { console.error("Failed to add annotation anchor:", e); }
         });
 
         const shapeComp = stageRef.current.addComponentFromObject(shape);
