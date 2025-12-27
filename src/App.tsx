@@ -14,7 +14,14 @@ function App() {
   const [coloring, setColoring] = useState<ColoringType>('chainid');
   const [resetKey, setResetKey] = useState(0);
   const [isMeasurementMode, setIsMeasurementMode] = useState(false);
-  const [isLightMode, setIsLightMode] = useState(false);
+
+  const [isLightMode, setIsLightMode] = useState(() => {
+    return localStorage.getItem('theme') === 'light';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+  }, [isLightMode]);
 
   // Snapshot Gallery State
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
