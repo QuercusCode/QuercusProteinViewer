@@ -25,6 +25,8 @@ interface ControlsProps {
     setShowSurface: (show: boolean) => void;
     showLigands: boolean;
     setShowLigands: (show: boolean) => void;
+    showMembrane: boolean;
+    setShowMembrane: (show: boolean) => void;
     onFocusLigands: () => void;
     proteinTitle?: string | null;
     snapshots: Snapshot[];
@@ -61,6 +63,8 @@ export const Controls: React.FC<ControlsProps> = ({
     setShowSurface,
     showLigands,
     setShowLigands,
+    showMembrane,
+    setShowMembrane,
     onFocusLigands,
     proteinTitle,
     snapshots,
@@ -315,6 +319,21 @@ export const Controls: React.FC<ControlsProps> = ({
                                     <Crosshair className="w-3 h-3" /> Focus Ligands
                                 </button>
                             )}
+
+
+                            <button
+                                onClick={() => setShowMembrane(!showMembrane)}
+                                className={`w-full flex items-center justify-between px-2 py-1.5 rounded border transition-all ${showMembrane
+                                    ? 'bg-cyan-500/10 border-cyan-500/50 text-cyan-500'
+                                    : `${cardBg} hover:opacity-80`
+                                    }`}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Layers className="w-4 h-4" />
+                                    <span className="text-xs font-medium">Show Membrane</span>
+                                </div>
+                                <div className={`w-3 h-3 rounded-full ${showMembrane ? 'bg-cyan-500' : 'bg-neutral-500'}`} />
+                            </button>
                         </div>
 
                         <div className="space-y-1.5 pt-2">

@@ -33,6 +33,7 @@ function App() {
   // Visualization Toggles
   const [showSurface, setShowSurface] = useState(false);
   const [showLigands, setShowLigands] = useState(false);
+  const [showMembrane, setShowMembrane] = useState(false);
 
   const [highlightedResidue, setHighlightedResidue] = useState<{ chain: string; resNo: number; resName?: string } | null>(null);
 
@@ -251,6 +252,8 @@ function App() {
         showLigands={showLigands}
         setShowLigands={setShowLigands}
         onFocusLigands={handleFocusLigands}
+        showMembrane={showMembrane}
+        setShowMembrane={setShowMembrane}
         proteinTitle={proteinTitle}
         snapshots={snapshots}
         onSnapshot={handleSnapshot}
@@ -278,6 +281,7 @@ function App() {
         backgroundColor={isLightMode ? "white" : "black"}
         showSurface={showSurface}
         showLigands={showLigands}
+        showMembrane={showMembrane}
         isSpinning={isSpinning}
         className="w-full h-full"
       />
