@@ -318,40 +318,28 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     const prev = i > 0 ? residues[i - 1] : null;
                     const next = i < residues.length - 1 ? residues[i + 1] : null;
 
-                    // Get Atoms
-                    const getN = (r: any): any => {
-                        let a = null;
-                        r.eachAtom((at: any) => { if (at.atomname === 'N') a = at; });
-                        return a;
-                    };
-                    const getCA = (r: any): any => {
-                        let a = null;
-                        r.eachAtom((at: any) => { if (at.atomname === 'CA') a = at; });
-                        return a;
-                    };
-                    const getC = (r: any): any => {
-                        let a = null;
-                        r.eachAtom((at: any) => { if (at.atomname === 'C') a = at; });
-                        return a;
+                    // Helper: Get Atom Coordinates safely
+                    const getAtomPos = (r: any, name: string): any => {
+                        let pos = null;
+                        r.eachAtom((at: any) => {
+                            if (at.atomname === name) {
+                                pos = new window.NGL.Vector3(at.x, at.y, at.z);
+                            }
+                        });
+                        return pos;
                     };
 
-                    const N = getN(curr);
-                    const CA = getCA(curr);
-                    const C = getC(curr);
-
-                    // Vectorize
-                    const vN = N ? new Vector3(N.x, N.y, N.z) : null;
-                    const vCA = CA ? new Vector3(CA.x, CA.y, CA.z) : null;
-                    const vC = C ? new Vector3(C.x, C.y, C.z) : null;
+                    const vN = getAtomPos(curr, 'N');
+                    const vCA = getAtomPos(curr, 'CA');
+                    const vC = getAtomPos(curr, 'C');
 
                     let phi = null;
                     let psi = null;
 
                     // Calculate Phi: C(prev) - N - CA - C
                     if (prev && vN && vCA && vC) {
-                        const prevC = getC(prev);
-                        if (prevC) {
-                            const vPrevC = new Vector3(prevC.x, prevC.y, prevC.z);
+                        const vPrevC = getAtomPos(prev, 'C');
+                        if (vPrevC) {
                             // Check connectivity distance (~1.33A) to ensure unbroken chain
                             if (vPrevC.distanceTo(vN) < 2.0) {
                                 phi = calculateDihedral(vPrevC, vN, vCA, vC);
@@ -361,9 +349,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                     // Calculate Psi: N - CA - C - N(next)
                     if (next && vN && vCA && vC) {
-                        const nextN = getN(next);
-                        if (nextN) {
-                            const vNextN = new Vector3(nextN.x, nextN.y, nextN.z);
+                        const vNextN = getAtomPos(next, 'N');
+                        if (vNextN) {
                             // Check connectivity
                             if (vC.distanceTo(vNextN) < 2.0) {
                                 psi = calculateDihedral(vN, vCA, vC, vNextN);
