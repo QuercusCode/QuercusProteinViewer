@@ -272,7 +272,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         x.push(caAtom.x);
                         y.push(caAtom.y);
                         z.push(caAtom.z);
-                        labels.push(`${res.resname} ${res.resno}`);
+                        labels.push(`${chain.chainname}:${res.resname} ${res.resno}`);
                     }
                 });
 

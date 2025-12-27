@@ -14,7 +14,6 @@ interface ContactMapProps {
 export const ContactMap: React.FC<ContactMapProps> = ({
     isOpen,
     onClose,
-    chains,
     getContactData,
     onPixelClick,
     isLightMode
@@ -45,12 +44,23 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
                 const allResidues: { x: number, y: number, z: number, chain: string, resNo: number, label: string }[] = [];
 
-                rawChains.forEach((c, idx) => {
-                    const chainName = chains[idx]?.name || '?';
+                rawChains.forEach((c) => {
                     for (let i = 0; i < c.x.length; i++) {
-                        const label = c.labels[i] || "";
-                        const parts = label.split(" ");
-                        const resNo = parseInt(parts[1]) || (i + 1);
+                        const rawLabel = c.labels[i] || "";
+                        // Expected format: "Chain:ResName ResNo" e.g., "A:ALA 10"
+                        // Or fallback if old format: "ALA 10"
+
+                        let chainName = "?";
+                        let residueLabel = rawLabel;
+
+                        if (rawLabel.includes(":")) {
+                            const firstSplit = rawLabel.split(":");
+                            chainName = firstSplit[0];
+                            residueLabel = firstSplit.slice(1).join(":");
+                        }
+
+                        const parts = residueLabel.trim().split(" ");
+                        const resNo = parseInt(parts[parts.length - 1]) || (i + 1);
 
                         allResidues.push({
                             x: c.x[i],
@@ -58,7 +68,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                             z: c.z[i],
                             chain: chainName,
                             resNo: resNo,
-                            label: label
+                            label: residueLabel
                         });
                     }
                 });
@@ -87,6 +97,11 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                     size: N,
                     labels: allResidues.map(r => ({ resNo: r.resNo, chain: r.chain, label: r.label }))
                 });
+
+                // Auto-scale to fit view (aim for ~600px or fit within container)
+                const optimalScale = Math.max(1, Math.min(20, Math.floor(600 / N)));
+                setScale(optimalScale);
+
             } catch (e) {
                 console.error("Map computation failed", e);
             } finally {
@@ -229,7 +244,12 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     // Generate Axis Labels
     const Axes = useMemo(() => {
         if (!distanceData) return null;
-        const { size } = distanceData;
+        const { size, labels } = distanceData;
+
+        // Check finding actual unique chains in the data
+        const uniqueChains = new Set(labels.map(l => l.chain));
+        const showChain = uniqueChains.size > 1;
+
         const step = 20;
         const ticks = [];
         for (let i = 0; i < size; i += step) {
@@ -237,21 +257,19 @@ export const ContactMap: React.FC<ContactMapProps> = ({
             ticks.push(i);
         }
 
-        const showChain = chains.length > 1;
-
         return {
             x: ticks.map(t => {
-                const data = distanceData.labels[t];
+                const data = labels[t];
                 const label = showChain ? `${data?.chain}:${data?.resNo}` : data?.resNo;
                 return (
                     <div key={`x-${t}`} className="absolute text-[10px] text-neutral-500 font-medium transform -translate-x-1/2 flex flex-col items-center" style={{ left: (t * scale) + (scale / 2) }}>
-                        <div className="h-1 w-px bg-neutral-300 mb-0.5"></div>
-                        <span className="whitespace-nowrap">{label}</span>
+                        <span className="whitespace-nowrap mb-0.5">{label}</span>
+                        <div className="h-1 w-px bg-neutral-300"></div>
                     </div>
                 );
             }),
             y: ticks.map(t => {
-                const data = distanceData.labels[t];
+                const data = labels[t];
                 const label = showChain ? `${data?.chain}:${data?.resNo}` : data?.resNo;
                 return (
                     <div key={`y-${t}`} className="absolute text-[10px] text-neutral-500 font-medium transform -translate-y-1/2 flex items-center justify-end w-12 right-0 pr-1" style={{ top: (t * scale) + (scale / 2) }}>
@@ -261,7 +279,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                 );
             })
         };
-    }, [distanceData, scale, chains.length]);
+    }, [distanceData, scale]);
 
     if (!isOpen) return null;
 
@@ -294,8 +312,8 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                     </div>
                 </div>
 
-                {/* Main Content Area - Grid Layout */}
-                <div className={`flex-1 overflow-auto relative flex justify-center p-8 ${isLightMode ? 'bg-neutral-50' : 'bg-black/20'}`}>
+                {/* Main Content Area - Grid Layout for Sticky Axes */}
+                <div className={`flex-1 overflow-auto relative p-0 ${isLightMode ? 'bg-neutral-50' : 'bg-black/20'}`}>
                     {loading ? (
                         <div className={`absolute inset-0 flex items-center justify-center z-10 ${isLightMode ? 'bg-white/80' : 'bg-black/80'}`}>
                             <div className="flex flex-col items-center gap-3">
@@ -304,14 +322,23 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                             </div>
                         </div>
                     ) : distanceData && (
-                        <div className={`relative inline-block shadow-sm p-4 rounded-lg border ${isLightMode ? 'bg-white border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`}>
-                            {/* Y Axis */}
-                            <div className="absolute top-4 bottom-4 left-0 w-8" style={{ height: distanceData.size * scale }}>
+                        <div className="inline-grid grid-cols-[auto_1fr] grid-rows-[auto_1fr]">
+
+                            {/* Top-Left Corner (Sticky) */}
+                            <div className={`sticky top-0 left-0 z-20 w-12 h-8 ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-900'}`} />
+
+                            {/* X Axis (Sticky Top) */}
+                            <div className={`sticky top-0 z-10 h-8 relative border-b ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`} style={{ width: distanceData.size * scale }}>
+                                {Axes?.x}
+                            </div>
+
+                            {/* Y Axis (Sticky Left) */}
+                            <div className={`sticky left-0 z-10 w-12 relative border-r ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`} style={{ height: distanceData.size * scale }}>
                                 {Axes?.y}
                             </div>
 
-                            {/* Map Container (Offset for Y axis) */}
-                            <div className="ml-8 relative" style={{ width: distanceData.size * scale, height: distanceData.size * scale }}>
+                            {/* Map Canvas */}
+                            <div className="relative" style={{ width: distanceData.size * scale, height: distanceData.size * scale }}>
                                 <canvas
                                     ref={mapCanvasRef}
                                     className="absolute inset-0 pointer-events-none image-pixelated"
@@ -325,11 +352,6 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                                     className="absolute inset-0 cursor-crosshair image-pixelated"
                                     style={{ imageRendering: 'pixelated' }}
                                 />
-                            </div>
-
-                            {/* X Axis */}
-                            <div className="ml-8 relative h-6 mt-1 w-full">
-                                {Axes?.x}
                             </div>
                         </div>
                     )}
