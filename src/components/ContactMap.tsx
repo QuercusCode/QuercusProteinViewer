@@ -155,6 +155,28 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         ctx.lineTo(size * P, size * P);
         ctx.stroke();
 
+        // Draw Chain Separators
+        const { labels } = distanceData;
+        ctx.strokeStyle = '#eab308'; // Yellow-500 for visibility
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+
+        let lastChain = labels[0]?.chain;
+        for (let i = 1; i < size; i++) {
+            const currentChain = labels[i]?.chain;
+            if (currentChain !== lastChain) {
+                const pos = i * P; // Exact pixel position
+                // Horizontal line
+                ctx.moveTo(0, pos);
+                ctx.lineTo(size * P, pos);
+                // Vertical line
+                ctx.moveTo(pos, 0);
+                ctx.lineTo(pos, size * P);
+                lastChain = currentChain;
+            }
+        }
+        ctx.stroke();
+
         // Draw Contacts
         for (let i = 0; i < size; i++) {
             for (let j = i; j < size; j++) {
@@ -368,11 +390,17 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                             <div className="grid grid-cols-2 gap-4 pt-2">
                                 <div>
                                     <span className="text-[10px] opacity-50 uppercase">Residue 1</span>
-                                    <div className="font-mono text-sm">{distanceData.labels[hoverPos.i].label}</div>
+                                    <div className="font-mono text-sm">
+                                        <span className="text-blue-500 font-bold mr-1">{distanceData.labels[hoverPos.i].chain}</span>
+                                        {distanceData.labels[hoverPos.i].label}
+                                    </div>
                                 </div>
                                 <div className="text-right">
                                     <span className="text-[10px] opacity-50 uppercase">Residue 2</span>
-                                    <div className="font-mono text-sm">{distanceData.labels[hoverPos.j].label}</div>
+                                    <div className="font-mono text-sm">
+                                        <span className="text-blue-500 font-bold mr-1">{distanceData.labels[hoverPos.j].chain}</span>
+                                        {distanceData.labels[hoverPos.j].label}
+                                    </div>
                                 </div>
                             </div>
                         </div>
