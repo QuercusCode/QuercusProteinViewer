@@ -16,7 +16,8 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     onClose,
     chains,
     getContactData,
-    onPixelClick
+    onPixelClick,
+    isLightMode
 }) => {
     const mapCanvasRef = useRef<HTMLCanvasElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -97,7 +98,8 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         setTimeout(computeMap, 100);
     }, [isOpen]);
 
-    // Render Base Map (Heavy)
+
+    // Render Base Map (Theme Aware)
     useEffect(() => {
         if (!distanceData || !mapCanvasRef.current) return;
         const ctx = mapCanvasRef.current.getContext('2d', { alpha: false });
@@ -105,67 +107,64 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
         const { matrix, size } = distanceData;
 
-        mapCanvasRef.current.width = size * scale;
-        mapCanvasRef.current.height = size * scale;
+        const P = scale;
+        mapCanvasRef.current.width = size * P;
+        mapCanvasRef.current.height = size * P;
 
-        // Fill White (Paper style)
-        ctx.fillStyle = '#ffffff';
+        // Theme Colors
+        const bg = isLightMode ? '#ffffff' : '#171717'; // White vs Neutral-900
+        const grid = isLightMode ? '#f0f0f0' : '#262626'; // Subtle Grid
+        const diag = isLightMode ? '#e5e5e5' : '#404040';
+
+        // Fill Bg
+        ctx.fillStyle = bg;
         ctx.fillRect(0, 0, mapCanvasRef.current.width, mapCanvasRef.current.height);
 
-        // Draw Grid Lines (Light Grey)
-        ctx.strokeStyle = '#f0f0f0'; // Very subtle
+        // Draw Grid Lines
+        ctx.strokeStyle = grid;
         ctx.lineWidth = 1;
 
-        const gridStep = 25; // Every 25 residues
+        const gridStep = 25;
         ctx.beginPath();
         for (let i = 0; i <= size; i += gridStep) {
-            const pos = Math.floor(i * scale) + 0.5; // Snap to pixel
-            // Horizontal
+            const pos = Math.floor(i * P) + 0.5;
             ctx.moveTo(0, pos);
-            ctx.lineTo(size * scale, pos);
-            // Vertical
+            ctx.lineTo(size * P, pos);
             ctx.moveTo(pos, 0);
-            ctx.lineTo(pos, size * scale);
+            ctx.lineTo(pos, size * P);
         }
         ctx.stroke();
 
         // Draw Diagonals
-        ctx.strokeStyle = '#e5e5e5';
+        ctx.strokeStyle = diag;
         ctx.beginPath();
         ctx.moveTo(0, 0);
-        ctx.lineTo(size * scale, size * scale);
+        ctx.lineTo(size * P, size * P);
         ctx.stroke();
 
         // Draw Contacts
-        // Optimized: direct pixel manipulation is faster for massive maps, but rects are easier
-        // Let's use Rects for < 3000
         for (let i = 0; i < size; i++) {
-            for (let j = i; j < size; j++) { // Symmetry optimization? Draw both
+            for (let j = i; j < size; j++) {
                 const dist = matrix[i][j];
-
-                // Theme: Clean Academic
-                // Contact (<5A): Black/Dark Navy
-                // Proximal (5-8A): Grey/Teal
-                // Distant (>8A): Hidden
 
                 if (dist < 8) {
                     if (dist < 5) {
-                        ctx.fillStyle = '#1e3a8a'; // Dark Blue (Indigo-900)
+                        // Close: Dark Blue (Light Mode) / Light Blue (Dark Mode)
+                        ctx.fillStyle = isLightMode ? '#1e3a8a' : '#60a5fa';
                     } else {
-                        ctx.fillStyle = '#94a3b8'; // Slate-400
+                        // Proximal: Slate Grey (Light Mode) / Slate Blue-Grey (Dark Mode)
+                        ctx.fillStyle = isLightMode ? '#94a3b8' : '#475569';
                     }
 
-                    // Draw (i,j)
-                    ctx.fillRect(j * scale, i * scale, scale, scale);
-                    // Draw (j,i) symmetric
+                    ctx.fillRect(j * P, i * P, P, P);
                     if (i !== j) {
-                        ctx.fillRect(i * scale, j * scale, scale, scale);
+                        ctx.fillRect(i * P, j * P, P, P);
                     }
                 }
             }
         }
 
-    }, [distanceData, scale]);
+    }, [distanceData, scale, isLightMode]);
 
     // Render Overlay (Crosshair) - Light
     useEffect(() => {
@@ -241,7 +240,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     const Axes = useMemo(() => {
         if (!distanceData) return null;
         const { size } = distanceData;
-        const step = 50; // Label every 50
+        const step = 20; // Label every 20 residues for better visibility
         const ticks = [];
         for (let i = 0; i < size; i += step) {
             if (i === 0 && size > 10) continue; // Skip 0 if crowded or handle 1
@@ -279,7 +278,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                         <div>
                             <h3 className="font-bold text-lg">Contact Map</h3>
                             <p className="text-xs text-neutral-400">
-                                {distanceData ? `${distanceData.size} Residues • Academic Style` : 'Initializing...'}
+                                {distanceData ? `${distanceData.size} Residues` : 'Initializing...'}
                             </p>
                         </div>
                     </div>
