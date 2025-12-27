@@ -203,36 +203,57 @@ function App() {
   };
 
   // Session Management
+  // Session Management
   const handleSaveSession = () => {
     try {
-      // Sanitize annotations to ensure they are plain objects
-      const safeAnnotations = annotations.map(ann => ({
-        id: ann.id,
-        chain: ann.chain,
-        resNo: ann.resNo,
-        text: ann.text,
-        position: { x: ann.position.x, y: ann.position.y, z: ann.position.z }
+      console.log("Starting save session...");
+
+      // 1. Sanitize annotations
+      const safeAnnotations = (annotations || []).map(ann => ({
+        id: String(ann.id),
+        chain: String(ann.chain),
+        resNo: Number(ann.resNo),
+        text: String(ann.text),
+        position: { x: Number(ann.position?.x || 0), y: Number(ann.position?.y || 0), z: Number(ann.position?.z || 0) }
       }));
 
+      // 2. Safely get orientation
+      let safeOrientation = null;
+      try {
+        safeOrientation = viewerRef.current?.getCameraOrientation() || null;
+      } catch (err) {
+        console.warn("Could not get orientation for save:", err);
+      }
+
+      // 3. Construct Data safely
       const sessionData = {
         version: 1,
-        pdbId,
-        representation,
-        coloring,
-        isMeasurementMode,
-        isLightMode,
-        showSurface,
-        showLigands,
-        isSpinning,
-        isCleanMode,
-        customColors,
-        chains,
+        pdbId: String(pdbId || ""),
+        representation: String(representation),
+        coloring: String(coloring),
+        isMeasurementMode: Boolean(isMeasurementMode),
+        isLightMode: Boolean(isLightMode),
+        showSurface: Boolean(showSurface),
+        showLigands: Boolean(showLigands),
+        isSpinning: Boolean(isSpinning),
+        isCleanMode: Boolean(isCleanMode),
+        customColors: customColors || {},
+        chains: Array.isArray(chains) ? chains : [],
         annotations: safeAnnotations,
-        orientation: viewerRef.current?.getCameraOrientation(),
+        orientation: safeOrientation,
         timestamp: Date.now()
       };
 
-      const blob = new Blob([JSON.stringify(sessionData, null, 2)], { type: 'application/json' });
+      console.log("Session data prepared, converting to JSON...");
+
+      // 4. Safe Stringify
+      const jsonString = JSON.stringify(sessionData, (key, value) => {
+        // Prevent circular references just in case (though we sanitized above)
+        if (key === 'viewerRef' || key === 'stageRef' || key === 'structure') return undefined;
+        return value;
+      }, 2);
+
+      const blob = new Blob([jsonString], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -241,9 +262,11 @@ function App() {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+
+      console.log("Save session completed successfully.");
     } catch (e) {
-      console.error("Save Session Failed:", e);
-      alert("Failed to save session. See console for details.");
+      console.error("CRITICAL SAVE ERROR:", e);
+      alert(`Failed to save session: ${e instanceof Error ? e.message : String(e)}`);
     }
   };
 
