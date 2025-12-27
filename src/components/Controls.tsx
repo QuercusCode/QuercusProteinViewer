@@ -21,8 +21,6 @@ interface ControlsProps {
     setIsLightMode: (enabled: boolean) => void;
     highlightedResidue: { chain: string; resNo: number; resName?: string } | null;
     onResidueClick: (chain: string, resNo: number) => void;
-    hoveredResidue: { chain: string; resNo: number; resName?: string } | null;
-    onResidueHover: (chain: string, resNo: number | null) => void;
     showSurface: boolean;
     setShowSurface: (show: boolean) => void;
     showLigands: boolean;
@@ -60,8 +58,6 @@ export const Controls: React.FC<ControlsProps> = ({
     setIsLightMode,
     highlightedResidue,
     onResidueClick,
-    hoveredResidue,
-    onResidueHover,
     showSurface,
     setShowSurface,
     showLigands,
@@ -530,28 +526,21 @@ export const Controls: React.FC<ControlsProps> = ({
                                                 {c.sequence.split('').map((char, idx) => {
                                                     const resNo = c.min + idx;
                                                     const isHighlighted = highlightedResidue?.chain === c.name && highlightedResidue.resNo === resNo;
-                                                    const isHovered = hoveredResidue?.chain === c.name && hoveredResidue.resNo === resNo;
-
                                                     return (
-                                                        <span
+                                                        <div
                                                             key={idx}
-                                                            ref={(el) => { if (el) residueRefs.current.set(`${c.name}-${resNo}`, el); }}
                                                             onClick={() => onResidueClick(c.name, resNo)}
-                                                            onMouseEnter={() => onResidueHover(c.name, resNo)}
-                                                            onMouseLeave={() => onResidueHover(c.name, null)}
                                                             className={`
-                                                                inline-block w-[1.2em] h-[1.4em] flex items-center justify-center cursor-pointer transition-colors rounded-sm
-                                                                ${isHighlighted
-                                                                    ? 'bg-blue-500 text-white font-bold scale-110 shadow-sm z-10 ring-1 ring-blue-300'
-                                                                    : isHovered
-                                                                        ? 'bg-amber-400 text-white font-bold scale-105 z-10'
-                                                                        : `hover:bg-blue-500/20 text-opacity-80 ${isLightMode ? 'text-neutral-700 hover:text-blue-700' : 'text-neutral-300 hover:text-blue-300'}`
+                                                                w-6 h-6 flex items-center justify-center text-[10px] font-mono
+                                                                cursor-pointer select-none transition-all duration-150 rounded-sm
+                                                                ${isHighlighted ? 'bg-blue-600 text-white font-bold scale-110 shadow-sm z-10' :
+                                                                    'hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-400'
                                                                 }
                                                             `}
                                                             title={`${char}${resNo}`}
                                                         >
                                                             {char}
-                                                        </span>
+                                                        </div>
                                                     );
                                                 })}
                                             </div>

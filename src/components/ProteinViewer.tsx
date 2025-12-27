@@ -27,8 +27,7 @@ interface ProteinViewerProps {
     setError?: (error: string | null) => void;
     resetCamera?: number;
     isMeasurementMode?: boolean;
-    onAtomClick?: (info: { chain: string; resNo: number; resName: string; atomIndex: number } | null) => void;
-    onAtomHover?: (info: { chain: string; resNo: number; resName: string; atomIndex: number } | null) => void;
+    onAtomClick: (info: { chain: string; resNo: number; resName: string; atomIndex: number } | null) => void;
     backgroundColor?: string;
     showSurface?: boolean;
     showLigands?: boolean;
@@ -60,7 +59,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     resetCamera,
     isMeasurementMode = false,
     onAtomClick,
-    onAtomHover,
     backgroundColor = "black",
     showSurface = false,
     showLigands = false,
@@ -593,30 +591,13 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             }
         };
 
-        const handleHover = (pickingProxy: any) => {
-            if (onAtomHover) {
-                if (pickingProxy && pickingProxy.atom) {
-                    const atom = pickingProxy.atom;
-                    onAtomHover({
-                        chain: atom.chainname,
-                        resNo: atom.resno,
-                        resName: atom.resname,
-                        atomIndex: atom.index
-                    });
-                } else {
-                    onAtomHover(null);
-                }
-            }
-        };
-
         stage.signals.clicked.add(handleClick);
-        stage.signals.hovered.add(handleHover);
 
         return () => {
             stage.signals.clicked.remove(handleClick);
-            stage.signals.hovered.remove(handleHover);
+
         };
-    }, [isMeasurementMode, onAtomClick, onAtomHover]);
+    }, [isMeasurementMode, onAtomClick]);
 
 
     const updateRepresentation = (specificComponent?: any) => {
