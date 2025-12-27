@@ -340,20 +340,20 @@ export const Controls: React.FC<ControlsProps> = ({
                                     <option value="charge">Charge (+/-)</option>
                                 </select>
                             </div>
-                            <p className={`text-[10px] leading-tight px-1 ${subtleText}`}>
-                                {(() => {
-                                    const descriptions: Record<string, string> = {
-                                        chainid: "Different color for each polymer chain.",
-                                        element: "CPK: Carbon (Grey), Oxygen (Red), Nitrogen (Blue), Sulfur (Yellow).",
-                                        resname: "Unique color for each amino acid type.",
-                                        structure: "Helix (Pink), Sheet (Yellow), Coil (Green).",
-                                        hydrophobicity: "Red = Hydrophobic (Core), White = Hydrophilic (Surface).",
-                                        bfactor: "Red = Flexible/Mobile regions, Blue = Rigid/Stable regions.",
-                                        charge: "Blue = Positive (Arg/Lys/His), Red = Negative (Asp/Glu)."
-                                    };
-                                    return descriptions[coloring] || "";
-                                })()}
-                            </p>
+                        </div>
+                        <div className={`mt-2 p-2 rounded border text-xs leading-snug ${isLightMode ? 'bg-neutral-50/50 border-neutral-100 text-neutral-600' : 'bg-neutral-800/50 border-neutral-700/50 text-neutral-400'}`}>
+                            {(() => {
+                                const descriptions: Record<string, string> = {
+                                    chainid: "Different color for each polymer chain.",
+                                    element: "CPK: Carbon (Grey), Oxygen (Red), Nitrogen (Blue), Sulfur (Yellow).",
+                                    resname: "Unique color for each amino acid type.",
+                                    structure: "Helix (Pink), Sheet (Yellow), Coil (Green).",
+                                    hydrophobicity: "Red = Hydrophobic (Core), White = Hydrophilic (Surface).",
+                                    bfactor: "Red = Flexible/Mobile regions, Blue = Rigid/Stable regions.",
+                                    charge: "Blue = Positive (Arg/Lys/His), Red = Negative (Asp/Glu)."
+                                };
+                                return descriptions[coloring] || "Select a coloring mode";
+                            })()}
                         </div>
                     </div>
 
@@ -581,30 +581,32 @@ export const Controls: React.FC<ControlsProps> = ({
                         </button>
                     </div>
                 </div>
-            </div>
+            </div >
 
             {/* Snapshot Preview Modal */}
-            {previewSnapshot && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setPreviewSnapshot(null)}>
-                    <div className="relative max-w-4xl max-h-[90vh] w-full rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
-                        <button
-                            onClick={() => setPreviewSnapshot(null)}
-                            className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
-                        >
-                            <X className="w-6 h-6" />
-                        </button>
-                        <img src={previewSnapshot.url} alt="Preview" className="w-full h-full object-contain bg-neutral-900" />
-                        <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-center gap-4">
+            {
+                previewSnapshot && (
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setPreviewSnapshot(null)}>
+                        <div className="relative max-w-4xl max-h-[90vh] w-full rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
                             <button
-                                onClick={() => onDownloadSnapshot(previewSnapshot.id)}
-                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
+                                onClick={() => setPreviewSnapshot(null)}
+                                className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
                             >
-                                <Download className="w-4 h-4" /> Download
+                                <X className="w-6 h-6" />
                             </button>
+                            <img src={previewSnapshot.url} alt="Preview" className="w-full h-full object-contain bg-neutral-900" />
+                            <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-center gap-4">
+                                <button
+                                    onClick={() => onDownloadSnapshot(previewSnapshot.id)}
+                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
+                                >
+                                    <Download className="w-4 h-4" /> Download
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )
+            }
         </>
     );
 };
