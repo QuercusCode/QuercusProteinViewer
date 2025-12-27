@@ -249,8 +249,14 @@ function App() {
 
   const handleSequenceResidueClick = (chain: string, resNo: number) => {
     console.log("App: Sequence Clicked", chain, resNo);
-    setHighlightedResidue({ chain, resNo });
-    viewerRef.current?.highlightResidue(chain, resNo);
+
+    if (highlightedResidue && highlightedResidue.chain === chain && highlightedResidue.resNo === resNo) {
+      setHighlightedResidue(null);
+      viewerRef.current?.clearHighlight();
+    } else {
+      setHighlightedResidue({ chain, resNo });
+      viewerRef.current?.highlightResidue(chain, resNo);
+    }
   };
 
   // Snapshot Handlers
