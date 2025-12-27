@@ -33,9 +33,10 @@ function App() {
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
 
   // Visualization Toggles
+
   const [showSurface, setShowSurface] = useState(false);
   const [showLigands, setShowLigands] = useState(false);
-
+  const [clipNear, setClipNear] = useState(0);
 
   const [highlightedResidue, setHighlightedResidue] = useState<{ chain: string; resNo: number; resName?: string } | null>(null);
 
@@ -44,6 +45,7 @@ function App() {
 
   const handleResetView = () => {
     setResetKey(prev => prev + 1);
+    setClipNear(0);
   };
 
   const handleUpload = (uploadedFile: File) => {
@@ -302,6 +304,8 @@ function App() {
         onSaveSession={handleSaveSession}
         onLoadSession={handleLoadSession}
         onToggleContactMap={() => setShowContactMap(true)}
+        clipNear={clipNear}
+        setClipNear={setClipNear}
       />
 
       <ProteinViewer
@@ -320,6 +324,7 @@ function App() {
         showSurface={showSurface}
         showLigands={showLigands}
         isSpinning={isSpinning}
+        clipNear={clipNear}
         className="w-full h-full"
       />
 

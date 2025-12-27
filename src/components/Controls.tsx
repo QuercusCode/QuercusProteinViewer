@@ -38,6 +38,8 @@ interface ControlsProps {
     onSaveSession: () => void;
     onLoadSession: (file: File) => void;
     onToggleContactMap: () => void;
+    clipNear: number;
+    setClipNear: (value: number) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -74,7 +76,9 @@ export const Controls: React.FC<ControlsProps> = ({
     setIsCleanMode,
     onSaveSession,
     onLoadSession,
-    onToggleContactMap
+    onToggleContactMap,
+    clipNear,
+    setClipNear
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const sessionInputRef = useRef<HTMLInputElement>(null);
@@ -318,8 +322,22 @@ export const Controls: React.FC<ControlsProps> = ({
                                 </button>
                             )}
 
-
-
+                            {/* Clipping Plane Slider */}
+                            <div className={`p-2 rounded border ${isLightMode ? 'bg-neutral-50/50 border-neutral-100' : 'bg-neutral-800/50 border-neutral-700'}`}>
+                                <div className="flex items-center justify-between mb-1.5">
+                                    <span className={`text-[10px] font-medium uppercase tracking-wider ${subtleText}`}>Slab View (Clip Near)</span>
+                                    <span className={`text-[10px] font-mono ${isLightMode ? 'text-neutral-600' : 'text-neutral-400'}`}>{clipNear}%</span>
+                                </div>
+                                <input
+                                    type="range"
+                                    min="0"
+                                    max="100"
+                                    step="1"
+                                    value={clipNear}
+                                    onChange={(e) => setClipNear(parseInt(e.target.value))}
+                                    className="w-full h-1.5 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                                />
+                            </div>
                         </div>
 
                         <div className="space-y-1.5 pt-2">

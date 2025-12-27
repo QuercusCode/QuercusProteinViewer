@@ -32,6 +32,7 @@ interface ProteinViewerProps {
     showSurface?: boolean;
     showLigands?: boolean;
     isSpinning?: boolean;
+    clipNear?: number;
 }
 
 export interface ProteinViewerRef {
@@ -62,7 +63,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     backgroundColor = "black",
     showSurface = false,
     showLigands = false,
-    isSpinning = false
+    isSpinning = false,
+    clipNear = 0 // 0 to 100
 }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const stageRef = useRef<any>(null);
@@ -77,6 +79,15 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     const setLoading = setExternalLoading || setInternalLoading;
     const error = externalError !== undefined ? externalError : internalError;
     const setError = setExternalError || setInternalError;
+
+    // Apply Clipping Plane
+    useEffect(() => {
+        if (stageRef.current) {
+            stageRef.current.setParameters({
+                clipNear: clipNear
+            });
+        }
+    }, [clipNear]);
 
     useImperativeHandle(ref, () => ({
         getSnapshotBlob: async () => {
