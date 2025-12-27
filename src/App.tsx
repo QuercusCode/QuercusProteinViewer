@@ -249,11 +249,16 @@ function App() {
 
   const handleSequenceResidueClick = (chain: string, resNo: number) => {
     console.log("App: Sequence Clicked", chain, resNo);
+    console.log("App: Current Highlight", highlightedResidue);
 
-    if (highlightedResidue && highlightedResidue.chain === chain && highlightedResidue.resNo === resNo) {
+    if (highlightedResidue &&
+      String(highlightedResidue.chain) === String(chain) &&
+      Number(highlightedResidue.resNo) === Number(resNo)) {
+      console.log("App: Toggling OFF");
       setHighlightedResidue(null);
       viewerRef.current?.clearHighlight();
     } else {
+      console.log("App: Selecting NEW");
       setHighlightedResidue({ chain, resNo });
       viewerRef.current?.highlightResidue(chain, resNo);
     }
