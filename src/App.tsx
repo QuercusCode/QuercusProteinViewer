@@ -99,15 +99,20 @@ function App() {
           const features: UniProtFeature[] = [];
 
           if (entry.features) {
+            console.log("Raw Features:", entry.features.map((f: any) => f.type)); // Debug log
+
             entry.features.forEach((feat: any) => {
-              // Filter for interesting features
-              if (['active_site', 'binding_site', 'domain', 'site', 'mutagenesis_site'].includes(feat.type)) {
+              // Normalize type for comparison (lowercase)
+              const normalizedType = feat.type.toLowerCase();
+
+              // Filter for interesting features (supports both 'active site' and 'active_site')
+              if (['active site', 'binding site', 'domain', 'site', 'mutagenesis site', 'active_site', 'binding_site'].includes(normalizedType)) {
                 features.push({
-                  type: feat.type,
+                  type: feat.type, // Keep original standard name
                   description: feat.description,
                   start: feat.location.start.value,
                   end: feat.location.end.value,
-                  chain: "A" // Assumption: Simplification for now, mapping UniProt to PDB chains is hard
+                  chain: "A" // Assumption: Simplification for now
                 });
               }
             });
