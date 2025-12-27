@@ -104,8 +104,19 @@ export const Controls: React.FC<ControlsProps> = ({
 
             const key = `${highlightedResidue.chain}-${highlightedResidue.resNo}`;
             const element = residueRefs.current.get(key);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const container = sequenceContainerRef.current;
+
+            if (element && container) {
+                // Calculate position relative to container to avoid scrolling the whole page (mobile fix)
+                const elementTop = element.offsetTop;
+                const elementHeight = element.offsetHeight;
+                const containerHeight = container.clientHeight;
+
+                // Center the element
+                container.scrollTo({
+                    top: elementTop - (containerHeight / 2) + (elementHeight / 2),
+                    behavior: 'smooth'
+                });
             }
         }
     }, [highlightedResidue, viewSequenceChain]);
