@@ -35,6 +35,8 @@ interface ControlsProps {
     setIsSpinning: (spinning: boolean) => void;
     isCleanMode: boolean;
     setIsCleanMode: (clean: boolean) => void;
+    onSaveSession: () => void;
+    onLoadSession: (file: File) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -68,9 +70,12 @@ export const Controls: React.FC<ControlsProps> = ({
     isSpinning,
     setIsSpinning,
     isCleanMode,
-    setIsCleanMode
+    setIsCleanMode,
+    onSaveSession,
+    onLoadSession
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const sessionInputRef = useRef<HTMLInputElement>(null);
     const [localPdbId, setLocalPdbId] = React.useState(pdbId);
     const [previewSnapshot, setPreviewSnapshot] = useState<Snapshot | null>(null);
 
@@ -358,6 +363,37 @@ export const Controls: React.FC<ControlsProps> = ({
                     </div>
 
                     <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
+
+                    {/* Session */}
+                    <div className="space-y-3">
+                        <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Session</label>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={onSaveSession}
+                                className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}
+                            >
+                                <Download className="w-4 h-4" /> Save
+                            </button>
+                            <input
+                                type="file"
+                                accept=".json"
+                                className="hidden"
+                                ref={sessionInputRef}
+                                onChange={(e) => {
+                                    if (e.target.files && e.target.files[0]) {
+                                        onLoadSession(e.target.files[0]);
+                                        e.target.value = '';
+                                    }
+                                }}
+                            />
+                            <button
+                                onClick={() => sessionInputRef.current?.click()}
+                                className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}
+                            >
+                                <Upload className="w-4 h-4" /> Load
+                            </button>
+                        </div>
+                    </div>
 
                     {/* Colors */}
                     <div className="space-y-3">

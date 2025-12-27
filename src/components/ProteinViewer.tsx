@@ -39,6 +39,8 @@ export interface ProteinViewerRef {
     highlightResidue: (chain: string, resNo: number) => void;
     focusLigands: () => void;
     clearHighlight: () => void;
+    getCameraOrientation: () => any;
+    setCameraOrientation: (orientation: any) => void;
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
@@ -232,6 +234,18 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 }
             } catch (e) {
                 console.warn("Clear highlight failed:", e);
+            }
+        },
+        getCameraOrientation: () => {
+            if (!stageRef.current || !stageRef.current.viewerControls) return null;
+            return stageRef.current.viewerControls.getOrientation();
+        },
+        setCameraOrientation: (orientation: any) => {
+            if (!stageRef.current || !stageRef.current.viewerControls || !orientation) return;
+            try {
+                stageRef.current.viewerControls.orient(orientation);
+            } catch (e) {
+                console.warn("Failed to set orientation:", e);
             }
         }
     }));

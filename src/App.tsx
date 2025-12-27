@@ -101,6 +101,62 @@ function App() {
     viewerRef.current?.focusLigands();
   };
 
+  // Session Management
+  const handleSaveSession = () => {
+    const state = {
+      pdbId,
+      representation,
+      coloring,
+      isMeasurementMode,
+      isLightMode,
+      showSurface,
+      showLigands,
+      isSpinning,
+      customColors,
+      chains,
+      orientation: viewerRef.current?.getCameraOrientation(),
+      savedAt: new Date().toISOString()
+    };
+
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `session-${pdbId || 'structure'}-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleLoadSession = async (file: File) => {
+    try {
+      const text = await file.text();
+      const state = JSON.parse(text);
+
+      if (!state.savedAt) console.warn("Session file missing timestamp");
+
+      if (state.pdbId) setPdbId(state.pdbId);
+      if (state.representation) setRepresentation(state.representation);
+      if (state.coloring) setColoring(state.coloring);
+      if (typeof state.isMeasurementMode === 'boolean') setIsMeasurementMode(state.isMeasurementMode);
+      if (typeof state.isLightMode === 'boolean') setIsLightMode(state.isLightMode);
+      if (typeof state.showSurface === 'boolean') setShowSurface(state.showSurface);
+      if (typeof state.showLigands === 'boolean') setShowLigands(state.showLigands);
+      if (typeof state.isSpinning === 'boolean') setIsSpinning(state.isSpinning);
+      if (state.customColors) setCustomColors(state.customColors);
+
+      if (state.orientation) {
+        setTimeout(() => {
+          viewerRef.current?.setCameraOrientation(state.orientation);
+        }, 1500);
+      }
+    } catch (error) {
+      console.error("Failed to load session:", error);
+      alert("Failed to load session file.");
+    }
+  };
+
   const handleStructureLoaded = (info: StructureInfo) => {
     setChains(info.chains);
   };
@@ -204,6 +260,8 @@ function App() {
         setIsSpinning={setIsSpinning}
         isCleanMode={isCleanMode}
         setIsCleanMode={setIsCleanMode}
+        onSaveSession={handleSaveSession}
+        onLoadSession={handleLoadSession}
       />
 
       <ProteinViewer
