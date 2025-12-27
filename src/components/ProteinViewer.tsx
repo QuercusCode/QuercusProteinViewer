@@ -263,16 +263,23 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                 // Iterate CA atoms
                 chain.eachResidue((res: any) => {
-                    let caAtom: any = null;
+                    let atomToUse: any = null;
+
+                    // Prioritize CA (Protein) > C3' (Nucleic) > P (Backbone fallback)
                     res.eachAtom((atom: any) => {
-                        if (atom.atomname === 'CA') caAtom = atom;
+                        const name = atom.atomname;
+                        if (name === 'CA') atomToUse = atom;
+                        else if (!atomToUse && name === "C3'") atomToUse = atom;
+                        else if (!atomToUse && name === 'P') atomToUse = atom;
                     });
 
-                    if (caAtom) {
-                        x.push(caAtom.x);
-                        y.push(caAtom.y);
-                        z.push(caAtom.z);
-                        labels.push(`${chain.chainname}:${res.resname} ${res.resno}`);
+                    if (atomToUse) {
+                        x.push(atomToUse.x);
+                        y.push(atomToUse.y);
+                        z.push(atomToUse.z);
+                        // Robust chain name
+                        const cName = chain.chainname || chain.name || chain.id || "?";
+                        labels.push(`${cName}:${res.resname} ${res.resno}`);
                     }
                 });
 
