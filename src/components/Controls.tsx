@@ -25,8 +25,6 @@ interface ControlsProps {
     setShowSurface: (show: boolean) => void;
     showLigands: boolean;
     setShowLigands: (show: boolean) => void;
-    showMembrane: boolean;
-    setShowMembrane: (show: boolean) => void;
     onFocusLigands: () => void;
     proteinTitle?: string | null;
     snapshots: Snapshot[];
@@ -39,6 +37,7 @@ interface ControlsProps {
     setIsCleanMode: (clean: boolean) => void;
     onSaveSession: () => void;
     onLoadSession: (file: File) => void;
+    onToggleContactMap: () => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -63,8 +62,6 @@ export const Controls: React.FC<ControlsProps> = ({
     setShowSurface,
     showLigands,
     setShowLigands,
-    showMembrane,
-    setShowMembrane,
     onFocusLigands,
     proteinTitle,
     snapshots,
@@ -76,7 +73,8 @@ export const Controls: React.FC<ControlsProps> = ({
     isCleanMode,
     setIsCleanMode,
     onSaveSession,
-    onLoadSession
+    onLoadSession,
+    onToggleContactMap
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const sessionInputRef = useRef<HTMLInputElement>(null);
@@ -321,19 +319,7 @@ export const Controls: React.FC<ControlsProps> = ({
                             )}
 
 
-                            <button
-                                onClick={() => setShowMembrane(!showMembrane)}
-                                className={`w-full flex items-center justify-between px-2 py-1.5 rounded border transition-all ${showMembrane
-                                    ? 'bg-cyan-500/10 border-cyan-500/50 text-cyan-500'
-                                    : `${cardBg} hover:opacity-80`
-                                    }`}
-                            >
-                                <div className="flex items-center gap-2">
-                                    <Layers className="w-4 h-4" />
-                                    <span className="text-xs font-medium">Show Membrane</span>
-                                </div>
-                                <div className={`w-3 h-3 rounded-full ${showMembrane ? 'bg-cyan-500' : 'bg-neutral-500'}`} />
-                            </button>
+
                         </div>
 
                         <div className="space-y-1.5 pt-2">
@@ -382,6 +368,20 @@ export const Controls: React.FC<ControlsProps> = ({
                     </div>
 
                     <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
+
+                    {/* Analysis */}
+                    <div className="space-y-3">
+                        <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Analysis</label>
+                        <button
+                            onClick={onToggleContactMap}
+                            className={`w-full flex items-center justify-between px-2 py-1.5 rounded border transition-all ${cardBg} hover:opacity-80`}
+                        >
+                            <div className="flex items-center gap-2">
+                                <Maximize className="w-4 h-4" />
+                                <span className="text-xs font-medium">Contact Map</span>
+                            </div>
+                        </button>
+                    </div>
 
                     {/* Session */}
                     <div className="space-y-3">

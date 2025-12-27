@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { ProteinViewer, type RepresentationType, type ColoringType, type ProteinViewerRef } from './components/ProteinViewer';
 import { Controls } from './components/Controls';
+import { ContactMap } from './components/ContactMap';
 import { HelpGuide } from './components/HelpGuide';
 import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot } from './types';
 
@@ -26,6 +27,7 @@ function App() {
   // Presentation State
   const [isSpinning, setIsSpinning] = useState(false);
   const [isCleanMode, setIsCleanMode] = useState(false);
+  const [showContactMap, setShowContactMap] = useState(false);
 
   // Snapshot Gallery State
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
@@ -33,7 +35,7 @@ function App() {
   // Visualization Toggles
   const [showSurface, setShowSurface] = useState(false);
   const [showLigands, setShowLigands] = useState(false);
-  const [showMembrane, setShowMembrane] = useState(false);
+
 
   const [highlightedResidue, setHighlightedResidue] = useState<{ chain: string; resNo: number; resName?: string } | null>(null);
 
@@ -100,6 +102,25 @@ function App() {
 
   const handleFocusLigands = () => {
     viewerRef.current?.focusLigands();
+  };
+
+  const getAtomDataWrapper = async () => {
+    if (viewerRef.current) {
+      return await viewerRef.current.getAtomCoordinates();
+    }
+    return [];
+  };
+
+  const handlePixelClick = (chainA: string, resA: number, _chainB: string, _resB: number) => {
+    // Highlight both residues
+    // viewerRef.current?.highlightResiduePair(chainA, resA, chainB, resB); 
+    // Current API only highlights one. Let's highlight one or toggle.
+    // Or: Highlight A, then small timeout Highlight B?
+    // Better: Update ProteinViewer to accept highlightResiduePair?
+    // For now, just click A (simplification)
+    viewerRef.current?.highlightResidue(chainA, resA);
+    // Ideally we want to draw a line between them too...
+    // Maybe set MeasurementMode?
   };
 
   // Session Management
@@ -252,8 +273,6 @@ function App() {
         showLigands={showLigands}
         setShowLigands={setShowLigands}
         onFocusLigands={handleFocusLigands}
-        showMembrane={showMembrane}
-        setShowMembrane={setShowMembrane}
         proteinTitle={proteinTitle}
         snapshots={snapshots}
         onSnapshot={handleSnapshot}
@@ -265,6 +284,7 @@ function App() {
         setIsCleanMode={setIsCleanMode}
         onSaveSession={handleSaveSession}
         onLoadSession={handleLoadSession}
+        onToggleContactMap={() => setShowContactMap(true)}
       />
 
       <ProteinViewer
@@ -281,9 +301,17 @@ function App() {
         backgroundColor={isLightMode ? "white" : "black"}
         showSurface={showSurface}
         showLigands={showLigands}
-        showMembrane={showMembrane}
         isSpinning={isSpinning}
         className="w-full h-full"
+      />
+
+      <ContactMap
+        isOpen={showContactMap}
+        onClose={() => setShowContactMap(false)}
+        chains={chains}
+        getContactData={getAtomDataWrapper}
+        onPixelClick={handlePixelClick}
+        isLightMode={isLightMode}
       />
 
       <HelpGuide />

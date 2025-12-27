@@ -31,7 +31,6 @@ interface ProteinViewerProps {
     backgroundColor?: string;
     showSurface?: boolean;
     showLigands?: boolean;
-    showMembrane?: boolean;
     isSpinning?: boolean;
 }
 
@@ -42,6 +41,7 @@ export interface ProteinViewerRef {
     clearHighlight: () => void;
     getCameraOrientation: () => any;
     setCameraOrientation: (orientation: any) => void;
+    getAtomCoordinates: () => Promise<{ x: number[], y: number[], z: number[], labels: string[] }[]>;
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
@@ -62,7 +62,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     backgroundColor = "black",
     showSurface = false,
     showLigands = false,
-    showMembrane = false,
     isSpinning = false
 }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -249,6 +248,40 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             } catch (e) {
                 console.warn("Failed to set orientation:", e);
             }
+        },
+        getAtomCoordinates: async () => {
+            if (!componentRef.current) return [];
+            const component = componentRef.current;
+            const data: { x: number[], y: number[], z: number[], labels: string[] }[] = [];
+
+            // Iterate chains
+            component.structure.eachChain((chain: any) => {
+                const x: number[] = [];
+                const y: number[] = [];
+                const z: number[] = [];
+                const labels: string[] = [];
+
+                // Iterate CA atoms
+                chain.eachResidue((res: any) => {
+                    let caAtom: any = null;
+                    res.eachAtom((atom: any) => {
+                        if (atom.atomname === 'CA') caAtom = atom;
+                    });
+
+                    if (caAtom) {
+                        x.push(caAtom.x);
+                        y.push(caAtom.y);
+                        z.push(caAtom.z);
+                        labels.push(`${res.resname} ${res.resno}`);
+                    }
+                });
+
+                if (x.length > 0) {
+                    data.push({ x, y, z, labels });
+                }
+            });
+
+            return data;
         }
     }));
 
@@ -629,64 +662,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 tryApply('ball+stick', 'element', 'ligand and not (water or ion)', { scale: 2.0 });
             }
 
-            // Membrane Slab
-            if (showMembrane) {
-                console.log("Adding Membrane Slab...");
-                // Create a semi-transparent box representing the membrane
-                const shape = new NGL.Shape("membrane-slab");
-                // Box center: 0,0,0
-                // Dimensions: Large slab (e.g., 200x200) with thickness ~30-40A (Z-axis aligned usually, or Y depending on orientation)
-                // NGL Shape box takes: [position], [size? no, it's specific geometry]
-                // Actually shape.addBox(position, color, size_height_depth?) -> checking NGL docs or best guess
-                // addBox(position, color, size, height, depth)
-                // Let's use a large flat box.
-                // Position: [0, 0, 0]
-                // Color: [0.8, 0.9, 0.9] (Light Cyan)
-                // Size (half-dimensions? no, usually full dimensions or vectors).
-                // NGL.Shape.addBox params: position, color, height, depth, width -- wait check usage
-                // Proper: shape.addBox([x,y,z], [r,g,b], height, depth, width) is not quite right.
-                // Standard NGL addBox: position, color, size (scalar) - no that's simple dots
-                // Let's use addMesh or simpler addBox if available.
-                // Safe bet: addBufferRepresentation if we had geometry.
-                // Alternative: "surface" representation of a dummy object? No.
-                // Let's use a simple cylinder or multiple spheres if box is tricky, BUT box is best.
-                // Checking known NGL patterns: shape.addBox([0,0,0], [0.5, 0.5, 0.5], 10)
-                // Actually, let's try a different approach: A large cylinder is often used for membrane representation in simple viewers.
-                // Or: shape.addMesh...
-                // Let's try addBox with specific dimensions if I can recall signature.
-                // Signature: addBox(position, color, size, height, depth) -> looks like 3 dimensions.
-                // Let's try: position=[0,0,0], color=[0.8,0.8,0.8], size=100 (height), 40 (depth/thick), 100 (width)
-
-                // Let's simplify: A pseudo-membrane using a Cylinder is very robust in NGL.
-                // shape.addCylinder(start, end, color, radius)
-                // A very flat cylinder?
-
-                // Let's try NGL.StructureComponent approach? No.
-
-                // Let's go with a MeshBuffer or just a Shape with "sphere" is wrong.
-
-                // Re-reading NGL docs (mental model):
-                // shape.addBox(position, color, size, height, depth) was added in some versions.
-                // Let's try a Sphere for "Core" and see.
-
-                // Better: Use a simple CUBE.
-                // shape.addMesh( [0,0,0], [ ... corner1, corner2 ... ] ) is hard manually.
-
-                // Let's try the "Slab" as a flattened cylinder (disk).
-                // Radius = 100, Height = 40. nothing "box" like.
-                // shape.addCylinder([0, -20, 0], [0, 20, 0], [0.8, 0.8, 0.9], 100);
-                // This creates a disk of radius 100, thickness 40 (from -20 to +20 on Y axis).
-                // Orientation: Y-axis alignment is common for membrane normals in OPM database.
-
-                const thickness = 40;
-                const radius = 100;
-
-                // Y-axis alignment (common for OPM)
-                shape.addCylinder([0, -thickness / 2, 0], [0, thickness / 2, 0], [0.8, 0.9, 0.9], radius);
-
-                const shapeComp = component.stage.addComponentFromObject(shape);
-                shapeComp.addRepresentation('buffer', { opacity: 0.3, transparent: true, depthWrite: false });
-            }
 
             if (stageRef.current?.viewer) {
                 stageRef.current.viewer.requestRender();
@@ -699,7 +674,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     useEffect(() => {
         updateRepresentation();
-    }, [representation, coloring, customColors, showSurface, showLigands, showMembrane]);
+    }, [representation, coloring, customColors, showSurface, showLigands]);
 
     useEffect(() => {
         if (stageRef.current && resetCamera) {
