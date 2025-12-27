@@ -207,6 +207,46 @@ function App() {
     }
   };
 
+  // Hover State
+  const [hoveredResidue, setHoveredResidue] = useState<{ chain: string; resNo: number; resName?: string } | null>(null);
+
+  // Debounced effect for 3D highlight (prevent flickering)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!hoveredResidue) {
+        viewerRef.current?.clearHighlight();
+        // Re-apply selection highlight if exists
+        if (highlightedResidue) {
+          viewerRef.current?.highlightResidue(highlightedResidue.chain, highlightedResidue.resNo);
+        }
+      } else {
+        // We use the same highlight method for now. 
+        viewerRef.current?.highlightResidue(hoveredResidue.chain, hoveredResidue.resNo);
+      }
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, [hoveredResidue, highlightedResidue]);
+
+  const handleHover = (info: { chain: string; resNo: number; resName: string } | null) => {
+    // Avoid state thrashing
+    if (!info) {
+      if (hoveredResidue !== null) setHoveredResidue(null);
+      return;
+    }
+    if (hoveredResidue?.chain === info.chain && hoveredResidue?.resNo === info.resNo) return;
+
+    setHoveredResidue({ chain: info.chain, resNo: info.resNo, resName: info.resName });
+  };
+
+  const handleSequenceHover = (chain: string, resNo: number | null) => {
+    if (resNo === null) {
+      if (hoveredResidue !== null) setHoveredResidue(null);
+    } else {
+      setHoveredResidue({ chain, resNo });
+    }
+  };
+
   const handleSequenceResidueClick = (chain: string, resNo: number) => {
     console.log("App: Sequence Clicked", chain, resNo);
     setHighlightedResidue({ chain, resNo });
@@ -270,6 +310,8 @@ function App() {
         setIsLightMode={setIsLightMode}
         highlightedResidue={highlightedResidue}
         onResidueClick={handleSequenceResidueClick}
+        hoveredResidue={hoveredResidue}
+        onResidueHover={handleSequenceHover}
         showSurface={showSurface}
         setShowSurface={setShowSurface}
         showLigands={showLigands}
@@ -300,6 +342,7 @@ function App() {
         resetCamera={resetKey}
         isMeasurementMode={isMeasurementMode}
         onAtomClick={handleAtomClick}
+        onAtomHover={handleHover}
         backgroundColor={isLightMode ? "white" : "black"}
         showSurface={showSurface}
         showLigands={showLigands}
