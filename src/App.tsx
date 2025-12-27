@@ -204,34 +204,47 @@ function App() {
 
   // Session Management
   const handleSaveSession = () => {
-    const sessionData = {
-      version: 1,
-      pdbId,
-      representation,
-      coloring,
-      isMeasurementMode,
-      isLightMode,
-      showSurface,
-      showLigands,
-      isSpinning,
-      isCleanMode,
-      customColors,
-      chains, // Note: chains are derived from structure, might not need to save if PDB ID is saved.
-      snapshots, // Save snapshots (URLs might become invalid if not handled carefully)
-      annotations, // Save annotations
-      orientation: viewerRef.current?.getCameraOrientation(),
-      timestamp: Date.now()
-    };
+    try {
+      // Sanitize annotations to ensure they are plain objects
+      const safeAnnotations = annotations.map(ann => ({
+        id: ann.id,
+        chain: ann.chain,
+        resNo: ann.resNo,
+        text: ann.text,
+        position: { x: ann.position.x, y: ann.position.y, z: ann.position.z }
+      }));
 
-    const blob = new Blob([JSON.stringify(sessionData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `session-${pdbId || 'structure'}-${new Date().toISOString().slice(0, 10)}.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+      const sessionData = {
+        version: 1,
+        pdbId,
+        representation,
+        coloring,
+        isMeasurementMode,
+        isLightMode,
+        showSurface,
+        showLigands,
+        isSpinning,
+        isCleanMode,
+        customColors,
+        chains,
+        annotations: safeAnnotations,
+        orientation: viewerRef.current?.getCameraOrientation(),
+        timestamp: Date.now()
+      };
+
+      const blob = new Blob([JSON.stringify(sessionData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `session-${pdbId || 'structure'}-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("Save Session Failed:", e);
+      alert("Failed to save session. See console for details.");
+    }
   };
 
   const handleLoadSession = async (file: File) => {
