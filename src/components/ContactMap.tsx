@@ -237,21 +237,31 @@ export const ContactMap: React.FC<ContactMapProps> = ({
             ticks.push(i);
         }
 
+        const showChain = chains.length > 1;
+
         return {
-            x: ticks.map(t => (
-                <div key={`x-${t}`} className="absolute text-[10px] text-neutral-500 font-medium transform -translate-x-1/2 flex flex-col items-center" style={{ left: (t * scale) + (scale / 2) }}>
-                    <div className="h-1 w-px bg-neutral-300 mb-0.5"></div>
-                    <span>{distanceData.labels[t]?.resNo}</span>
-                </div>
-            )),
-            y: ticks.map(t => (
-                <div key={`y-${t}`} className="absolute text-[10px] text-neutral-500 font-medium transform -translate-y-1/2 flex items-center justify-end w-8 right-0 pr-1" style={{ top: (t * scale) + (scale / 2) }}>
-                    <span>{distanceData.labels[t]?.resNo}</span>
-                    <div className="h-px w-1 bg-neutral-300 ml-1"></div>
-                </div>
-            ))
+            x: ticks.map(t => {
+                const data = distanceData.labels[t];
+                const label = showChain ? `${data?.chain}:${data?.resNo}` : data?.resNo;
+                return (
+                    <div key={`x-${t}`} className="absolute text-[10px] text-neutral-500 font-medium transform -translate-x-1/2 flex flex-col items-center" style={{ left: (t * scale) + (scale / 2) }}>
+                        <div className="h-1 w-px bg-neutral-300 mb-0.5"></div>
+                        <span className="whitespace-nowrap">{label}</span>
+                    </div>
+                );
+            }),
+            y: ticks.map(t => {
+                const data = distanceData.labels[t];
+                const label = showChain ? `${data?.chain}:${data?.resNo}` : data?.resNo;
+                return (
+                    <div key={`y-${t}`} className="absolute text-[10px] text-neutral-500 font-medium transform -translate-y-1/2 flex items-center justify-end w-12 right-0 pr-1" style={{ top: (t * scale) + (scale / 2) }}>
+                        <span className="whitespace-nowrap">{label}</span>
+                        <div className="h-px w-1 bg-neutral-300 ml-1"></div>
+                    </div>
+                );
+            })
         };
-    }, [distanceData, scale]);
+    }, [distanceData, scale, chains.length]);
 
     if (!isOpen) return null;
 
