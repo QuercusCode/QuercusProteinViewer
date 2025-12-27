@@ -303,6 +303,27 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         };
     }, [distanceData, scale]);
 
+    // Calculate Chain Ranges
+    const chainRanges = useMemo(() => {
+        if (!distanceData) return [];
+        const ranges: { chain: string, start: number, end: number }[] = [];
+        const { labels } = distanceData;
+        if (labels.length === 0) return [];
+
+        let currentChain = labels[0].chain;
+        let startIndex = 0;
+
+        for (let i = 1; i < labels.length; i++) {
+            if (labels[i].chain !== currentChain) {
+                ranges.push({ chain: currentChain, start: startIndex, end: i });
+                currentChain = labels[i].chain;
+                startIndex = i;
+            }
+        }
+        ranges.push({ chain: currentChain, start: startIndex, end: labels.length });
+        return ranges;
+    }, [distanceData]);
+
     if (!isOpen) return null;
 
     return (
@@ -334,7 +355,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                     </div>
                 </div>
 
-                {/* Main Content Area - Grid Layout for Sticky Axes */}
+                {/* Main Content Area - Grid Layout for Sticky Axes & Chain Bars */}
                 <div className={`flex-1 overflow-auto relative p-0 ${isLightMode ? 'bg-neutral-50' : 'bg-black/20'}`}>
                     {loading ? (
                         <div className={`absolute inset-0 flex items-center justify-center z-10 ${isLightMode ? 'bg-white/80' : 'bg-black/80'}`}>
@@ -344,23 +365,64 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                             </div>
                         </div>
                     ) : distanceData && (
-                        <div className="inline-grid grid-cols-[auto_1fr] grid-rows-[auto_1fr]">
+                        <div className="inline-grid grid-cols-[2rem_3rem_1fr] grid-rows-[2rem_2rem_1fr]">
 
-                            {/* Top-Left Corner (Sticky) */}
-                            <div className={`sticky top-0 left-0 z-20 w-12 h-8 ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-900'}`} />
+                            {/* CORNERS (Sticky) */}
+                            {/* Row 1, Col 1+2 (Chain Bar Corner) */}
+                            <div className={`col-span-2 sticky top-0 left-0 z-30 ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-900'}`} style={{ gridRow: 1 }} />
+                            {/* Row 2, Col 1+2 (Axis Corner) */}
+                            <div className={`col-span-2 sticky top-8 left-0 z-30 ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-900'} border-b ${isLightMode ? 'border-neutral-200' : 'border-neutral-800'}`} style={{ gridRow: 2 }} />
 
-                            {/* X Axis (Sticky Top) */}
-                            <div className={`sticky top-0 z-10 h-8 relative border-b ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`} style={{ width: distanceData.size * scale }}>
+
+                            {/* 1. TOP CHAIN BARS (Sticky Top) */}
+                            {/* Grid Row 1, Col 3 */}
+                            <div className={`sticky top-0 z-20 h-8 relative whitespace-nowrap overflow-hidden ${isLightMode ? 'bg-neutral-100/80 backdrop-blur' : 'bg-neutral-900/80 backdrop-blur'}`} style={{ gridColumn: 3, width: distanceData.size * scale }}>
+                                {chainRanges.map((range, idx) => (
+                                    <div
+                                        key={`top-chain-${idx}`}
+                                        className={`absolute h-full flex items-center justify-center border-l first:border-l-0 ${isLightMode ? 'border-neutral-300 text-neutral-600' : 'border-neutral-700 text-neutral-400'}`}
+                                        style={{
+                                            left: range.start * scale,
+                                            width: (range.end - range.start) * scale
+                                        }}
+                                    >
+                                        <span className="text-xs font-bold px-2 truncate">Chain {range.chain}</span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* 2. TOP AXIS (Sticky Top - Offset by 2rem) */}
+                            {/* Grid Row 2, Col 3 */}
+                            <div className={`sticky top-8 z-20 h-8 relative border-b ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`} style={{ gridColumn: 3, width: distanceData.size * scale }}>
                                 {Axes?.x}
                             </div>
 
-                            {/* Y Axis (Sticky Left) */}
-                            <div className={`sticky left-0 z-10 w-12 relative border-r ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`} style={{ height: distanceData.size * scale }}>
+                            {/* 3. LEFT CHAIN BARS (Sticky Left) */}
+                            {/* Grid Row 3, Col 1 */}
+                            <div className={`sticky left-0 z-20 w-8 relative overflow-hidden ${isLightMode ? 'bg-neutral-100/80 backdrop-blur' : 'bg-neutral-900/80 backdrop-blur'}`} style={{ gridRow: 3, height: distanceData.size * scale }}>
+                                {chainRanges.map((range, idx) => (
+                                    <div
+                                        key={`left-chain-${idx}`}
+                                        className={`absolute w-full flex items-center justify-center border-t first:border-t-0 ${isLightMode ? 'border-neutral-300 text-neutral-600' : 'border-neutral-700 text-neutral-400'}`}
+                                        style={{
+                                            top: range.start * scale,
+                                            height: (range.end - range.start) * scale
+                                        }}
+                                    >
+                                        <span className="text-xs font-bold -rotate-90 whitespace-nowrap">Chain {range.chain}</span>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* 4. LEFT AXIS (Sticky Left - Offset by 2rem) */}
+                            {/* Grid Row 3, Col 2 */}
+                            <div className={`sticky left-8 z-20 w-12 relative border-r ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`} style={{ gridRow: 3, height: distanceData.size * scale }}>
                                 {Axes?.y}
                             </div>
 
-                            {/* Map Canvas */}
-                            <div className="relative" style={{ width: distanceData.size * scale, height: distanceData.size * scale }}>
+                            {/* 5. MAIN MAP (Scrolls) */}
+                            {/* Grid Row 3, Col 3 */}
+                            <div className="relative" style={{ gridRow: 3, gridColumn: 3, width: distanceData.size * scale, height: distanceData.size * scale }}>
                                 <canvas
                                     ref={mapCanvasRef}
                                     className="absolute inset-0 pointer-events-none image-pixelated"
