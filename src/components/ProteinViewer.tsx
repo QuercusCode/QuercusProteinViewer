@@ -44,6 +44,7 @@ export interface ProteinViewerRef {
     setCameraOrientation: (orientation: any) => void;
     getAtomCoordinates: () => Promise<{ x: number[], y: number[], z: number[], labels: string[] }[]>;
     getAtomPosition: (chain: string, resNo: number, atomName?: string) => { x: number, y: number, z: number } | null;
+    getAtomPositionByIndex: (atomIndex: number) => { x: number, y: number, z: number } | null;
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
@@ -158,19 +159,23 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             componentRef.current.structure.eachResidue((res: any) => {
                 if (res.chain.name === chain && res.resno === resNo) {
-                    res.eachAtom((atom: any) => {
-                        if (atom.atomname === atomName) {
-                            position = { x: atom.x, y: atom.y, z: atom.z };
-                        }
-                    });
-                    // Fallback if CA not found
-                    if (!position) {
-                        const atom = res.getAtom((res.atomCount / 2) | 0); // Pick simple middle atom
-                        if (atom) position = { x: atom.x, y: atom.y, z: atom.z };
+                    const atom = res.getAtomByName(atomName) || res.getAtomByName('C3\'') || res.getAtomByName('P') || res.getAtomByIndex(0);
+                    if (atom) {
+                        position = { x: atom.x, y: atom.y, z: atom.z };
                     }
                 }
             });
             return position;
+        },
+        getAtomPositionByIndex: (atomIndex: number) => {
+            if (!componentRef.current) return null;
+            try {
+                const proxy = componentRef.current.structure.getAtomProxy(atomIndex);
+                if (proxy) {
+                    return { x: proxy.x, y: proxy.y, z: proxy.z };
+                }
+            } catch (e) { console.error("Error getting atom by index", e); }
+            return null;
         },
         captureImage: async () => {
             const fixPngBlob = async (blob: Blob): Promise<Blob> => {
@@ -625,6 +630,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 return;
             }
             const atom = pickingProxy.atom;
+            console.log("DEBUG: Clicked Atom:", atom);
+            console.log("DEBUG: Atom Coords:", atom.x, atom.y, atom.z);
 
             // Measurement Mode Logic takes precedence
             if (isMeasurementMode) {

@@ -80,11 +80,19 @@ function App() {
       if (note) {
         // Use coordinates directly from the click event if available
         let position = info.position;
+        console.log("DEBUG: handleAtomClick Info:", info);
+        console.log("DEBUG: Position from click:", position);
 
         // Fallback: If not passed (shouldn't happen with new logic), try to query
         if (!position) {
-          const fallbackPos = viewerRef.current?.getAtomPosition(info.chain, info.resNo);
-          if (fallbackPos) position = fallbackPos;
+          console.warn("DEBUG: Primary position missing, using fallback.");
+          if (info.atomIndex !== undefined) {
+            position = viewerRef.current?.getAtomPositionByIndex(info.atomIndex) || undefined;
+          }
+          if (!position) {
+            const fallbackPos = viewerRef.current?.getAtomPosition(info.chain, info.resNo);
+            if (fallbackPos) position = fallbackPos;
+          }
         }
 
         if (position) {
