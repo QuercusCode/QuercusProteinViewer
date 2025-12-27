@@ -7,6 +7,7 @@ interface RamachandranPlotProps {
     getData: () => Promise<{ phi: number | null, psi: number | null, chain: string, resNo: number, resName: string }[]>;
     onPointClick?: (chain: string, resNo: number) => void;
     isLightMode: boolean;
+    pdbId?: string;
 }
 
 export const RamachandranPlot: React.FC<RamachandranPlotProps> = ({
@@ -14,7 +15,8 @@ export const RamachandranPlot: React.FC<RamachandranPlotProps> = ({
     onClose,
     getData,
     onPointClick,
-    isLightMode
+    isLightMode,
+    pdbId
 }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const overlayRef = useRef<HTMLCanvasElement>(null);
@@ -43,9 +45,10 @@ export const RamachandranPlot: React.FC<RamachandranPlotProps> = ({
             }
         };
 
-        // Slight delay to allow animation
-        setTimeout(fetchData, 100);
-    }, [isOpen]);
+        // Slight delay to allow animation or structure load
+        const timer = setTimeout(fetchData, 100);
+        return () => clearTimeout(timer);
+    }, [isOpen, pdbId]);
 
     // Draw Plot
     useEffect(() => {
@@ -109,7 +112,7 @@ export const RamachandranPlot: React.FC<RamachandranPlotProps> = ({
 
         // 4. Points
         data.forEach(p => {
-            if (p.phi === null || p.psi === null) return;
+            if (p.phi === null || p.psi === null || isNaN(p.phi) || isNaN(p.psi)) return;
             const x = mapX(p.phi);
             const y = mapY(p.psi);
 

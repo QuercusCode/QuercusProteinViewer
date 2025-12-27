@@ -330,6 +330,7 @@ function App() {
         getData={getTorsionDataWrapper}
         onPointClick={handleSequenceResidueClick} // Reuse sequence click handler to highlight
         isLightMode={isLightMode}
+        pdbId={pdbId}
       />
 
       <HelpGuide />
