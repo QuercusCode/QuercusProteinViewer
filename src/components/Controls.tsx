@@ -446,7 +446,7 @@ export const Controls: React.FC<ControlsProps> = ({
 
                 {/* Footer Tools */}
                 <div className="space-y-4">
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2">
                         <button onClick={onResetView} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}>
                             <RotateCcw className="w-4 h-4" /> Reset
                         </button>
