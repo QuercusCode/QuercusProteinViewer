@@ -102,8 +102,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             // Add text: position, text, color, size
             // NGL.Shape.addText(position, text, color, size)
             const pos = [note.position.x, note.position.y, note.position.z];
-            const color = [1, 1, 1];
-            const size = 2.0;
+            const color = [1, 1, 0]; // Bright Yellow
+            const size = 5.0; // Large text
 
             try {
                 // Attempt 1: (pos, color, size, text) - Modern NGL
@@ -118,12 +118,16 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             }
 
             try {
-                shape.addSphere(pos, [1, 0.5, 0], 0.5);
+                shape.addSphere(pos, [1, 0, 1], 1.0); // Magenta anchor, larger sphere
             } catch (e) { console.error("Failed to add annotation anchor:", e); }
         });
 
         const shapeComp = stageRef.current.addComponentFromObject(shape);
-        shapeComp.addRepresentation("buffer");
+        // depthTest: false forces rendering on top of everything
+        shapeComp.addRepresentation("buffer", {
+            depthTest: false,
+            opacity: 1.0
+        });
         shapeComp.setName("annotation-component");
         shapeComp.autoView(); // Optional: might disrupt user view, better remove it.
 
