@@ -10,7 +10,7 @@ declare global {
 }
 
 export type RepresentationType = 'cartoon' | 'licorice' | 'backbone' | 'spacefill' | 'surface' | 'ribbon';
-export type ColoringType = 'chainid' | 'element' | 'residue' | 'secondary' | 'hydrophobicity' | 'structure';
+export type ColoringType = 'chainid' | 'element' | 'residue' | 'secondary' | 'hydrophobicity' | 'structure' | 'bfactor' | 'charge';
 
 interface ProteinViewerProps {
     pdbId?: string;
@@ -502,7 +502,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             // For simple coloring modes (chainid, element), we use a purely manual scheme
             // This ensures that "base" colors are identical whether a custom rule exists or not.
 
-            if (currentColoring === 'chainid' || currentColoring === 'element') {
+            if (currentColoring === 'chainid' || currentColoring === 'element' || currentColoring === 'charge') {
                 const schemeId = `unified-scheme-${Date.now()}`;
 
                 // Pre-calculate custom colors for fast lookup
@@ -528,7 +528,18 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                 return customColorMap.get(atom.index);
                             }
 
-                            // 2. Base Coloring (Stable)
+                            // 2. Charge Coloring
+                            if (currentColoring === 'charge') {
+                                const resName = atom.resname;
+                                // Positive: Blue
+                                if (['ARG', 'LYS', 'HIS'].includes(resName)) return 0x0000FF;
+                                // Negative: Red
+                                if (['ASP', 'GLU'].includes(resName)) return 0xFF0000;
+                                // Neutral: White/Grey
+                                return 0xCCCCCC;
+                            }
+
+                            // 3. Base Coloring (Stable)
                             if (currentColoring === 'element') {
                                 return ELEMENT_COLORS[atom.element] || ELEMENT_COLORS['DEFAULT'];
                             }

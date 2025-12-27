@@ -335,6 +335,9 @@ export const Controls: React.FC<ControlsProps> = ({
                                     <option value="element">Element</option>
                                     <option value="resname">Residue</option>
                                     <option value="structure">Structure</option>
+                                    <option value="hydrophobicity">Hydrophobicity</option>
+                                    <option value="bfactor">B-Factor (Flexibility)</option>
+                                    <option value="charge">Charge (+/-)</option>
                                 </select>
                             </div>
                         </div>
