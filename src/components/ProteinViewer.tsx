@@ -42,6 +42,7 @@ export interface ProteinViewerRef {
     getCameraOrientation: () => any;
     setCameraOrientation: (orientation: any) => void;
     getAtomCoordinates: () => Promise<{ x: number[], y: number[], z: number[], labels: string[] }[]>;
+    getTorsionData: () => Promise<{ phi: number | null, psi: number | null, chain: string, resNo: number, resName: string }[]>;
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
@@ -282,6 +283,107 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             });
 
             return data;
+        },
+        getTorsionData: async () => {
+            if (!componentRef.current) return [];
+            const component = componentRef.current;
+            const results: { phi: number | null, psi: number | null, chain: string, resNo: number, resName: string }[] = [];
+
+            const Vector3 = window.NGL.Vector3;
+
+            // Helper: Calculate Dihedral Angle (in degrees)
+            const calculateDihedral = (a: any, b: any, c: any, d: any) => {
+                if (!a || !b || !c || !d) return null;
+
+                const v1 = new Vector3().subVectors(b, a);
+                const v2 = new Vector3().subVectors(c, b);
+                const v3 = new Vector3().subVectors(d, c);
+
+                const n1 = new Vector3().crossVectors(v1, v2).normalize();
+                const n2 = new Vector3().crossVectors(v2, v3).normalize();
+
+                const x = n1.dot(n2);
+                const y = new Vector3().crossVectors(n1, n2).dot(v2.normalize());
+
+                return -Math.atan2(y, x) * (180 / Math.PI);
+            };
+
+            component.structure.eachChain((chain: any) => {
+                const residues: any[] = [];
+                chain.eachResidue((res: any) => residues.push(res));
+
+                // Need random access for prev/next
+                for (let i = 0; i < residues.length; i++) {
+                    const curr = residues[i];
+                    const prev = i > 0 ? residues[i - 1] : null;
+                    const next = i < residues.length - 1 ? residues[i + 1] : null;
+
+                    // Get Atoms
+                    const getN = (r: any): any => {
+                        let a = null;
+                        r.eachAtom((at: any) => { if (at.atomname === 'N') a = at; });
+                        return a;
+                    };
+                    const getCA = (r: any): any => {
+                        let a = null;
+                        r.eachAtom((at: any) => { if (at.atomname === 'CA') a = at; });
+                        return a;
+                    };
+                    const getC = (r: any): any => {
+                        let a = null;
+                        r.eachAtom((at: any) => { if (at.atomname === 'C') a = at; });
+                        return a;
+                    };
+
+                    const N = getN(curr);
+                    const CA = getCA(curr);
+                    const C = getC(curr);
+
+                    // Vectorize
+                    const vN = N ? new Vector3(N.x, N.y, N.z) : null;
+                    const vCA = CA ? new Vector3(CA.x, CA.y, CA.z) : null;
+                    const vC = C ? new Vector3(C.x, C.y, C.z) : null;
+
+                    let phi = null;
+                    let psi = null;
+
+                    // Calculate Phi: C(prev) - N - CA - C
+                    if (prev && vN && vCA && vC) {
+                        const prevC = getC(prev);
+                        if (prevC) {
+                            const vPrevC = new Vector3(prevC.x, prevC.y, prevC.z);
+                            // Check connectivity distance (~1.33A) to ensure unbroken chain
+                            if (vPrevC.distanceTo(vN) < 2.0) {
+                                phi = calculateDihedral(vPrevC, vN, vCA, vC);
+                            }
+                        }
+                    }
+
+                    // Calculate Psi: N - CA - C - N(next)
+                    if (next && vN && vCA && vC) {
+                        const nextN = getN(next);
+                        if (nextN) {
+                            const vNextN = new Vector3(nextN.x, nextN.y, nextN.z);
+                            // Check connectivity
+                            if (vC.distanceTo(vNextN) < 2.0) {
+                                psi = calculateDihedral(vN, vCA, vC, vNextN);
+                            }
+                        }
+                    }
+
+                    if (phi !== null || psi !== null) {
+                        results.push({
+                            phi,
+                            psi,
+                            chain: chain.chainname,
+                            resNo: curr.resno,
+                            resName: curr.resname
+                        });
+                    }
+                }
+            });
+
+            return results;
         }
     }));
 

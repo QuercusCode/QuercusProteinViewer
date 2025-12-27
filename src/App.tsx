@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ProteinViewer, type RepresentationType, type ColoringType, type ProteinViewerRef } from './components/ProteinViewer';
 import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
+import { RamachandranPlot } from './components/RamachandranPlot';
 import { HelpGuide } from './components/HelpGuide';
 import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot } from './types';
 
@@ -28,6 +29,7 @@ function App() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [isCleanMode, setIsCleanMode] = useState(false);
   const [showContactMap, setShowContactMap] = useState(false);
+  const [showRamachandran, setShowRamachandran] = useState(false);
 
   // Snapshot Gallery State
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
@@ -107,6 +109,13 @@ function App() {
   const getAtomDataWrapper = async () => {
     if (viewerRef.current) {
       return await viewerRef.current.getAtomCoordinates();
+    }
+    return [];
+  };
+
+  const getTorsionDataWrapper = async () => {
+    if (viewerRef.current) {
+      return await viewerRef.current.getTorsionData();
     }
     return [];
   };
@@ -285,6 +294,7 @@ function App() {
         onSaveSession={handleSaveSession}
         onLoadSession={handleLoadSession}
         onToggleContactMap={() => setShowContactMap(true)}
+        onToggleRamachandran={() => setShowRamachandran(true)}
       />
 
       <ProteinViewer
@@ -311,6 +321,14 @@ function App() {
         chains={chains}
         getContactData={getAtomDataWrapper}
         onPixelClick={handlePixelClick}
+        isLightMode={isLightMode}
+      />
+
+      <RamachandranPlot
+        isOpen={showRamachandran}
+        onClose={() => setShowRamachandran(false)}
+        getData={getTorsionDataWrapper}
+        onPointClick={handleSequenceResidueClick} // Reuse sequence click handler to highlight
         isLightMode={isLightMode}
       />
 
