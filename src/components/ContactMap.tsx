@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { X, ZoomIn, ZoomOut } from 'lucide-react';
+import { X, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
 import type { ChainInfo } from '../types';
 
 interface ContactMapProps {
     isOpen: boolean;
     onClose: () => void;
     chains: ChainInfo[];
-    getContactData: () => Promise<{ x: number[], y: number[], z: number[], labels: string[] }[]>; // Returns CA coords per chain
+    getContactData: () => Promise<{ x: number[], y: number[], z: number[], labels: string[] }[]>;
     onPixelClick?: (chainA: string, resA: number, chainB: string, resB: number) => void;
     isLightMode: boolean;
 }
@@ -23,48 +23,35 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     const containerRef = useRef<HTMLDivElement>(null);
     const [loading, setLoading] = useState(false);
     const [scale, setScale] = useState(1);
-    const [hoverInfo, setHoverInfo] = useState<{ label: string, x: number, y: number } | null>(null);
+    const [autoFitted, setAutoFitted] = useState(false);
+    const [hoverInfo, setHoverInfo] = useState<{ label: string, x: number, y: number, resA: string, resB: string, dist: string } | null>(null);
     const [distanceData, setDistanceData] = useState<{ matrix: number[][], xLabels: { resNo: number, chain: string }[], yLabels: { resNo: number, chain: string }[] } | null>(null);
 
     // Initial Load
     useEffect(() => {
         if (!isOpen) {
             setDistanceData(null);
+            setAutoFitted(false);
             return;
         }
 
         const computeMap = async () => {
             setLoading(true);
             try {
-                // Fetch coords
-                // Simplifying: We only map the FIRST chain against ITSELF for now, or ALL vs ALL if manageable.
-                // Let's do ALL vs ALL for comprehensive view, but limited to CA.
-
                 const rawChains = await getContactData();
                 if (!rawChains || rawChains.length === 0) {
                     setLoading(false);
                     return;
                 }
 
-                // Flatten all residues into a single list
                 const allResidues: { x: number, y: number, z: number, chain: string, resNo: number }[] = [];
 
-                // Assuming getContactData returns logical structure matching 'chains' prop index
                 rawChains.forEach((c, idx) => {
                     const chainName = chains[idx]?.name || '?';
                     for (let i = 0; i < c.x.length; i++) {
-                        // We need the ACTUAL resNo. The 'labels' might have it or we infer from index + minSeq
-                        // Let's assume the helper returns aligned data. 
-                        // To be robust, the helper should return objects, but let's assume strict index mapping for now 
-                        // or better: The helper should return strictly CA atoms.
-
-                        // Actually, let's just push "Residue i"
-                        // We need resNo for interaction. 
-                        // Let's assume sequential for now or parse from labels if provided.
-                        // But we passed 'labels' in the interface.
-                        const label = c.labels[i] || ""; // "ALA 12"
+                        const label = c.labels[i] || "";
                         const parts = label.split(" ");
-                        const resNo = parseInt(parts[1]) || (i + 1); // Fallback
+                        const resNo = parseInt(parts[1]) || (i + 1);
 
                         allResidues.push({
                             x: c.x[i],
@@ -76,9 +63,8 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                     }
                 });
 
-                // Compute N x N matrix
                 const N = allResidues.length;
-                if (N > 2000) {
+                if (N > 3000) {
                     alert("Protein too large for browser-based contact map.");
                     setLoading(false);
                     return;
@@ -98,7 +84,6 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
                 const labels = allResidues.map(r => ({ resNo: r.resNo, chain: r.chain }));
                 setDistanceData({ matrix, xLabels: labels, yLabels: labels });
-
             } catch (e) {
                 console.error("Map computation failed", e);
             } finally {
@@ -106,10 +91,24 @@ export const ContactMap: React.FC<ContactMapProps> = ({
             }
         };
 
-        // Small delay to allow UI to open
         setTimeout(computeMap, 100);
 
-    }, [isOpen]); // Re-run if chains change? Maybe add 'chains' dependency if needed.
+    }, [isOpen]);
+
+    // Auto-Fit logic
+    useEffect(() => {
+        if (distanceData && containerRef.current && !autoFitted) {
+            const size = distanceData.matrix.length;
+            const { clientWidth, clientHeight } = containerRef.current;
+            // Pad for axes (e.g. 40px)
+            const availableW = clientWidth - 50;
+            const availableH = clientHeight - 50;
+
+            const newScale = Math.min(Math.floor(availableW / size), Math.floor(availableH / size));
+            setScale(Math.max(1, newScale)); // Minimum 1px per residue
+            setAutoFitted(true);
+        }
+    }, [distanceData, autoFitted]);
 
     // Draw Canvas
     useEffect(() => {
@@ -119,52 +118,100 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
         const { matrix } = distanceData;
         const size = matrix.length;
-        const pixelSize = scale; // px per residue
+        const P = scale;
+        const offset = 30; // Margin for axes
 
-        canvasRef.current.width = size * pixelSize;
-        canvasRef.current.height = size * pixelSize;
+        // Set total dimensions including axis margin
+        canvasRef.current.width = (size * P) + offset;
+        canvasRef.current.height = (size * P) + offset;
 
-        // Clear
-        ctx.fillStyle = isLightMode ? '#ffffff' : '#000000';
+        // Background
+        ctx.fillStyle = isLightMode ? '#f5f5f5' : '#171717';
         ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
-        // Draw
+        // Plot Area Background
+        ctx.fillStyle = isLightMode ? '#ffffff' : '#000000';
+        ctx.fillRect(offset, offset, size * P, size * P);
+
+        // Draw Map
         for (let i = 0; i < size; i++) {
             for (let j = 0; j < size; j++) {
                 const dist = matrix[i][j];
-                if (dist < 12) { // Threshold 12A usually captures contacts
-                    // 0 distance = black/darkest. 12 = white/lightest (in inverted logic)
-                    // Heatmap: 
-                    // < 4A (Contact/H-bond): Red/Black
-                    // 4-8A (Near): Orange/Gray
-                    // 8-12A (Far): Yellow/Light
-
+                if (dist < 12) {
                     let color = '';
                     if (isLightMode) {
-                        // Light Mode: Contact = Dark
-                        const intensity = Math.floor((dist / 12) * 255);
-                        color = `rgb(${intensity}, ${intensity}, ${intensity})`;
+                        if (dist < 5) color = '#dc2626'; // Deep Red
+                        else if (dist < 8) color = '#ea580c'; // Orange
+                        else color = '#93c5fd'; // Light Blue (faint)
                     } else {
-                        // Dark Mode: Contact = Bright/Colored
-                        if (dist < 5) color = '#ef4444'; // Red (Close)
-                        else if (dist < 8) color = '#f59e0b'; // Amber (Med)
-                        else color = '#3b82f6'; // Blue (Far)
+                        // Dark Mode: Glowing
+                        if (dist < 5) color = '#f87171'; // Red
+                        else if (dist < 8) color = '#fbbf24'; // Amber
+                        else color = '#1e3a8a'; // Dark Blue (subtle)
                     }
-                    ctx.fillStyle = color;
-                    ctx.fillRect(j * pixelSize, i * pixelSize, pixelSize, pixelSize);
+
+                    // Optimization: Skip very far/faint ones if dense? No, render all < 12.
+                    if (dist >= 8) {
+                        ctx.fillStyle = color;
+                        ctx.globalAlpha = 0.4;
+                    } else {
+                        ctx.fillStyle = color;
+                        ctx.globalAlpha = 1.0;
+                    }
+
+                    ctx.fillRect(offset + (j * P), offset + (i * P), P, P);
                 }
             }
         }
+        ctx.globalAlpha = 1.0;
 
-    }, [distanceData, scale, isLightMode]);
+        // Draw Axes Tick Marks
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = isLightMode ? '#525252' : '#a3a3a3';
+        ctx.font = '10px sans-serif';
+
+        const step = Math.ceil(size / 10 / 5) * 5; // e.g., every 5, 10, 20 residues
+
+        for (let i = 0; i < size; i += step) {
+            const pos = offset + (i * P) + (P / 2);
+            // Y Axis
+            ctx.fillText(distanceData.yLabels[i].resNo.toString(), offset - 4, pos);
+            // X Axis
+            ctx.save();
+            ctx.translate(pos, offset - 4);
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText(distanceData.xLabels[i].resNo.toString(), 0, 0);
+            ctx.restore();
+        }
+
+        // Crosshair if hovering
+        // Crosshair if hovering
+        if (hoverInfo) {
+            // Future: Draw exact crosshair on canvas?
+        }
+
+    }, [distanceData, scale, isLightMode]); // Removing hoverInfo from dependency to avoid redraw lag. Handle crosshair via overlay? 
+    // Actually, let's skip canvas-based crosshair for performance and use a DOM overlay or just the tooltip.
 
     const handleCanvasMouseMove = (e: React.MouseEvent) => {
         if (!distanceData) return;
         const rect = canvasRef.current?.getBoundingClientRect();
         if (!rect) return;
 
-        const x = Math.floor((e.clientX - rect.left) / scale);
-        const y = Math.floor((e.clientY - rect.top) / scale);
+        const offset = 30; // Match render offset
+        // Adjust for scale being CSS scale? No, canvas width/height match.
+
+        const xRaw = e.clientX - rect.left;
+        const yRaw = e.clientY - rect.top;
+
+        if (xRaw < offset || yRaw < offset) {
+            setHoverInfo(null);
+            return;
+        }
+
+        const x = Math.floor((xRaw - offset) / scale);
+        const y = Math.floor((yRaw - offset) / scale);
 
         if (x >= 0 && x < distanceData.xLabels.length && y >= 0 && y < distanceData.yLabels.length) {
             const resX = distanceData.xLabels[x];
@@ -172,7 +219,10 @@ export const ContactMap: React.FC<ContactMapProps> = ({
             const dist = distanceData.matrix[y][x].toFixed(1);
 
             setHoverInfo({
-                label: `Contact: ${resX.chain}${resX.resNo} - ${resY.chain}${resY.resNo} (${dist}Å)`,
+                label: `${resX.chain}${resX.resNo} - ${resY.chain}${resY.resNo}`,
+                resA: `${resX.chain}${resX.resNo}`,
+                resB: `${resY.chain}${resY.resNo}`,
+                dist: dist,
                 x: e.clientX,
                 y: e.clientY
             });
@@ -185,9 +235,10 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         if (!distanceData || !onPixelClick) return;
         const rect = canvasRef.current?.getBoundingClientRect();
         if (!rect) return;
+        const offset = 30;
 
-        const x = Math.floor((e.clientX - rect.left) / scale);
-        const y = Math.floor((e.clientY - rect.top) / scale);
+        const x = Math.floor((e.clientX - rect.left - offset) / scale);
+        const y = Math.floor((e.clientY - rect.top - offset) / scale);
 
         if (x >= 0 && x < distanceData.xLabels.length && y >= 0 && y < distanceData.yLabels.length) {
             const resX = distanceData.xLabels[x];
@@ -199,26 +250,43 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in">
-            <div className={`relative w-full max-w-2xl h-[80vh] rounded-xl shadow-2xl flex flex-col overflow-hidden ${isLightMode ? 'bg-white text-neutral-900' : 'bg-neutral-900 text-white'}`}>
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+            <div className={`relative w-full max-w-4xl h-[85vh] rounded-xl shadow-2xl flex flex-col overflow-hidden ${isLightMode ? 'bg-white text-neutral-900 border border-neutral-200' : 'bg-neutral-900 text-white border border-neutral-800'}`}>
 
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 border-b border-neutral-200/20">
-                    <h3 className="font-bold text-lg">Contact Map</h3>
+                <div className="flex items-center justify-between p-4 border-b border-neutral-200/10 bg-neutral-50/5">
+                    <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-lg ${isLightMode ? 'bg-blue-50 text-blue-600' : 'bg-blue-500/10 text-blue-400'}`}>
+                            <Maximize className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-lg leading-tight">Contact Map</h3>
+                            <p className={`text-xs ${isLightMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
+                                Visualizing {chains.length} Chains • {distanceData?.matrix.length || 0} Residues
+                            </p>
+                        </div>
+                    </div>
+
                     <div className="flex items-center gap-2">
-                        <span className="text-xs opacity-60 mr-2">Scale: {scale}x</span>
-                        <button onClick={() => setScale(s => Math.max(1, s - 1))} className="p-1.5 hover:bg-neutral-500/20 rounded"><ZoomOut className="w-4 h-4" /></button>
-                        <button onClick={() => setScale(s => Math.min(10, s + 1))} className="p-1.5 hover:bg-neutral-500/20 rounded"><ZoomIn className="w-4 h-4" /></button>
-                        <div className="w-px h-4 bg-neutral-500/30 mx-1" />
-                        <button onClick={onClose} className="p-1.5 hover:bg-red-500/20 hover:text-red-500 rounded transition-colors"><X className="w-5 h-5" /></button>
+                        <div className={`flex items-center gap-1 px-2 py-1 rounded text-xs font-medium border ${isLightMode ? 'bg-neutral-100 border-neutral-200' : 'bg-neutral-800 border-neutral-700'}`}>
+                            <span className="opacity-60">Scale:</span>
+                            <span>{scale}x</span>
+                        </div>
+                        <button onClick={() => setScale(s => Math.max(1, s - 1))} className="p-2 hover:bg-neutral-500/10 rounded-lg transition-colors"><ZoomOut className="w-4 h-4" /></button>
+                        <button onClick={() => setScale(s => Math.min(20, s + 1))} className="p-2 hover:bg-neutral-500/10 rounded-lg transition-colors"><ZoomIn className="w-4 h-4" /></button>
+                        <div className="w-px h-6 bg-neutral-500/20 mx-1" />
+                        <button onClick={onClose} className="p-2 hover:bg-red-500/10 hover:text-red-500 rounded-lg transition-colors"><X className="w-5 h-5" /></button>
                     </div>
                 </div>
 
                 {/* Content */}
-                <div ref={containerRef} className="flex-1 overflow-auto p-4 flex justify-center bg-neutral-100/5 relative">
+                <div ref={containerRef} className="flex-1 overflow-auto p-4 flex justify-center bg-neutral-100/5 relative select-none">
                     {loading && (
-                        <div className="absolute inset-0 flex items-center justify-center z-10">
-                            <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" />
+                        <div className="absolute inset-0 flex items-center justify-center z-10 bg-black/20 backdrop-blur-[1px]">
+                            <div className="flex flex-col items-center gap-3">
+                                <div className="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full" />
+                                <span className="text-sm font-medium">Calculating Distances...</span>
+                            </div>
                         </div>
                     )}
 
@@ -227,22 +295,55 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                         onMouseMove={handleCanvasMouseMove}
                         onMouseLeave={() => setHoverInfo(null)}
                         onClick={handleCanvasClick}
-                        className="cursor-crosshair shadow-lg border border-neutral-500/20 image-pixelated"
+                        className="shadow-lg border border-neutral-500/10 image-pixelated bg-white"
                         style={{ imageRendering: 'pixelated' }}
                     />
 
-                    {/* Hover Tooltip */}
+                    {/* Fancy Tooltip */}
                     {hoverInfo && (
                         <div
-                            className="fixed pointer-events-none px-2 py-1 bg-black/80 text-white text-xs rounded z-50 whitespace-nowrap"
+                            className="fixed pointer-events-none z-50 flex flex-col gap-1 p-3 rounded-lg shadow-xl backdrop-blur-md border border-white/10"
                             style={{
-                                left: hoverInfo.x + 10,
-                                top: hoverInfo.y + 10
+                                left: hoverInfo.x + 16,
+                                top: hoverInfo.y + 16,
+                                backgroundColor: isLightMode ? 'rgba(255,255,255,0.95)' : 'rgba(0,0,0,0.85)',
+                                color: isLightMode ? '#171717' : '#ffffff'
                             }}
                         >
-                            {hoverInfo.label}
+                            <div className="text-xs font-bold uppercase tracking-wider opacity-60">Interaction</div>
+                            <div className="font-mono text-sm flex items-center gap-2">
+                                <span>{hoverInfo.resA}</span>
+                                <span className="opacity-40">↔</span>
+                                <span>{hoverInfo.resB}</span>
+                            </div>
+                            <div className="mt-1 pt-1 border-t border-neutral-500/20 flex items-center justify-between gap-4">
+                                <span className="text-xs opacity-70">Distance</span>
+                                <span className={`font-bold ${parseFloat(hoverInfo.dist) < 5 ? 'text-red-500' : 'text-blue-500'}`}>{hoverInfo.dist} Å</span>
+                            </div>
                         </div>
                     )}
+                </div>
+
+                {/* Footer / Legend */}
+                <div className={`py-3 px-6 border-t font-medium text-xs flex items-center justify-between ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`}>
+                    <div className="flex items-center gap-6">
+                        <span className="uppercase tracking-wider opacity-50">Legend</span>
+                        <div className="flex items-center gap-2">
+                            <div className={`w-3 h-3 rounded-sm ${isLightMode ? 'bg-red-600' : 'bg-red-400'}`} />
+                            <span>&lt; 5 Å (Contact)</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className={`w-3 h-3 rounded-sm ${isLightMode ? 'bg-orange-600' : 'bg-amber-400'}`} />
+                            <span>5 - 8 Å (Proximal)</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <div className={`w-3 h-3 rounded-sm ${isLightMode ? 'bg-blue-300' : 'bg-blue-900'}`} />
+                            <span>8 - 12 Å (Distal)</span>
+                        </div>
+                    </div>
+                    <div className="opacity-50">
+                        Click to Highlight in 3D
+                    </div>
                 </div>
             </div>
         </div>
