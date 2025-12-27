@@ -174,7 +174,7 @@ function App() {
     <main className={`w-full h-full relative overflow-hidden transition-colors duration-300 ${isLightMode ? 'bg-neutral-100 text-neutral-900' : 'bg-neutral-950 text-white'}`}>
       <Controls
         pdbId={pdbId}
-        setPdbId={setPdbId}
+        setPdbId={handlePdbIdChange}
         onUpload={handleUpload}
         representation={representation}
         setRepresentation={setRepresentation}
@@ -205,6 +205,29 @@ function App() {
         isCleanMode={isCleanMode}
         setIsCleanMode={setIsCleanMode}
       />
+
+      <ProteinViewer
+        ref={viewerRef}
+        pdbId={pdbId}
+        file={file || undefined}
+        representation={representation}
+        coloring={coloring}
+        customColors={customColors}
+        onStructureLoaded={handleStructureLoaded}
+        resetCamera={resetKey}
+        isMeasurementMode={isMeasurementMode}
+        onAtomClick={handleAtomClick}
+        backgroundColor={isLightMode ? "white" : "black"}
+        showSurface={showSurface}
+        showLigands={showLigands}
+        isSpinning={isSpinning}
+        className="w-full h-full"
+      />
+
+      <HelpGuide />
+
+      {/* Background Gradient */}
+      <div className={`absolute inset-0 pointer-events-none transition-opacity duration-300 ${isLightMode ? 'opacity-0' : 'opacity-100 bg-[radial-gradient(circle_at_50%_50%,rgba(50,50,80,0.2),rgba(0,0,0,0))]'}`} />
     </main>
   );
 }
