@@ -380,7 +380,7 @@ export const Controls: React.FC<ControlsProps> = ({
                 <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
 
                 {/* Sequence */}
-                <div className="space-y-3 flex flex-col min-h-0 flex-1 md:flex-none">
+                <div className="space-y-3 flex flex-col md:flex-none">
                     {proteinTitle && typeof proteinTitle === 'string' && (
                         <div className={`p-3 rounded-lg border ${cardBg} mb-1`}>
                             <h3 className={`text-xs font-semibold uppercase tracking-wider mb-1 ${subtleText}`}>Structure</h3>
@@ -401,7 +401,7 @@ export const Controls: React.FC<ControlsProps> = ({
                         </select>
                     </div>
 
-                    <div className={`flex-1 min-h-[10rem] md:h-48 rounded-lg border p-3 flex flex-col resize-y overflow-hidden ${cardBg}`}>
+                    <div className={`h-64 md:h-48 rounded-lg border p-3 flex flex-col resize-y overflow-hidden ${cardBg}`}>
                         <div ref={sequenceContainerRef} className="flex-1 min-h-0 overflow-y-auto pr-1 scrollbar-thin">
                             {chains.length === 0 ? (
                                 <p className={`italic text-xs ${subtleText}`}>No sequence data</p>
