@@ -31,6 +31,7 @@ interface ProteinViewerProps {
     backgroundColor?: string;
     showSurface?: boolean;
     showLigands?: boolean;
+    isSpinning?: boolean;
 }
 
 export interface ProteinViewerRef {
@@ -57,7 +58,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     onAtomClick,
     backgroundColor = "black",
     showSurface = false,
-    showLigands = false
+    showLigands = false,
+    isSpinning = false
 }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const stageRef = useRef<any>(null);
@@ -75,11 +77,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     useImperativeHandle(ref, () => ({
         getSnapshotBlob: async () => {
-            console.log("ProteinViewer: getSnapshotBlob called");
-            if (!stageRef.current) {
-                console.error("ProteinViewer: Stage is null");
-                return null;
-            }
+            if (!stageRef.current) return null;
             try {
                 // High Quality Export (3x)
                 return await stageRef.current.makeImage({
@@ -238,6 +236,13 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         }
     }));
 
+    useEffect(() => {
+        if (stageRef.current) {
+            stageRef.current.setSpin(isSpinning);
+        }
+    }, [isSpinning]);
+
+    // Handle Window Resize
     useEffect(() => {
         if (stageRef.current) {
             stageRef.current.setParameters({ backgroundColor });

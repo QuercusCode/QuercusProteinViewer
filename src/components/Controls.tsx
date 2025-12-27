@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera, Ruler, Sun, Moon, Layers, Hexagon, Crosshair, Download, Image as ImageIcon, Eye } from 'lucide-react';
+import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera, Ruler, Sun, Moon, Layers, Hexagon, Crosshair, Download, Image as ImageIcon, Eye, RefreshCw, Maximize, Minimize } from 'lucide-react';
 import type { RepresentationType, ColoringType } from './ProteinViewer';
 import type { ChainInfo, CustomColorRule, Snapshot } from '../types';
 
@@ -31,6 +31,10 @@ interface ControlsProps {
     onSnapshot: () => void;
     onDownloadSnapshot: (id: string) => void;
     onDeleteSnapshot: (id: string) => void;
+    isSpinning: boolean;
+    setIsSpinning: (spinning: boolean) => void;
+    isCleanMode: boolean;
+    setIsCleanMode: (clean: boolean) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -60,7 +64,11 @@ export const Controls: React.FC<ControlsProps> = ({
     snapshots,
     onSnapshot,
     onDownloadSnapshot,
-    onDeleteSnapshot
+    onDeleteSnapshot,
+    isSpinning,
+    setIsSpinning,
+    isCleanMode,
+    setIsCleanMode
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [localPdbId, setLocalPdbId] = React.useState(pdbId);
@@ -171,6 +179,19 @@ export const Controls: React.FC<ControlsProps> = ({
     const cardBg = isLightMode ? 'bg-white/80 border-neutral-200 text-neutral-800' : 'bg-neutral-900/90 border-white/10 text-neutral-300';
     const inputBg = isLightMode ? 'bg-white border-neutral-300 text-neutral-900 focus:ring-blue-500' : 'bg-neutral-800 border-neutral-700 text-white focus:ring-blue-500';
     const subtleText = isLightMode ? 'text-neutral-500' : 'text-neutral-400';
+
+    // Clean Mode: Return only the exit button
+    if (isCleanMode) {
+        return (
+            <button
+                onClick={() => setIsCleanMode(false)}
+                className={`absolute bottom-6 right-6 z-50 p-3 rounded-full shadow-lg transition-transform hover:scale-110 ${isLightMode ? 'bg-white text-neutral-800' : 'bg-neutral-800 text-white'}`}
+                title="Exit Presentation Mode"
+            >
+                <Minimize className="w-5 h-5" />
+            </button>
+        );
+    }
 
     return (
         <>
@@ -504,6 +525,26 @@ export const Controls: React.FC<ControlsProps> = ({
                             </div>
                         </div>
                     )}
+
+                    <div className="flex gap-2 pb-2">
+                        <button
+                            onClick={() => setIsSpinning(!isSpinning)}
+                            className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${isSpinning
+                                ? 'bg-blue-500/20 border-blue-500/50 text-blue-500'
+                                : `${cardBg} hover:opacity-80`
+                                }`}
+                        >
+                            <RefreshCw className={`w-4 h-4 ${isSpinning ? 'animate-spin' : ''}`} />
+                            <span>{isSpinning ? 'Spinning' : 'Spin'}</span>
+                        </button>
+                        <button
+                            onClick={() => setIsCleanMode(true)}
+                            className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}
+                        >
+                            <Maximize className="w-4 h-4" />
+                            <span>Clean Mode</span>
+                        </button>
+                    </div>
 
                     <button
                         onClick={() => setIsMeasurementMode(!isMeasurementMode)}
