@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera, Ruler, Sun, Moon, Layers, Hexagon, Crosshair, Download, Image as ImageIcon, Eye, RefreshCw, Maximize, Minimize } from 'lucide-react';
+import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera, Ruler, Sun, Moon, Layers, Hexagon, Crosshair, Download, Image as ImageIcon, Eye, RefreshCw, Maximize, Minimize, Dna } from 'lucide-react';
 import type { RepresentationType, ColoringType } from './ProteinViewer';
-import type { ChainInfo, CustomColorRule, Snapshot } from '../types';
+import type { ChainInfo, CustomColorRule, Snapshot, UniProtFeature } from '../types';
 
 interface ControlsProps {
     pdbId: string;
@@ -23,6 +23,9 @@ interface ControlsProps {
     onResidueClick: (chain: string, resNo: number) => void;
     hoveredResidue: { chain: string; resNo: number; resName?: string } | null;
     onResidueHover: (chain: string, resNo: number | null) => void;
+    uniprotFeatures: UniProtFeature[];
+    activeFeature: UniProtFeature | null;
+    onFeatureClick: (feature: UniProtFeature | null) => void;
     showSurface: boolean;
     setShowSurface: (show: boolean) => void;
     showLigands: boolean;
@@ -62,6 +65,9 @@ export const Controls: React.FC<ControlsProps> = ({
     onResidueClick,
     hoveredResidue,
     onResidueHover,
+    uniprotFeatures,
+    activeFeature,
+    onFeatureClick,
     showSurface,
     setShowSurface,
     showLigands,
@@ -186,10 +192,11 @@ export const Controls: React.FC<ControlsProps> = ({
         return chain ? `${chain.min} - ${chain.max}` : null;
     };
 
-    // Theme Classes
-    const cardBg = isLightMode ? 'bg-white/80 border-neutral-200 text-neutral-800' : 'bg-neutral-900/90 border-white/10 text-neutral-300';
-    const inputBg = isLightMode ? 'bg-white border-neutral-300 text-neutral-900 focus:ring-blue-500' : 'bg-neutral-800 border-neutral-700 text-white focus:ring-blue-500';
+    // Styles
+    const cardBg = isLightMode ? 'bg-white' : 'bg-neutral-900';
     const subtleText = isLightMode ? 'text-neutral-500' : 'text-neutral-400';
+    const borderColor = isLightMode ? 'border-neutral-200' : 'border-neutral-800';
+    const inputBg = isLightMode ? 'bg-white border-neutral-300 text-neutral-900 focus:ring-blue-500' : 'bg-neutral-800 border-neutral-700 text-white focus:ring-blue-500';
 
     // Clean Mode: Return only the exit button
     if (isCleanMode) {
@@ -372,6 +379,43 @@ export const Controls: React.FC<ControlsProps> = ({
                     </div>
 
                     <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
+
+                    {/* Biology (UniProt Data) */}
+                    <div className={`p-3 rounded-lg border ${cardBg} ${borderColor} shadow-sm`}>
+                        <div className="flex items-center gap-2 mb-3 text-sm font-semibold opacity-90">
+                            <Dna className="w-4 h-4 text-purple-500" />
+                            <span>Biology (UniProt)</span>
+                        </div>
+
+                        <div className="space-y-2 max-h-48 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700">
+                            {uniprotFeatures && uniprotFeatures.length > 0 ? (
+                                uniprotFeatures.map((feat, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => onFeatureClick(activeFeature === feat ? null : feat)}
+                                        className={`w-full text-left px-2 py-1.5 rounded text-xs transition-colors border ${activeFeature === feat
+                                            ? 'bg-purple-500 text-white border-purple-600 font-medium'
+                                            : `hover:bg-purple-500/10 border-transparent ${isLightMode ? 'text-neutral-700' : 'text-neutral-300'}`
+                                            }`}
+                                    >
+                                        <div className="flex justify-between items-center">
+                                            <span>{feat.type.replace(/_/g, ' ')}</span>
+                                            <span className="opacity-70">{feat.start}-{feat.end}</span>
+                                        </div>
+                                        {feat.description && (
+                                            <div className="mt-0.5 text-[10px] opacity-80 truncate">
+                                                {feat.description}
+                                            </div>
+                                        )}
+                                    </button>
+                                ))
+                            ) : (
+                                <div className="text-xs opacity-50 text-center py-2 italic">
+                                    No biological features found.
+                                </div>
+                            )}
+                        </div>
+                    </div>
 
                     {/* Analysis */}
                     <div className="space-y-3">

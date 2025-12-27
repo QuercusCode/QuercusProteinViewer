@@ -3,7 +3,7 @@ import { ProteinViewer, type RepresentationType, type ColoringType, type Protein
 import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
 import { HelpGuide } from './components/HelpGuide';
-import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot } from './types';
+import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, UniProtFeature } from './types';
 
 function App() {
   const [pdbId, setPdbId] = useState(() => {
@@ -54,40 +54,95 @@ function App() {
     setHighlightedResidue(null);
   };
 
+
+
   const [proteinTitle, setProteinTitle] = useState<string | null>(null);
+
+  // UniProt Data
+  const [uniprotFeatures, setUniprotFeatures] = useState<UniProtFeature[]>([]);
+  const [activeFeature, setActiveFeature] = useState<UniProtFeature | null>(null);
 
   useEffect(() => {
     if (!pdbId || pdbId.length < 4) {
       setProteinTitle(null);
+      setUniprotFeatures([]);
+      setActiveFeature(null);
       return;
     }
 
-    const fetchTitle = async () => {
+    const fetchData = async () => {
       const cleanId = pdbId.trim().toLowerCase();
-      console.log(`Fetching title for PDB: ${cleanId}`);
+      console.log(`Fetching data for PDB: ${cleanId}`);
+
       try {
-        const response = await fetch(`https://data.rcsb.org/rest/v1/core/entry/${cleanId}`);
-        if (!response.ok) {
-          console.error(`Fetch failed with status: ${response.status}`);
-          throw new Error('Failed to fetch metadata');
+        // 1. Fetch PDB Info
+        const pdbResponse = await fetch(`https://data.rcsb.org/rest/v1/core/entry/${cleanId}`);
+        if (!pdbResponse.ok) throw new Error('Failed to fetch PDB metadata');
+        const pdbData = await pdbResponse.json();
+
+        if (pdbData.struct && pdbData.struct.title) {
+          setProteinTitle(pdbData.struct.title);
         }
-        const data = await response.json();
-        console.log("Fetched structure data:", data);
-        if (data.struct && data.struct.title) {
-          console.log("Setting protein title:", data.struct.title);
-          setProteinTitle(data.struct.title);
+
+        // 2. Find UniProt Accession via RCSB Polymer Entity
+        // This is a bit complex as it requires drilling down.
+        // Simplified approach: Search UniProt directly via PDB ID cross-ref
+        // https://rest.uniprot.org/uniprotkb/search?query=xref:pdb-1crn
+
+        const uniprotResponse = await fetch(`https://rest.uniprot.org/uniprotkb/search?query=xref:pdb-${cleanId}&format=json`);
+        const uniprotData = await uniprotResponse.json();
+
+        if (uniprotData.results && uniprotData.results.length > 0) {
+          const entry = uniprotData.results[0]; // Take first match
+          console.log("UniProt Entry:", entry);
+
+          const features: UniProtFeature[] = [];
+
+          if (entry.features) {
+            entry.features.forEach((feat: any) => {
+              // Filter for interesting features
+              if (['active_site', 'binding_site', 'domain', 'site', 'mutagenesis_site'].includes(feat.type)) {
+                features.push({
+                  type: feat.type,
+                  description: feat.description,
+                  start: feat.location.start.value,
+                  end: feat.location.end.value,
+                  chain: "A" // Assumption: Simplification for now, mapping UniProt to PDB chains is hard
+                });
+              }
+            });
+          }
+          console.log("Extracted Features:", features);
+          setUniprotFeatures(features);
         } else {
-          console.warn("No struct.title found in response");
-          setProteinTitle(null);
+          console.log("No UniProt match found.");
+          setUniprotFeatures([]);
         }
+
       } catch (error) {
-        console.error("Failed to fetch protein title:", error);
+        console.error("Failed to fetch biology data:", error);
         setProteinTitle(null);
+        setUniprotFeatures([]);
       }
     };
 
-    fetchTitle();
+    fetchData();
   }, [pdbId]);
+
+  const handleFeatureClick = (feature: UniProtFeature | null) => {
+    setActiveFeature(feature);
+    if (feature) {
+      // Highlight range
+      // TODO: Chain mapping is tricky. PDB chain "A" might not map 1:1 to UniProt sequence.
+      // For now, we assume simplistic mapping or try to apply to all chains or default "A".
+      // Better: Apply to the first chain detected in the viewer or try wildcard.
+      // Let's try passing the chain from our assumed data or just "A" for now.
+      viewerRef.current?.highlightResidueRange(feature.chain || "A", feature.start, feature.end);
+    } else {
+      // Clear highlighter
+      viewerRef.current?.highlightResidueRange("A", -1, -1);
+    }
+  };
 
   const handlePdbIdChange = (id: string) => {
     setPdbId(id);
@@ -96,6 +151,8 @@ function App() {
     setChains([]);
     setCustomColors([]);
     setHighlightedResidue(null);
+    setUniprotFeatures([]);
+    setActiveFeature(null);
   };
 
   const viewerRef = useRef<ProteinViewerRef>(null);
@@ -323,6 +380,9 @@ function App() {
         onResidueClick={handleSequenceResidueClick}
         hoveredResidue={hoveredResidue}
         onResidueHover={handleSequenceHover}
+        uniprotFeatures={uniprotFeatures}
+        activeFeature={activeFeature}
+        onFeatureClick={handleFeatureClick}
         showSurface={showSurface}
         setShowSurface={setShowSurface}
         showLigands={showLigands}

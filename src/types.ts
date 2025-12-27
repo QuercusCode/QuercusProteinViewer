@@ -6,6 +6,14 @@ export interface CustomColorRule {
 }
 
 
+export interface UniProtFeature {
+    type: string;
+    description: string;
+    start: number;
+    end: number;
+    chain?: string;
+}
+
 export interface ChainInfo {
     name: string;
     min: number;

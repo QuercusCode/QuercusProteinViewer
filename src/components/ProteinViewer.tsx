@@ -43,7 +43,7 @@ export interface ProteinViewerRef {
     getCameraOrientation: () => any;
     setCameraOrientation: (orientation: any) => void;
     getAtomCoordinates: () => Promise<{ x: number[], y: number[], z: number[], labels: string[] }[]>;
-
+    highlightResidueRange: (chain: string, start: number, end: number) => void;
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
@@ -372,7 +372,30 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 }
             });
 
+            if (results.length > 0) console.log("Sample:", results[0]);
+
             return results;
+        },
+        highlightResidueRange: (chain: string, start: number, end: number) => {
+            if (!componentRef.current) return;
+
+            // Remove previous features representation if any
+            componentRef.current.removeRepresentation("feature-highlight");
+
+            // If start/end invalid (e.g. -1), just clearing is enough
+            if (start < 0 || end < 0) return;
+
+            const selection = `${start}-${end}:${chain}`; // e.g. "10-20:A"
+
+            componentRef.current.addRepresentation("ball+stick", {
+                name: "feature-highlight",
+                sele: selection,
+                colorValue: "purple", // Distinct color for biology features
+                radiusScale: 0.3
+            });
+
+            // Also zoom to it
+            componentRef.current.autoView(selection, 1000);
         }
     }));
 
