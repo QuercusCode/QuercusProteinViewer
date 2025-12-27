@@ -340,6 +340,20 @@ export const Controls: React.FC<ControlsProps> = ({
                                     <option value="charge">Charge (+/-)</option>
                                 </select>
                             </div>
+                            <p className={`text-[10px] leading-tight px-1 ${subtleText}`}>
+                                {(() => {
+                                    const descriptions: Record<string, string> = {
+                                        chainid: "Different color for each polymer chain.",
+                                        element: "CPK: Carbon (Grey), Oxygen (Red), Nitrogen (Blue), Sulfur (Yellow).",
+                                        resname: "Unique color for each amino acid type.",
+                                        structure: "Helix (Pink), Sheet (Yellow), Coil (Green).",
+                                        hydrophobicity: "Red = Hydrophobic (Core), White = Hydrophilic (Surface).",
+                                        bfactor: "Red = Flexible/Mobile regions, Blue = Rigid/Stable regions.",
+                                        charge: "Blue = Positive (Arg/Lys/His), Red = Negative (Asp/Glu)."
+                                    };
+                                    return descriptions[coloring] || "";
+                                })()}
+                            </p>
                         </div>
                     </div>
 
