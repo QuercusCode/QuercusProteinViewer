@@ -3,7 +3,7 @@ import { ProteinViewer, type RepresentationType, type ColoringType, type Protein
 import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
 import { HelpGuide } from './components/HelpGuide';
-import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Annotation } from './types';
+import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot } from './types';
 
 function App() {
   const [pdbId, setPdbId] = useState(() => {
@@ -39,8 +39,7 @@ function App() {
   const [showLigands, setShowLigands] = useState(false);
 
   // Tools
-  const [isAnnotationMode, setIsAnnotationMode] = useState(false);
-  const [annotations, setAnnotations] = useState<Annotation[]>([]);
+
 
   const [highlightedResidue, setHighlightedResidue] = useState<{ chain: string; resNo: number; resName?: string } | null>(null);
 
@@ -49,7 +48,7 @@ function App() {
 
   const handleResetView = () => {
     setResetKey(prev => prev + 1);
-    setAnnotations([]); // Optional: Clean annotations on reset? Maybe better to keep them unless user reloads file.
+    setResetKey(prev => prev + 1);
   };
 
   const handleUpload = (uploadedFile: File) => {
@@ -57,7 +56,7 @@ function App() {
     setPdbId(''); // Clear PDB ID when file is uploaded
     setChains([]);
     setCustomColors([]);
-    setAnnotations([]);
+
     setHighlightedResidue(null);
   };
 
@@ -75,40 +74,7 @@ function App() {
     }
 
     // Annotation Logic
-    if (isAnnotationMode) {
-      const note = window.prompt(`Enter note for ${info.resName} ${info.resNo}:`);
-      if (note) {
-        // Use coordinates directly from the click event if available
-        let position = info.position;
-        console.log("DEBUG: handleAtomClick Info:", info);
-        console.log("DEBUG: Position from click:", position);
 
-        // Fallback: If not passed (shouldn't happen with new logic), try to query
-        if (!position) {
-          console.warn("DEBUG: Primary position missing, using fallback.");
-          if (info.atomIndex !== undefined) {
-            position = viewerRef.current?.getAtomPositionByIndex(info.atomIndex) || undefined;
-          }
-          if (!position) {
-            const fallbackPos = viewerRef.current?.getAtomPosition(info.chain, info.resNo);
-            if (fallbackPos) position = fallbackPos;
-          }
-        }
-
-        if (position) {
-          const newAnnotation: Annotation = {
-            id: crypto.randomUUID(),
-            chain: info.chain,
-            resNo: info.resNo,
-            text: note,
-            position: position
-          };
-          setAnnotations(prev => [...prev, newAnnotation]);
-        } else {
-          alert("Could not determine 3D position for annotation.");
-        }
-      }
-    }
 
     if (info) {
       // ... highlight logic ...
@@ -208,14 +174,7 @@ function App() {
     try {
       console.log("Starting save session...");
 
-      // 1. Sanitize annotations
-      const safeAnnotations = (annotations || []).map(ann => ({
-        id: String(ann.id),
-        chain: String(ann.chain),
-        resNo: Number(ann.resNo),
-        text: String(ann.text),
-        position: { x: Number(ann.position?.x || 0), y: Number(ann.position?.y || 0), z: Number(ann.position?.z || 0) }
-      }));
+
 
       // 2. Safely get orientation
       let safeOrientation = null;
@@ -239,7 +198,7 @@ function App() {
         isCleanMode: Boolean(isCleanMode),
         customColors: customColors || {},
         chains: Array.isArray(chains) ? chains : [],
-        annotations: safeAnnotations,
+
         orientation: safeOrientation,
         timestamp: Date.now()
       };
@@ -290,7 +249,7 @@ function App() {
 
       if (session.customColors) setCustomColors(session.customColors);
       if (session.snapshots) setSnapshots(session.snapshots);
-      if (session.annotations) setAnnotations(session.annotations);
+
 
       if (session.orientation) {
         setTimeout(() => {
@@ -399,8 +358,7 @@ function App() {
         onSaveSession={handleSaveSession}
         onLoadSession={handleLoadSession}
         onToggleContactMap={() => setShowContactMap(true)}
-        isAnnotationMode={isAnnotationMode}
-        setIsAnnotationMode={setIsAnnotationMode}
+
       />
 
       <ProteinViewer
@@ -419,7 +377,7 @@ function App() {
         showSurface={showSurface}
         showLigands={showLigands}
         isSpinning={isSpinning}
-        annotations={annotations}
+
         className="w-full h-full"
       />
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import type { CustomColorRule, ChainInfo, Annotation } from '../types';
+import type { CustomColorRule, ChainInfo } from '../types';
 
 declare global {
     interface Window {
@@ -18,7 +18,7 @@ interface ProteinViewerProps {
     representation?: string;
     coloring?: string;
     customColors?: CustomColorRule[];
-    annotations?: Annotation[];
+
     className?: string;
     onStructureLoaded?: (info: { chains: ChainInfo[] }) => void;
     onError?: (error: string) => void;
@@ -66,7 +66,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     showSurface = false,
     showLigands = false,
     isSpinning = false,
-    annotations = []
+
 }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const stageRef = useRef<any>(null);
@@ -81,78 +81,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     const setLoading = setExternalLoading || setInternalLoading;
     const error = externalError !== undefined ? externalError : internalError;
     const setError = setExternalError || setInternalError;
-
-    // Render Annotations
-    useEffect(() => {
-        if (!stageRef.current) return;
-
-        // Clean up previous annotations
-        stageRef.current.eachComponent((comp: any) => {
-            if (comp.name === "annotation-component") {
-                stageRef.current.removeComponent(comp);
-            }
-        });
-
-        if (annotations.length === 0) return;
-
-        // Create new shape for annotations
-        const shape = new window.NGL.Shape("annotations");
-
-        // Calculate center of structure for outward direction
-        let center = new window.NGL.Vector3();
-        if (componentRef.current && componentRef.current.structure) {
-            try {
-                const box = componentRef.current.structure.getBoundingBox();
-                box.getCenter(center);
-            } catch (e) { console.warn("Could not get structure center", e); }
-        }
-
-        annotations.forEach(note => {
-            const atomPos = new window.NGL.Vector3(note.position.x, note.position.y, note.position.z);
-
-            // Calculate direction from center to atom
-            const dir = atomPos.clone().sub(center).normalize();
-
-            // Push text out by 10 Angstroms (Close but not touching)
-            const textPos = atomPos.clone().add(dir.multiplyScalar(10));
-
-            const posArray = [textPos.x, textPos.y, textPos.z];
-            const atomPosArray = [atomPos.x, atomPos.y, atomPos.z];
-
-            console.log("DEBUG: Rendering annotation (Green-10A) at", posArray);
-
-            const color = [0, 1, 0]; // Bright Green
-            const size = 5.0;
-
-            try {
-                // Draw connecting line
-                shape.addCylinder(atomPosArray, posArray, [1, 1, 1], 0.2);
-
-                // Add Text at new position
-                try {
-                    shape.addText(posArray, color, size, note.text);
-                } catch (e) {
-                    shape.addText(posArray, note.text, color, size);
-                }
-            } catch (e) {
-                console.error("Failed to add annotation visual:", e);
-            }
-
-            try {
-                shape.addSphere(atomPosArray, [1, 0, 1], 1.0); // Anchor on atom
-            } catch (e) { }
-        });
-
-        const shapeComp = stageRef.current.addComponentFromObject(shape);
-        // depthTest: false forces rendering on top of everything
-        shapeComp.addRepresentation("buffer", {
-            depthTest: false,
-            opacity: 1.0
-        });
-        shapeComp.setName("annotation-component");
-        shapeComp.autoView(); // Optional: might disrupt user view, better remove it.
-
-    }, [annotations]);
 
     useImperativeHandle(ref, () => ({
         getSnapshotBlob: async () => {

@@ -38,8 +38,7 @@ interface ControlsProps {
     onSaveSession: () => void;
     onLoadSession: (file: File) => void;
     onToggleContactMap: () => void;
-    isAnnotationMode: boolean;
-    setIsAnnotationMode: (mode: boolean) => void;
+
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -77,8 +76,7 @@ export const Controls: React.FC<ControlsProps> = ({
     onSaveSession,
     onLoadSession,
     onToggleContactMap,
-    isAnnotationMode,
-    setIsAnnotationMode
+
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const sessionInputRef = useRef<HTMLInputElement>(null);
@@ -399,19 +397,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <div className={`w-3 h-3 rounded-full ${isMeasurementMode ? 'bg-amber-500' : 'bg-neutral-500'}`} />
                             </button>
 
-                            <button
-                                onClick={() => setIsAnnotationMode(!isAnnotationMode)}
-                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isAnnotationMode
-                                    ? 'bg-purple-500/10 border-purple-500 text-purple-500'
-                                    : `${cardBg} hover:opacity-80`
-                                    }`}
-                            >
-                                <div className="flex items-center gap-2">
-                                    <Crosshair className="w-4 h-4" />
-                                    <span className="text-xs font-medium">{isAnnotationMode ? 'Annotation Active' : 'Annotate Residues'}</span>
-                                </div>
-                                <div className={`w-3 h-3 rounded-full ${isAnnotationMode ? 'bg-purple-500' : 'bg-neutral-500'}`} />
-                            </button>
+
                         </div>
                     </div>
 
