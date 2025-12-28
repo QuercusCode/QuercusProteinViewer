@@ -471,28 +471,28 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 // 2. Start Recording
                 mediaRecorder.start();
 
-                // 3. Perform Spin (Full 360 over 4 seconds approx)
+                // 3. Perform Spin (Use built-in spin for stability)
                 const duration = 4000; // 4 seconds
                 const fps = 30;
                 const totalFrames = duration / 1000 * fps;
-                const rotationPerFrame = (2 * Math.PI) / totalFrames; // 360 degrees in radians
 
                 let frame = 0;
                 const originalSpin = stage.spinAnimation.paused; // Store original state
-                stage.setSpin(false); // Disable auto-spin to control it manually
+
+                // Ensure spin is ON for recording
+                stage.setSpin(true);
 
                 const animate = () => {
                     if (frame >= totalFrames) {
                         mediaRecorder.stop();
                         // Restore original spin state
-                        if (!originalSpin) {
-                            stage.setSpin(true);
+                        if (originalSpin) {
+                            stage.setSpin(false);
                         }
                         return;
                     }
 
-                    // Rotate
-                    stage.viewer.controls.rotate(rotationPerFrame, 0);
+                    // Force a render frame for the recorder
                     stage.viewer.requestRender();
 
                     frame++;
