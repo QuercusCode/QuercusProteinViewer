@@ -647,7 +647,7 @@ export const Controls: React.FC<ControlsProps> = ({
                         </div>
                         <div className="flex flex-col sm:flex-row gap-2">
                             <div className="flex items-center gap-2 flex-none">
-                                <span className={`text-xs font-medium ${subtleText}`}>Sec:</span>
+                                <span className={`text-xs font-bold ${subtleText}`}>Duration (s):</span>
                                 <input
                                     type="number"
                                     min="1"
