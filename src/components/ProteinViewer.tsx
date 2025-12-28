@@ -555,49 +555,63 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             // stage.setParameters({ backgroundColor: 'white' }); 
 
             try {
-                // 3. Synchronous Render & Capture Loop
-                const renderer = stage.viewer.renderer;
-                const scene = stage.viewer.scene;
-                const camera = stage.viewer.camera;
+                // 3. Recursive Double-RAF Loop (The "Golden Path")
+                // We must use requestRender() (to update NGL internals) AND wait for the browser paint.
+                const processFrame = (i: number) => {
+                    if (i >= totalFrames) {
+                        try {
+                            if (wasSpinning) stage.setSpin(true);
+                            stage.viewer.requestRender(); // Restore view
+                        } catch (e) { /* ignore */ }
 
-                for (let i = 0; i < totalFrames; i++) {
+                        gif.render(); // Finish
+                        return;
+                    }
+
                     // a. Rotate
                     stage.viewerControls.rotate(anglePerFrame, 0);
 
-                    // b. Update Global Uniforms/State (Important for NGL effects)
-                    // stage.viewer.updateHelper(); // If accessible, otherwise requestRender updates basic stats but is async.
-                    // For pure geometry rotation, simple render is usually enough.
+                    // b. Request Standard NGL Render (Updates lights/uniforms correctly)
+                    stage.viewer.requestRender();
 
-                    // c. FORCE SYNCHRONOUS RENDER
-                    // This bypasses the requestAnimationFrame loop and effectively 
-                    // "paints" the scene to the buffer RIGHT NOW.
-                    renderer.render(scene, camera);
+                    // c. Wait for Paint (Double RAF)
+                    // RAF 1: Browser schedules the paint for the next frame
+                    requestAnimationFrame(() => {
+                        // RAF 2: Browser has theoretically finished the previous paint
+                        requestAnimationFrame(() => {
+                            try {
+                                // d. Capture
+                                const sourceCanvas = stage.viewer.renderer.domElement;
+                                if (sourceCanvas) {
+                                    // 1. Fill White
+                                    ctx.fillStyle = '#ffffff';
+                                    ctx.fillRect(0, 0, width, height);
+                                    // 2. Draw Visible Canvas
+                                    ctx.drawImage(sourceCanvas, 0, 0, width, height);
+                                    // 3. Add Frame
+                                    gif.addFrame(ctx, { delay: 1000 / fps, copy: true });
+                                }
+                            } catch (e) {
+                                console.error("Frame capture failed:", e);
+                            }
+                            // e. Next Frame
+                            processFrame(i + 1);
+                        });
+                    });
+                };
 
-                    // d. DIRECT CANVAS CAPTURE (WYSIWYG)
-                    // We grab the pixels immediately after render, before the browser clears the buffer.
-                    // This should solve the "White GIF" issue.
-                    const sourceCanvas = renderer.domElement;
-                    if (!sourceCanvas) throw new Error("WebGL Canvas not found");
+                // Start Loop
+                processFrame(0);
 
-                    // e. Draw to Intermediate (Flattening transparency)
-                    // 1. Fill White
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(0, 0, width, height);
-                    // 2. Draw Visible Canvas
-                    ctx.drawImage(sourceCanvas, 0, 0, width, height);
-
-                    // f. Add Frame
-                    gif.addFrame(ctx, { delay: 1000 / fps, copy: true });
-                }
-            } finally {
-                // Restore State
+            } catch (e) {
+                console.error("GIF Loop Error:", e);
                 if (wasSpinning) stage.setSpin(true);
-                // stage.setParameters(originalParams);
             }
+            // stage.setParameters(originalParams);
+
 
             return new Promise((resolve) => {
                 gif.on('finished', (blob: Blob) => resolve(blob));
-                gif.render();
             });
         },
 
