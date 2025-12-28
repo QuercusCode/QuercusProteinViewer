@@ -23,6 +23,7 @@ export interface ChainInfo {
 
 export interface StructureInfo {
     chains: ChainInfo[];
+    ligands: string[];
 }
 
 export interface Snapshot {

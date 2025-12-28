@@ -20,7 +20,7 @@ interface ProteinViewerProps {
     customColors?: CustomColorRule[];
 
     className?: string;
-    onStructureLoaded?: (info: { chains: ChainInfo[] }) => void;
+    onStructureLoaded?: (info: { chains: ChainInfo[], ligands: string[] }) => void;
     onError?: (error: string) => void;
     loading?: boolean;
     setLoading?: (loading: boolean) => void;
@@ -667,7 +667,20 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                 console.log(`Chain ${c.chainname}: Range ${minSeq}-${maxSeq}, SeqLen: ${seq.length}`);
                                 chains.push({ name: c.chainname, min: minSeq, max: maxSeq, sequence: seq });
                             });
-                            onStructureLoaded({ chains });
+
+                            // Extract Ligands
+                            const ligandSet = new Set<string>();
+                            component.structure.eachResidue((r: any) => {
+                                // Basic filter for ligands: isHetero and not Water/Ion (generic check)
+                                // NGL might mark waters as hetero. Typical water names: HOH, WAT, TIP
+                                const invalidLigands = ['HOH', 'WAT', 'TIP', 'SOL', 'DOD'];
+                                if (r.isHetero() && !invalidLigands.includes(r.resname)) {
+                                    ligandSet.add(r.resname);
+                                }
+                            });
+                            const ligands = Array.from(ligandSet).sort();
+
+                            onStructureLoaded({ chains, ligands });
                         } catch (e) { console.warn("Chain parsing error", e); }
                     }
 

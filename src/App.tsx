@@ -44,6 +44,7 @@ function App() {
   const [highlightedResidue, setHighlightedResidue] = useState<{ chain: string; resNo: number; resName?: string } | null>(null);
 
   const [chains, setChains] = useState<ChainInfo[]>([]);
+  const [ligands, setLigands] = useState<string[]>([]);
   const [customColors, setCustomColors] = useState<CustomColorRule[]>([]);
 
   const handleResetView = () => {
@@ -55,6 +56,7 @@ function App() {
     setFile(uploadedFile);
     setPdbId(''); // Clear PDB ID when file is uploaded
     setChains([]);
+    setLigands([]);
     setCustomColors([]);
 
     setHighlightedResidue(null);
@@ -264,6 +266,7 @@ function App() {
 
   const handleStructureLoaded = (info: StructureInfo) => {
     setChains(info.chains);
+    setLigands(info.ligands || []);
   };
 
 
@@ -335,6 +338,7 @@ function App() {
         setColoring={setColoring}
         onResetView={handleResetView}
         chains={chains}
+        ligands={ligands}
         customColors={customColors}
         setCustomColors={setCustomColors}
         isMeasurementMode={isMeasurementMode}

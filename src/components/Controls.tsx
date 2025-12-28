@@ -13,6 +13,7 @@ interface ControlsProps {
     setColoring: (type: ColoringType) => void;
     onResetView: () => void;
     chains: ChainInfo[];
+    ligands: string[];
     customColors: CustomColorRule[];
     setCustomColors: (colors: CustomColorRule[]) => void;
     isMeasurementMode: boolean;
@@ -51,6 +52,7 @@ export const Controls: React.FC<ControlsProps> = ({
     setColoring,
     onResetView,
     chains,
+    ligands,
     customColors,
     setCustomColors,
     isMeasurementMode,
@@ -312,12 +314,36 @@ export const Controls: React.FC<ControlsProps> = ({
                             </button>
 
                             {showLigands && (
-                                <button
-                                    onClick={onFocusLigands}
-                                    className="w-full flex items-center justify-center gap-1.5 bg-neutral-600 hover:bg-neutral-500 text-white text-xs py-1.5 rounded transition-colors animate-in fade-in slide-in-from-top-2"
-                                >
-                                    <Crosshair className="w-3 h-3" /> Focus Ligands
-                                </button>
+                                <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                                    <button
+                                        onClick={onFocusLigands}
+                                        className="w-full flex items-center justify-center gap-1.5 bg-neutral-600 hover:bg-neutral-500 text-white text-xs py-1.5 rounded transition-colors"
+                                    >
+                                        <Crosshair className="w-3 h-3" /> Focus Ligands
+                                    </button>
+
+                                    {/* Educational Info */}
+                                    <div className={`p-2 rounded border text-[10px] leading-relaxed ${isLightMode ? 'bg-blue-50 border-blue-100 text-blue-800' : 'bg-blue-900/20 border-blue-800 text-blue-200'}`}>
+                                        <strong>What is a Ligand?</strong><br />
+                                        A ligand is a substance that forms a complex with a biomolecule to serve a biological purpose. Usually a small molecule (like a drug, hormone, or cofactor) binding to a protein.
+                                    </div>
+
+                                    {/* List of Ligands */}
+                                    {ligands.length > 0 ? (
+                                        <div className={`p-2 rounded border space-y-1 ${cardBg}`}>
+                                            <div className={`text-[10px] font-semibold uppercase tracking-wider ${subtleText}`}>Detected Ligands</div>
+                                            <div className="flex flex-wrap gap-1">
+                                                {ligands.map(lig => (
+                                                    <span key={lig} className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300">
+                                                        {lig}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className={`text-[10px] italic p-1 ${subtleText}`}>No ligands detected in this structure.</div>
+                                    )}
+                                </div>
                             )}
 
                         </div>
