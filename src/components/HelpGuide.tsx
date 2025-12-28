@@ -82,7 +82,7 @@ export const HelpGuide: React.FC = () => {
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <span className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 flex-shrink-0" />
-                                        <span><strong>Record Movies & GIFs</strong> (Turntable) with custom duration settings. Saved to your local gallery.</span>
+                                        <span><strong>Record Movies & GIFs</strong> (Turntable). Saved to gallery. (Note: GIFs take a moment to process).</span>
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
