@@ -516,68 +516,81 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         recordGif: async (duration = 4000) => {
             if (!stageRef.current) throw new Error("Stage not ready");
             const stage = stageRef.current;
+            const viewerCanvas = stage.viewer.canvas;
 
-            // 1. Setup GIF
+            // 1. Setup GIF with EXACT dimensions from drawing buffer
+            const width = viewerCanvas.width;
+            const height = viewerCanvas.height;
+
             const gif = new GIF({
                 workers: 2,
                 quality: 10,
-                // Use current canvas dimensions
-                width: containerRef.current?.clientWidth || 800,
-                height: containerRef.current?.clientHeight || 600,
-                workerScript: 'gif.worker.js'
+                width: width,
+                height: height,
+                workerScript: 'gif.worker.js',
+                background: '#ffffff' // White background for GIF
             });
 
+            // Intermediate Canvas for flattening transparency
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = width;
+            tempCanvas.height = height;
+            const ctx = tempCanvas.getContext('2d', { willReadFrequently: true });
+            if (!ctx) throw new Error("Canvas context failed");
+
             // 2. Configure Animation Loop
-            const fps = 15; // Trade-off between speed and smoothness
+            const fps = 10; // Conservative FPS
             const totalFrames = Math.max(10, Math.floor((duration / 1000) * fps));
-            // Calculate rotation Step (2*PI is full circle) because NGL rotate takes radians usually? 
-            // Actually NGL viewerControls.rotate(x, y) input is relative to window size usually or arbitrary sensitivity.
-            // But we can use the 'spin' command's logic or just rotate by small increments.
-            // Let's rely on a fixed step that feels like a 'turntable'. 
-            // A full 360 spin in 'duration' ms.
-            // However, NGL rotate sensitivity is not strictly radians.
-            // Standard trick: use `stage.viewerControls.rotate( (2 * Math.PI) / totalFrames, 0 )` if it accepts radians.
-            // If not, we might need to guess or use the 'spin' method. 
-            // Let's use `stage.spinAnimation` axis logic if accessible, OR just use small delta.
-            // Safest: Use `stage.viewerControls.rotate(x, y)` where x is the horizontal delta.
-            // A full rotation usually corresponds to some value. 
-            // Let's try to assume inputs are radians for now, as is common in 3D libs.
             const anglePerFrame = (2 * Math.PI) / totalFrames;
 
             // Store State
             const wasSpinning = stage.spinAnimation.paused === false;
+
             if (wasSpinning) stage.setSpin(false);
+
+            // Force opaque background on stage for capture (if possible, otherwise handle in temp canvas)
+            // stage.setParameters({ backgroundColor: 'white' }); 
 
             try {
                 // 3. Stop-Motion Loop
                 for (let i = 0; i < totalFrames; i++) {
                     // Rotate
-                    // Note: rotate(dh, dv) - horizontal delta rotates around up axis
                     stage.viewerControls.rotate(anglePerFrame, 0);
                     stage.viewer.requestRender();
 
-                    // Capture High-Quality Snapshot (Direct from WebGL buffer)
+                    // CRITICAL DELAY: Wait for GPU to settle and render to occur
+                    // 100ms is conservative but safe.
+                    await new Promise(r => setTimeout(r, 100));
+
+                    // Capture High-Quality Snapshot
+                    // We use 'image/png' to preserve quality before flattening
                     const blob = await stage.makeImage({
                         factor: 1,
                         type: 'png',
-                        antialias: true,
+                        antialias: false, // Disable AA for sharper read back check
                         trim: false,
-                        transparent: false // Opaque background prevents GIF artifacts
+                        transparent: true // Get alpha so we can flatten it ourselves
                     });
 
-                    // Create Image element for gif.js
-                    const img = document.createElement('img');
-                    img.src = URL.createObjectURL(blob);
-                    await new Promise((resolve) => { img.onload = resolve; });
+                    // Load into Image Bitmap (Atomic Decode)
+                    const imgBitmap = await createImageBitmap(blob);
 
-                    gif.addFrame(img, { delay: 1000 / fps, copy: true });
+                    // Draw to Intermediate Canvas (Flattening)
+                    // 1. Fill White
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillRect(0, 0, width, height);
+                    // 2. Draw Image
+                    ctx.drawImage(imgBitmap, 0, 0);
 
-                    // Cleanup texture memory immediately
-                    URL.revokeObjectURL(img.src);
+                    imgBitmap.close(); // Cleanup GPU memory
+
+                    // Add Frame from Context
+                    gif.addFrame(ctx, { delay: 1000 / fps, copy: true });
                 }
             } finally {
                 // Restore State
                 if (wasSpinning) stage.setSpin(true);
+                // stage.setParameters(originalParams);
             }
 
             return new Promise((resolve) => {
