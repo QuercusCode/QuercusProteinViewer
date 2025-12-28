@@ -15,8 +15,10 @@ export const convertVideoToGif = async (
     progressCallback?: (p: number) => void
 ): Promise<Blob> => {
     return new Promise((resolve, reject) => {
+        let status = "Initializing";
+
         const timeoutId = setTimeout(() => {
-            reject(new Error("GIF conversion timed out after 30s"));
+            reject(new Error(`GIF conversion timed out at stage: ${status}`));
             cleanup();
         }, 30000);
 
@@ -26,15 +28,14 @@ export const convertVideoToGif = async (
         video.muted = true;
         video.playsInline = true;
 
-        // Make it slightly visible to prevent throttling, but off-screen
+        // Position off-screen but keep "visible" to browser layout to ensure frame/paint callbacks fire
         Object.assign(video.style, {
             position: 'fixed',
             top: '0',
-            left: '0',
-            width: '2px', // Needs size
-            height: '2px',
-            opacity: '0.01', // Needs non-zero opacity
-            pointerEvents: 'none',
+            left: '-9999px', // Off-screen
+            width: '300px',
+            height: '200px',
+            opacity: '1', // Fully opaque but off-screen
             zIndex: '-100'
         });
         document.body.appendChild(video);
@@ -52,6 +53,7 @@ export const convertVideoToGif = async (
 
         // 2. Wait for metadata to know dimensions/duration
         video.onloadedmetadata = () => {
+            status = "Metadata Loaded";
             console.log("GIF: Metadata loaded", video.videoWidth, video.videoHeight, video.duration);
             const width = video.videoWidth || 800;
             const height = video.videoHeight || 600;
@@ -89,6 +91,7 @@ export const convertVideoToGif = async (
             let lastCaptureTime = -interval; // Ensure first frame (0s) is captured
 
             gif.on('finished', (blob: Blob) => {
+                status = "Finished";
                 console.log("GIF: Finished encoding", blob.size);
                 cleanup();
                 if (progressCallback) progressCallback(1);
@@ -102,8 +105,8 @@ export const convertVideoToGif = async (
             });
 
             if (progressCallback) {
-                gif.on('progress', (_p: number) => {
-                    // Encoding progress
+                gif.on('progress', (p: number) => {
+                    status = `Encoding ${(p * 100).toFixed(0)}%`;
                 });
             }
 
@@ -111,19 +114,23 @@ export const convertVideoToGif = async (
                 if (video.ended || video.paused) {
                     // Finished playback
                     if (video.ended) {
-                        console.log("GIF: Video ended, rendering...");
-                        try {
-                            gif.render();
-                        } catch (e) {
-                            console.error("GIF Render failed", e);
-                            cleanup();
-                            reject(e);
+                        if (status !== "Rendering") {
+                            status = "Rendering";
+                            console.log("GIF: Video ended, rendering...");
+                            try {
+                                gif.render();
+                            } catch (e) {
+                                console.error("GIF Render failed", e);
+                                cleanup();
+                                reject(e);
+                            }
                         }
                     }
                     return;
                 }
 
                 const currentTime = video.currentTime;
+                status = `Playing ${currentTime.toFixed(2)}s`;
 
                 // Check if enough time passed for next frame
                 if (currentTime - lastCaptureTime >= interval) {
@@ -149,17 +156,22 @@ export const convertVideoToGif = async (
                     }
                 } else {
                     // Fallback if ended event doesn't fire for some reason
-                    console.log("GIF: Time limit reached, rendering...");
-                    gif.render();
+                    if (status !== "Rendering") {
+                        status = "Rendering (Fallback)";
+                        gif.render();
+                    }
                 }
             };
 
             // Start Playback
             video.oncanplay = async () => {
                 try {
+                    status = "Starting Playback";
                     // Ensure we start from 0
                     video.currentTime = 0;
                     console.log("GIF: Starting playback");
+                    // For modern browsers requiring user gesture, we rely on the click event that triggered this.
+                    // But if it fails, we need to know.
                     await video.play();
                     captureFrame();
                 } catch (e) {
