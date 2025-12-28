@@ -539,10 +539,17 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             const ctx = tempCanvas.getContext('2d');
             if (!ctx) throw new Error("Canvas context failed");
 
-            // Extract frames
+            // Extract frames - ROBUST LOOP
             for (let t = 0; t < video.duration; t += step) {
                 video.currentTime = t;
+                // 1. Wait for Seek
                 await new Promise(r => { video.onseeked = r; });
+
+                // 2. Safety Buffer: Wait for Paint
+                // Explicitly request animation frames to ensure the browser paints the new video frame
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                await new Promise(r => setTimeout(r, 10)); // Tiny 10ms buffer for good measure
+
                 ctx.drawImage(video, 0, 0);
                 gif.addFrame(ctx, { delay: 1000 / fps, copy: true });
             }
