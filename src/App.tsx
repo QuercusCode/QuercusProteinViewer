@@ -152,9 +152,9 @@ function App() {
       setIsRecording(true);
       try {
         await viewerRef.current.recordTurntable();
-      } catch (e) {
+      } catch (e: any) {
         console.error("Recording failed", e);
-        alert("Recording failed. Browser may not support it.");
+        alert(`Recording failed: ${e.message || e.toString() || "Unknown error"}`);
       } finally {
         setIsRecording(false);
       }
