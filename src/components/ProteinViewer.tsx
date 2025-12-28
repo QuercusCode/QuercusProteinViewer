@@ -514,104 +514,95 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             return performVideoRecord(duration);
         },
         recordGif: async (duration = 4000) => {
-            if (!stageRef.current) throw new Error("Stage not ready");
-            const stage = stageRef.current;
+            // 1. Record Video First (Proven to work)
+            const videoBlob = await performVideoRecord(duration);
 
-            // Safer access to canvas
-            const viewerCanvas = stage.viewer.renderer.domElement;
-            if (!viewerCanvas) throw new Error("WebGL Canvas not found");
-
-            // 1. Setup GIF with EXACT dimensions from drawing buffer
-            const width = viewerCanvas.width;
-            const height = viewerCanvas.height;
+            // 2. Setup GIF
+            const gifWidth = containerRef.current?.clientWidth || 800;
+            const gifHeight = containerRef.current?.clientHeight || 600;
 
             const gif = new GIF({
                 workers: 2,
                 quality: 10,
-                width: width,
-                height: height,
+                width: gifWidth,
+                height: gifHeight,
                 workerScript: 'gif.worker.js',
-                background: '#ffffff' // White background for GIF
+                background: '#ffffff'
             });
 
-            // Intermediate Canvas for flattening transparency
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = width;
-            tempCanvas.height = height;
-            const ctx = tempCanvas.getContext('2d', { willReadFrequently: true });
+            // 3. Playback & Capture (No Seeking)
+            const video = document.createElement('video');
+            video.src = URL.createObjectURL(videoBlob);
+            video.muted = true;
+            video.playsInline = true;
+
+            // Hidden but in DOM for valid rendering
+            Object.assign(video.style, {
+                position: 'fixed',
+                top: '0',
+                left: '0',
+                opacity: '0',
+                pointerEvents: 'none',
+                zIndex: '-100'
+            });
+            document.body.appendChild(video);
+
+            // Intermediate Canvas
+            const canvas = document.createElement('canvas');
+            canvas.width = gifWidth;
+            canvas.height = gifHeight;
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
             if (!ctx) throw new Error("Canvas context failed");
+            ctx.fillStyle = '#ffffff';
 
-            // 2. Configure Animation Loop
-            const fps = 10; // Conservative FPS
-            const totalFrames = Math.max(10, Math.floor((duration / 1000) * fps));
-            const anglePerFrame = (2 * Math.PI) / totalFrames;
+            return new Promise((resolve, reject) => {
+                const fps = 10;
+                const interval = 1 / fps;
+                let lastTime = 0;
 
-            // Store State
-            const wasSpinning = stage.spinAnimation.paused === false;
+                gif.on('finished', (blob: Blob) => {
+                    document.body.removeChild(video);
+                    URL.revokeObjectURL(video.src);
+                    resolve(blob);
+                });
 
-            if (wasSpinning) stage.setSpin(false);
-
-            // Force opaque background on stage for capture (if possible, otherwise handle in temp canvas)
-            // stage.setParameters({ backgroundColor: 'white' }); 
-
-            try {
-                // 3. Recursive Double-RAF Loop (The "Golden Path")
-                // We must use requestRender() (to update NGL internals) AND wait for the browser paint.
-                const processFrame = (i: number) => {
-                    if (i >= totalFrames) {
-                        try {
-                            if (wasSpinning) stage.setSpin(true);
-                            stage.viewer.requestRender(); // Restore view
-                        } catch (e) { /* ignore */ }
-
-                        gif.render(); // Finish
+                const captureFrame = () => {
+                    if (video.ended || video.paused) {
+                        gif.render();
                         return;
                     }
 
-                    // a. Rotate
-                    stage.viewerControls.rotate(anglePerFrame, 0);
+                    // Capture only if enough time passed
+                    if (video.currentTime - lastTime >= interval) {
+                        ctx.fillRect(0, 0, canvas.width, canvas.height); // First Fill White
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height); // Draw Video Frame
+                        gif.addFrame(ctx, { delay: interval * 1000, copy: true });
+                        lastTime = video.currentTime;
+                    }
 
-                    // b. Request Standard NGL Render (Updates lights/uniforms correctly)
-                    stage.viewer.requestRender();
-
-                    // c. Wait for Paint (Double RAF)
-                    // RAF 1: Browser schedules the paint for the next frame
-                    requestAnimationFrame(() => {
-                        // RAF 2: Browser has theoretically finished the previous paint
-                        requestAnimationFrame(() => {
-                            try {
-                                // d. Capture
-                                const sourceCanvas = stage.viewer.renderer.domElement;
-                                if (sourceCanvas) {
-                                    // 1. Fill White
-                                    ctx.fillStyle = '#ffffff';
-                                    ctx.fillRect(0, 0, width, height);
-                                    // 2. Draw Visible Canvas
-                                    ctx.drawImage(sourceCanvas, 0, 0, width, height);
-                                    // 3. Add Frame
-                                    gif.addFrame(ctx, { delay: 1000 / fps, copy: true });
-                                }
-                            } catch (e) {
-                                console.error("Frame capture failed:", e);
-                            }
-                            // e. Next Frame
-                            processFrame(i + 1);
-                        });
-                    });
+                    if (video.currentTime < video.duration) {
+                        if ('requestVideoFrameCallback' in video) {
+                            (video as any).requestVideoFrameCallback(captureFrame);
+                        } else {
+                            requestAnimationFrame(captureFrame);
+                        }
+                    } else {
+                        gif.render();
+                    }
                 };
 
-                // Start Loop
-                processFrame(0);
+                video.oncanplay = async () => {
+                    try {
+                        await video.play();
+                        captureFrame();
+                    } catch (e) {
+                        console.error("Playback failed", e);
+                        reject(e);
+                    }
+                };
 
-            } catch (e) {
-                console.error("GIF Loop Error:", e);
-                if (wasSpinning) stage.setSpin(true);
-            }
-            // stage.setParameters(originalParams);
-
-
-            return new Promise((resolve) => {
-                gif.on('finished', (blob: Blob) => resolve(blob));
+                video.onerror = () => reject(new Error("Video playback error"));
             });
         },
 
