@@ -147,11 +147,11 @@ function App() {
 
   const viewerRef = useRef<ProteinViewerRef>(null);
 
-  const handleRecordMovie = async () => {
+  const handleRecordMovie = async (duration: number = 4000) => {
     if (viewerRef.current && !isRecording) {
       setIsRecording(true);
       try {
-        await viewerRef.current.recordTurntable();
+        await viewerRef.current.recordTurntable(duration);
       } catch (e: any) {
         console.error("Recording failed", e);
         alert(`Recording failed: ${e.message || e.toString() || "Unknown error"}`);

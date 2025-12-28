@@ -46,7 +46,7 @@ export interface ProteinViewerRef {
     getAtomPosition: (chain: string, resNo: number, atomName?: string) => { x: number, y: number, z: number } | null;
     getAtomPositionByIndex: (atomIndex: number) => { x: number, y: number, z: number } | null;
     addResidue: (chainName: string, resType: string) => Promise<Blob | null>;
-    recordTurntable: () => Promise<void>;
+    recordTurntable: (duration?: number) => Promise<void>;
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
@@ -408,7 +408,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             });
             return results;
         },
-        recordTurntable: async () => {
+        recordTurntable: async (duration: number = 4000) => {
             if (!stageRef.current || !stageRef.current.viewer) return;
             const stage = stageRef.current;
             const canvas = containerRef.current?.querySelector('canvas');
@@ -472,7 +472,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 mediaRecorder.start();
 
                 // 3. Perform Spin (Use built-in spin for stability)
-                const duration = 4000; // 4 seconds
+                // duration is passed as argument
                 const fps = 30;
                 const totalFrames = duration / 1000 * fps;
 

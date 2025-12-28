@@ -27,7 +27,7 @@ interface ControlsProps {
     showLigands: boolean;
     setShowLigands: (show: boolean) => void;
     onFocusLigands: () => void;
-    onRecordMovie: () => void;
+    onRecordMovie: (duration: number) => void;
     isRecording: boolean;
     proteinTitle?: string | null;
     snapshots: Snapshot[];
@@ -98,6 +98,7 @@ export const Controls: React.FC<ControlsProps> = ({
 
     // Mobile Sidebar State
     const [isOpen, setIsOpen] = useState(false);
+    const [recordDuration, setRecordDuration] = useState(4000);
 
     // Refs for scrolling
     const sequenceContainerRef = useRef<HTMLDivElement>(null);
@@ -644,23 +645,38 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <Camera className="w-4 h-4" /> Snapshot
                             </button>
                         </div>
-                        <button
-                            onClick={onRecordMovie}
-                            disabled={isRecording}
-                            className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all text-xs font-medium group ${isRecording ? 'bg-red-500 text-white' : (`${cardBg} hover:border-red-500/50 hover:text-red-500`)}`}
-                        >
-                            {isRecording ? (
-                                <>
-                                    <Loader2 className="w-4 h-4 animate-spin" />
-                                    <span>Recording...</span>
-                                </>
-                            ) : (
-                                <>
-                                    <Video className="w-4 h-4" />
-                                    <span>Record 360° Clip</span>
-                                </>
-                            )}
-                        </button>
+                        <div className="flex flex-col sm:flex-row gap-2">
+                            <select
+                                value={recordDuration}
+                                onChange={(e) => setRecordDuration(Number(e.target.value))}
+                                disabled={isRecording}
+                                className={`flex-none w-24 border rounded-lg px-2 text-xs outline-none cursor-pointer ${inputBg} ${isRecording ? 'opacity-50' : ''}`}
+                                title="Recording Duration"
+                            >
+                                <option value="4000">4s (Fast)</option>
+                                <option value="8000">8s (Normal)</option>
+                                <option value="12000">12s (Slow)</option>
+                                <option value="20000">20s (Very Slow)</option>
+                            </select>
+
+                            <button
+                                onClick={() => onRecordMovie(recordDuration)}
+                                disabled={isRecording}
+                                className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all text-xs font-medium group ${isRecording ? 'bg-red-500 text-white' : (`${cardBg} hover:border-red-500/50 hover:text-red-500`)}`}
+                            >
+                                {isRecording ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                        <span>Recording...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Video className="w-4 h-4" />
+                                        <span>Record Clip</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
 
                         {/* Snapshot Gallery */}
                         {snapshots.length > 0 && (
