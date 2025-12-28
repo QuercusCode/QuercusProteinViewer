@@ -514,71 +514,70 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             return performVideoRecord(duration);
         },
         recordGif: async (duration = 4000) => {
-            // Reuse the exact same recording logic
-            const videoBlob = await performVideoRecord(duration);
+            if (!stageRef.current) throw new Error("Stage not ready");
+            const stage = stageRef.current;
 
-            // 2. Convert to GIF (Requires DOM attachment for reliable texture read)
-            const video = document.createElement('video');
-            video.src = URL.createObjectURL(videoBlob);
-            video.muted = true;
-
-            // Critical Fix: Append to DOM to force rendering, making it invisible but active
-            Object.assign(video.style, {
-                position: 'fixed',
-                top: '0',
-                left: '0',
-                opacity: '0.01', // Non-zero opacity to avoid optimization culling
-                pointerEvents: 'none',
-                zIndex: '-1000'
-            });
-            document.body.appendChild(video);
-
-            await new Promise((r) => { video.onloadedmetadata = r; });
-
+            // 1. Setup GIF
             const gif = new GIF({
                 workers: 2,
                 quality: 10,
-                width: video.videoWidth,
-                height: video.videoHeight,
+                // Use current canvas dimensions
+                width: containerRef.current?.clientWidth || 800,
+                height: containerRef.current?.clientHeight || 600,
                 workerScript: 'gif.worker.js'
             });
 
-            const fps = 10;
-            const step = 1 / fps;
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = video.videoWidth;
-            tempCanvas.height = video.videoHeight;
-            const ctx = tempCanvas.getContext('2d');
-            if (!ctx) throw new Error("Canvas context failed");
+            // 2. Configure Animation Loop
+            const fps = 15; // Trade-off between speed and smoothness
+            const totalFrames = Math.max(10, Math.floor((duration / 1000) * fps));
+            // Calculate rotation Step (2*PI is full circle) because NGL rotate takes radians usually? 
+            // Actually NGL viewerControls.rotate(x, y) input is relative to window size usually or arbitrary sensitivity.
+            // But we can use the 'spin' command's logic or just rotate by small increments.
+            // Let's rely on a fixed step that feels like a 'turntable'. 
+            // A full 360 spin in 'duration' ms.
+            // However, NGL rotate sensitivity is not strictly radians.
+            // Standard trick: use `stage.viewerControls.rotate( (2 * Math.PI) / totalFrames, 0 )` if it accepts radians.
+            // If not, we might need to guess or use the 'spin' method. 
+            // Let's use `stage.spinAnimation` axis logic if accessible, OR just use small delta.
+            // Safest: Use `stage.viewerControls.rotate(x, y)` where x is the horizontal delta.
+            // A full rotation usually corresponds to some value. 
+            // Let's try to assume inputs are radians for now, as is common in 3D libs.
+            const anglePerFrame = (2 * Math.PI) / totalFrames;
+
+            // Store State
+            const wasSpinning = stage.spinAnimation.paused === false;
+            if (wasSpinning) stage.setSpin(false);
 
             try {
-                // Extract frames - ROBUST LOOP
-                for (let t = 0; t < video.duration; t += step) {
-                    video.currentTime = t;
-                    // 1. Wait for Seek
-                    await new Promise(r => { video.onseeked = r; });
+                // 3. Stop-Motion Loop
+                for (let i = 0; i < totalFrames; i++) {
+                    // Rotate
+                    // Note: rotate(dh, dv) - horizontal delta rotates around up axis
+                    stage.viewerControls.rotate(anglePerFrame, 0);
+                    stage.viewer.requestRender();
 
-                    // 2. Safety Buffer (still good to have)
-                    await new Promise(r => requestAnimationFrame(r));
+                    // Capture High-Quality Snapshot (Direct from WebGL buffer)
+                    const blob = await stage.makeImage({
+                        factor: 1,
+                        type: 'png',
+                        antialias: true,
+                        trim: false,
+                        transparent: false // Opaque background prevents GIF artifacts
+                    });
 
-                    // 3. ATOMIC DECODE: The magic fix
-                    // createImageBitmap waits for the video frame to be fully decoded in GPU memory
-                    const bitmap = await createImageBitmap(video);
+                    // Create Image element for gif.js
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(blob);
+                    await new Promise((resolve) => { img.onload = resolve; });
 
-                    // 4. Draw
-                    // Clear with background color to prevent transparency artifacts
-                    ctx.fillStyle = stageRef.current?.getParameters().backgroundColor || 'white';
-                    ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+                    gif.addFrame(img, { delay: 1000 / fps, copy: true });
 
-                    ctx.drawImage(bitmap, 0, 0);
-                    bitmap.close(); // Clean up GPU memory immediately
-
-                    gif.addFrame(ctx, { delay: 1000 / fps, copy: true });
+                    // Cleanup texture memory immediately
+                    URL.revokeObjectURL(img.src);
                 }
             } finally {
-                // Clean up DOM
-                document.body.removeChild(video);
-                URL.revokeObjectURL(video.src);
+                // Restore State
+                if (wasSpinning) stage.setSpin(true);
             }
 
             return new Promise((resolve) => {
