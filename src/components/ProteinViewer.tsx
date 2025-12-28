@@ -98,28 +98,47 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         // Create new shape for annotations
         const shape = new window.NGL.Shape("annotations");
 
+        // Calculate center of structure for outward direction
+        let center = new window.NGL.Vector3();
+        if (componentRef.current && componentRef.current.structure) {
+            try {
+                const box = componentRef.current.structure.getBoundingBox();
+                box.getCenter(center);
+            } catch (e) { console.warn("Could not get structure center", e); }
+        }
+
         annotations.forEach(note => {
-            // Add text: position, text, color, size
-            // NGL.Shape.addText(position, text, color, size)
-            const pos = [note.position.x, note.position.y, note.position.z];
+            const atomPos = new window.NGL.Vector3(note.position.x, note.position.y, note.position.z);
+
+            // Calculate direction from center to atom
+            const dir = atomPos.clone().sub(center).normalize();
+
+            // Push text out by 20 Angstroms
+            const textPos = atomPos.clone().add(dir.multiplyScalar(20));
+
+            const posArray = [textPos.x, textPos.y, textPos.z];
+            const atomPosArray = [atomPos.x, atomPos.y, atomPos.z];
+
             const color = [1, 1, 0]; // Bright Yellow
-            const size = 5.0; // Large text
+            const size = 5.0;
 
             try {
-                // Attempt 1: (pos, color, size, text) - Modern NGL
-                shape.addText(pos, color, size, note.text);
-            } catch (e) {
+                // Draw connecting line
+                shape.addCylinder(atomPosArray, posArray, [1, 1, 1], 0.2);
+
+                // Add Text at new position
                 try {
-                    // Attempt 2: (pos, text, color, size) - Older NGL
-                    shape.addText(pos, note.text, color, size);
-                } catch (e2) {
-                    console.error("Failed to add annotation text:", e2);
+                    shape.addText(posArray, color, size, note.text);
+                } catch (e) {
+                    shape.addText(posArray, note.text, color, size);
                 }
+            } catch (e) {
+                console.error("Failed to add annotation visual:", e);
             }
 
             try {
-                shape.addSphere(pos, [1, 0, 1], 1.0); // Magenta anchor, larger sphere
-            } catch (e) { console.error("Failed to add annotation anchor:", e); }
+                shape.addSphere(atomPosArray, [1, 0, 1], 1.0); // Anchor on atom
+            } catch (e) { }
         });
 
         const shapeComp = stageRef.current.addComponentFromObject(shape);
