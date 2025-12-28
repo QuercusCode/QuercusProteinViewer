@@ -555,31 +555,38 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             // stage.setParameters({ backgroundColor: 'white' }); 
 
             try {
-                // 3. Stop-Motion Loop
+                // 3. Synchronous Render & Capture Loop
+                const renderer = stage.viewer.renderer;
+                const scene = stage.viewer.scene;
+                const camera = stage.viewer.camera;
+
                 for (let i = 0; i < totalFrames; i++) {
-                    // Rotate
+                    // a. Rotate
                     stage.viewerControls.rotate(anglePerFrame, 0);
-                    stage.viewer.requestRender();
 
-                    // CRITICAL DELAY: Wait for GPU to settle and render to occur
-                    // 100ms is conservative but safe.
-                    await new Promise(r => setTimeout(r, 100));
+                    // b. Update Global Uniforms/State (Important for NGL effects)
+                    // stage.viewer.updateHelper(); // If accessible, otherwise requestRender updates basic stats but is async.
+                    // For pure geometry rotation, simple render is usually enough.
 
-                    // DIRECT CANVAS CAPTURE (WYSIWYG)
-                    // Instead of NGL's makeImage (which might use offscreen buffers),
-                    // we grab the visible WebGL canvas directly.
-                    // This guarantees we get exactly what is on screen.
-                    const sourceCanvas = stage.viewer.renderer.domElement;
+                    // c. FORCE SYNCHRONOUS RENDER
+                    // This bypasses the requestAnimationFrame loop and effectively 
+                    // "paints" the scene to the buffer RIGHT NOW.
+                    renderer.render(scene, camera);
+
+                    // d. DIRECT CANVAS CAPTURE (WYSIWYG)
+                    // We grab the pixels immediately after render, before the browser clears the buffer.
+                    // This should solve the "White GIF" issue.
+                    const sourceCanvas = renderer.domElement;
                     if (!sourceCanvas) throw new Error("WebGL Canvas not found");
 
-                    // Draw to Intermediate (Flattening transparency)
+                    // e. Draw to Intermediate (Flattening transparency)
                     // 1. Fill White
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(0, 0, width, height);
                     // 2. Draw Visible Canvas
                     ctx.drawImage(sourceCanvas, 0, 0, width, height);
 
-                    // Add Frame
+                    // f. Add Frame
                     gif.addFrame(ctx, { delay: 1000 / fps, copy: true });
                 }
             } finally {
