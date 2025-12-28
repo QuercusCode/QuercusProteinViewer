@@ -646,18 +646,22 @@ export const Controls: React.FC<ControlsProps> = ({
                             </button>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-2">
-                            <select
-                                value={recordDuration}
-                                onChange={(e) => setRecordDuration(Number(e.target.value))}
-                                disabled={isRecording}
-                                className={`flex-none w-24 border rounded-lg px-2 text-xs outline-none cursor-pointer ${inputBg} ${isRecording ? 'opacity-50' : ''}`}
-                                title="Recording Duration"
-                            >
-                                <option value="4000">4s (Fast)</option>
-                                <option value="8000">8s (Normal)</option>
-                                <option value="12000">12s (Slow)</option>
-                                <option value="20000">20s (Very Slow)</option>
-                            </select>
+                            <div className="flex items-center gap-2 flex-none">
+                                <span className={`text-xs font-medium ${subtleText}`}>Sec:</span>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    max="60"
+                                    value={recordDuration / 1000}
+                                    onChange={(e) => {
+                                        const val = Number(e.target.value);
+                                        if (val > 0) setRecordDuration(val * 1000);
+                                    }}
+                                    disabled={isRecording}
+                                    className={`w-16 border rounded-lg px-2 py-1 text-xs outline-none ${inputBg} ${isRecording ? 'opacity-50' : ''}`}
+                                    title="Recording Duration (Seconds)"
+                                />
+                            </div>
 
                             <button
                                 onClick={() => onRecordMovie(recordDuration)}
