@@ -258,7 +258,40 @@ export const Controls: React.FC<ControlsProps> = ({
                 {/* Scrollable Content */}
                 <div className={`flex-1 overflow-y-auto scrollbar-thin p-4 pt-0 space-y-4 ${isLightMode ? 'scrollbar-thumb-neutral-300' : 'scrollbar-thumb-neutral-700'}`}>
 
-                    {/* Structure Details (Top Sidebar) */}
+
+                    {/* Load Structure (Moved to Top) */}
+                    <div className="space-y-3">
+                        <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Load Structure</label>
+                        <form onSubmit={handleSubmit} className="flex gap-2">
+                            <div className="relative flex-1">
+                                <Search className={`absolute left-2.5 top-2.5 w-4 h-4 ${subtleText}`} />
+                                <input
+                                    type="text"
+                                    value={localPdbId}
+                                    onChange={(e) => setLocalPdbId(e.target.value)}
+                                    placeholder="PDB ID (e.g. 4hhb)"
+                                    className={`w-full rounded-lg pl-9 pr-3 py-2 border outline-none transition-all ${inputBg}`}
+                                />
+                            </div>
+                            <button type="submit" className="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors font-medium">
+                                Load
+                            </button>
+                        </form>
+                        <div className="relative">
+                            <input type="file" accept=".pdb,.cif,.ent" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all group ${cardBg} hover:opacity-80`}
+                            >
+                                <Upload className="w-4 h-4 group-hover:text-blue-500 transition-colors" />
+                                <span>Upload File</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
+
+                    {/* Structure Details (Moved Below Load) */}
                     {(proteinTitle || ligands.length > 0) && (
                         <div className="space-y-3">
                             <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Structure Details</label>
@@ -319,39 +352,6 @@ export const Controls: React.FC<ControlsProps> = ({
                             </div>
                         </div>
                     )}
-
-
-                    <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
-
-                    {/* Load */}
-                    <div className="space-y-3">
-                        <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Load Structure</label>
-                        <form onSubmit={handleSubmit} className="flex gap-2">
-                            <div className="relative flex-1">
-                                <Search className={`absolute left-2.5 top-2.5 w-4 h-4 ${subtleText}`} />
-                                <input
-                                    type="text"
-                                    value={localPdbId}
-                                    onChange={(e) => setLocalPdbId(e.target.value)}
-                                    placeholder="PDB ID (e.g. 4hhb)"
-                                    className={`w-full rounded-lg pl-9 pr-3 py-2 border outline-none transition-all ${inputBg}`}
-                                />
-                            </div>
-                            <button type="submit" className="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors font-medium">
-                                Load
-                            </button>
-                        </form>
-                        <div className="relative">
-                            <input type="file" accept=".pdb,.cif,.ent" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
-                            <button
-                                onClick={() => fileInputRef.current?.click()}
-                                className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all group ${cardBg} hover:opacity-80`}
-                            >
-                                <Upload className="w-4 h-4 group-hover:text-blue-500 transition-colors" />
-                                <span>Upload File</span>
-                            </button>
-                        </div>
-                    </div>
 
                     <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
 

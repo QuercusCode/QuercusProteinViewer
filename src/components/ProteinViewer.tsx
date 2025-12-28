@@ -723,6 +723,12 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     // Handle H-Bonds Toggle
     const hBondRepresentationRef = useRef<any>(null);
+
+    // Reset ref when structure changes
+    useEffect(() => {
+        hBondRepresentationRef.current = null;
+    }, [pdbId, file]);
+
     useEffect(() => {
         if (!componentRef.current) return;
         const component = componentRef.current;
@@ -744,15 +750,14 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 if (hBondRepresentationRef.current) {
                     console.log("Hiding H-Bond representation");
                     hBondRepresentationRef.current.setVisibility(false);
-                    // Optional: remove significantly better for performance if widely toggled
-                    // component.removeRepresentation(hBondRepresentationRef.current);
-                    // hBondRepresentationRef.current = null;
                 }
             }
         } catch (e) {
             console.warn("Failed to toggle H-Bonds:", e);
+            // If failed, likely because component is new but ref was old. Reset and retry?
+            hBondRepresentationRef.current = null;
         }
-    }, [showHBonds]);
+    }, [showHBonds, pdbId, file]); // Re-run when structure changes
 
     const selectedAtomsRef = useRef<any[]>([]);
 
