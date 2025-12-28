@@ -4,7 +4,6 @@ import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
 import { HelpGuide } from './components/HelpGuide';
 import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Movie } from './types';
-import { convertVideoToGif } from './utils/gifConverter';
 
 function App() {
   const [pdbId, setPdbId] = useState(() => {
@@ -112,7 +111,7 @@ function App() {
 
     const fetchTitle = async () => {
       const cleanId = pdbId.trim().toLowerCase();
-      console.log(`Fetching title for PDB: ${cleanId}`);
+      console.log(`Fetching title for PDB: ${cleanId} `);
       try {
         const response = await fetch(`https://data.rcsb.org/rest/v1/core/entry/${cleanId}`);
         if (!response.ok) {
@@ -201,36 +200,7 @@ function App() {
     }
   };
 
-  const handleConvertToGif = async (id: string) => {
-    const movie = movies.find(m => m.id === id);
-    if (!movie || !movie.blob) return;
 
-    // Optimistic: Add placeholder or rely on toast?
-    // For now, simple alert or console. We'll add a "converting" state to Controls maybe?
-    // Or just block UI? Let's use a simple state in Controls or passed down?
-    // For MVP: Let's just do it and add result to gallery.
-
-    console.log(`Starting GIF conversion for movie ${id}`);
-    try {
-      const gifBlob = await convertVideoToGif(movie.blob);
-      const url = URL.createObjectURL(gifBlob);
-
-      const newGif: Movie = {
-        id: crypto.randomUUID(),
-        url,
-        blob: gifBlob,
-        timestamp: Date.now(),
-        duration: movie.duration,
-        format: 'gif'
-      };
-
-      setMovies(prev => [newGif, ...prev]);
-      console.log("GIF created successfully");
-    } catch (e: any) {
-      console.error("GIF Conversion failed", e);
-      alert(`Failed to convert video to GIF: ${e.message || "Unknown error"}`);
-    }
-  };
 
   const handleFocusLigands = () => {
     viewerRef.current?.focusLigands();
@@ -450,7 +420,6 @@ function App() {
         movies={movies}
         onDownloadMovie={handleDownloadMovie}
         onDeleteMovie={handleDeleteMovie}
-        onConvertToGif={handleConvertToGif}
         isSpinning={isSpinning}
         setIsSpinning={setIsSpinning}
         isCleanMode={isCleanMode}

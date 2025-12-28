@@ -68,7 +68,6 @@ interface ControlsProps {
     movies: Movie[];
     onDownloadMovie: (id: string) => void;
     onDeleteMovie: (id: string) => void;
-    onConvertToGif: (id: string) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -112,15 +111,12 @@ export const Controls: React.FC<ControlsProps> = ({
     movies,
     onDownloadMovie,
     onDeleteMovie,
-    onConvertToGif,
-
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const sessionInputRef = useRef<HTMLInputElement>(null);
     const [localPdbId, setLocalPdbId] = React.useState(pdbId);
     const [previewSnapshot, setPreviewSnapshot] = useState<Snapshot | null>(null);
     const [previewMovie, setPreviewMovie] = useState<Movie | null>(null);
-    const [convertingIds, setConvertingIds] = useState<Set<string>>(new Set());
 
     // Recording State
     const [recordDuration, setRecordDuration] = useState(4000);
@@ -696,29 +692,6 @@ export const Controls: React.FC<ControlsProps> = ({
                                         <div className="text-[9px] text-neutral-400">{Math.round(movie.duration)}s • {movie.format}</div>
                                     </div>
                                     <div className="flex gap-1">
-                                        {movie.format !== 'gif' && (
-                                            <button
-                                                onClick={async (e) => {
-                                                    e.stopPropagation();
-                                                    if (convertingIds.has(movie.id)) return;
-
-                                                    setConvertingIds(prev => new Set(prev).add(movie.id));
-                                                    try {
-                                                        await onConvertToGif(movie.id);
-                                                    } finally {
-                                                        setConvertingIds(prev => {
-                                                            const next = new Set(prev);
-                                                            next.delete(movie.id);
-                                                            return next;
-                                                        });
-                                                    }
-                                                }}
-                                                className={`p-1.5 ${convertingIds.has(movie.id) ? 'bg-amber-600' : 'bg-neutral-600 hover:bg-neutral-500'} text-white rounded transition-colors text-[10px] font-bold`}
-                                                title="Convert to GIF"
-                                            >
-                                                {convertingIds.has(movie.id) ? <Loader2 className="w-3 h-3 animate-spin" /> : "GIF"}
-                                            </button>
-                                        )}
                                         <button
                                             onClick={(e) => { e.stopPropagation(); setPreviewMovie(movie); }}
                                             className="p-1.5 bg-neutral-600 hover:bg-neutral-500 text-white rounded transition-colors"
@@ -746,7 +719,7 @@ export const Controls: React.FC<ControlsProps> = ({
                         </div>
                     </div>
                 )}
-            </div>
+            </div >
 
 
             {/* Snapshot Preview Modal */}
