@@ -423,11 +423,16 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 return null;
             }
 
-            // 2. Find Last Residue
+            // 2. Find Last Valid Residue (must have Backbone Atoms)
             let lastResidue: any = null;
             let maxResNo = -Infinity;
             targetChain.eachResidue((r: any) => {
-                if (r.resno > maxResNo) {
+                // Check for CA and C atoms to ensure it's a valid extension point
+                // Note: getAtomByName returns AtomProxy or undefined
+                const ca = r.getAtomByName('CA');
+                const c = r.getAtomByName('C');
+
+                if (ca && c && r.resno > maxResNo) {
                     maxResNo = r.resno;
                     lastResidue = r;
                 }
