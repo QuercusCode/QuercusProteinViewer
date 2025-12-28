@@ -539,50 +539,85 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             const stage = stageRef.current;
             const canvas = stage.viewer.renderer.domElement;
 
-            // Setup GIF encoder
+            // 1. Record Video Stream (Same logic as recordTurntable)
+            const stream = canvas.captureStream(30);
+            const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+            const chunks: Blob[] = [];
+
+            const videoBlobPromise = new Promise<Blob>((resolve, reject) => {
+                recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+
+                recorder.onstop = () => {
+                    // Restore State
+                    stage.setSpin(false);
+                    stage.setParameters({ spinSpeed: stage.getParameters().spinSpeed, pixelRatio: stage.viewer.pixelRatio }); // Reset if confused
+                    resolve(new Blob(chunks, { type: 'video/webm' }));
+                };
+
+                recorder.onerror = (e) => reject(e);
+
+                // Start
+                recorder.start();
+
+                // Animation Loop (Explicit Render)
+                const startTime = performance.now();
+                const defaultSpeed = 0.01;
+                const targetSpeed = defaultSpeed * (4000 / duration);
+
+                stage.setParameters({ spinSpeed: targetSpeed, pixelRatio: 3 });
+                stage.setSpin(true);
+
+                const animate = () => {
+                    const now = performance.now();
+                    if (now - startTime >= duration) {
+                        recorder.stop();
+                        return;
+                    }
+                    stage.viewer.requestRender();
+                    requestAnimationFrame(animate);
+                };
+                requestAnimationFrame(animate);
+            });
+
+            // Wait for video
+            const videoBlob = await videoBlobPromise;
+
+            // 2. Convert to GIF
+            const video = document.createElement('video');
+            video.src = URL.createObjectURL(videoBlob);
+            video.muted = true;
+            await new Promise((r) => { video.onloadedmetadata = r; });
+
             const gif = new GIF({
                 workers: 2,
                 quality: 10,
-                width: stage.viewer.width,
-                height: stage.viewer.height,
+                width: video.videoWidth, // Use actual video dims
+                height: video.videoHeight,
                 workerScript: 'gif.worker.js'
             });
 
-            // Config
             const fps = 10;
-            const frames = Math.round((duration / 1000) * fps);
-            const anglePerFrame = (2 * Math.PI) / frames;
+            const step = 1 / fps;
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = video.videoWidth;
+            tempCanvas.height = video.videoHeight;
+            const ctx = tempCanvas.getContext('2d');
+            if (!ctx) throw new Error("Canvas context failed");
 
-            stage.setSpin(false);
-
-            try {
-                // Loop for frames
-                for (let i = 0; i < frames; i++) {
-                    // Rotate
-                    stage.viewerControls.rotate(0, anglePerFrame);
-
-                    // Wait for render - explicit tick
-                    stage.viewer.requestRender();
-                    await new Promise(r => setTimeout(r, 60)); // > 1000/15 to ensure render
-
-                    // Direct Canvas Capture
-                    // With preserveDrawingBuffer: true, this reads the current buffer visually.
-                    // Copy: true is essential to decouple from the live canvas buffer.
-                    gif.addFrame(canvas, { delay: 1000 / fps, copy: true });
-                }
-
-                return new Promise((resolve) => {
-                    gif.on('finished', (blob: Blob) => {
-                        resolve(blob);
-                    });
-                    gif.render();
-                });
-            } catch (err) {
-                console.error("GIF Record Error", err);
-                throw err;
-            } finally {
-                stage.setSpin(false);
+            // Extract frames
+            for (let t = 0; t < video.duration; t += step) {
+                video.currentTime = t;
+                await new Promise(r => { video.onseeked = r; });
+                ctx.drawImage(video, 0, 0);
+                gif.addFrame(ctx, { delay: 1000 / fps, copy: true });
             }
+
+            URL.revokeObjectURL(video.src);
+
+            return new Promise((resolve) => {
+                gif.on('finished', (blob: Blob) => resolve(blob));
+                gif.render();
+            });
         },
 
         addResidue: async (chainName: string, resType: string) => {
