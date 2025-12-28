@@ -558,12 +558,21 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     // 1. Wait for Seek
                     await new Promise(r => { video.onseeked = r; });
 
-                    // 2. Safety Buffer: Wait for Paint
-                    // Explicitly request animation frames to ensure the browser paints the new video frame
-                    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-                    await new Promise(r => setTimeout(r, 20)); // Increased buffer slightly
+                    // 2. Safety Buffer (still good to have)
+                    await new Promise(r => requestAnimationFrame(r));
 
-                    ctx.drawImage(video, 0, 0);
+                    // 3. ATOMIC DECODE: The magic fix
+                    // createImageBitmap waits for the video frame to be fully decoded in GPU memory
+                    const bitmap = await createImageBitmap(video);
+
+                    // 4. Draw
+                    // Clear with background color to prevent transparency artifacts
+                    ctx.fillStyle = stageRef.current?.getParameters().backgroundColor || 'white';
+                    ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+                    ctx.drawImage(bitmap, 0, 0);
+                    bitmap.close(); // Clean up GPU memory immediately
+
                     gif.addFrame(ctx, { delay: 1000 / fps, copy: true });
                 }
             } finally {
