@@ -421,62 +421,90 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             // 1. Setup Stream
             const stream = canvas.captureStream(30); // 30 FPS
-            const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
-                ? 'video/webm;codecs=vp9'
-                : 'video/webm';
 
-            const mediaRecorder = new MediaRecorder(stream, { mimeType });
-            const chunks: Blob[] = [];
+            // Robust MIME type detection
+            const mimeTypes = [
+                'video/webm;codecs=vp9',
+                'video/webm;codecs=vp8',
+                'video/webm',
+                'video/mp4'
+            ];
 
-            mediaRecorder.ondataavailable = (e) => {
-                if (e.data.size > 0) chunks.push(e.data);
-            };
-
-            mediaRecorder.onstop = () => {
-                const blob = new Blob(chunks, { type: 'video/webm' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `protein-turntable-${new Date().toISOString().slice(0, 10)}.webm`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                console.log("Recording finished and downloaded.");
-            };
-
-            // 2. Start Recording
-            mediaRecorder.start();
-
-            // 3. Perform Spin (Full 360 over 4 seconds approx)
-            const duration = 4000; // 4 seconds
-            const fps = 30;
-            const totalFrames = duration / 1000 * fps;
-            const rotationPerFrame = (2 * Math.PI) / totalFrames; // 360 degrees in radians
-
-            let frame = 0;
-            const originalSpin = stage.spinAnimation.paused; // Store original state
-            stage.setSpin(false); // Disable auto-spin to control it manually
-
-            const animate = () => {
-                if (frame >= totalFrames) {
-                    mediaRecorder.stop();
-                    // Restore original spin state
-                    if (!originalSpin) {
-                        stage.setSpin(true);
-                    }
-                    return;
+            let selectedMimeType = '';
+            for (const type of mimeTypes) {
+                if (MediaRecorder.isTypeSupported(type)) {
+                    selectedMimeType = type;
+                    break;
                 }
+            }
 
-                // Rotate
-                stage.viewer.controls.rotate(rotationPerFrame, 0);
-                stage.viewer.requestRender();
+            if (!selectedMimeType) {
+                console.warn("No supported MIME type found, trying default");
+            }
 
-                frame++;
-                requestAnimationFrame(animate);
-            };
+            const options = selectedMimeType ? { mimeType: selectedMimeType } : undefined;
 
-            animate();
+            try {
+                const mediaRecorder = new MediaRecorder(stream, options);
+                const chunks: Blob[] = [];
+
+                // Set extension based on type
+                const ext = selectedMimeType.includes('mp4') ? 'mp4' : 'webm';
+
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) chunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: selectedMimeType || 'video/webm' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `protein-turntable-${new Date().toISOString().slice(0, 10)}.${ext}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    console.log("Recording finished and downloaded.");
+                };
+
+                // 2. Start Recording
+                mediaRecorder.start();
+
+                // 3. Perform Spin (Full 360 over 4 seconds approx)
+                const duration = 4000; // 4 seconds
+                const fps = 30;
+                const totalFrames = duration / 1000 * fps;
+                const rotationPerFrame = (2 * Math.PI) / totalFrames; // 360 degrees in radians
+
+                let frame = 0;
+                const originalSpin = stage.spinAnimation.paused; // Store original state
+                stage.setSpin(false); // Disable auto-spin to control it manually
+
+                const animate = () => {
+                    if (frame >= totalFrames) {
+                        mediaRecorder.stop();
+                        // Restore original spin state
+                        if (!originalSpin) {
+                            stage.setSpin(true);
+                        }
+                        return;
+                    }
+
+                    // Rotate
+                    stage.viewer.controls.rotate(rotationPerFrame, 0);
+                    stage.viewer.requestRender();
+
+                    frame++;
+                    requestAnimationFrame(animate);
+                };
+
+                animate();
+            } catch (err) {
+                console.error("MediaRecorder creation failed:", err);
+                // Re-throw to be caught by App.tsx
+                throw err;
+            }
         },
         addResidue: async (chainName: string, resType: string) => {
             if (!componentRef.current) return null;
