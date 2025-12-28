@@ -45,6 +45,7 @@ export interface ProteinViewerRef {
     getAtomCoordinates: () => Promise<{ x: number[], y: number[], z: number[], labels: string[] }[]>;
     getAtomPosition: (chain: string, resNo: number, atomName?: string) => { x: number, y: number, z: number } | null;
     getAtomPositionByIndex: (atomIndex: number) => { x: number, y: number, z: number } | null;
+    addResidue: (chainName: string, resType: string) => Promise<Blob | null>;
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
@@ -405,6 +406,125 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 }
             });
             return results;
+        },
+        addResidue: async (chainName: string, resType: string) => {
+            if (!componentRef.current) return null;
+            const structure = componentRef.current.structure;
+            const NGL = window.NGL;
+
+            // 1. Find the Chain
+            let targetChain: any = null;
+            structure.eachChain((c: any) => {
+                if (c.chainname === chainName) targetChain = c;
+            });
+
+            if (!targetChain) {
+                console.warn(`Chain ${chainName} not found.`);
+                return null;
+            }
+
+            // 2. Find Last Residue
+            let lastResidue: any = null;
+            let maxResNo = -Infinity;
+            targetChain.eachResidue((r: any) => {
+                if (r.resno > maxResNo) {
+                    maxResNo = r.resno;
+                    lastResidue = r;
+                }
+            });
+
+            if (!lastResidue) return null;
+
+            // 3. Get Reference Atoms (C, CA from last residue)
+            let atomC: any, atomCA: any;
+            lastResidue.eachAtom((a: any) => {
+                if (a.atomname === 'C') atomC = a;
+                if (a.atomname === 'CA') atomCA = a;
+            });
+
+            if (!atomC || !atomCA) {
+                console.warn("Last residue missing backbone atoms.");
+                return null;
+            }
+
+            // 4. Calculate New Position (Simple Extension)
+            // Vector: CA -> C
+            const vCA = new NGL.Vector3(atomCA.x, atomCA.y, atomCA.z);
+            const vC = new NGL.Vector3(atomC.x, atomC.y, atomC.z);
+            const dir = new NGL.Vector3().subVectors(vC, vCA).normalize();
+
+            // Place New N approx 1.33A away
+            const newN = new NGL.Vector3().copy(vC).add(dir.clone().multiplyScalar(1.33));
+            // Place New CA approx 1.45A from N (slightly angled? simplified: straight line for MVP)
+            const newCA = new NGL.Vector3().copy(newN).add(dir.clone().multiplyScalar(1.45));
+            // Place New C approx 1.52A from CA
+            const newC = new NGL.Vector3().copy(newCA).add(dir.clone().multiplyScalar(1.52));
+            // Place New O
+            const orth = new NGL.Vector3(0, 1, 0); // Arbitrary up
+            const newO = new NGL.Vector3().copy(newC).add(orth.multiplyScalar(1.23));
+
+            // 5. Generate PDB Records
+            // We need to fetch the existing PDB string first
+            let originalPdb = '';
+            try {
+                // NGL writer isn't exposed easily on structure object directly in all versions, 
+                // but we can try getting the blob from the component?
+                // Easier: Just assume we loaded a PDB and modify the 'file' content? 
+                // No, we need the *current* structure state (rotated? no, coords are static).
+                // Use built-in writer:
+                const writer = new NGL.PdbWriter(structure);
+                originalPdb = writer.getData();
+            } catch (e) {
+                console.error("Failed to write PDB:", e);
+                return null;
+            }
+
+            // Find last serial number
+            const lines = originalPdb.split('\n');
+            let lastSerial = 0;
+            // Scan from bottom
+            for (let i = lines.length - 1; i >= 0; i--) {
+                if (lines[i].startsWith("ATOM") || lines[i].startsWith("HETATM")) {
+                    const serialStr = lines[i].substring(6, 11).trim();
+                    lastSerial = parseInt(serialStr) || 0;
+                    break;
+                }
+            }
+
+            const formatAtom = (serial: number, name: string, resName: string, chain: string, resSeq: number, x: number, y: number, z: number) => {
+                const sSerial = String(serial).padStart(5);
+                const sName = name.padEnd(4); // "N   "
+                const sResName = resName.padStart(3);
+                const sChain = chain.substring(0, 1);
+                const sResSeq = String(resSeq).padStart(4);
+                const sX = x.toFixed(3).padStart(8);
+                const sY = y.toFixed(3).padStart(8);
+                const sZ = z.toFixed(3).padStart(8);
+                const element = name.substring(0, 1);
+                return `ATOM  ${sSerial} ${sName} ${sResName} ${sChain}${sResSeq}    ${sX}${sY}${sZ}  1.00 20.00           ${element}`;
+            };
+
+            const nextResNo = maxResNo + 1;
+            const newLines = [];
+
+            // Add N
+            lastSerial++;
+            newLines.push(formatAtom(lastSerial, " N  ", resType, chainName, nextResNo, newN.x, newN.y, newN.z));
+            // Add CA
+            lastSerial++;
+            newLines.push(formatAtom(lastSerial, " CA ", resType, chainName, nextResNo, newCA.x, newCA.y, newCA.z));
+            // Add C
+            lastSerial++;
+            newLines.push(formatAtom(lastSerial, " C  ", resType, chainName, nextResNo, newC.x, newC.y, newC.z));
+            // Add O
+            lastSerial++;
+            newLines.push(formatAtom(lastSerial, " O  ", resType, chainName, nextResNo, newO.x, newO.y, newO.z));
+
+            // Append to PDB (filtering out END if present)
+            const cleanPdb = originalPdb.replace(/^END\s*$/m, '');
+            const finalPdb = cleanPdb.trimEnd() + '\n' + newLines.join('\n') + '\nEND';
+
+            return new Blob([finalPdb], { type: 'text/plain' });
         }
     }));
 
