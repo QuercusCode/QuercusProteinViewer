@@ -347,6 +347,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                     <option value="structure">Structure</option>
                                     <option value="hydrophobicity">Hydrophobicity</option>
                                     <option value="bfactor">B-Factor (Flexibility)</option>
+                                    <option value="alphafold">AlphaFold Confidence (pLDDT)</option>
                                     <option value="charge">Charge (+/-)</option>
                                 </select>
                             </div>
@@ -360,6 +361,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                     structure: "Helix (Pink), Sheet (Yellow), Coil (Green).",
                                     hydrophobicity: "Red = Hydrophobic (Core), White = Hydrophilic (Surface).",
                                     bfactor: "Red = Flexible/Mobile regions, Blue = Rigid/Stable regions.",
+                                    alphafold: "Blue = High Confidence (>90), Yellow/Red = Low Confidence (<70). Use for AI structures.",
                                     charge: "Blue = Positive (Arg/Lys/His), Red = Negative (Asp/Glu)."
                                 };
                                 return descriptions[coloring] || "Select a coloring mode";
