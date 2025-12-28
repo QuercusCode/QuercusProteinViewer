@@ -517,10 +517,22 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             // Reuse the exact same recording logic
             const videoBlob = await performVideoRecord(duration);
 
-            // 2. Convert to GIF
+            // 2. Convert to GIF (Requires DOM attachment for reliable texture read)
             const video = document.createElement('video');
             video.src = URL.createObjectURL(videoBlob);
             video.muted = true;
+
+            // Critical Fix: Append to DOM to force rendering, making it invisible but active
+            Object.assign(video.style, {
+                position: 'fixed',
+                top: '0',
+                left: '0',
+                opacity: '0.01', // Non-zero opacity to avoid optimization culling
+                pointerEvents: 'none',
+                zIndex: '-1000'
+            });
+            document.body.appendChild(video);
+
             await new Promise((r) => { video.onloadedmetadata = r; });
 
             const gif = new GIF({
@@ -539,22 +551,26 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             const ctx = tempCanvas.getContext('2d');
             if (!ctx) throw new Error("Canvas context failed");
 
-            // Extract frames - ROBUST LOOP
-            for (let t = 0; t < video.duration; t += step) {
-                video.currentTime = t;
-                // 1. Wait for Seek
-                await new Promise(r => { video.onseeked = r; });
+            try {
+                // Extract frames - ROBUST LOOP
+                for (let t = 0; t < video.duration; t += step) {
+                    video.currentTime = t;
+                    // 1. Wait for Seek
+                    await new Promise(r => { video.onseeked = r; });
 
-                // 2. Safety Buffer: Wait for Paint
-                // Explicitly request animation frames to ensure the browser paints the new video frame
-                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-                await new Promise(r => setTimeout(r, 10)); // Tiny 10ms buffer for good measure
+                    // 2. Safety Buffer: Wait for Paint
+                    // Explicitly request animation frames to ensure the browser paints the new video frame
+                    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                    await new Promise(r => setTimeout(r, 20)); // Increased buffer slightly
 
-                ctx.drawImage(video, 0, 0);
-                gif.addFrame(ctx, { delay: 1000 / fps, copy: true });
+                    ctx.drawImage(video, 0, 0);
+                    gif.addFrame(ctx, { delay: 1000 / fps, copy: true });
+                }
+            } finally {
+                // Clean up DOM
+                document.body.removeChild(video);
+                URL.revokeObjectURL(video.src);
             }
-
-            URL.revokeObjectURL(video.src);
 
             return new Promise((resolve) => {
                 gif.on('finished', (blob: Blob) => resolve(blob));
