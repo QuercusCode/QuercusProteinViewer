@@ -554,61 +554,44 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             stage.setSpin(false);
 
-            // Loop for frames
-            for (let i = 0; i < frames; i++) {
-                // Rotate
-                stage.viewerControls.rotate(0, anglePerFrame);
+            try {
+                // Loop for frames
+                for (let i = 0; i < frames; i++) {
+                    // Rotate
+                    stage.viewerControls.rotate(0, anglePerFrame);
 
-                // Wait for render
-                await new Promise(r => setTimeout(r, 50));
-                stage.viewer.requestRender();
-                await new Promise(r => setTimeout(r, 50));
+                    // Wait for render - keep delay small but enough
+                    await new Promise(r => setTimeout(r, 20));
+                    stage.viewer.requestRender();
+                    await new Promise(r => setTimeout(r, 20));
 
-                // Capture Frame
-                const blob = await stage.makeImage({ format: 'png', trim: false, transparent: true, factor: 1 });
-                const img = new Image();
-                const imgLoadPromise = new Promise<void>((resolve, reject) => {
-                    img.onload = () => resolve();
-                    img.onerror = reject;
-                });
-                img.src = URL.createObjectURL(blob);
-                await imgLoadPromise;
+                    // Capture Frame - OPAQUE (transparent: false)
+                    const blob = await stage.makeImage({ format: 'png', trim: false, transparent: false, factor: 1 });
+                    const img = new Image();
+                    const imgLoadPromise = new Promise<void>((resolve, reject) => {
+                        img.onload = () => resolve();
+                        img.onerror = reject;
+                    });
+                    img.src = URL.createObjectURL(blob);
+                    await imgLoadPromise;
 
-                // Create a temporary canvas to ensure background is drawn
-                // This handles issues where transparency might be interpreted as black
-                // or if preserveDrawingBuffer wasn't perfect.
-                const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext('2d');
-                if (ctx) {
-                    // Check current background color of the viewer container or default to white/black
-                    // We can assume the viewer's background color prop.
-                    // But simpler: just fill with the component's background color or white/black based on mode
-                    // However, we don't have easy access to 'isLightMode' inside this ref method easily unless passed or inferred.
-                    // NGL Stage usually has a background color.
-                    // Let's assume a default background if transparent.
-
-                    // Actually, let's just draw on top of a solid color
-                    ctx.fillStyle = stage.viewer.parameters.backgroundColor === 0xffffff ? '#ffffff' : '#000000';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(img, 0, 0);
-
-                    gif.addFrame(canvas, { delay: 1000 / fps });
-                } else {
-                    // Fallback
                     gif.addFrame(img, { delay: 1000 / fps });
+                    URL.revokeObjectURL(img.src);
                 }
 
-                URL.revokeObjectURL(img.src);
-            }
-
-            return new Promise((resolve) => {
-                gif.on('finished', (blob: Blob) => {
-                    resolve(blob);
+                return new Promise((resolve) => {
+                    gif.on('finished', (blob: Blob) => {
+                        resolve(blob);
+                    });
+                    gif.render();
                 });
-                gif.render();
-            });
+            } catch (err) {
+                console.error("GIF Record Error", err);
+                throw err;
+            } finally {
+                // Ensure we don't leave it in weird state?
+                stage.setSpin(false);
+            }
         },
 
         addResidue: async (chainName: string, resType: string) => {
