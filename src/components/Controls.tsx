@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera, Ruler, Sun, Moon, Layers, Hexagon, Crosshair, Download, Image as ImageIcon, Eye, RefreshCw, Maximize, Minimize } from 'lucide-react';
+import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera, Ruler, Sun, Moon, Layers, Hexagon, Crosshair, Download, Image as ImageIcon, Eye, RefreshCw, Maximize, Minimize, Video, Loader2 } from 'lucide-react';
 import type { RepresentationType, ColoringType } from './ProteinViewer';
 import type { ChainInfo, CustomColorRule, Snapshot } from '../types';
 
@@ -27,6 +27,8 @@ interface ControlsProps {
     showLigands: boolean;
     setShowLigands: (show: boolean) => void;
     onFocusLigands: () => void;
+    onRecordMovie: () => void;
+    isRecording: boolean;
     proteinTitle?: string | null;
     snapshots: Snapshot[];
     onSnapshot: () => void;
@@ -66,6 +68,8 @@ export const Controls: React.FC<ControlsProps> = ({
     showLigands,
     setShowLigands,
     onFocusLigands,
+    onRecordMovie,
+    isRecording,
     proteinTitle,
     snapshots,
     onSnapshot,
@@ -640,6 +644,23 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <Camera className="w-4 h-4" /> Snapshot
                             </button>
                         </div>
+                        <button
+                            onClick={onRecordMovie}
+                            disabled={isRecording}
+                            className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all text-xs font-medium group ${isRecording ? 'bg-red-500 text-white' : (`${cardBg} hover:border-red-500/50 hover:text-red-500`)}`}
+                        >
+                            {isRecording ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    <span>Recording...</span>
+                                </>
+                            ) : (
+                                <>
+                                    <Video className="w-4 h-4" />
+                                    <span>Record 360° Clip</span>
+                                </>
+                            )}
+                        </button>
 
                         {/* Snapshot Gallery */}
                         {snapshots.length > 0 && (

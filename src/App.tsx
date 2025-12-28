@@ -143,7 +143,23 @@ function App() {
     setHighlightedResidue(null);
   };
 
+  const [isRecording, setIsRecording] = useState(false);
+
   const viewerRef = useRef<ProteinViewerRef>(null);
+
+  const handleRecordMovie = async () => {
+    if (viewerRef.current && !isRecording) {
+      setIsRecording(true);
+      try {
+        await viewerRef.current.recordTurntable();
+      } catch (e) {
+        console.error("Recording failed", e);
+        alert("Recording failed. Browser may not support it.");
+      } finally {
+        setIsRecording(false);
+      }
+    }
+  };
 
   const handleFocusLigands = () => {
     viewerRef.current?.focusLigands();
@@ -352,6 +368,8 @@ function App() {
         showLigands={showLigands}
         setShowLigands={setShowLigands}
         onFocusLigands={handleFocusLigands}
+        onRecordMovie={handleRecordMovie}
+        isRecording={isRecording}
         proteinTitle={proteinTitle}
         snapshots={snapshots}
         onSnapshot={handleSnapshot}

@@ -46,6 +46,7 @@ export interface ProteinViewerRef {
     getAtomPosition: (chain: string, resNo: number, atomName?: string) => { x: number, y: number, z: number } | null;
     getAtomPositionByIndex: (atomIndex: number) => { x: number, y: number, z: number } | null;
     addResidue: (chainName: string, resType: string) => Promise<Blob | null>;
+    recordTurntable: () => Promise<void>;
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
@@ -406,6 +407,76 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 }
             });
             return results;
+        },
+        recordTurntable: async () => {
+            if (!stageRef.current || !stageRef.current.viewer) return;
+            const stage = stageRef.current;
+            const canvas = containerRef.current?.querySelector('canvas');
+            if (!canvas) {
+                console.error("No canvas found for recording");
+                return;
+            }
+
+            console.log("Starting Turntable Recording...");
+
+            // 1. Setup Stream
+            const stream = canvas.captureStream(30); // 30 FPS
+            const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+                ? 'video/webm;codecs=vp9'
+                : 'video/webm';
+
+            const mediaRecorder = new MediaRecorder(stream, { mimeType });
+            const chunks: Blob[] = [];
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) chunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `protein-turntable-${new Date().toISOString().slice(0, 10)}.webm`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                console.log("Recording finished and downloaded.");
+            };
+
+            // 2. Start Recording
+            mediaRecorder.start();
+
+            // 3. Perform Spin (Full 360 over 4 seconds approx)
+            const duration = 4000; // 4 seconds
+            const fps = 30;
+            const totalFrames = duration / 1000 * fps;
+            const rotationPerFrame = (2 * Math.PI) / totalFrames; // 360 degrees in radians
+
+            let frame = 0;
+            const originalSpin = stage.spinAnimation.paused; // Store original state
+            stage.setSpin(false); // Disable auto-spin to control it manually
+
+            const animate = () => {
+                if (frame >= totalFrames) {
+                    mediaRecorder.stop();
+                    // Restore original spin state
+                    if (!originalSpin) {
+                        stage.setSpin(true);
+                    }
+                    return;
+                }
+
+                // Rotate
+                stage.viewer.controls.rotate(rotationPerFrame, 0);
+                stage.viewer.requestRender();
+
+                frame++;
+                requestAnimationFrame(animate);
+            };
+
+            animate();
         },
         addResidue: async (chainName: string, resType: string) => {
             if (!componentRef.current) return null;
