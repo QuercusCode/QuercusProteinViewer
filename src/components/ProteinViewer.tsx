@@ -10,7 +10,7 @@ declare global {
 }
 
 export type RepresentationType = 'cartoon' | 'licorice' | 'backbone' | 'spacefill' | 'surface' | 'ribbon';
-export type ColoringType = 'chainid' | 'element' | 'residue' | 'secondary' | 'hydrophobicity' | 'structure' | 'bfactor' | 'charge' | 'alphafold';
+export type ColoringType = 'chainid' | 'element' | 'residue' | 'secondary' | 'hydrophobicity' | 'structure' | 'bfactor' | 'charge';
 
 interface ProteinViewerProps {
     pdbId?: string;
@@ -691,7 +691,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             // For simple coloring modes (chainid, element), we use a purely manual scheme
             // This ensures that "base" colors are identical whether a custom rule exists or not.
 
-            if (currentColoring === 'chainid' || currentColoring === 'element' || currentColoring === 'charge' || currentColoring === 'alphafold') {
+            if (currentColoring === 'chainid' || currentColoring === 'element' || currentColoring === 'charge') {
                 const schemeId = `unified-scheme-${Date.now()}`;
 
                 // Pre-calculate custom colors for fast lookup
@@ -728,18 +728,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                 return 0xCCCCCC;
                             }
 
-                            // 2b. AlphaFold Confidence (pLDDT) from B-Factor
-                            if (currentColoring === 'alphafold') {
-                                const score = atom.bfactor;
-                                // > 90 (Very High): Dark Blue
-                                if (score > 90) return 0x0053D6;
-                                // > 70 (Confident): Light Blue
-                                if (score > 70) return 0x65CBF3;
-                                // > 50 (Low): Yellow
-                                if (score > 50) return 0xFFDB13;
-                                // < 50 (Very Low): Orange
-                                return 0xFF7D45;
-                            }
+
 
                             // 3. Base Coloring (Stable)
                             if (currentColoring === 'element') {
