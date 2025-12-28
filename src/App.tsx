@@ -379,6 +379,28 @@ function App() {
     }
   };
 
+  const handleRecordGif = async (duration: number) => {
+    if (!viewerRef.current) return;
+    setIsRecording(true);
+    try {
+      const blob = await viewerRef.current.recordGif(duration);
+      const url = URL.createObjectURL(blob);
+      const newMovie: Movie = {
+        id: crypto.randomUUID(),
+        url,
+        blob,
+        timestamp: Date.now(),
+        duration: duration / 1000,
+        format: 'gif'
+      };
+      setMovies(prev => [newMovie, ...prev]);
+    } catch (e: any) {
+      console.error("GIF Recording failed", e);
+      alert(`GIF Recording failed: ${e.message}`);
+    } finally {
+      setIsRecording(false);
+    }
+  };
 
 
   return (
@@ -408,6 +430,7 @@ function App() {
         setShowLigands={setShowLigands}
         onFocusLigands={handleFocusLigands}
         onRecordMovie={handleRecordMovie}
+        onRecordGif={handleRecordGif}
         isRecording={isRecording}
         proteinTitle={proteinTitle}
         snapshots={snapshots}

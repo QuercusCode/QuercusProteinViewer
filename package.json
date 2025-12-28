@@ -10,7 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/gif.js": "^0.2.5",
     "clsx": "^2.1.1",
+    "gif.js": "^0.2.0",
     "lucide-react": "^0.562.0",
     "molstar": "^5.4.2",
     "ngl": "^2.4.0",

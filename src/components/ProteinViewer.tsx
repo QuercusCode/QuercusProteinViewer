@@ -47,7 +47,10 @@ export interface ProteinViewerRef {
     getAtomPositionByIndex: (atomIndex: number) => { x: number, y: number, z: number } | null;
     addResidue: (chainName: string, resType: string) => Promise<Blob | null>;
     recordTurntable: (duration?: number) => Promise<Blob>;
+    recordGif: (duration?: number) => Promise<Blob>;
 }
+
+import GIF from 'gif.js';
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     pdbId,
@@ -528,6 +531,50 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 } catch (e: any) {
                     reject(e);
                 }
+            });
+        },
+
+        recordGif: async (duration = 4000) => {
+            if (!stageRef.current) throw new Error("Stage not initialized");
+            const stage = stageRef.current;
+
+            // Setup GIF encoder
+            const gif = new GIF({
+                workers: 2,
+                quality: 10,
+                width: stage.viewer.width,
+                height: stage.viewer.height,
+                workerScript: 'gif.worker.js'
+            });
+
+            // Config
+            const fps = 15;
+            const frames = Math.round((duration / 1000) * fps);
+            const anglePerFrame = (2 * Math.PI) / frames;
+
+            stage.setSpin(false);
+
+            // Loop for frames
+            for (let i = 0; i < frames; i++) {
+                // Rotate
+                stage.viewerControls.rotate(0, anglePerFrame);
+
+                // Capture Frame
+                const blob = await stage.makeImage({ format: 'png', trim: false, transparent: false, factor: 1 });
+                const img = new Image();
+                const imgLoadPromise = new Promise<void>((resolve) => { img.onload = () => resolve(); });
+                img.src = URL.createObjectURL(blob);
+                await imgLoadPromise;
+
+                gif.addFrame(img, { delay: 1000 / fps });
+                URL.revokeObjectURL(img.src);
+            }
+
+            return new Promise((resolve) => {
+                gif.on('finished', (blob: Blob) => {
+                    resolve(blob);
+                });
+                gif.render();
             });
         },
 

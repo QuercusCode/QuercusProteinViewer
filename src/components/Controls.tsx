@@ -1,5 +1,29 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera, Ruler, Sun, Moon, Layers, Hexagon, Crosshair, Download, Image as ImageIcon, Eye, RefreshCw, Maximize, Minimize, Video, Loader2 } from 'lucide-react';
+import {
+    Camera,
+    Crosshair,
+    Download,
+    Eye,
+    Hexagon,
+    Layers,
+    Menu,
+    Maximize,
+    Minimize,
+    Moon,
+    Plus,
+    RefreshCw,
+    RotateCcw,
+    Ruler,
+    Search,
+    Sun,
+    Trash2,
+    Upload,
+    Video,
+    X,
+    Loader2,
+    ImageIcon,
+    Film
+} from 'lucide-react';
 import type { RepresentationType, ColoringType } from './ProteinViewer';
 import type { ChainInfo, CustomColorRule, Snapshot, Movie } from '../types';
 
@@ -17,9 +41,9 @@ interface ControlsProps {
     customColors: CustomColorRule[];
     setCustomColors: (colors: CustomColorRule[]) => void;
     isMeasurementMode: boolean;
-    setIsMeasurementMode: (enabled: boolean) => void;
+    setIsMeasurementMode: (mode: boolean) => void;
     isLightMode: boolean;
-    setIsLightMode: (enabled: boolean) => void;
+    setIsLightMode: (mode: boolean) => void;
     highlightedResidue: { chain: string; resNo: number; resName?: string } | null;
     onResidueClick: (chain: string, resNo: number) => void;
     showSurface: boolean;
@@ -28,8 +52,9 @@ interface ControlsProps {
     setShowLigands: (show: boolean) => void;
     onFocusLigands: () => void;
     onRecordMovie: (duration: number) => void;
+    onRecordGif: (duration: number) => void;
     isRecording: boolean;
-    proteinTitle?: string | null;
+    proteinTitle: string | null;
     snapshots: Snapshot[];
     onSnapshot: () => void;
     onDownloadSnapshot: (id: string) => void;
@@ -71,6 +96,7 @@ export const Controls: React.FC<ControlsProps> = ({
     setShowLigands,
     onFocusLigands,
     onRecordMovie,
+    onRecordGif,
     isRecording,
     proteinTitle,
     snapshots,
@@ -95,6 +121,10 @@ export const Controls: React.FC<ControlsProps> = ({
     const [previewSnapshot, setPreviewSnapshot] = useState<Snapshot | null>(null);
     const [previewMovie, setPreviewMovie] = useState<Movie | null>(null);
 
+    // Recording State
+    const [recordFormat, setRecordFormat] = useState<'video' | 'gif'>('video');
+    const [recordDuration, setRecordDuration] = useState(4000);
+
     // Custom Color State
     const [targetType, setTargetType] = useState<'chain' | 'residue'>('chain');
     const [selectedChain, setSelectedChain] = useState(chains[0]?.name || '');
@@ -104,7 +134,6 @@ export const Controls: React.FC<ControlsProps> = ({
 
     // Mobile Sidebar State
     const [isOpen, setIsOpen] = useState(false);
-    const [recordDuration, setRecordDuration] = useState(4000);
 
     // Refs for scrolling
     const sequenceContainerRef = useRef<HTMLDivElement>(null);
@@ -583,6 +612,20 @@ export const Controls: React.FC<ControlsProps> = ({
 
                     {/* ACTIONS ROW 2: Recording */}
                     <div className="flex items-center gap-2">
+                        <div className={`p-0.5 rounded-lg flex border ${cardBg}`}>
+                            <button
+                                onClick={() => setRecordFormat('video')}
+                                className={`px-2 py-1 text-[10px] font-bold rounded ${recordFormat === 'video' ? 'bg-blue-600 text-white' : subtleText}`}
+                            >
+                                MP4
+                            </button>
+                            <button
+                                onClick={() => setRecordFormat('gif')}
+                                className={`px-2 py-1 text-[10px] font-bold rounded ${recordFormat === 'gif' ? 'bg-blue-600 text-white' : subtleText}`}
+                            >
+                                GIF
+                            </button>
+                        </div>
                         <div className={`flex items-center gap-2 pl-2 pr-1 py-1 border rounded-lg ${cardBg}`}>
                             <span className={`text-[10px] font-bold ${subtleText}`}>SEC</span>
                             <input
@@ -596,12 +639,12 @@ export const Controls: React.FC<ControlsProps> = ({
                             />
                         </div>
                         <button
-                            onClick={() => onRecordMovie(recordDuration)}
+                            onClick={() => recordFormat === 'video' ? onRecordMovie(recordDuration) : onRecordGif(recordDuration)}
                             disabled={isRecording}
                             className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all text-xs font-medium ${isRecording ? 'bg-red-500 text-white border-red-500' : `${cardBg} hover:text-red-500 hover:border-red-500/50`}`}
                         >
-                            {isRecording ? <Loader2 className="w-4 h-4 animate-spin" /> : <Video className="w-4 h-4" />}
-                            {isRecording ? 'Recording...' : 'Record Movie'}
+                            {isRecording ? <Loader2 className="w-4 h-4 animate-spin" /> : (recordFormat === 'video' ? <Video className="w-4 h-4" /> : <Film className="w-4 h-4" />)}
+                            {isRecording ? 'Recording...' : (recordFormat === 'video' ? 'Record' : 'Make GIF')}
                         </button>
                     </div>
                 </div>
