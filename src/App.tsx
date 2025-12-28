@@ -3,7 +3,7 @@ import { ProteinViewer, type RepresentationType, type ColoringType, type Protein
 import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
 import { HelpGuide } from './components/HelpGuide';
-import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot } from './types';
+import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Movie } from './types';
 
 function App() {
   const [pdbId, setPdbId] = useState(() => {
@@ -30,7 +30,9 @@ function App() {
   const [showContactMap, setShowContactMap] = useState(false);
 
   // Snapshot Gallery State
+  // Snapshot & Movie Gallery State
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
+  const [movies, setMovies] = useState<Movie[]>([]);
 
   // Visualization Toggles
 
@@ -151,13 +153,57 @@ function App() {
     if (viewerRef.current && !isRecording) {
       setIsRecording(true);
       try {
-        await viewerRef.current.recordTurntable(duration);
+        const blob = await viewerRef.current.recordTurntable(duration);
+
+        // Create Movie Object
+        const mimeType = blob.type; // e.g. 'video/webm'
+        const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
+
+        const newMovie: Movie = {
+          id: crypto.randomUUID(),
+          url: URL.createObjectURL(blob),
+          blob: blob,
+          timestamp: Date.now(),
+          duration: duration / 1000,
+          format: ext
+        };
+
+        setMovies(prev => [newMovie, ...prev]);
+
+        // Auto Download (optional, keeping for convenience)
+        const a = document.createElement('a');
+        a.href = newMovie.url;
+        a.download = `protein-turntable-${pdbId || 'structure'}-${newMovie.id.slice(0, 4)}.${ext}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
       } catch (e: any) {
         console.error("Recording failed", e);
         alert(`Recording failed: ${e.message || e.toString() || "Unknown error"}`);
       } finally {
         setIsRecording(false);
       }
+    }
+  };
+
+  const handleDownloadMovie = (id: string) => {
+    const movie = movies.find(m => m.id === id);
+    if (movie) {
+      const a = document.createElement('a');
+      a.href = movie.url;
+      a.download = `protein-turntable-${pdbId || 'structure'}-${movie.id.slice(0, 4)}.${movie.format}`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  };
+
+  const handleDeleteMovie = (id: string) => {
+    const movie = movies.find(m => m.id === id);
+    if (movie) {
+      URL.revokeObjectURL(movie.url);
+      setMovies(prev => prev.filter(m => m.id !== id));
     }
   };
 
@@ -375,6 +421,9 @@ function App() {
         onSnapshot={handleSnapshot}
         onDownloadSnapshot={handleDownloadSnapshot}
         onDeleteSnapshot={handleDeleteSnapshot}
+        movies={movies}
+        onDownloadMovie={handleDownloadMovie}
+        onDeleteMovie={handleDeleteMovie}
         isSpinning={isSpinning}
         setIsSpinning={setIsSpinning}
         isCleanMode={isCleanMode}

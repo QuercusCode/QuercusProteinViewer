@@ -32,6 +32,15 @@ export interface Snapshot {
     timestamp: number;
 }
 
+export interface Movie {
+    id: string;
+    url: string; // Blob URL
+    blob: Blob;
+    timestamp: number;
+    duration: number; // in seconds
+    format: string; // 'webm' or 'mp4'
+}
+
 export interface Annotation {
     id: string;
     chain: string;

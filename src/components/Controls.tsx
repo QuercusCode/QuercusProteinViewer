@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Upload, RotateCcw, Search, Plus, Trash2, Menu, X, Camera, Ruler, Sun, Moon, Layers, Hexagon, Crosshair, Download, Image as ImageIcon, Eye, RefreshCw, Maximize, Minimize, Video, Loader2 } from 'lucide-react';
 import type { RepresentationType, ColoringType } from './ProteinViewer';
-import type { ChainInfo, CustomColorRule, Snapshot } from '../types';
+import type { ChainInfo, CustomColorRule, Snapshot, Movie } from '../types';
 
 interface ControlsProps {
     pdbId: string;
@@ -41,7 +41,9 @@ interface ControlsProps {
     onSaveSession: () => void;
     onLoadSession: (file: File) => void;
     onToggleContactMap: () => void;
-
+    movies: Movie[];
+    onDownloadMovie: (id: string) => void;
+    onDeleteMovie: (id: string) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -82,6 +84,9 @@ export const Controls: React.FC<ControlsProps> = ({
     onSaveSession,
     onLoadSession,
     onToggleContactMap,
+    movies,
+    onDownloadMovie,
+    onDeleteMovie,
 
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -639,7 +644,50 @@ export const Controls: React.FC<ControlsProps> = ({
                     </div>
                 )}
 
-            </div >
+                {/* Movie Gallery - Full View */}
+                {movies.length > 0 && (
+                    <div className={`space-y-2 pt-2 border-t ${isLightMode ? 'border-neutral-200' : 'bg-neutral-800'}`}>
+                        <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText} flex items-center gap-2`}>
+                            <Video className="w-3.5 h-3.5" /> Movies ({movies.length})
+                        </label>
+                        <div className="grid grid-cols-1 gap-2">
+                            {movies.map(movie => (
+                                <div key={movie.id} className="group relative rounded-lg overflow-hidden border border-neutral-700/50 bg-neutral-900 flex items-center p-2 gap-2">
+                                    <div className="w-16 h-10 bg-black rounded flex items-center justify-center relative overflow-hidden">
+                                        <video src={movie.url} className="w-full h-full object-cover" muted />
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                                            <div className="w-4 h-4 rounded-full bg-white/80 flex items-center justify-center pl-0.5">
+                                                <div className="w-0 h-0 border-t-[3px] border-t-transparent border-l-[5px] border-l-black border-b-[3px] border-b-transparent" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="text-[10px] font-medium text-white truncate">Movie {movie.id.slice(0, 4)}</div>
+                                        <div className="text-[9px] text-neutral-400">{Math.round(movie.duration)}s • {movie.format}</div>
+                                    </div>
+                                    <div className="flex gap-1">
+                                        <button
+                                            onClick={() => onDownloadMovie(movie.id)}
+                                            className="p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors"
+                                            title="Download"
+                                        >
+                                            <Download className="w-3 h-3" />
+                                        </button>
+                                        <button
+                                            onClick={() => onDeleteMovie(movie.id)}
+                                            className="p-1.5 bg-red-600/80 hover:bg-red-500/80 text-white rounded transition-colors"
+                                            title="Delete"
+                                        >
+                                            <Trash2 className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+
 
             {/* Snapshot Preview Modal */}
             {

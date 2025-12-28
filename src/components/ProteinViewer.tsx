@@ -46,7 +46,7 @@ export interface ProteinViewerRef {
     getAtomPosition: (chain: string, resNo: number, atomName?: string) => { x: number, y: number, z: number } | null;
     getAtomPositionByIndex: (atomIndex: number) => { x: number, y: number, z: number } | null;
     addResidue: (chainName: string, resType: string) => Promise<Blob | null>;
-    recordTurntable: (duration?: number) => Promise<void>;
+    recordTurntable: (duration?: number) => Promise<Blob>;
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
@@ -408,143 +408,129 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             });
             return results;
         },
-        recordTurntable: async (duration: number = 4000) => {
-            if (!stageRef.current || !stageRef.current.viewer) return;
-            const stage = stageRef.current;
-            const canvas = containerRef.current?.querySelector('canvas');
-            if (!canvas) {
-                console.error("No canvas found for recording");
-                return;
-            }
-
-            console.log("Starting Turntable Recording...");
-
-            // 1. Setup Stream
-            const stream = canvas.captureStream(30); // 30 FPS
-
-            // Robust MIME type detection
-            const mimeTypes = [
-                'video/webm;codecs=vp9',
-                'video/webm;codecs=vp8',
-                'video/webm',
-                'video/mp4'
-            ];
-
-            let selectedMimeType = '';
-            for (const type of mimeTypes) {
-                if (MediaRecorder.isTypeSupported(type)) {
-                    selectedMimeType = type;
-                    break;
+        recordTurntable: async (duration: number = 4000): Promise<Blob> => {
+            return new Promise((resolve, reject) => {
+                if (!stageRef.current || !stageRef.current.viewer) {
+                    reject(new Error("Viewer not initialized"));
+                    return;
                 }
-            }
+                const stage = stageRef.current;
+                const canvas = containerRef.current?.querySelector('canvas');
+                if (!canvas) {
+                    reject(new Error("No canvas found for recording"));
+                    return;
+                }
 
-            if (!selectedMimeType) {
-                console.warn("No supported MIME type found, trying default");
-            }
+                console.log("Starting Turntable Recording...");
 
-            const options: MediaRecorderOptions = {
-                mimeType: selectedMimeType || 'video/webm',
-                videoBitsPerSecond: 8000000 // 8 Mbps for high quality
-            };
+                // 1. Setup Stream
+                const stream = canvas.captureStream(30); // 30 FPS
 
-            try {
-                const mediaRecorder = new MediaRecorder(stream, options);
-                const chunks: Blob[] = [];
+                // Robust MIME type detection
+                const mimeTypes = [
+                    'video/webm;codecs=vp9',
+                    'video/webm;codecs=vp8',
+                    'video/webm',
+                    'video/mp4'
+                ];
 
-                // Set extension based on type
-                const ext = selectedMimeType.includes('mp4') ? 'mp4' : 'webm';
-
-                mediaRecorder.ondataavailable = (e) => {
-                    if (e.data.size > 0) chunks.push(e.data);
-                };
-
-                mediaRecorder.onstop = () => {
-                    const blob = new Blob(chunks, { type: selectedMimeType || 'video/webm' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `protein-turntable-${new Date().toISOString().slice(0, 10)}.${ext}`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    console.log("Recording finished and downloaded.");
-                };
-
-                // 2. Start Recording
-                mediaRecorder.start();
-
-                // 3. Perform Spin (Use built-in spin for stability)
-                // duration is passed as argument
-                const startTime = performance.now();
-                const originalSpin = stage.spinAnimation.paused; // Store original state
-
-                // Calculate required spin speed to complete 360 degrees in 'duration'
-                // Default speed 0.01 roughly does ~360 in 4s (at 60fps?)
-                // Actually NGL spinSpeed is angle per step.
-                // Let's approximate: 0.01 is "normal".
-                // If duration is 8000 (2x longer), speed should be 0.005 (0.5x).
-                // Formula: newSpeed = 0.01 * (4000 / duration)
-                const defaultSpeed = 0.01;
-                const targetSpeed = defaultSpeed * (4000 / duration);
-
-                const oldSpeed = stage.getParameters().spinSpeed;
-
-                // Enhance Quality: Boost Pixel Ratio temporarily
-                const originalPixelRatio = stage.viewer.pixelRatio;
-                stage.setParameters({ spinSpeed: targetSpeed, pixelRatio: 3 }); // 3x resolution
-
-                // Ensure spin is ON for recording
-                stage.setSpin(true);
-
-                const animate = () => {
-                    try {
-                        const now = performance.now();
-                        const elapsed = now - startTime;
-
-                        if (elapsed >= duration) {
-                            mediaRecorder.stop();
-                            // Restore original spin state
-                            if (originalSpin) {
-                                stage.setSpin(false);
-                            }
-                            // Restore original speed and quality
-                            stage.setParameters({
-                                spinSpeed: oldSpeed,
-                                pixelRatio: originalPixelRatio
-                            });
-                            return;
-                        }
-
-                        // Force a render frame for the recorder
-                        stage.viewer.requestRender();
-
-                        requestAnimationFrame(animate);
-                    } catch (err: any) {
-                        console.error("Animation loop error:", err);
-                        alert(`Recording Error (Animation): ${err.message}`);
-                        mediaRecorder.stop();
-                        if (originalSpin) stage.setSpin(false);
-                        stage.setParameters({
-                            spinSpeed: oldSpeed,
-                            pixelRatio: originalPixelRatio
-                        });
+                let selectedMimeType = '';
+                for (const type of mimeTypes) {
+                    if (MediaRecorder.isTypeSupported(type)) {
+                        selectedMimeType = type;
+                        break;
                     }
+                }
+
+                if (!selectedMimeType) {
+                    console.warn("No supported MIME type found, trying default");
+                }
+
+                const options: MediaRecorderOptions = {
+                    mimeType: selectedMimeType || 'video/webm',
+                    videoBitsPerSecond: 8000000 // 8 Mbps for high quality
                 };
 
-                // Wrap MediaRecorder callbacks too
-                mediaRecorder.onerror = (e: any) => {
-                    console.error("MediaRecorder Error:", e);
-                    alert(`Recording Error (MediaRecorder): ${e.error?.message || e.message || "Unknown"}`);
-                };
+                try {
+                    const mediaRecorder = new MediaRecorder(stream, options);
+                    const chunks: Blob[] = [];
 
-                animate();
-            } catch (err) {
-                console.error("MediaRecorder creation failed:", err);
-                // Re-throw to be caught by App.tsx
-                throw err;
-            }
+                    mediaRecorder.ondataavailable = (e) => {
+                        if (e.data.size > 0) chunks.push(e.data);
+                    };
+
+                    // Store original state
+                    const originalSpin = stage.spinAnimation.paused;
+                    const oldSpeed = stage.getParameters().spinSpeed;
+                    const originalPixelRatio = stage.viewer.pixelRatio;
+
+                    mediaRecorder.onstop = () => {
+                        // Restore state immediately
+                        if (originalSpin) {
+                            stage.setSpin(false);
+                        }
+                        stage.setParameters({ spinSpeed: oldSpeed, pixelRatio: originalPixelRatio });
+
+                        const blob = new Blob(chunks, { type: selectedMimeType || 'video/webm' });
+                        console.log("Recording finished.");
+                        resolve(blob);
+                    };
+
+                    mediaRecorder.onerror = (e: any) => {
+                        console.error("MediaRecorder Error:", e);
+                        // Restore state on error
+                        if (originalSpin) stage.setSpin(false);
+                        stage.setParameters({ spinSpeed: oldSpeed, pixelRatio: originalPixelRatio });
+                        reject(new Error(e.error?.message || "MediaRecorder error"));
+                    };
+
+                    // 2. Start Recording
+                    mediaRecorder.start();
+
+                    // 3. Perform Spin
+                    const startTime = performance.now();
+
+                    // Calculate spin speed
+                    const defaultSpeed = 0.01;
+                    const targetSpeed = defaultSpeed * (4000 / duration);
+
+                    // Boost Quality
+                    stage.setParameters({ spinSpeed: targetSpeed, pixelRatio: 3 });
+
+                    // Ensure spin is ON
+                    stage.setSpin(true);
+
+                    const animate = () => {
+                        try {
+                            const now = performance.now();
+                            const elapsed = now - startTime;
+
+                            if (elapsed >= duration) {
+                                mediaRecorder.stop();
+                                return; // Stop loop, onstop will handle restore & resolve
+                            }
+
+                            // Force render
+                            stage.viewer.requestRender();
+                            requestAnimationFrame(animate);
+                        } catch (err: any) {
+                            console.error("Animation loop error:", err);
+                            mediaRecorder.stop();
+                            // Restore state on error if stop fails to trigger onstop correctly
+                            if (originalSpin) stage.setSpin(false);
+                            stage.setParameters({ spinSpeed: oldSpeed, pixelRatio: originalPixelRatio });
+                            reject(err);
+                        }
+                    };
+
+                    requestAnimationFrame(animate);
+
+                } catch (e: any) {
+                    reject(e);
+                }
+            });
         },
+
         addResidue: async (chainName: string, resType: string) => {
             if (!componentRef.current) return null;
             const structure = componentRef.current.structure;
