@@ -170,14 +170,7 @@ function App() {
 
         setMovies(prev => [newMovie, ...prev]);
 
-        // Auto Download (optional, keeping for convenience)
-        const a = document.createElement('a');
-        a.href = newMovie.url;
-        a.download = `protein-turntable-${pdbId || 'structure'}-${newMovie.id.slice(0, 4)}.${ext}`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-
+        // Auto Download removed per user request: saved to gallery instead.
       } catch (e: any) {
         console.error("Recording failed", e);
         alert(`Recording failed: ${e.message || e.toString() || "Unknown error"}`);

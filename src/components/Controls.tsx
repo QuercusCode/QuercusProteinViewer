@@ -93,6 +93,7 @@ export const Controls: React.FC<ControlsProps> = ({
     const sessionInputRef = useRef<HTMLInputElement>(null);
     const [localPdbId, setLocalPdbId] = React.useState(pdbId);
     const [previewSnapshot, setPreviewSnapshot] = useState<Snapshot | null>(null);
+    const [previewMovie, setPreviewMovie] = useState<Movie | null>(null);
 
     // Custom Color State
     const [targetType, setTargetType] = useState<'chain' | 'residue'>('chain');
@@ -652,7 +653,7 @@ export const Controls: React.FC<ControlsProps> = ({
                         </label>
                         <div className="grid grid-cols-1 gap-2">
                             {movies.map(movie => (
-                                <div key={movie.id} className="group relative rounded-lg overflow-hidden border border-neutral-700/50 bg-neutral-900 flex items-center p-2 gap-2">
+                                <div key={movie.id} className="group relative rounded-lg overflow-hidden border border-neutral-700/50 bg-neutral-900 flex items-center p-2 gap-2 cursor-pointer" onClick={() => setPreviewMovie(movie)}>
                                     <div className="w-16 h-10 bg-black rounded flex items-center justify-center relative overflow-hidden">
                                         <video src={movie.url} className="w-full h-full object-cover" muted />
                                         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
@@ -667,14 +668,21 @@ export const Controls: React.FC<ControlsProps> = ({
                                     </div>
                                     <div className="flex gap-1">
                                         <button
-                                            onClick={() => onDownloadMovie(movie.id)}
+                                            onClick={(e) => { e.stopPropagation(); setPreviewMovie(movie); }}
+                                            className="p-1.5 bg-neutral-600 hover:bg-neutral-500 text-white rounded transition-colors"
+                                            title="Play"
+                                        >
+                                            <Video className="w-3 h-3" />
+                                        </button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); onDownloadMovie(movie.id); }}
                                             className="p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors"
                                             title="Download"
                                         >
                                             <Download className="w-3 h-3" />
                                         </button>
                                         <button
-                                            onClick={() => onDeleteMovie(movie.id)}
+                                            onClick={(e) => { e.stopPropagation(); onDeleteMovie(movie.id); }}
                                             className="p-1.5 bg-red-600/80 hover:bg-red-500/80 text-white rounded transition-colors"
                                             title="Delete"
                                         >
@@ -704,6 +712,31 @@ export const Controls: React.FC<ControlsProps> = ({
                             <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-center gap-4">
                                 <button
                                     onClick={() => onDownloadSnapshot(previewSnapshot.id)}
+                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
+                                >
+                                    <Download className="w-4 h-4" /> Download
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+
+            {/* Movie Preview Modal */}
+            {
+                previewMovie && (
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setPreviewMovie(null)}>
+                        <div className="relative max-w-4xl max-h-[90vh] w-full rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 bg-black" onClick={e => e.stopPropagation()}>
+                            <button
+                                onClick={() => setPreviewMovie(null)}
+                                className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                            <video src={previewMovie.url} controls autoPlay className="w-full h-full object-contain bg-neutral-900 max-h-[80vh]" />
+                            <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-center gap-4">
+                                <button
+                                    onClick={() => onDownloadMovie(previewMovie.id)}
                                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
                                 >
                                     <Download className="w-4 h-4" /> Download
