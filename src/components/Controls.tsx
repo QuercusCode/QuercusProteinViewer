@@ -257,10 +257,9 @@ export const Controls: React.FC<ControlsProps> = ({
                 </div>
 
                 {/* Scrollable Content */}
-                <div className={`flex-1 overflow-y-auto scrollbar-thin p-4 pt-0 space-y-4 ${isLightMode ? 'scrollbar-thumb-neutral-300' : 'scrollbar-thumb-neutral-700'}`}>
+                <div className={`flex-1 overflow-y-auto scrollbar-thin p-4 space-y-6 ${isLightMode ? 'scrollbar-thumb-neutral-300' : 'scrollbar-thumb-neutral-700'}`}>
 
-
-                    {/* Load Structure (Moved to Top) */}
+                    {/* 1. INPUT SECTION */}
                     <div className="space-y-3">
                         <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Load Structure</label>
                         <form onSubmit={handleSubmit} className="flex gap-2">
@@ -285,112 +284,91 @@ export const Controls: React.FC<ControlsProps> = ({
                                 className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all group ${cardBg} hover:opacity-80`}
                             >
                                 <Upload className="w-4 h-4 group-hover:text-blue-500 transition-colors" />
-                                <span>Upload File</span>
+                                <span className="text-xs font-medium">Upload File</span>
                             </button>
                         </div>
                     </div>
 
                     <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
 
-                    {/* Structure Details (Moved Below Load) */}
+                    {/* 2. STRUCTURE INFO (Title & Ligands) */}
                     {(proteinTitle || ligands.length > 0) && (
                         <div className="space-y-3">
-                            <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Structure Details</label>
+                            <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Structure Info</label>
 
-                            {/* Protein Title */}
+                            {/* Title */}
                             {proteinTitle && typeof proteinTitle === 'string' && (
                                 <div className={`p-3 rounded-lg border ${cardBg} mb-1 shadow-sm`}>
-                                    <h3 className={`text-[10px] font-bold uppercase tracking-wider mb-1 ${subtleText}`}>Structure Title</h3>
+                                    <h3 className={`text-[10px] font-bold uppercase tracking-wider mb-1 ${subtleText}`}>Title</h3>
                                     <p className={`text-xs font-medium leading-relaxed ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>
                                         {proteinTitle}
                                     </p>
                                 </div>
                             )}
 
-                            {/* Ligand Info Box */}
-                            <div className={`p-3 rounded-lg border ${cardBg} shadow-sm`}>
-                                <div className="flex items-center justify-between mb-2">
-                                    <div className="flex items-center gap-2">
-                                        <Hexagon className="w-3.5 h-3.5 text-blue-500" />
-                                        <span className={`text-xs font-semibold ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>Ligands</span>
-                                    </div>
-                                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${ligands.length > 0 ? 'bg-blue-100 text-blue-700' : 'bg-neutral-100 text-neutral-500'}`}>
-                                        {ligands.length}
-                                    </span>
-                                </div>
-
-                                {ligands.length > 0 ? (
-                                    <div className="space-y-2">
-                                        <div className="flex flex-wrap gap-1">
-                                            {ligands.map(lig => (
-                                                <span key={lig} className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600">
-                                                    {lig}
-                                                </span>
-                                            ))}
+                            {/* Ligands */}
+                            {ligands.length > 0 && (
+                                <div className={`p-3 rounded-lg border ${cardBg} shadow-sm`}>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div className="flex items-center gap-2">
+                                            <Hexagon className="w-3.5 h-3.5 text-blue-500" />
+                                            <span className={`text-xs font-semibold ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>Ligands</span>
                                         </div>
                                         <div className="flex gap-1">
                                             <button
                                                 onClick={() => setShowLigands(!showLigands)}
-                                                className={`flex-1 text-[10px] py-1 rounded border transition-colors ${showLigands ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-transparent text-neutral-500 hover:bg-neutral-50'}`}
+                                                className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${showLigands ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-transparent text-neutral-500 hover:bg-neutral-50'}`}
                                             >
                                                 {showLigands ? 'Hide' : 'Show'}
                                             </button>
                                             <button
                                                 onClick={onFocusLigands}
-                                                className="flex-1 text-[10px] py-1 rounded bg-blue-600 text-white hover:bg-blue-500 transition-colors flex items-center justify-center gap-1"
+                                                className="text-[10px] px-2 py-0.5 rounded bg-blue-600 text-white hover:bg-blue-500 transition-colors flex items-center gap-1"
                                             >
                                                 <Crosshair className="w-3 h-3" /> Focus
                                             </button>
                                         </div>
-                                        {/* Educational Tooltip/Text */}
-                                        <div className={`mt-2 text-[10px] leading-relaxed italic ${subtleText}`}>
-                                            Small molecules bound to the protein complex.
-                                        </div>
                                     </div>
-                                ) : (
-                                    <div className={`text-[10px] italic ${subtleText}`}>No ligands detected.</div>
-                                )}
-                            </div>
+                                    <div className="flex flex-wrap gap-1">
+                                        {ligands.map(lig => (
+                                            <span key={lig} className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600">
+                                                {lig}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
 
-                    <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
-
-                    {/* Visualization */}
+                    {/* 3. VISUALIZATION (Style, Color, Surface) */}
                     <div className="space-y-3">
                         <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Visualization</label>
 
-                        <div className="space-y-2">
+                        {/* Quick Toggles */}
+                        <div className="grid grid-cols-2 gap-2">
                             <button
                                 onClick={() => setShowSurface(!showSurface)}
-                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${showSurface ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
+                                className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${showSurface ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
                             >
                                 <div className="flex items-center gap-2">
                                     <Layers className="w-4 h-4" />
-                                    <span className="text-xs font-medium">Show Surface</span>
+                                    <span className="text-xs font-medium">Surface</span>
                                 </div>
-                                <div className={`w-3 h-3 rounded-full ${showSurface ? 'bg-blue-500' : 'bg-neutral-500'}`} />
+                                <div className={`w-2 h-2 rounded-full ${showSurface ? 'bg-blue-500' : 'bg-neutral-500'}`} />
                             </button>
-
                             <button
                                 onClick={() => setIsSpinning(!isSpinning)}
-                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isSpinning ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
+                                className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isSpinning ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
                             >
-                                <div className="flex items-center gap-2">
-                                    <RefreshCw className={`w-4 h-4 ${isSpinning ? 'animate-spin' : ''}`} />
-                                    <span className="text-xs font-medium">{isSpinning ? 'Spinning Active' : 'Auto-Spin'}</span>
-                                </div>
-                                <div className={`w-3 h-3 rounded-full ${isSpinning ? 'bg-blue-500' : 'bg-neutral-500'}`} />
+                                <span className="text-xs font-medium">Auto-Spin</span>
+                                <RefreshCw className={`w-3 h-3 ${isSpinning ? 'animate-spin' : ''}`} />
                             </button>
-
-
-
-
-
                         </div>
 
-                        <div className="space-y-1.5 pt-2">
-                            <span className={`text-xs ${subtleText}`}>Style</span>
+                        {/* Style & Color Dropdowns */}
+                        <div className="space-y-1.5">
+                            <span className={`text-[10px] uppercase font-bold ${subtleText}`}>Representation & Color</span>
                             <div className="grid grid-cols-2 gap-2">
                                 <select
                                     value={representation}
@@ -408,221 +386,150 @@ export const Controls: React.FC<ControlsProps> = ({
                                     onChange={(e) => setColoring(e.target.value as ColoringType)}
                                     className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
                                 >
-                                    <option value="chainid">Chain</option>
-                                    <option value="element">Element</option>
-                                    <option value="resname">Residue</option>
-                                    <option value="structure">Structure</option>
+                                    <option value="chainid">By Chain</option>
+                                    <option value="element">By Element</option>
+                                    <option value="resname">By Residue</option>
+                                    <option value="structure">Secondary Structure</option>
                                     <option value="hydrophobicity">Hydrophobicity</option>
-                                    <option value="bfactor">B-Factor (Flexibility)</option>
-                                    <option value="charge">Charge (+/-)</option>
+                                    <option value="bfactor">B-Factor</option>
+                                    <option value="charge">Charge</option>
                                 </select>
                             </div>
+                            <div className={`p-2 rounded border text-[10px] leading-snug ${isLightMode ? 'bg-neutral-50/50 border-neutral-100 text-neutral-600' : 'bg-neutral-800/50 border-neutral-700/50 text-neutral-400'}`}>
+                                {(() => {
+                                    const descriptions: Record<string, string> = {
+                                        chainid: "Colors each protein chain differently.",
+                                        element: "Standard CPK coloring (C=Grey, O=Red, N=Blue, S=Yellow).",
+                                        resname: "Distinct color for each amino acid type.",
+                                        structure: "Helix (Pink), Sheet (Yellow), Loop (Green).",
+                                        hydrophobicity: "Red = Hydrophobic core, White = Hydrophilic surface.",
+                                        bfactor: "Red = Flexible/Mobile, Blue = Rigid/Stable.",
+                                        charge: "Blue = Positive (Basic), Red = Negative (Acidic)."
+                                    };
+                                    return descriptions[coloring] || "Select a coloring mode";
+                                })()}
+                            </div>
                         </div>
-                        <div className={`mt-2 p-2 rounded border text-xs leading-snug ${isLightMode ? 'bg-neutral-50/50 border-neutral-100 text-neutral-600' : 'bg-neutral-800/50 border-neutral-700/50 text-neutral-400'}`}>
-                            {(() => {
-                                const descriptions: Record<string, string> = {
-                                    chainid: "Different color for each polymer chain.",
-                                    element: "CPK: Carbon (Grey), Oxygen (Red), Nitrogen (Blue), Sulfur (Yellow).",
-                                    resname: "Unique color for each amino acid type.",
-                                    structure: "Helix (Pink), Sheet (Yellow), Coil (Green).",
-                                    hydrophobicity: "Red = Hydrophobic (Core), White = Hydrophilic (Surface).",
-                                    bfactor: "Red = Flexible/Mobile regions, Blue = Rigid/Stable regions.",
-                                    charge: "Blue = Positive (Arg/Lys/His), Red = Negative (Asp/Glu)."
-                                };
-                                return descriptions[coloring] || "Select a coloring mode";
-                            })()}
+
+                        {/* Custom Colors */}
+                        <div className="space-y-1.5 pt-1">
+                            <div className="flex items-center justify-between">
+                                <span className={`text-[10px] uppercase font-bold ${subtleText}`}>Custom Rules</span>
+                            </div>
+
+                            <form onSubmit={addCustomRule} className={`space-y-2 p-2 rounded-lg border ${cardBg}`}>
+                                <div className="grid grid-cols-[1fr_auto] gap-2">
+                                    <div className="flex flex-col gap-1">
+                                        <div className="flex gap-2">
+                                            <select
+                                                value={targetType}
+                                                onChange={(e) => setTargetType(e.target.value as any)}
+                                                className={`w-20 border rounded px-1 text-xs outline-none ${inputBg}`}
+                                            >
+                                                <option value="chain">Chain</option>
+                                                <option value="residue">Res</option>
+                                            </select>
+                                            {/* Dynamic Input based on Type */}
+                                            {targetType === 'chain' ? (
+                                                <select
+                                                    value={selectedChain}
+                                                    onChange={(e) => setSelectedChain(e.target.value)}
+                                                    disabled={chains.length === 0}
+                                                    className={`flex-1 border rounded px-1 text-xs outline-none ${inputBg}`}
+                                                >
+                                                    {chains.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
+                                                </select>
+                                            ) : (
+                                                <input
+                                                    type="text"
+                                                    placeholder="e.g. 10-20"
+                                                    value={residueRange}
+                                                    onChange={(e) => setResidueRange(e.target.value)}
+                                                    className={`flex-1 border rounded px-2 py-1 text-xs outline-none ${inputBg}`}
+                                                />
+                                            )}
+                                        </div>
+                                        {targetType === 'residue' && selectedChain && getSelectedChainRange() && (
+                                            <div className={`text-[10px] px-1 ${subtleText}`}>Valid: {getSelectedChainRange()}</div>
+                                        )}
+                                    </div>
+                                    <input
+                                        type="color"
+                                        value={selectedColor}
+                                        onChange={(e) => setSelectedColor(e.target.value)}
+                                        className="w-8 h-full rounded cursor-pointer border-none p-0 overflow-hidden"
+                                    />
+                                </div>
+                                <button type="submit" className="w-full flex items-center justify-center gap-1 bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-xs py-1 rounded transition-colors font-medium">
+                                    <Plus className="w-3 h-3" /> Add Rule
+                                </button>
+                            </form>
+                            {/* Rule List */}
+                            {customColors.map(rule => (
+                                <div key={rule.id} className={`flex items-center justify-between text-xs px-2 py-1 rounded border-l-4 ${cardBg}`} style={{ borderLeftColor: rule.color }}>
+                                    <span className="font-mono">{rule.type === 'chain' ? `Chain ${rule.target.replace(':', '')}` : `Res ${rule.target}`}</span>
+                                    <button onClick={() => removeRule(rule.id)} className={`${subtleText} hover:text-red-500`}><Trash2 className="w-3 h-3" /></button>
+                                </div>
+                            ))}
                         </div>
                     </div>
 
                     <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
 
-
-
-                    {/* Analysis */}
+                    {/* 4. ANALYSIS SECTION (Sequence, Measurements, etc) */}
                     <div className="space-y-3">
                         <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Analysis</label>
-                        <div className="space-y-2">
-                            <button
-                                onClick={onToggleContactMap}
-                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
-                            >
-                                <div className="flex items-center gap-2">
-                                    <Maximize className="w-4 h-4" />
-                                    <span className="text-xs font-medium">Contact Map</span>
-                                </div>
-                            </button>
 
+                        {/* Tools */}
+                        <div className="grid grid-cols-2 gap-2">
                             <button
                                 onClick={() => setIsMeasurementMode(!isMeasurementMode)}
-                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isMeasurementMode
-                                    ? 'bg-amber-500/10 border-amber-500 text-amber-500'
-                                    : `${cardBg} hover:opacity-80`
-                                    }`}
+                                className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isMeasurementMode ? 'bg-amber-500/10 border-amber-500 text-amber-500' : `${cardBg} hover:opacity-80`}`}
                             >
-                                <div className="flex items-center gap-2">
-                                    <Ruler className="w-4 h-4" />
-                                    <span className="text-xs font-medium">{isMeasurementMode ? 'Measurement Active' : 'Measure Distance'}</span>
-                                </div>
-                                <div className={`w-3 h-3 rounded-full ${isMeasurementMode ? 'bg-amber-500' : 'bg-neutral-500'}`} />
+                                <span className="text-xs font-medium">Measure</span>
+                                <Ruler className="w-3.5 h-3.5" />
                             </button>
-
-
-                        </div>
-                    </div>
-
-                    {/* Session */}
-                    <div className="space-y-3">
-                        <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Session</label>
-                        <div className="flex gap-2">
                             <button
-                                onClick={onSaveSession}
-                                className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}
+                                onClick={onToggleContactMap}
+                                className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
                             >
-                                <Download className="w-4 h-4" /> Save
-                            </button>
-                            <input
-                                type="file"
-                                accept=".json"
-                                className="hidden"
-                                ref={sessionInputRef}
-                                onChange={(e) => {
-                                    if (e.target.files && e.target.files[0]) {
-                                        onLoadSession(e.target.files[0]);
-                                        e.target.value = '';
-                                    }
-                                }}
-                            />
-                            <button
-                                onClick={() => sessionInputRef.current?.click()}
-                                className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}
-                            >
-                                <Upload className="w-4 h-4" /> Load
+                                <span className="text-xs font-medium">Contact Map</span>
+                                <Maximize className="w-3.5 h-3.5" />
                             </button>
                         </div>
-                    </div>
 
-
-
-                    {/* Colors */}
-                    <div className="space-y-3">
-                        <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Custom Colors</label>
-                        <form onSubmit={addCustomRule} className={`space-y-2 p-3 rounded-lg border ${cardBg}`}>
-                            <div className="grid grid-cols-2 gap-2">
+                        {/* Sequence Viewer */}
+                        <div className="rounded-lg border overflow-hidden flex flex-col ${cardBg}">
+                            <div className={`px-3 py-2 flex items-center justify-between ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-800'}`}>
+                                <span className={`text-xs font-bold ${subtleText}`}>Sequence Viewer</span>
                                 <select
-                                    value={targetType}
-                                    onChange={(e) => setTargetType(e.target.value as any)}
-                                    className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
+                                    value={viewSequenceChain}
+                                    onChange={(e) => setViewSequenceChain(e.target.value)}
+                                    className={`bg-transparent border-none text-[10px] outline-none cursor-pointer text-right ${subtleText}`}
                                 >
-                                    <option value="chain">Chain</option>
-                                    <option value="residue">Residues</option>
-                                </select>
-                                <input
-                                    type="color"
-                                    value={selectedColor}
-                                    onChange={(e) => setSelectedColor(e.target.value)}
-                                    className="w-full h-full min-h-[26px] bg-transparent cursor-pointer rounded overflow-hidden"
-                                />
-                            </div>
-
-                            {targetType === 'chain' ? (
-                                <select
-                                    value={selectedChain}
-                                    onChange={(e) => setSelectedChain(e.target.value)}
-                                    disabled={chains.length === 0}
-                                    className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
-                                >
-                                    {chains.length === 0 && <option>No chains loaded</option>}
+                                    <option value="">All Chains</option>
                                     {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
                                 </select>
-                            ) : (
-                                <div className="space-y-1">
-                                    <div className="flex gap-2">
-                                        <select
-                                            value={selectedChain || ""}
-                                            onChange={(e) => setSelectedChain(e.target.value)}
-                                            disabled={chains.length === 0}
-                                            className={`w-1/3 border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
-                                        >
-                                            <option value="">All</option>
-                                            {chains.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-                                        </select>
-                                        <input
-                                            type="text"
-                                            placeholder="e.g. 10-20"
-                                            value={residueRange}
-                                            onChange={(e) => setResidueRange(e.target.value)}
-                                            className={`w-2/3 border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
-                                        />
-                                    </div>
-                                    {selectedChain && getSelectedChainRange() && (
-                                        <div className={`text-[10px] px-1 ${subtleText}`}>Valid range: {getSelectedChainRange()}</div>
-                                    )}
-                                </div>
-                            )}
-                            <button type="submit" disabled={targetType === 'chain' && !selectedChain} className="w-full flex items-center justify-center gap-1.5 bg-neutral-600 hover:bg-neutral-500 text-white text-xs py-1.5 rounded transition-colors disabled:opacity-50">
-                                <Plus className="w-3 h-3" /> Add Rule
-                            </button>
-                        </form>
-
-                        {customColors.length > 0 && (
-                            <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1">
-                                {customColors.map(rule => (
-                                    <div key={rule.id} className={`flex items-center justify-between text-xs px-2 py-1.5 rounded border-l-2 ${cardBg}`} style={{ borderLeftColor: rule.color }}>
-                                        {rule.type === 'chain' ? `Chain ${rule.target}` : `Res ${rule.target}`}
-                                        <button onClick={() => removeRule(rule.id)} className={`${subtleText} hover:text-red-500`}><Trash2 className="w-3.5 h-3.5" /></button>
-                                    </div>
-                                ))}
                             </div>
-                        )}
-                    </div>
-
-                    <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
-
-                    {/* Sequence */}
-                    <div className="space-y-3 flex flex-col md:flex-none">
-
-                        <div className="flex items-center justify-between">
-                            <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Sequence</label>
-                            <select
-                                value={viewSequenceChain}
-                                onChange={(e) => setViewSequenceChain(e.target.value)}
-                                className={`border rounded px-2 py-0.5 text-[10px] outline-none ${inputBg}`}
-                            >
-                                <option value="">All Chains</option>
-                                {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
-                            </select>
-                        </div>
-
-                        <div className={`h-64 md:h-48 rounded-lg border p-3 flex flex-col resize-y overflow-hidden ${cardBg}`}>
-                            <div ref={sequenceContainerRef} className="flex-1 min-h-0 overflow-y-auto pr-1 scrollbar-thin">
-                                {chains.length === 0 ? (
-                                    <p className={`italic text-xs ${subtleText}`}>No sequence data</p>
-                                ) : (
+                            <div className={`h-32 p-2 overflow-y-auto scrollbar-thin ${cardBg}`} ref={sequenceContainerRef}>
+                                {chains.length === 0 ? <p className={`italic text-[10px] ${subtleText}`}>No sequence data</p> : (
                                     chains.filter(c => viewSequenceChain ? c.name === viewSequenceChain : true).map(c => (
-                                        <div key={c.name} className="mb-4 last:mb-0">
-                                            <div className={`flex items-center gap-2 mb-1 sticky top-0 py-1 z-10 ${isLightMode ? 'bg-white/95' : 'bg-neutral-900/95'}`}>
-                                                <span className="text-xs font-bold text-blue-500">Chain {c.name}</span>
-                                                <span className={`text-[10px] ${subtleText}`}>({c.max - c.min + 1} residues)</span>
-                                            </div>
-                                            <div className="flex flex-wrap text-[10px] font-mono leading-none content-start">
+                                        <div key={c.name} className="mb-2">
+                                            <div className="text-[10px] font-bold text-blue-500 mb-0.5 sticky top-0 bg-inherit z-10">Chain {c.name}</div>
+                                            <div className="flex flex-wrap text-[10px] font-mono leading-none">
                                                 {c.sequence.split('').map((char, idx) => {
                                                     const resNo = c.min + idx;
                                                     const isHighlighted = highlightedResidue?.chain === c.name && highlightedResidue.resNo === resNo;
                                                     return (
-                                                        <div
+                                                        <span
                                                             key={idx}
+                                                            ref={(el) => { if (el) residueRefs.current.set(`${c.name}-${resNo}`, el); }}
                                                             onClick={() => onResidueClick(c.name, resNo)}
-                                                            className={`
-                                                                w-6 h-6 flex items-center justify-center text-[10px] font-mono
-                                                                cursor-pointer select-none transition-all duration-150 rounded-sm
-                                                                ${isHighlighted ? 'bg-blue-600 text-white font-bold scale-110 shadow-sm z-10' :
-                                                                    'hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-400'
-                                                                }
-                                                            `}
+                                                            className={`w-5 h-5 flex items-center justify-center cursor-pointer rounded-sm transition-colors ${isHighlighted ? 'bg-blue-600 text-white font-bold' : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'}`}
                                                             title={`${char}${resNo}`}
                                                         >
                                                             {char}
-                                                        </div>
+                                                        </span>
                                                     );
                                                 })}
                                             </div>
@@ -634,106 +541,102 @@ export const Controls: React.FC<ControlsProps> = ({
                     </div>
                 </div>
 
-                {/* Footer Tools - Fixed */}
-                <div className={`flex-none p-4 pt-4 border-t ${isLightMode ? 'border-neutral-200' : 'border-neutral-800'}`}>
-                    <div className="space-y-4">
-                        <div className="flex flex-col sm:flex-row gap-2">
-                            <button onClick={onResetView} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}>
-                                <RotateCcw className="w-4 h-4" /> Reset
-                            </button>
-                            <button onClick={onSnapshot} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:text-blue-500 hover:border-blue-500/50`}>
-                                <Camera className="w-4 h-4" /> Snapshot
-                            </button>
-                        </div>
-                        <div className="flex flex-col sm:flex-row gap-2">
-                            <div className="flex items-center gap-2 flex-none">
-                                <span className={`text-xs font-bold ${subtleText}`}>Duration (s):</span>
-                                <input
-                                    type="number"
-                                    min="1"
-                                    max="60"
-                                    value={recordDuration / 1000}
-                                    onChange={(e) => {
-                                        const val = Number(e.target.value);
-                                        if (val > 0) setRecordDuration(val * 1000);
-                                    }}
-                                    disabled={isRecording}
-                                    className={`w-16 border rounded-lg px-2 py-1 text-xs outline-none ${inputBg} ${isRecording ? 'opacity-50' : ''}`}
-                                    title="Recording Duration (Seconds)"
-                                />
-                            </div>
+                {/* 5. FOOTER (Sessions & Exports) - Fixed at bottom */}
+                <div className={`flex-none p-4 border-t space-y-3 ${isLightMode ? 'border-neutral-200 bg-white/50' : 'border-neutral-800 bg-neutral-900/50'}`}>
 
-                            <button
-                                onClick={() => onRecordMovie(recordDuration)}
-                                disabled={isRecording}
-                                className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all text-xs font-medium group ${isRecording ? 'bg-red-500 text-white' : (`${cardBg} hover:border-red-500/50 hover:text-red-500`)}`}
-                            >
-                                {isRecording ? (
-                                    <>
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                        <span>Recording...</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Video className="w-4 h-4" />
-                                        <span>Record Clip</span>
-                                    </>
-                                )}
-                            </button>
-                        </div>
+                    {/* Session Controls */}
+                    <div className="flex gap-2">
+                        <button onClick={onSaveSession} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
+                            <Download className="w-3.5 h-3.5" /> Save Session
+                        </button>
+                        <button onClick={() => sessionInputRef.current?.click()} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
+                            <Upload className="w-3.5 h-3.5" /> Load Session
+                        </button>
+                        <input type="file" accept=".json" className="hidden" ref={sessionInputRef} onChange={(e) => e.target.files?.[0] && onLoadSession(e.target.files[0])} />
+                    </div>
 
-                        {/* Snapshot Gallery */}
+                    <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
+
+                    {/* ACTIONS ROW 1: Reset & Snapshot */}
+                    <div className="flex gap-2">
+                        <button onClick={onResetView} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}>
+                            <RotateCcw className="w-4 h-4" /> Reset
+                        </button>
+                        <button onClick={onSnapshot} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:text-blue-500 hover:border-blue-500/50`}>
+                            <Camera className="w-4 h-4" /> Snapshot
+                        </button>
+                        {/* Mini Gallery Trigger if snapshot exists */}
                         {snapshots.length > 0 && (
-                            <div className={`space-y-2 pt-2 border-t ${isLightMode ? 'border-neutral-200' : 'border-neutral-800'}`}>
-                                <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText} flex items-center gap-2`}>
-                                    <ImageIcon className="w-3.5 h-3.5" /> Gallery ({snapshots.length})
-                                </label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    {snapshots.map(snap => (
-                                        <div key={snap.id} className="group relative aspect-video rounded-lg overflow-hidden border border-neutral-700/50 bg-neutral-900 cursor-pointer" onClick={() => setPreviewSnapshot(snap)}>
-                                            <img src={snap.url} alt="Snapshot" className="w-full h-full object-cover" />
-                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); setPreviewSnapshot(snap); }}
-                                                    className="p-1.5 bg-neutral-600 hover:bg-neutral-500 text-white rounded-full transition-colors"
-                                                    title="Preview"
-                                                >
-                                                    <Eye className="w-3 h-3" />
-                                                </button>
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); onDownloadSnapshot(snap.id); }}
-                                                    className="p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-full transition-colors"
-                                                    title="Download"
-                                                >
-                                                    <Download className="w-3 h-3" />
-                                                </button>
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); onDeleteSnapshot(snap.id); }}
-                                                    className="p-1.5 bg-red-600/80 hover:bg-red-500/80 text-white rounded-full transition-colors"
-                                                    title="Delete"
-                                                >
-                                                    <Trash2 className="w-3 h-3" />
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="flex gap-2 pb-2">
-
-                            <button
-                                onClick={() => setIsCleanMode(true)}
-                                className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}
-                            >
-                                <Maximize className="w-4 h-4" />
-                                <span>Clean Mode</span>
+                            <button onClick={() => setPreviewSnapshot(snapshots[snapshots.length - 1])} className="px-3 border rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800">
+                                <ImageIcon className="w-4 h-4" />
                             </button>
-                        </div>
+                        )}
+                    </div>
 
+                    {/* ACTIONS ROW 2: Recording */}
+                    <div className="flex items-center gap-2">
+                        <div className={`flex items-center gap-2 pl-2 pr-1 py-1 border rounded-lg ${cardBg}`}>
+                            <span className={`text-[10px] font-bold ${subtleText}`}>SEC</span>
+                            <input
+                                type="number"
+                                min="1"
+                                max="60"
+                                value={recordDuration / 1000}
+                                onChange={(e) => setRecordDuration(Math.max(1, Number(e.target.value)) * 1000)}
+                                disabled={isRecording}
+                                className={`w-8 bg-transparent text-center text-xs outline-none font-mono ${isRecording ? 'opacity-50' : ''}`}
+                            />
+                        </div>
+                        <button
+                            onClick={() => onRecordMovie(recordDuration)}
+                            disabled={isRecording}
+                            className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all text-xs font-medium ${isRecording ? 'bg-red-500 text-white border-red-500' : `${cardBg} hover:text-red-500 hover:border-red-500/50`}`}
+                        >
+                            {isRecording ? <Loader2 className="w-4 h-4 animate-spin" /> : <Video className="w-4 h-4" />}
+                            {isRecording ? 'Recording...' : 'Record Movie'}
+                        </button>
                     </div>
                 </div>
+
+                {/* Snapshot Gallery - Full View */}
+                {snapshots.length > 0 && (
+                    <div className={`space-y-2 pt-2 border-t ${isLightMode ? 'border-neutral-200' : 'bg-neutral-800'}`}>
+                        <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText} flex items-center gap-2`}>
+                            <ImageIcon className="w-3.5 h-3.5" /> Gallery ({snapshots.length})
+                        </label>
+                        <div className="grid grid-cols-2 gap-2">
+                            {snapshots.map(snap => (
+                                <div key={snap.id} className="group relative aspect-video rounded-lg overflow-hidden border border-neutral-700/50 bg-neutral-900 cursor-pointer" onClick={() => setPreviewSnapshot(snap)}>
+                                    <img src={snap.url} alt="Snapshot" className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setPreviewSnapshot(snap); }}
+                                            className="p-1.5 bg-neutral-600 hover:bg-neutral-500 text-white rounded-full transition-colors"
+                                            title="Preview"
+                                        >
+                                            <Eye className="w-3 h-3" />
+                                        </button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); onDownloadSnapshot(snap.id); }}
+                                            className="p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-full transition-colors"
+                                            title="Download"
+                                        >
+                                            <Download className="w-3 h-3" />
+                                        </button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); onDeleteSnapshot(snap.id); }}
+                                            className="p-1.5 bg-red-600/80 hover:bg-red-500/80 text-white rounded-full transition-colors"
+                                            title="Delete"
+                                        >
+                                            <Trash2 className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
             </div >
 
             {/* Snapshot Preview Modal */}
