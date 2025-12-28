@@ -367,6 +367,17 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <div className={`w-3 h-3 rounded-full ${showSurface ? 'bg-blue-500' : 'bg-neutral-500'}`} />
                             </button>
 
+                            <button
+                                onClick={() => setIsSpinning(!isSpinning)}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isSpinning ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <RefreshCw className={`w-4 h-4 ${isSpinning ? 'animate-spin' : ''}`} />
+                                    <span className="text-xs font-medium">{isSpinning ? 'Spinning Active' : 'Auto-Spin'}</span>
+                                </div>
+                                <div className={`w-3 h-3 rounded-full ${isSpinning ? 'bg-blue-500' : 'bg-neutral-500'}`} />
+                            </button>
+
 
 
                         </div>
@@ -668,16 +679,7 @@ export const Controls: React.FC<ControlsProps> = ({
                         )}
 
                         <div className="flex gap-2 pb-2">
-                            <button
-                                onClick={() => setIsSpinning(!isSpinning)}
-                                className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${isSpinning
-                                    ? 'bg-blue-500/20 border-blue-500/50 text-blue-500'
-                                    : `${cardBg} hover:opacity-80`
-                                    }`}
-                            >
-                                <RefreshCw className={`w-4 h-4 ${isSpinning ? 'animate-spin' : ''}`} />
-                                <span>{isSpinning ? 'Spinning' : 'Spin'}</span>
-                            </button>
+
                             <button
                                 onClick={() => setIsCleanMode(true)}
                                 className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}
