@@ -473,10 +473,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                 // 3. Perform Spin (Use built-in spin for stability)
                 // duration is passed as argument
-                const fps = 30;
-                const totalFrames = duration / 1000 * fps;
-
-                let frame = 0;
+                const startTime = performance.now();
                 const originalSpin = stage.spinAnimation.paused; // Store original state
 
                 // Calculate required spin speed to complete 360 degrees in 'duration'
@@ -496,7 +493,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                 const animate = () => {
                     try {
-                        if (frame >= totalFrames) {
+                        const now = performance.now();
+                        const elapsed = now - startTime;
+
+                        if (elapsed >= duration) {
                             mediaRecorder.stop();
                             // Restore original spin state
                             if (originalSpin) {
@@ -510,7 +510,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         // Force a render frame for the recorder
                         stage.viewer.requestRender();
 
-                        frame++;
                         requestAnimationFrame(animate);
                     } catch (err: any) {
                         console.error("Animation loop error:", err);
