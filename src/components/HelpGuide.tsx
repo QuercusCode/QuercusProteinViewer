@@ -4,6 +4,17 @@ import { CircleHelp, X, MousePointer2, Search } from 'lucide-react';
 export const HelpGuide: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
 
+    React.useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isOpen) {
+                setIsOpen(false);
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen]);
+
     return (
         <>
             {/* Help Button */}
