@@ -80,6 +80,22 @@ export const HelpGuide: React.FC = () => {
                                         <span className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 flex-shrink-0" />
                                         <span>Create <strong>Custom Color Rules</strong> to highlight specific chains or residues.</span>
                                     </li>
+                                    <li className="flex items-start gap-2">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 flex-shrink-0" />
+                                        <span><strong>Record Movies</strong> (Turntable) with custom duration settings. Videos are saved to your local gallery.</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+                                        <span>Manage <strong>Snapshots & Movies</strong> in the gallery. Preview, download, or delete media.</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-green-400 mt-1.5 flex-shrink-0" />
+                                        <span><strong>Save & Load Sessions</strong> to persist your visualization settings and custom rules.</span>
+                                    </li>
+                                    <li className="flex items-start gap-2">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-pink-400 mt-1.5 flex-shrink-0" />
+                                        <span>Advanced Analysis: Use the <strong>Contact Map</strong> or <strong>Measurement Tool</strong> for structural insights.</span>
+                                    </li>
                                 </ul>
                             </div>
 
