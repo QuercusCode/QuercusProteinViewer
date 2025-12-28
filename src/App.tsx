@@ -226,9 +226,9 @@ function App() {
 
       setMovies(prev => [newGif, ...prev]);
       console.log("GIF created successfully");
-    } catch (e) {
+    } catch (e: any) {
       console.error("GIF Conversion failed", e);
-      alert("Failed to convert video to GIF.");
+      alert(`Failed to convert video to GIF: ${e.message || "Unknown error"}`);
     }
   };
 
