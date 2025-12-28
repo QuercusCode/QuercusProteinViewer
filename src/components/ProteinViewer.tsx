@@ -479,6 +479,18 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 let frame = 0;
                 const originalSpin = stage.spinAnimation.paused; // Store original state
 
+                // Calculate required spin speed to complete 360 degrees in 'duration'
+                // Default speed 0.01 roughly does ~360 in 4s (at 60fps?)
+                // Actually NGL spinSpeed is angle per step.
+                // Let's approximate: 0.01 is "normal".
+                // If duration is 8000 (2x longer), speed should be 0.005 (0.5x).
+                // Formula: newSpeed = 0.01 * (4000 / duration)
+                const defaultSpeed = 0.01;
+                const targetSpeed = defaultSpeed * (4000 / duration);
+
+                const oldSpeed = stage.getParameters().spinSpeed;
+                stage.setParameters({ spinSpeed: targetSpeed });
+
                 // Ensure spin is ON for recording
                 stage.setSpin(true);
 
@@ -490,6 +502,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             if (originalSpin) {
                                 stage.setSpin(false);
                             }
+                            // Restore original speed
+                            stage.setParameters({ spinSpeed: oldSpeed });
                             return;
                         }
 
@@ -503,6 +517,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         alert(`Recording Error (Animation): ${err.message}`);
                         mediaRecorder.stop();
                         if (originalSpin) stage.setSpin(false);
+                        stage.setParameters({ spinSpeed: oldSpeed });
                     }
                 };
 
