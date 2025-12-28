@@ -516,7 +516,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         recordGif: async (duration = 4000) => {
             if (!stageRef.current) throw new Error("Stage not ready");
             const stage = stageRef.current;
-            const viewerCanvas = stage.viewer.canvas;
+
+            // Safer access to canvas
+            const viewerCanvas = stage.viewer.renderer.domElement;
+            if (!viewerCanvas) throw new Error("WebGL Canvas not found");
 
             // 1. Setup GIF with EXACT dimensions from drawing buffer
             const width = viewerCanvas.width;
