@@ -424,38 +424,44 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             }
 
             // 2. Find Last Valid Residue (must have Backbone Atoms)
-            let lastResidue: any = null;
             let maxResNo = -Infinity;
             targetChain.eachResidue((r: any) => {
                 // Check for CA and C atoms to ensure it's a valid extension point
-                // Note: getAtomByName returns AtomProxy or undefined
                 const ca = r.getAtomByName('CA');
                 const c = r.getAtomByName('C');
-
                 if (ca && c && r.resno > maxResNo) {
                     maxResNo = r.resno;
-                    lastResidue = r;
                 }
             });
 
-            if (!lastResidue) return null;
+            if (maxResNo === -Infinity) {
+                console.warn("No valid C-terminus found.");
+                return null;
+            }
 
-            // 3. Get Reference Atoms (C, CA from last residue)
-            let atomC: any, atomCA: any;
-            lastResidue.eachAtom((a: any) => {
-                if (a.atomname === 'C') atomC = a;
-                if (a.atomname === 'CA') atomCA = a;
+            // 3. Get Reference Atoms SAFELY (Re-finding the residue)
+            let vCA: any = null;
+            let vC: any = null;
+
+            targetChain.eachResidue((r: any) => {
+                if (r.resno === maxResNo) {
+                    const atomCA = r.getAtomByName('CA');
+                    const atomC = r.getAtomByName('C');
+                    if (atomCA && atomC) {
+                        // Clone coordinates immediately to avoid Proxy issues
+                        vCA = new NGL.Vector3(atomCA.x, atomCA.y, atomCA.z);
+                        vC = new NGL.Vector3(atomC.x, atomC.y, atomC.z);
+                    }
+                }
             });
 
-            if (!atomC || !atomCA) {
-                console.warn("Last residue missing backbone atoms.");
+            if (!vCA || !vC) {
+                console.warn("Could not retrieve backbone atoms for last residue.");
                 return null;
             }
 
             // 4. Calculate New Position (Simple Extension)
-            // Vector: CA -> C
-            const vCA = new NGL.Vector3(atomCA.x, atomCA.y, atomCA.z);
-            const vC = new NGL.Vector3(atomC.x, atomC.y, atomC.z);
+            // Vector: CA -> C (Using vCA/vC from above)
             const dir = new NGL.Vector3().subVectors(vC, vCA).normalize();
 
             // Place New N approx 1.33A away
