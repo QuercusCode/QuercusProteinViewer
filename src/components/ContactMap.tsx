@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { X, ZoomIn, ZoomOut, Maximize } from 'lucide-react';
+import { X, ZoomIn, ZoomOut, Maximize, Download, Settings, Grid3X3, Check } from 'lucide-react';
 import type { ChainInfo } from '../types';
 
 interface ContactMapProps {
@@ -25,6 +25,12 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     const [scale, setScale] = useState(2);
     const [distanceData, setDistanceData] = useState<{ matrix: number[][], size: number, labels: { resNo: number, chain: string, label: string }[] } | null>(null);
     const [hoverPos, setHoverPos] = useState<{ i: number, j: number, x: number, y: number } | null>(null);
+
+    // Settings State
+    const [contactThreshold, setContactThreshold] = useState(5);
+    const [proximalThreshold, setProximalThreshold] = useState(8);
+    const [showGrid, setShowGrid] = useState(true);
+    const [showSettings, setShowSettings] = useState(false);
 
     // Initial Data Calculation
     useEffect(() => {
@@ -134,19 +140,21 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         ctx.fillRect(0, 0, mapCanvasRef.current.width, mapCanvasRef.current.height);
 
         // Draw Grid Lines (Light Grey)
-        ctx.strokeStyle = grid;
-        ctx.lineWidth = 1;
+        if (showGrid) {
+            ctx.strokeStyle = grid;
+            ctx.lineWidth = 1;
 
-        const gridStep = 25;
-        ctx.beginPath();
-        for (let i = 0; i <= size; i += gridStep) {
-            const pos = Math.floor(i * P) + 0.5;
-            ctx.moveTo(0, pos);
-            ctx.lineTo(size * P, pos);
-            ctx.moveTo(pos, 0);
-            ctx.lineTo(pos, size * P);
+            const gridStep = 25;
+            ctx.beginPath();
+            for (let i = 0; i <= size; i += gridStep) {
+                const pos = Math.floor(i * P) + 0.5;
+                ctx.moveTo(0, pos);
+                ctx.lineTo(size * P, pos);
+                ctx.moveTo(pos, 0);
+                ctx.lineTo(pos, size * P);
+            }
+            ctx.stroke();
         }
-        ctx.stroke();
 
         // Draw Diagonals
         ctx.strokeStyle = diag;
@@ -182,8 +190,8 @@ export const ContactMap: React.FC<ContactMapProps> = ({
             for (let j = i; j < size; j++) {
                 const dist = matrix[i][j];
 
-                if (dist < 8) {
-                    if (dist < 5) {
+                if (dist < proximalThreshold) {
+                    if (dist < contactThreshold) {
                         ctx.fillStyle = isLightMode ? '#1e3a8a' : '#60a5fa';
                     } else {
                         ctx.fillStyle = isLightMode ? '#94a3b8' : '#475569';
@@ -197,7 +205,24 @@ export const ContactMap: React.FC<ContactMapProps> = ({
             }
         }
 
-    }, [distanceData, scale, isLightMode]);
+    }, [distanceData, scale, isLightMode, contactThreshold, proximalThreshold, showGrid]);
+
+
+    const handleDownload = () => {
+        if (!mapCanvasRef.current) return;
+
+        // Create a temporary canvas to combine grid and overlay if needed, 
+        // but for now just the map canvas is the most important part.
+        // Actually, let's download exactly what is drawn on the main canvas.
+        const url = mapCanvasRef.current.toDataURL('image/png');
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `contact-map-${new Date().toISOString().slice(0, 10)}.png`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    };
 
     // Render Overlay (Crosshair) - Light
     useEffect(() => {
@@ -350,6 +375,75 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                             <span className="w-12 text-center text-xs font-mono font-medium opacity-70">{scale}x</span>
                             <button onClick={() => setScale(s => Math.min(20, s + 1))} className={`p-2 rounded-md transition-all shadow-sm ${isLightMode ? 'hover:bg-white text-neutral-600' : 'hover:bg-neutral-700 text-neutral-300'}`}><ZoomIn className="w-4 h-4" /></button>
                         </div>
+
+                        <div className={`w-px h-6 mx-2 ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-700'}`} />
+
+                        {/* Tools */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowSettings(!showSettings)}
+                                className={`p-2 rounded-lg transition-colors ${showSettings ? (isLightMode ? 'bg-blue-100 text-blue-600' : 'bg-blue-900/40 text-blue-400') : (isLightMode ? 'hover:bg-neutral-100 text-neutral-600' : 'hover:bg-neutral-800 text-neutral-400')}`}
+                                title="Settings"
+                            >
+                                <Settings className="w-5 h-5" />
+                            </button>
+
+                            {/* Settings Popover */}
+                            {showSettings && (
+                                <div className={`absolute top-full right-0 mt-2 w-64 p-4 rounded-xl shadow-xl z-50 animate-in fade-in zoom-in-95 border ${isLightMode ? 'bg-white border-neutral-100' : 'bg-neutral-900 border-neutral-800'}`}>
+                                    <h4 className="font-bold text-xs uppercase opacity-50 mb-3 tracking-wider">Map Settings</h4>
+
+                                    <div className="space-y-4">
+                                        <div className="space-y-1">
+                                            <div className="flex justify-between text-xs">
+                                                <span>Contact Threshold</span>
+                                                <span className="font-mono">{contactThreshold} Å</span>
+                                            </div>
+                                            <input
+                                                type="range" min="3" max="10" step="0.5"
+                                                value={contactThreshold}
+                                                onChange={(e) => setContactThreshold(parseFloat(e.target.value))}
+                                                className="w-full h-1.5 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                            />
+                                        </div>
+
+                                        <div className="space-y-1">
+                                            <div className="flex justify-between text-xs">
+                                                <span>Proximal Threshold</span>
+                                                <span className="font-mono">{proximalThreshold} Å</span>
+                                            </div>
+                                            <input
+                                                type="range" min={contactThreshold} max="15" step="0.5"
+                                                value={proximalThreshold}
+                                                onChange={(e) => setProximalThreshold(parseFloat(e.target.value))}
+                                                className="w-full h-1.5 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-slate-500"
+                                            />
+                                        </div>
+
+                                        <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800">
+                                            <button
+                                                onClick={() => setShowGrid(!showGrid)}
+                                                className={`w-full flex items-center justify-between p-2 rounded-lg text-xs font-medium transition-colors ${showGrid ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'}`}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <Grid3X3 className="w-4 h-4" /> show Grid
+                                                </div>
+                                                {showGrid && <Check className="w-3 h-3" />}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <button
+                            onClick={handleDownload}
+                            className={`p-2 rounded-lg transition-colors ${isLightMode ? 'hover:bg-neutral-100 text-neutral-600' : 'hover:bg-neutral-800 text-neutral-400'}`}
+                            title="Download Image"
+                        >
+                            <Download className="w-5 h-5" />
+                        </button>
+
                         <div className={`w-px h-6 mx-2 ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-700'}`} />
                         <button onClick={onClose} className="p-2 hover:bg-red-500/10 hover:text-red-500 opacity-60 hover:opacity-100 rounded-lg transition-colors"><X className="w-6 h-6" /></button>
                     </div>
@@ -473,15 +567,15 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                 <div className={`border-t px-6 py-3 flex items-center justify-center gap-8 text-xs font-medium ${isLightMode ? 'bg-white border-neutral-100 text-neutral-600' : 'bg-neutral-900 border-neutral-800 text-neutral-400'}`}>
                     <div className="flex items-center gap-2">
                         <div className={`w-3 h-3 rounded-sm ${isLightMode ? 'bg-[#1e3a8a]' : 'bg-blue-400'}`}></div>
-                        <span>Close Contact (&lt; 5 Å)</span>
+                        <span>Close Contact (&lt; {contactThreshold} Å)</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className={`w-3 h-3 rounded-sm ${isLightMode ? 'bg-[#94a3b8]' : 'bg-slate-600'}`}></div>
-                        <span>Proximal (5 - 8 Å)</span>
+                        <span>Proximal ({contactThreshold} - {proximalThreshold} Å)</span>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className={`w-3 h-3 border rounded-sm ${isLightMode ? 'bg-white border-neutral-200' : 'bg-neutral-900 border-neutral-700'}`}></div>
-                        <span>Distal / No Contact (&gt; 8 Å)</span>
+                        <span>Distal / No Contact (&gt; {proximalThreshold} Å)</span>
                     </div>
                 </div>
             </div>
