@@ -32,7 +32,6 @@ interface ProteinViewerProps {
     backgroundColor?: string;
     showSurface?: boolean;
     showLigands?: boolean;
-    showHBonds?: boolean;
     isSpinning?: boolean;
 }
 
@@ -67,7 +66,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     backgroundColor = "black",
     showSurface = false,
     showLigands = false,
-    showHBonds = false,
     isSpinning = false,
 
 }, ref) => {
@@ -78,7 +76,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     const isMounted = useRef(true);
 
     const [internalLoading, setInternalLoading] = React.useState(false);
-    const [structureVersion, setStructureVersion] = React.useState(0);
     const [internalError, setInternalError] = React.useState<string | null>(null);
 
     const loading = externalLoading !== undefined ? externalLoading : internalLoading;
@@ -711,10 +708,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 }
             } finally {
                 if (isMounted.current) setLoading(false);
-                if (isMounted.current) {
-                    setStructureVersion(prev => prev + 1); // Trigger dependent effects
-                    console.log("Structure Version Incremented");
-                }
             }
         };
 
@@ -726,45 +719,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         }
     }, [pdbId, file]);
 
-    // Handle H-Bonds Toggle
-    const hBondRepresentationRef = useRef<any>(null);
 
-    // Reset ref when structure changes
-    // Reset ref when structure changes
-    useEffect(() => {
-        hBondRepresentationRef.current = null;
-    }, [pdbId, file, structureVersion]);
-
-    useEffect(() => {
-        if (!componentRef.current) return;
-        const component = componentRef.current;
-
-        try {
-            // Remove existing one first to ensure clean state
-            if (hBondRepresentationRef.current) {
-                try {
-                    component.removeRepresentation(hBondRepresentationRef.current);
-                } catch (e) { /* ignore cleanup error */ }
-                hBondRepresentationRef.current = null;
-            }
-
-            if (showHBonds) {
-                console.log("Adding H-Bond representation (Fresh)");
-                // Valid NGL contact types: 'polar', 'polarBackbone', 'polarSidechainHelix', 'charged', 'custom'
-                // But try explicit parameters for H-bonds
-                hBondRepresentationRef.current = component.addRepresentation('contact', {
-                    contactType: 'hydrogenBond', // Or try excluding contactType to let it default if needed
-                    color: 'lightgreen',
-                    radius: 0.15,
-                    opacity: 0.8,
-                    labelVisible: false,
-                    maxDistance: 3.5
-                });
-            }
-        } catch (e) {
-            console.warn("Failed to update H-Bonds:", e);
-        }
-    }, [showHBonds, structureVersion]); // Trigger on Show Change OR Structure Ready only
 
     const selectedAtomsRef = useRef<any[]>([]);
 
