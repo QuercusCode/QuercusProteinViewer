@@ -21,8 +21,7 @@ import {
     Video,
     X,
     Loader2,
-    ImageIcon,
-    Film
+    ImageIcon
 } from 'lucide-react';
 import type { RepresentationType, ColoringType } from './ProteinViewer';
 import type { ChainInfo, CustomColorRule, Snapshot, Movie } from '../types';
@@ -52,7 +51,7 @@ interface ControlsProps {
     setShowLigands: (show: boolean) => void;
     onFocusLigands: () => void;
     onRecordMovie: (duration: number) => void;
-    onRecordGif: (duration: number) => void;
+
     isRecording: boolean;
     proteinTitle: string | null;
     snapshots: Snapshot[];
@@ -69,6 +68,7 @@ interface ControlsProps {
     movies: Movie[];
     onDownloadMovie: (id: string) => void;
     onDeleteMovie: (id: string) => void;
+    onConvertToGif: (id: string) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -96,7 +96,6 @@ export const Controls: React.FC<ControlsProps> = ({
     setShowLigands,
     onFocusLigands,
     onRecordMovie,
-    onRecordGif,
     isRecording,
     proteinTitle,
     snapshots,
@@ -113,6 +112,7 @@ export const Controls: React.FC<ControlsProps> = ({
     movies,
     onDownloadMovie,
     onDeleteMovie,
+    onConvertToGif,
 
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -120,9 +120,9 @@ export const Controls: React.FC<ControlsProps> = ({
     const [localPdbId, setLocalPdbId] = React.useState(pdbId);
     const [previewSnapshot, setPreviewSnapshot] = useState<Snapshot | null>(null);
     const [previewMovie, setPreviewMovie] = useState<Movie | null>(null);
+    const [convertingIds, setConvertingIds] = useState<Set<string>>(new Set());
 
     // Recording State
-    const [recordFormat, setRecordFormat] = useState<'video' | 'gif'>('video');
     const [recordDuration, setRecordDuration] = useState(4000);
 
     // Custom Color State
@@ -612,20 +612,6 @@ export const Controls: React.FC<ControlsProps> = ({
 
                     {/* ACTIONS ROW 2: Recording */}
                     <div className="flex items-center gap-2">
-                        <div className={`p-0.5 rounded-lg flex border ${cardBg}`}>
-                            <button
-                                onClick={() => setRecordFormat('video')}
-                                className={`px-2 py-1 text-[10px] font-bold rounded ${recordFormat === 'video' ? 'bg-blue-600 text-white' : subtleText}`}
-                            >
-                                MP4
-                            </button>
-                            <button
-                                onClick={() => setRecordFormat('gif')}
-                                className={`px-2 py-1 text-[10px] font-bold rounded ${recordFormat === 'gif' ? 'bg-blue-600 text-white' : subtleText}`}
-                            >
-                                GIF
-                            </button>
-                        </div>
                         <div className={`flex items-center gap-2 pl-2 pr-1 py-1 border rounded-lg ${cardBg}`}>
                             <span className={`text-[10px] font-bold ${subtleText}`}>SEC</span>
                             <input
@@ -639,12 +625,12 @@ export const Controls: React.FC<ControlsProps> = ({
                             />
                         </div>
                         <button
-                            onClick={() => recordFormat === 'video' ? onRecordMovie(recordDuration) : onRecordGif(recordDuration)}
+                            onClick={() => onRecordMovie(recordDuration)}
                             disabled={isRecording}
                             className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all text-xs font-medium ${isRecording ? 'bg-red-500 text-white border-red-500' : `${cardBg} hover:text-red-500 hover:border-red-500/50`}`}
                         >
-                            {isRecording ? <Loader2 className="w-4 h-4 animate-spin" /> : (recordFormat === 'video' ? <Video className="w-4 h-4" /> : <Film className="w-4 h-4" />)}
-                            {isRecording ? 'Recording...' : (recordFormat === 'video' ? 'Record' : 'Make GIF')}
+                            {isRecording ? <Loader2 className="w-4 h-4 animate-spin" /> : <Video className="w-4 h-4" />}
+                            {isRecording ? 'Recording...' : 'Record Movie'}
                         </button>
                     </div>
                 </div>
@@ -710,6 +696,29 @@ export const Controls: React.FC<ControlsProps> = ({
                                         <div className="text-[9px] text-neutral-400">{Math.round(movie.duration)}s • {movie.format}</div>
                                     </div>
                                     <div className="flex gap-1">
+                                        {movie.format !== 'gif' && (
+                                            <button
+                                                onClick={async (e) => {
+                                                    e.stopPropagation();
+                                                    if (convertingIds.has(movie.id)) return;
+
+                                                    setConvertingIds(prev => new Set(prev).add(movie.id));
+                                                    try {
+                                                        await onConvertToGif(movie.id);
+                                                    } finally {
+                                                        setConvertingIds(prev => {
+                                                            const next = new Set(prev);
+                                                            next.delete(movie.id);
+                                                            return next;
+                                                        });
+                                                    }
+                                                }}
+                                                className={`p-1.5 ${convertingIds.has(movie.id) ? 'bg-amber-600' : 'bg-neutral-600 hover:bg-neutral-500'} text-white rounded transition-colors text-[10px] font-bold`}
+                                                title="Convert to GIF"
+                                            >
+                                                {convertingIds.has(movie.id) ? <Loader2 className="w-3 h-3 animate-spin" /> : "GIF"}
+                                            </button>
+                                        )}
                                         <button
                                             onClick={(e) => { e.stopPropagation(); setPreviewMovie(movie); }}
                                             className="p-1.5 bg-neutral-600 hover:bg-neutral-500 text-white rounded transition-colors"

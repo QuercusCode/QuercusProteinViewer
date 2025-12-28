@@ -10,7 +10,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@types/gif.js": "^0.2.5",
     "clsx": "^2.1.1",
     "gif.js": "^0.2.0",
     "lucide-react": "^0.562.0",
@@ -23,6 +22,7 @@
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@tailwindcss/postcss": "^4.1.18",
+    "@types/gif.js": "^0.2.5",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",

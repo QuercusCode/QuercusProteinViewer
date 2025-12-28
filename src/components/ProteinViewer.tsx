@@ -47,10 +47,10 @@ export interface ProteinViewerRef {
     getAtomPositionByIndex: (atomIndex: number) => { x: number, y: number, z: number } | null;
     addResidue: (chainName: string, resType: string) => Promise<Blob | null>;
     recordTurntable: (duration?: number) => Promise<Blob>;
-    recordGif: (duration?: number) => Promise<Blob>;
+
 }
 
-import GIF from 'gif.js';
+
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     pdbId,
@@ -513,98 +513,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         recordTurntable: async (duration: number = 4000) => {
             return performVideoRecord(duration);
         },
-        recordGif: async (duration = 4000) => {
-            // 1. Record Video First (Proven to work)
-            const videoBlob = await performVideoRecord(duration);
 
-            // 2. Setup GIF
-            const gifWidth = containerRef.current?.clientWidth || 800;
-            const gifHeight = containerRef.current?.clientHeight || 600;
-
-            const gif = new GIF({
-                workers: 2,
-                quality: 10,
-                width: gifWidth,
-                height: gifHeight,
-                workerScript: 'gif.worker.js',
-                background: '#ffffff'
-            });
-
-            // 3. Playback & Capture (No Seeking)
-            const video = document.createElement('video');
-            video.src = URL.createObjectURL(videoBlob);
-            video.muted = true;
-            video.playsInline = true;
-
-            // Hidden but in DOM for valid rendering
-            Object.assign(video.style, {
-                position: 'fixed',
-                top: '0',
-                left: '0',
-                opacity: '0',
-                pointerEvents: 'none',
-                zIndex: '-100'
-            });
-            document.body.appendChild(video);
-
-            // Intermediate Canvas
-            const canvas = document.createElement('canvas');
-            canvas.width = gifWidth;
-            canvas.height = gifHeight;
-            const ctx = canvas.getContext('2d', { willReadFrequently: true });
-
-            if (!ctx) throw new Error("Canvas context failed");
-            ctx.fillStyle = '#ffffff';
-
-            return new Promise((resolve, reject) => {
-                const fps = 10;
-                const interval = 1 / fps;
-                let lastTime = 0;
-
-                gif.on('finished', (blob: Blob) => {
-                    document.body.removeChild(video);
-                    URL.revokeObjectURL(video.src);
-                    resolve(blob);
-                });
-
-                const captureFrame = () => {
-                    if (video.ended || video.paused) {
-                        gif.render();
-                        return;
-                    }
-
-                    // Capture only if enough time passed
-                    if (video.currentTime - lastTime >= interval) {
-                        ctx.fillRect(0, 0, canvas.width, canvas.height); // First Fill White
-                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height); // Draw Video Frame
-                        gif.addFrame(ctx, { delay: interval * 1000, copy: true });
-                        lastTime = video.currentTime;
-                    }
-
-                    if (video.currentTime < video.duration) {
-                        if ('requestVideoFrameCallback' in video) {
-                            (video as any).requestVideoFrameCallback(captureFrame);
-                        } else {
-                            requestAnimationFrame(captureFrame);
-                        }
-                    } else {
-                        gif.render();
-                    }
-                };
-
-                video.oncanplay = async () => {
-                    try {
-                        await video.play();
-                        captureFrame();
-                    } catch (e) {
-                        console.error("Playback failed", e);
-                        reject(e);
-                    }
-                };
-
-                video.onerror = () => reject(new Error("Video playback error"));
-            });
-        },
 
         addResidue: async (chainName: string, resType: string) => {
             if (!componentRef.current) return null;
