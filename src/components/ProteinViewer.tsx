@@ -483,20 +483,33 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 stage.setSpin(true);
 
                 const animate = () => {
-                    if (frame >= totalFrames) {
-                        mediaRecorder.stop();
-                        // Restore original spin state
-                        if (originalSpin) {
-                            stage.setSpin(false);
+                    try {
+                        if (frame >= totalFrames) {
+                            mediaRecorder.stop();
+                            // Restore original spin state
+                            if (originalSpin) {
+                                stage.setSpin(false);
+                            }
+                            return;
                         }
-                        return;
+
+                        // Force a render frame for the recorder
+                        stage.viewer.requestRender();
+
+                        frame++;
+                        requestAnimationFrame(animate);
+                    } catch (err: any) {
+                        console.error("Animation loop error:", err);
+                        alert(`Recording Error (Animation): ${err.message}`);
+                        mediaRecorder.stop();
+                        if (originalSpin) stage.setSpin(false);
                     }
+                };
 
-                    // Force a render frame for the recorder
-                    stage.viewer.requestRender();
-
-                    frame++;
-                    requestAnimationFrame(animate);
+                // Wrap MediaRecorder callbacks too
+                mediaRecorder.onerror = (e: any) => {
+                    console.error("MediaRecorder Error:", e);
+                    alert(`Recording Error (MediaRecorder): ${e.error?.message || e.message || "Unknown"}`);
                 };
 
                 animate();
