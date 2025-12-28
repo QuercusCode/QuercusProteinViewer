@@ -442,7 +442,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 console.warn("No supported MIME type found, trying default");
             }
 
-            const options = selectedMimeType ? { mimeType: selectedMimeType } : undefined;
+            const options: MediaRecorderOptions = {
+                mimeType: selectedMimeType || 'video/webm',
+                videoBitsPerSecond: 8000000 // 8 Mbps for high quality
+            };
 
             try {
                 const mediaRecorder = new MediaRecorder(stream, options);
@@ -486,7 +489,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 const targetSpeed = defaultSpeed * (4000 / duration);
 
                 const oldSpeed = stage.getParameters().spinSpeed;
-                stage.setParameters({ spinSpeed: targetSpeed });
+
+                // Enhance Quality: Boost Pixel Ratio temporarily
+                const originalPixelRatio = stage.viewer.pixelRatio;
+                stage.setParameters({ spinSpeed: targetSpeed, pixelRatio: 3 }); // 3x resolution
 
                 // Ensure spin is ON for recording
                 stage.setSpin(true);
@@ -502,8 +508,11 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             if (originalSpin) {
                                 stage.setSpin(false);
                             }
-                            // Restore original speed
-                            stage.setParameters({ spinSpeed: oldSpeed });
+                            // Restore original speed and quality
+                            stage.setParameters({
+                                spinSpeed: oldSpeed,
+                                pixelRatio: originalPixelRatio
+                            });
                             return;
                         }
 
@@ -516,7 +525,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         alert(`Recording Error (Animation): ${err.message}`);
                         mediaRecorder.stop();
                         if (originalSpin) stage.setSpin(false);
-                        stage.setParameters({ spinSpeed: oldSpeed });
+                        stage.setParameters({
+                            spinSpeed: oldSpeed,
+                            pixelRatio: originalPixelRatio
+                        });
                     }
                 };
 
