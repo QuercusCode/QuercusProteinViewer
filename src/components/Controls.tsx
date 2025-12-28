@@ -418,13 +418,13 @@ export const Controls: React.FC<ControlsProps> = ({
                             </div>
 
                             <form onSubmit={addCustomRule} className={`space-y-2 p-2 rounded-lg border ${cardBg}`}>
-                                <div className="grid grid-cols-[1fr_auto] gap-2">
-                                    <div className="flex flex-col gap-1">
+                                <div className="flex gap-2 items-start">
+                                    <div className="flex-1 flex flex-col gap-1 min-w-0">
                                         <div className="flex gap-2">
                                             <select
                                                 value={targetType}
                                                 onChange={(e) => setTargetType(e.target.value as any)}
-                                                className={`w-20 border rounded px-1 text-xs outline-none ${inputBg}`}
+                                                className={`w-18 border rounded px-1 py-1.5 text-xs outline-none ${inputBg}`}
                                             >
                                                 <option value="chain">Chain</option>
                                                 <option value="residue">Res</option>
@@ -435,7 +435,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                                     value={selectedChain}
                                                     onChange={(e) => setSelectedChain(e.target.value)}
                                                     disabled={chains.length === 0}
-                                                    className={`flex-1 border rounded px-1 text-xs outline-none ${inputBg}`}
+                                                    className={`flex-1 border rounded px-1 py-1.5 text-xs outline-none min-w-0 ${inputBg}`}
                                                 >
                                                     {chains.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
                                                 </select>
@@ -445,22 +445,24 @@ export const Controls: React.FC<ControlsProps> = ({
                                                     placeholder="e.g. 10-20"
                                                     value={residueRange}
                                                     onChange={(e) => setResidueRange(e.target.value)}
-                                                    className={`flex-1 border rounded px-2 py-1 text-xs outline-none ${inputBg}`}
+                                                    className={`flex-1 border rounded px-2 py-1.5 text-xs outline-none min-w-0 ${inputBg}`}
                                                 />
                                             )}
                                         </div>
                                         {targetType === 'residue' && selectedChain && getSelectedChainRange() && (
-                                            <div className={`text-[10px] px-1 ${subtleText}`}>Valid: {getSelectedChainRange()}</div>
+                                            <div className={`text-[10px] px-1 truncate ${subtleText}`}>Valid: {getSelectedChainRange()}</div>
                                         )}
                                     </div>
-                                    <input
-                                        type="color"
-                                        value={selectedColor}
-                                        onChange={(e) => setSelectedColor(e.target.value)}
-                                        className="w-8 h-full rounded cursor-pointer border-none p-0 overflow-hidden"
-                                    />
+                                    <div className="shrink-0">
+                                        <input
+                                            type="color"
+                                            value={selectedColor}
+                                            onChange={(e) => setSelectedColor(e.target.value)}
+                                            className="w-8 h-8 rounded cursor-pointer border-none p-0 overflow-hidden shadow-sm"
+                                        />
+                                    </div>
                                 </div>
-                                <button type="submit" className="w-full flex items-center justify-center gap-1 bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-xs py-1 rounded transition-colors font-medium">
+                                <button type="submit" className="w-full flex items-center justify-center gap-1 bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-xs py-1.5 rounded transition-colors font-medium">
                                     <Plus className="w-3 h-3" /> Add Rule
                                 </button>
                             </form>
