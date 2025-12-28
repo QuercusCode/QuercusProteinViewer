@@ -87,6 +87,105 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     const error = externalError !== undefined ? externalError : internalError;
     const setError = setExternalError || setInternalError;
 
+    const performVideoRecord = async (duration: number): Promise<Blob> => {
+        return new Promise((resolve, reject) => {
+            if (!stageRef.current || !stageRef.current.viewer) {
+                reject(new Error("Viewer not initialized"));
+                return;
+            }
+            const stage = stageRef.current;
+            const canvas = containerRef.current?.querySelector('canvas');
+            if (!canvas) {
+                reject(new Error("No canvas found"));
+                return;
+            }
+
+            // 1. Setup Stream
+            const stream = canvas.captureStream(30);
+
+            // Robust MIME type detection
+            const mimeTypes = [
+                'video/webm;codecs=vp9',
+                'video/webm;codecs=vp8',
+                'video/webm',
+                'video/mp4'
+            ];
+
+            let selectedMimeType = '';
+            for (const type of mimeTypes) {
+                if (MediaRecorder.isTypeSupported(type)) {
+                    selectedMimeType = type;
+                    break;
+                }
+            }
+
+            const options: MediaRecorderOptions = {
+                mimeType: selectedMimeType || 'video/webm',
+                videoBitsPerSecond: 8000000
+            };
+
+            try {
+                const mediaRecorder = new MediaRecorder(stream, options);
+                const chunks: Blob[] = [];
+
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) chunks.push(e.data);
+                };
+
+                // Store original state
+                const originalSpin = stage.spinAnimation.paused;
+                const oldSpeed = stage.getParameters().spinSpeed;
+                const originalPixelRatio = stage.viewer.pixelRatio;
+
+                mediaRecorder.onstop = () => {
+                    // Restore state immediately
+                    if (originalSpin) stage.setSpin(false);
+                    stage.setParameters({ spinSpeed: oldSpeed, pixelRatio: originalPixelRatio });
+
+                    const blob = new Blob(chunks, { type: selectedMimeType || 'video/webm' });
+                    resolve(blob);
+                };
+
+                mediaRecorder.onerror = (e: any) => {
+                    console.error("MediaRecorder Error:", e);
+                    if (originalSpin) stage.setSpin(false);
+                    stage.setParameters({ spinSpeed: oldSpeed, pixelRatio: originalPixelRatio });
+                    reject(new Error(e.error?.message || "MediaRecorder error"));
+                };
+
+                // 2. Start Recording
+                mediaRecorder.start();
+
+                // 3. Perform Spin
+                const startTime = performance.now();
+                const defaultSpeed = 0.01;
+                const targetSpeed = defaultSpeed * (4000 / duration);
+
+                // Boost Quality
+                stage.setParameters({ spinSpeed: targetSpeed, pixelRatio: 3 });
+                stage.setSpin(true);
+
+                const animate = () => {
+                    const now = performance.now();
+                    const elapsed = now - startTime;
+
+                    if (elapsed >= duration) {
+                        mediaRecorder.stop();
+                        return;
+                    }
+
+                    stage.viewer.requestRender();
+                    requestAnimationFrame(animate);
+                };
+
+                requestAnimationFrame(animate);
+
+            } catch (e: any) {
+                reject(e);
+            }
+        });
+    };
+
     useImperativeHandle(ref, () => ({
         getSnapshotBlob: async () => {
             if (!stageRef.current) return null;
@@ -411,176 +510,12 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             });
             return results;
         },
-        recordTurntable: async (duration: number = 4000): Promise<Blob> => {
-            return new Promise((resolve, reject) => {
-                if (!stageRef.current || !stageRef.current.viewer) {
-                    reject(new Error("Viewer not initialized"));
-                    return;
-                }
-                const stage = stageRef.current;
-                const canvas = containerRef.current?.querySelector('canvas');
-                if (!canvas) {
-                    reject(new Error("No canvas found for recording"));
-                    return;
-                }
-
-                console.log("Starting Turntable Recording...");
-
-                // 1. Setup Stream
-                const stream = canvas.captureStream(30); // 30 FPS
-
-                // Robust MIME type detection
-                const mimeTypes = [
-                    'video/webm;codecs=vp9',
-                    'video/webm;codecs=vp8',
-                    'video/webm',
-                    'video/mp4'
-                ];
-
-                let selectedMimeType = '';
-                for (const type of mimeTypes) {
-                    if (MediaRecorder.isTypeSupported(type)) {
-                        selectedMimeType = type;
-                        break;
-                    }
-                }
-
-                if (!selectedMimeType) {
-                    console.warn("No supported MIME type found, trying default");
-                }
-
-                const options: MediaRecorderOptions = {
-                    mimeType: selectedMimeType || 'video/webm',
-                    videoBitsPerSecond: 8000000 // 8 Mbps for high quality
-                };
-
-                try {
-                    const mediaRecorder = new MediaRecorder(stream, options);
-                    const chunks: Blob[] = [];
-
-                    mediaRecorder.ondataavailable = (e) => {
-                        if (e.data.size > 0) chunks.push(e.data);
-                    };
-
-                    // Store original state
-                    const originalSpin = stage.spinAnimation.paused;
-                    const oldSpeed = stage.getParameters().spinSpeed;
-                    const originalPixelRatio = stage.viewer.pixelRatio;
-
-                    mediaRecorder.onstop = () => {
-                        // Restore state immediately
-                        if (originalSpin) {
-                            stage.setSpin(false);
-                        }
-                        stage.setParameters({ spinSpeed: oldSpeed, pixelRatio: originalPixelRatio });
-
-                        const blob = new Blob(chunks, { type: selectedMimeType || 'video/webm' });
-                        console.log("Recording finished.");
-                        resolve(blob);
-                    };
-
-                    mediaRecorder.onerror = (e: any) => {
-                        console.error("MediaRecorder Error:", e);
-                        // Restore state on error
-                        if (originalSpin) stage.setSpin(false);
-                        stage.setParameters({ spinSpeed: oldSpeed, pixelRatio: originalPixelRatio });
-                        reject(new Error(e.error?.message || "MediaRecorder error"));
-                    };
-
-                    // 2. Start Recording
-                    mediaRecorder.start();
-
-                    // 3. Perform Spin
-                    const startTime = performance.now();
-
-                    // Calculate spin speed
-                    const defaultSpeed = 0.01;
-                    const targetSpeed = defaultSpeed * (4000 / duration);
-
-                    // Boost Quality
-                    stage.setParameters({ spinSpeed: targetSpeed, pixelRatio: 3 });
-
-                    // Ensure spin is ON
-                    stage.setSpin(true);
-
-                    const animate = () => {
-                        try {
-                            const now = performance.now();
-                            const elapsed = now - startTime;
-
-                            if (elapsed >= duration) {
-                                mediaRecorder.stop();
-                                return; // Stop loop, onstop will handle restore & resolve
-                            }
-
-                            // Force render
-                            stage.viewer.requestRender();
-                            requestAnimationFrame(animate);
-                        } catch (err: any) {
-                            console.error("Animation loop error:", err);
-                            mediaRecorder.stop();
-                            // Restore state on error if stop fails to trigger onstop correctly
-                            if (originalSpin) stage.setSpin(false);
-                            stage.setParameters({ spinSpeed: oldSpeed, pixelRatio: originalPixelRatio });
-                            reject(err);
-                        }
-                    };
-
-                    requestAnimationFrame(animate);
-
-                } catch (e: any) {
-                    reject(e);
-                }
-            });
+        recordTurntable: async (duration: number = 4000) => {
+            return performVideoRecord(duration);
         },
-
         recordGif: async (duration = 4000) => {
-            if (!stageRef.current) throw new Error("Stage not initialized");
-            const stage = stageRef.current;
-            const canvas = stage.viewer.renderer.domElement;
-
-            // 1. Record Video Stream (Same logic as recordTurntable)
-            const stream = canvas.captureStream(30);
-            const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
-            const chunks: Blob[] = [];
-
-            const videoBlobPromise = new Promise<Blob>((resolve, reject) => {
-                recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
-
-                recorder.onstop = () => {
-                    // Restore State
-                    stage.setSpin(false);
-                    stage.setParameters({ spinSpeed: stage.getParameters().spinSpeed, pixelRatio: stage.viewer.pixelRatio }); // Reset if confused
-                    resolve(new Blob(chunks, { type: 'video/webm' }));
-                };
-
-                recorder.onerror = (e) => reject(e);
-
-                // Start
-                recorder.start();
-
-                // Animation Loop (Explicit Render)
-                const startTime = performance.now();
-                const defaultSpeed = 0.01;
-                const targetSpeed = defaultSpeed * (4000 / duration);
-
-                stage.setParameters({ spinSpeed: targetSpeed, pixelRatio: 3 });
-                stage.setSpin(true);
-
-                const animate = () => {
-                    const now = performance.now();
-                    if (now - startTime >= duration) {
-                        recorder.stop();
-                        return;
-                    }
-                    stage.viewer.requestRender();
-                    requestAnimationFrame(animate);
-                };
-                requestAnimationFrame(animate);
-            });
-
-            // Wait for video
-            const videoBlob = await videoBlobPromise;
+            // Reuse the exact same recording logic
+            const videoBlob = await performVideoRecord(duration);
 
             // 2. Convert to GIF
             const video = document.createElement('video');
@@ -591,7 +526,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             const gif = new GIF({
                 workers: 2,
                 quality: 10,
-                width: video.videoWidth, // Use actual video dims
+                width: video.videoWidth,
                 height: video.videoHeight,
                 workerScript: 'gif.worker.js'
             });
@@ -624,7 +559,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             if (!componentRef.current) return null;
             const structure = componentRef.current.structure;
             const NGL = window.NGL;
-
             // 1. Find the Chain
             let targetChain: any = null;
             structure.eachChain((c: any) => {
