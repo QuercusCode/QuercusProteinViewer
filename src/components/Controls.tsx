@@ -369,6 +369,44 @@ export const Controls: React.FC<ControlsProps> = ({
 
                     <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
 
+                    {/* Builder / Editor */}
+                    <div className="space-y-3">
+                        <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Protein Editor</label>
+                        <div className={`p-3 rounded-lg border ${cardBg} space-y-3`}>
+                            <div className="space-y-1">
+                                <label className={`text-[10px] ${subtleText}`}>Extend Chain (at C-Terminus)</label>
+                                <div className="flex gap-2">
+                                    <select
+                                        value={selectedChain}
+                                        onChange={(e) => setSelectedChain(e.target.value)}
+                                        className={`flex-1 border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
+                                    >
+                                        {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
+                                    </select>
+                                    <select
+                                        id="resType-select" // Helper ID
+                                        className={`flex-1 border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
+                                        defaultValue="ALA"
+                                    >
+                                        <option value="ALA">ALA</option>
+                                        <option value="GLY">GLY</option>
+                                        <option value="SER">SER</option>
+                                        <option value="VAL">VAL</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    const select = document.getElementById('resType-select') as HTMLSelectElement;
+                                    onAddResidue(selectedChain, select.value);
+                                }}
+                                className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg transition-colors text-xs font-medium"
+                            >
+                                <Plus className="w-3.5 h-3.5" /> Add Residue
+                            </button>
+                        </div>
+                    </div>
+
                     {/* Analysis */}
                     <div className="space-y-3">
                         <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Analysis</label>
@@ -432,45 +470,7 @@ export const Controls: React.FC<ControlsProps> = ({
                         </div>
                     </div>
 
-                    <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
 
-                    {/* Builder / Editor */}
-                    <div className="space-y-3">
-                        <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Protein Editor</label>
-                        <div className={`p-3 rounded-lg border ${cardBg} space-y-3`}>
-                            <div className="space-y-1">
-                                <label className={`text-[10px] ${subtleText}`}>Extend Chain (at C-Terminus)</label>
-                                <div className="flex gap-2">
-                                    <select
-                                        value={selectedChain}
-                                        onChange={(e) => setSelectedChain(e.target.value)}
-                                        className={`flex-1 border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
-                                    >
-                                        {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
-                                    </select>
-                                    <select
-                                        id="resType-select" // Helper ID
-                                        className={`flex-1 border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
-                                        defaultValue="ALA"
-                                    >
-                                        <option value="ALA">ALA</option>
-                                        <option value="GLY">GLY</option>
-                                        <option value="SER">SER</option>
-                                        <option value="VAL">VAL</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button
-                                onClick={() => {
-                                    const select = document.getElementById('resType-select') as HTMLSelectElement;
-                                    onAddResidue(selectedChain, select.value);
-                                }}
-                                className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg transition-colors text-xs font-medium"
-                            >
-                                <Plus className="w-3.5 h-3.5" /> Add Residue
-                            </button>
-                        </div>
-                    </div>
 
                     {/* Colors */}
                     <div className="space-y-3">
