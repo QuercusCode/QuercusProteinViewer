@@ -254,6 +254,71 @@ export const Controls: React.FC<ControlsProps> = ({
                 {/* Scrollable Content */}
                 <div className={`flex-1 overflow-y-auto scrollbar-thin p-4 pt-0 space-y-4 ${isLightMode ? 'scrollbar-thumb-neutral-300' : 'scrollbar-thumb-neutral-700'}`}>
 
+                    {/* Structure Details (Top Sidebar) */}
+                    {(proteinTitle || ligands.length > 0) && (
+                        <div className="space-y-3">
+                            <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Structure Details</label>
+
+                            {/* Protein Title */}
+                            {proteinTitle && typeof proteinTitle === 'string' && (
+                                <div className={`p-3 rounded-lg border ${cardBg} mb-1 shadow-sm`}>
+                                    <h3 className={`text-[10px] font-bold uppercase tracking-wider mb-1 ${subtleText}`}>Structure Title</h3>
+                                    <p className={`text-xs font-medium leading-relaxed ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>
+                                        {proteinTitle}
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Ligand Info Box */}
+                            <div className={`p-3 rounded-lg border ${cardBg} shadow-sm`}>
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center gap-2">
+                                        <Hexagon className="w-3.5 h-3.5 text-blue-500" />
+                                        <span className={`text-xs font-semibold ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>Ligands</span>
+                                    </div>
+                                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${ligands.length > 0 ? 'bg-blue-100 text-blue-700' : 'bg-neutral-100 text-neutral-500'}`}>
+                                        {ligands.length}
+                                    </span>
+                                </div>
+
+                                {ligands.length > 0 ? (
+                                    <div className="space-y-2">
+                                        <div className="flex flex-wrap gap-1">
+                                            {ligands.map(lig => (
+                                                <span key={lig} className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600">
+                                                    {lig}
+                                                </span>
+                                            ))}
+                                        </div>
+                                        <div className="flex gap-1">
+                                            <button
+                                                onClick={() => setShowLigands(!showLigands)}
+                                                className={`flex-1 text-[10px] py-1 rounded border transition-colors ${showLigands ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-transparent text-neutral-500 hover:bg-neutral-50'}`}
+                                            >
+                                                {showLigands ? 'Hide' : 'Show'}
+                                            </button>
+                                            <button
+                                                onClick={onFocusLigands}
+                                                className="flex-1 text-[10px] py-1 rounded bg-blue-600 text-white hover:bg-blue-500 transition-colors flex items-center justify-center gap-1"
+                                            >
+                                                <Crosshair className="w-3 h-3" /> Focus
+                                            </button>
+                                        </div>
+                                        {/* Educational Tooltip/Text */}
+                                        <div className={`mt-2 text-[10px] leading-relaxed italic ${subtleText}`}>
+                                            Small molecules bound to the protein complex.
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className={`text-[10px] italic ${subtleText}`}>No ligands detected.</div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+
+                    <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
+
                     {/* Load */}
                     <div className="space-y-3">
                         <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Load Structure</label>
@@ -302,49 +367,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <div className={`w-3 h-3 rounded-full ${showSurface ? 'bg-blue-500' : 'bg-neutral-500'}`} />
                             </button>
 
-                            <button
-                                onClick={() => setShowLigands(!showLigands)}
-                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${showLigands ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
-                            >
-                                <div className="flex items-center gap-2">
-                                    <Hexagon className="w-4 h-4" />
-                                    <span className="text-xs font-medium">Show Ligands</span>
-                                </div>
-                                <div className={`w-3 h-3 rounded-full ${showLigands ? 'bg-blue-500' : 'bg-neutral-500'}`} />
-                            </button>
 
-                            {showLigands && (
-                                <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
-                                    <button
-                                        onClick={onFocusLigands}
-                                        className="w-full flex items-center justify-center gap-1.5 bg-neutral-600 hover:bg-neutral-500 text-white text-xs py-1.5 rounded transition-colors"
-                                    >
-                                        <Crosshair className="w-3 h-3" /> Focus Ligands
-                                    </button>
-
-                                    {/* Educational Info */}
-                                    <div className={`p-2 rounded border text-[10px] leading-relaxed ${isLightMode ? 'bg-blue-50 border-blue-100 text-blue-800' : 'bg-blue-900/20 border-blue-800 text-blue-200'}`}>
-                                        <strong>What is a Ligand?</strong><br />
-                                        A ligand is a substance that forms a complex with a biomolecule to serve a biological purpose. Usually a small molecule (like a drug, hormone, or cofactor) binding to a protein.
-                                    </div>
-
-                                    {/* List of Ligands */}
-                                    {ligands.length > 0 ? (
-                                        <div className={`p-2 rounded border space-y-1 ${cardBg}`}>
-                                            <div className={`text-[10px] font-semibold uppercase tracking-wider ${subtleText}`}>Detected Ligands</div>
-                                            <div className="flex flex-wrap gap-1">
-                                                {ligands.map(lig => (
-                                                    <span key={lig} className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300">
-                                                        {lig}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className={`text-[10px] italic p-1 ${subtleText}`}>No ligands detected in this structure.</div>
-                                    )}
-                                </div>
-                            )}
 
                         </div>
 
@@ -539,14 +562,7 @@ export const Controls: React.FC<ControlsProps> = ({
 
                     {/* Sequence */}
                     <div className="space-y-3 flex flex-col md:flex-none">
-                        {proteinTitle && typeof proteinTitle === 'string' && (
-                            <div className={`p-3 rounded-lg border ${cardBg} mb-1`}>
-                                <h3 className={`text-xs font-semibold uppercase tracking-wider mb-1 ${subtleText}`}>Structure</h3>
-                                <p className={`text-xs font-medium leading-relaxed ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
-                                    {proteinTitle}
-                                </p>
-                            </div>
-                        )}
+
                         <div className="flex items-center justify-between">
                             <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Sequence</label>
                             <select
