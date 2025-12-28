@@ -26,6 +26,8 @@ interface ControlsProps {
     setShowSurface: (show: boolean) => void;
     showLigands: boolean;
     setShowLigands: (show: boolean) => void;
+    showHBonds: boolean;
+    setShowHBonds: (show: boolean) => void;
     onFocusLigands: () => void;
     proteinTitle?: string | null;
     snapshots: Snapshot[];
@@ -65,6 +67,8 @@ export const Controls: React.FC<ControlsProps> = ({
     setShowSurface,
     showLigands,
     setShowLigands,
+    showHBonds,
+    setShowHBonds,
     onFocusLigands,
     proteinTitle,
     snapshots,
@@ -376,6 +380,17 @@ export const Controls: React.FC<ControlsProps> = ({
                                     <span className="text-xs font-medium">{isSpinning ? 'Spinning Active' : 'Auto-Spin'}</span>
                                 </div>
                                 <div className={`w-3 h-3 rounded-full ${isSpinning ? 'bg-blue-500' : 'bg-neutral-500'}`} />
+                            </button>
+
+                            <button
+                                onClick={() => setShowHBonds(!showHBonds)}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${showHBonds ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <span style={{ fontWeight: 'bold', fontSize: '10px', width: '16px', textAlign: 'center' }}>H</span>
+                                    <span className="text-xs font-medium">Show H-Bonds</span>
+                                </div>
+                                <div className={`w-3 h-3 rounded-full ${showHBonds ? 'bg-blue-500' : 'bg-neutral-500'}`} />
                             </button>
 
 

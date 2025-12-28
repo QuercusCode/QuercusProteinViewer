@@ -37,6 +37,7 @@ function App() {
   // Visualization Toggles
   const [showSurface, setShowSurface] = useState(false);
   const [showLigands, setShowLigands] = useState(false);
+  const [showHBonds, setShowHBonds] = useState(false);
 
   // Tools
 
@@ -351,6 +352,8 @@ function App() {
         setShowSurface={setShowSurface}
         showLigands={showLigands}
         setShowLigands={setShowLigands}
+        showHBonds={showHBonds}
+        setShowHBonds={setShowHBonds}
         onFocusLigands={handleFocusLigands}
         proteinTitle={proteinTitle}
         snapshots={snapshots}

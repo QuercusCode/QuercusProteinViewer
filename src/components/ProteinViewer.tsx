@@ -32,6 +32,7 @@ interface ProteinViewerProps {
     backgroundColor?: string;
     showSurface?: boolean;
     showLigands?: boolean;
+    showHBonds?: boolean;
     isSpinning?: boolean;
 }
 
@@ -66,6 +67,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     backgroundColor = "black",
     showSurface = false,
     showLigands = false,
+    showHBonds = false,
     isSpinning = false,
 
 }, ref) => {
@@ -718,6 +720,39 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             componentRef.current = null;
         }
     }, [pdbId, file]);
+
+    // Handle H-Bonds Toggle
+    const hBondRepresentationRef = useRef<any>(null);
+    useEffect(() => {
+        if (!componentRef.current) return;
+        const component = componentRef.current;
+
+        try {
+            if (showHBonds) {
+                if (!hBondRepresentationRef.current) {
+                    console.log("Adding H-Bond representation");
+                    hBondRepresentationRef.current = component.addRepresentation('contact', {
+                        contactType: 'hydrogenBond',
+                        color: 'lightgreen',
+                        radius: 0.1,
+                        labelVisible: false
+                    });
+                } else {
+                    hBondRepresentationRef.current.setVisibility(true);
+                }
+            } else {
+                if (hBondRepresentationRef.current) {
+                    console.log("Hiding H-Bond representation");
+                    hBondRepresentationRef.current.setVisibility(false);
+                    // Optional: remove significantly better for performance if widely toggled
+                    // component.removeRepresentation(hBondRepresentationRef.current);
+                    // hBondRepresentationRef.current = null;
+                }
+            }
+        } catch (e) {
+            console.warn("Failed to toggle H-Bonds:", e);
+        }
+    }, [showHBonds]);
 
     const selectedAtomsRef = useRef<any[]>([]);
 
