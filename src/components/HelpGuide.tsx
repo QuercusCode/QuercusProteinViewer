@@ -24,7 +24,7 @@ export const HelpGuide: React.FC = () => {
                         <div className="flex items-center justify-between p-4 border-b border-neutral-800 bg-neutral-900/50">
                             <h2 className="text-lg font-bold text-white flex items-center gap-2">
                                 <CircleHelp className="w-5 h-5 text-blue-400" />
-                                Viewer Guide
+                                Viewer Guide (Updated)
                             </h2>
                             <button
                                 onClick={() => setIsOpen(false)}
