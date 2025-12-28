@@ -553,6 +553,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             const anglePerFrame = (2 * Math.PI) / frames;
 
             stage.setSpin(false);
+            const canvas = stage.viewer.renderer.domElement;
 
             try {
                 // Loop for frames
@@ -560,23 +561,13 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     // Rotate
                     stage.viewerControls.rotate(0, anglePerFrame);
 
-                    // Wait for render - keep delay small but enough
-                    await new Promise(r => setTimeout(r, 20));
+                    // Force render and wait a tick
                     stage.viewer.requestRender();
-                    await new Promise(r => setTimeout(r, 20));
+                    await new Promise(r => setTimeout(r, 50));
 
-                    // Capture Frame - OPAQUE (transparent: false)
-                    const blob = await stage.makeImage({ format: 'png', trim: false, transparent: false, factor: 1 });
-                    const img = new Image();
-                    const imgLoadPromise = new Promise<void>((resolve, reject) => {
-                        img.onload = () => resolve();
-                        img.onerror = reject;
-                    });
-                    img.src = URL.createObjectURL(blob);
-                    await imgLoadPromise;
-
-                    gif.addFrame(img, { delay: 1000 / fps });
-                    URL.revokeObjectURL(img.src);
+                    // Direct Canvas Capture (Fast & Opaque)
+                    // This relies on preserveDrawingBuffer: true
+                    gif.addFrame(canvas, { delay: 1000 / fps, copy: true });
                 }
 
                 return new Promise((resolve) => {
@@ -589,7 +580,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 console.error("GIF Record Error", err);
                 throw err;
             } finally {
-                // Ensure we don't leave it in weird state?
                 stage.setSpin(false);
             }
         },
@@ -751,6 +741,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             const stage = new window.NGL.Stage(containerRef.current, {
                 backgroundColor: backgroundColor,
                 tooltip: true,
+                webglParams: { preserveDrawingBuffer: true }
             });
             stageRef.current = stage;
 
