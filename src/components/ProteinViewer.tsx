@@ -562,29 +562,21 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     // 100ms is conservative but safe.
                     await new Promise(r => setTimeout(r, 100));
 
-                    // Capture High-Quality Snapshot
-                    // We use 'image/png' to preserve quality before flattening
-                    const blob = await stage.makeImage({
-                        factor: 1,
-                        type: 'png',
-                        antialias: false, // Disable AA for sharper read back check
-                        trim: false,
-                        transparent: true // Get alpha so we can flatten it ourselves
-                    });
+                    // DIRECT CANVAS CAPTURE (WYSIWYG)
+                    // Instead of NGL's makeImage (which might use offscreen buffers),
+                    // we grab the visible WebGL canvas directly.
+                    // This guarantees we get exactly what is on screen.
+                    const sourceCanvas = stage.viewer.renderer.domElement;
+                    if (!sourceCanvas) throw new Error("WebGL Canvas not found");
 
-                    // Load into Image Bitmap (Atomic Decode)
-                    const imgBitmap = await createImageBitmap(blob);
-
-                    // Draw to Intermediate Canvas (Flattening)
+                    // Draw to Intermediate (Flattening transparency)
                     // 1. Fill White
                     ctx.fillStyle = '#ffffff';
                     ctx.fillRect(0, 0, width, height);
-                    // 2. Draw Image
-                    ctx.drawImage(imgBitmap, 0, 0);
+                    // 2. Draw Visible Canvas
+                    ctx.drawImage(sourceCanvas, 0, 0, width, height);
 
-                    imgBitmap.close(); // Cleanup GPU memory
-
-                    // Add Frame from Context
+                    // Add Frame
                     gif.addFrame(ctx, { delay: 1000 / fps, copy: true });
                 }
             } finally {
