@@ -113,14 +113,16 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             // Calculate direction from center to atom
             const dir = atomPos.clone().sub(center).normalize();
 
-            // Push text out by 35 Angstroms (more drastic)
-            const textPos = atomPos.clone().add(dir.multiplyScalar(35));
+            // Push text out by 50 Angstroms (Maximum visibility)
+            const textPos = atomPos.clone().add(dir.multiplyScalar(50));
 
             const posArray = [textPos.x, textPos.y, textPos.z];
             const atomPosArray = [atomPos.x, atomPos.y, atomPos.z];
 
-            const color = [0, 1, 1]; // Cyan for distinction
-            const size = 6.0; // Even Larger
+            console.log("DEBUG: Rendering annotation (Red-50A) at", posArray);
+
+            const color = [1, 0, 0]; // Bright Red
+            const size = 7.0; // Huge text
 
             try {
                 // Draw connecting line
