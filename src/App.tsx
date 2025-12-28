@@ -266,26 +266,7 @@ function App() {
     setChains(info.chains);
   };
 
-  const handleAddResidue = async (chain: string, type: string) => {
-    if (!viewerRef.current) return;
-    console.log(`Adding ${type} to chain ${chain}...`);
-    try {
-      const newBlob = await viewerRef.current.addResidue(chain, type);
-      if (newBlob) {
-        console.log("Structure updated! Reloading...");
-        // Use a generic name to force reload or maintain state
-        const newFile = new File([newBlob], `modified-${pdbId || "structure"}.pdb`, { type: "text/plain" });
-        setFile(newFile);
-        // Should we clear PDB ID to indicate it's custom now?
-        // setPdbId(""); 
-      } else {
-        alert("Failed to add residue. Ensure the chain has a valid C-terminus.");
-      }
-    } catch (e) {
-      console.error("Add Residue Error:", e);
-      alert("Error modifying structure.");
-    }
-  };
+
 
 
   const handleSequenceResidueClick = (chain: string, resNo: number) => {
@@ -379,7 +360,7 @@ function App() {
         onSaveSession={handleSaveSession}
         onLoadSession={handleLoadSession}
         onToggleContactMap={() => setShowContactMap(true)}
-        onAddResidue={handleAddResidue}
+
       />
 
       <ProteinViewer
