@@ -116,18 +116,21 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             // Use Native NGL Distance Representation (Most Robust)
             // This bypasses Shape primitive issues by using built-in measurement rendering
             // We need atom indices for this
-            let idx1 = -1;
-            let idx2 = -1;
+            let idx1 = m.atom1.index;
+            let idx2 = m.atom2.index;
 
-            if (componentRef.current && componentRef.current.structure) {
-                // We need to find the correct atom proxy indices
-                // We can iterate again or optimize. Since we have findAtom, let's just get the index from the proxy.
-                // IMPORTANT: findAtom returns an AtomProxy which has .index property
-                if (atom1 && typeof atom1.index === 'number') idx1 = atom1.index;
-                if (atom2 && typeof atom2.index === 'number') idx2 = atom2.index;
+            // Fallback for legacy data or if index is missing: careful lookups
+            // Note: We avoid holding two proxies simultaneously to prevent reuse issues
+            if (idx1 === undefined) {
+                const a1 = findAtom(m.atom1.chain, m.atom1.resNo, m.atom1.atomName);
+                if (a1) idx1 = a1.index;
+            }
+            if (idx2 === undefined) {
+                const a2 = findAtom(m.atom2.chain, m.atom2.resNo, m.atom2.atomName);
+                if (a2) idx2 = a2.index;
             }
 
-            if (idx1 !== -1 && idx2 !== -1) {
+            if (typeof idx1 === 'number' && typeof idx2 === 'number') {
                 const params = {
                     labelUnit: 'angstrom',
                     labelSize: 2.0,
@@ -137,15 +140,16 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     opacity: 1.0
                 };
 
-                const distanceRep = componentRef.current.addRepresentation("distance", params);
-                // Store the representation so we can remove it later
-                // We can cheat and attach the measurement ID to the representation object wrapper
-                if (distanceRep) {
-                    measurementRepsRef.current.push(distanceRep);
+                try {
+                    const distanceRep = componentRef.current.addRepresentation("distance", params);
+                    if (distanceRep) {
+                        measurementRepsRef.current.push(distanceRep);
+                    }
+                } catch (e) {
+                    console.warn("Failed to add distance representation", e);
                 }
             } else {
-                // Fallback to Shape if indices fail (unlikely)
-                console.warn("Could not find atom indices for distance rep");
+                console.warn("Could not find atom indices for distance rep", m);
             }
         }
     };
