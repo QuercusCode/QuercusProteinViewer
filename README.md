@@ -24,6 +24,7 @@ A high-performance, interactive 3D Protein Structure Viewer built for modern res
 - **Interactive Contact Map**:
   - Visualize residue-residue interactions as a 2D heatmap.
   - **Interaction Guessing**: Tooltips automatically predict interactions (Salt Bridges, Disulfides, Hydrophobic, Pi-Stacking) based on biological rules.
+  - **Interface Focus Mode**: Toggle to hide intra-chain interactions, instantly highlighting binding interfaces between subunits.
   - **3D Sync**: Clicking a pixel on the map draws a connection line between the residues in the 3D viewer.
   - Export interaction data as CSV or download the map as an image.
 - **Distance Measurement**: Click any two atoms to measure the precise Angstrom distance.

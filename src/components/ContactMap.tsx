@@ -73,6 +73,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     const [contactThreshold, setContactThreshold] = useState(5);
     const [proximalThreshold, setProximalThreshold] = useState(8);
     const [showGrid, setShowGrid] = useState(true);
+    const [showIntraChain, setShowIntraChain] = useState(true);
     const [showSettings, setShowSettings] = useState(false);
 
     // Initial Data Calculation
@@ -231,6 +232,13 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         // Draw Contacts
         for (let i = 0; i < size; i++) {
             for (let j = i; j < size; j++) {
+                // Interface Mode Check
+                if (!showIntraChain) {
+                    const c1 = labels[i]?.chain;
+                    const c2 = labels[j]?.chain;
+                    if (c1 === c2) continue; // Skip intra-chain
+                }
+
                 const dist = matrix[i][j];
 
                 if (dist < proximalThreshold) {
@@ -495,15 +503,25 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                                             />
                                         </div>
 
-                                        <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800">
+                                        <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800 space-y-2">
                                             <button
                                                 onClick={() => setShowGrid(!showGrid)}
                                                 className={`w-full flex items-center justify-between p-2 rounded-lg text-xs font-medium transition-colors ${showGrid ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'}`}
                                             >
                                                 <div className="flex items-center gap-2">
-                                                    <Grid3X3 className="w-4 h-4" /> show Grid
+                                                    <Grid3X3 className="w-4 h-4" /> Show Grid
                                                 </div>
                                                 {showGrid && <Check className="w-3 h-3" />}
+                                            </button>
+
+                                            <button
+                                                onClick={() => setShowIntraChain(!showIntraChain)}
+                                                className={`w-full flex items-center justify-between p-2 rounded-lg text-xs font-medium transition-colors ${!showIntraChain ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'}`}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <Maximize className="w-4 h-4" /> Interface Focus
+                                                </div>
+                                                {!showIntraChain && <Check className="w-3 h-3" />}
                                             </button>
                                         </div>
                                     </div>
