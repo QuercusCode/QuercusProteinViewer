@@ -111,14 +111,28 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
         if (atom1 && atom2) {
             // Safe ID generation
-            const id = "distance-" + Math.random().toString(36).substring(2, 9);
-            console.log("DEBUG: atoms found, adding shape", id);
-            const shape = new window.NGL.Shape(id);
-            shape.addCylinder([atom1.x, atom1.y, atom1.z], [atom2.x, atom2.y, atom2.z], [1, 1, 0], 0.5);
-            shape.addText([(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2], [1, 1, 1], 1.5, `${m.distance} A`);
-            const shapeComp = stage.addComponentFromObject(shape);
-            shapeComp.addRepresentation("buffer");
-            return shapeComp;
+            // 1. Line Shape
+            const lineId = "distance-line-" + Math.random().toString(36).substring(2, 9);
+            const lineShape = new window.NGL.Shape(lineId);
+            lineShape.addCylinder([atom1.x, atom1.y, atom1.z], [atom2.x, atom2.y, atom2.z], [1, 1, 0], 0.4);
+            const lineComp = stage.addComponentFromObject(lineShape);
+            lineComp.addRepresentation("buffer", { opacity: 1.0 });
+
+            // 2. Text Shape
+            const textId = "distance-text-" + Math.random().toString(36).substring(2, 9);
+            const textShape = new window.NGL.Shape(textId);
+            textShape.addText([(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2], [1, 1, 1], 1.5, `${m.distance} A`);
+            const textComp = stage.addComponentFromObject(textShape);
+            textComp.addRepresentation("buffer", { opacity: 1.0, depthWrite: false });
+
+            return lineComp; // We return one, but both are added to stage. Clearing relies on name prefix "distance-" which both share partialmatch? No, wait. 
+            // We need to ensure we clear BOTH. 
+            // setMeasurements clears by: stageRef.current.getComponentsByName("distance-").list.forEach... 
+            // NGL getComponentsByName might be exact match? Or substring?
+            // Actually NGL doesn't have getComponentsByName in standard API easily. 
+            // My clean up logic is: 
+            // stageRef.current.eachComponent((c: any) => { if (c.name.startsWith("distance-")) stageRef.current.removeComponent(c); });
+            // My ID is "distance-line-..." and "distance-text-..." -> startsWith("distance-") works!
         } else {
             console.warn("DEBUG: atoms NOT found for measurement", m);
         }
