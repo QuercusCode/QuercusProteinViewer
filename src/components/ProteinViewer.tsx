@@ -105,22 +105,37 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     };
 
     const drawMeasurement = (m: MeasurementData, stage: any) => {
-        // console.log("DEBUG: drawing measurement", m);
+        console.log("=== DRAW MEASUREMENT START ===");
+        console.log("Measurement data:", m);
         const atom1 = findAtom(m.atom1.chain, m.atom1.resNo, m.atom1.atomName);
         const atom2 = findAtom(m.atom2.chain, m.atom2.resNo, m.atom2.atomName);
+        console.log("Found atom1:", atom1);
+        console.log("Found atom2:", atom2);
 
         if (atom1 && atom2) {
             // Safe ID generation (Math.random is safer than crypto in some contexts)
             const id = "distance-" + Math.random().toString(36).substring(2, 9);
+            console.log("Creating shape with ID:", id);
 
             const shape = new window.NGL.Shape(id);
+            console.log("Shape created:", shape);
+
+            console.log("Adding cylinder from", [atom1.x, atom1.y, atom1.z], "to", [atom2.x, atom2.y, atom2.z]);
             shape.addCylinder([atom1.x, atom1.y, atom1.z], [atom2.x, atom2.y, atom2.z], [1, 1, 0], 0.2);
+            console.log("Cylinder added");
+
             shape.addText([(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2], [1, 1, 1], 1.5, `${m.distance} A`);
+            console.log("Text added");
 
             const shapeComp = stage.addComponentFromObject(shape);
+            console.log("Component added to stage:", shapeComp);
+
             shapeComp.addRepresentation("buffer", { depthTest: false, opacity: 1.0 });
+            console.log("Representation added - COMPLETE");
+            console.log("=== DRAW MEASUREMENT END ===");
             return shapeComp;
         }
+        console.log("WARNING: Atoms not found, cannot draw measurement");
         return null;
     };
 
