@@ -313,13 +313,13 @@ export const Controls: React.FC<ControlsProps> = ({
                             </button>
                         </form>
                         <div className="relative">
-                            <input type="file" accept=".pdb,.cif,.ent,.mmcif" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
+                            <input type="file" accept=".pdb,.ent" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
                             <button
                                 onClick={() => fileInputRef.current?.click()}
                                 className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all group ${cardBg} hover:opacity-80`}
                             >
                                 <Upload className="w-4 h-4 group-hover:text-blue-500 transition-colors" />
-                                <span className="text-xs font-medium">Upload PDB/CIF</span>
+                                <span className="text-xs font-medium">Upload PDB</span>
                             </button>
                         </div>
                     </div>
