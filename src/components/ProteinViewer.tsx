@@ -903,7 +903,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         }
 
                         console.log(`Detected extension: ${rawExt} -> Parsed as: ${ext}`);
-                        return await stage.loadFile(currentFile, { defaultRepresentation: false, ext });
+                        return await stage.loadFile(currentFile, { defaultRepresentation: false, ext, name: currentFile.name });
                     }
 
                     if (currentPdbId) {
