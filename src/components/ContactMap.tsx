@@ -74,6 +74,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     const [proximalThreshold, setProximalThreshold] = useState(8);
     const [showGrid, setShowGrid] = useState(true);
     const [showIntraChain, setShowIntraChain] = useState(true);
+    const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
     const [filters, setFilters] = useState({
         all: true,
@@ -471,7 +472,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     if (!isOpen) return null;
 
 
-    const [showMobileSidebar, setShowMobileSidebar] = useState(false);
+
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm animate-in fade-in">
