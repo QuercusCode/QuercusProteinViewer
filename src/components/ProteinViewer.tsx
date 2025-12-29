@@ -738,34 +738,52 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             }
 
             // 2. Find Atoms (Prefer CA, fallback to center or first atom)
-            const getAtomIndex = (c: string, r: number) => {
+            const getSafeAtomIndex = (c: string, r: number, preferredAtom: string | null = null) => {
                 let idx: number | null = null;
-                // Try CA
-                const a1 = findAtom(c, r, 'CA');
-                if (a1) return a1.index;
-                // Try CB
-                const a2 = findAtom(c, r, 'CB');
-                if (a2) return a2.index;
-                // Any atom
+
+                // If specific atom requested (e.g. CA or CB), try that first
+                if (preferredAtom && comp.structure) {
+                    const sel = new window.NGL.Selection(`${r}:${c} and .${preferredAtom}`);
+                    comp.structure.eachAtom((atom: any) => {
+                        // Capture index immediately!
+                        idx = atom.index;
+                    }, sel);
+                }
+
+                if (idx !== null) return idx;
+
+                // Fallback: Try CA (Alpha Carbon/Backbone)
+                if (comp.structure) {
+                    const sel = new window.NGL.Selection(`${r}:${c} and .CA`);
+                    comp.structure.eachAtom((atom: any) => {
+                        idx = atom.index;
+                    }, sel);
+                }
+
+                if (idx !== null) return idx;
+
+                // Fallback: First atom of residue
                 if (comp.structure) {
                     const sel = new window.NGL.Selection(`${r}:${c}`);
                     comp.structure.eachAtom((atom: any) => {
                         if (idx === null) idx = atom.index;
                     }, sel);
                 }
+
                 return idx;
             };
 
-            const idx1 = getAtomIndex(chainA, resA);
-            const idx2 = getAtomIndex(chainB, resB);
+            // Use 'CB' (Beta Carbon) if available for better side-chain indication
+            const idx1 = getSafeAtomIndex(chainA, resA, 'CB');
+            const idx2 = getSafeAtomIndex(chainB, resB, 'CB');
 
             if (idx1 !== null && idx2 !== null) {
                 const params = {
-                    labelVisible: false, // Clean look, just the line
-                    color: '#06b6d4', // Cyan-500
+                    labelVisible: false,
+                    color: '#22d3ee', // Cyan-400 (brighter)
                     atomPair: [[idx1, idx2]],
-                    opacity: 0.8,
-                    linewidth: 5.0 // Thicker line for emphasis
+                    opacity: 1.0,
+                    linewidth: 5.0
                 };
 
                 try {
