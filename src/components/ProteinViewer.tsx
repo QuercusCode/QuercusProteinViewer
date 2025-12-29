@@ -1077,6 +1077,11 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 repType = 'licorice';
             }
 
+            // Map 'structure' to NGL's 'sstruc'
+            if (currentColoring === 'structure') {
+                currentColoring = 'sstruc';
+            }
+
             // Strategy: Unified Custom Scheme
             // For simple coloring modes (chainid, element), we use a purely manual scheme
             // This ensures that "base" colors are identical whether a custom rule exists or not.
