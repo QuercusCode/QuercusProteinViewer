@@ -29,13 +29,13 @@ export const HelpGuide: React.FC = () => {
             {/* Modal Overlay */}
             {isOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="relative w-full max-w-md bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+                    <div className="relative w-full max-w-md max-h-[90vh] flex flex-col bg-neutral-900 border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
 
                         {/* Header */}
-                        <div className="flex items-center justify-between p-4 border-b border-neutral-800 bg-neutral-900/50">
+                        <div className="flex items-center justify-between p-4 border-b border-neutral-800 bg-neutral-900/50 flex-shrink-0">
                             <h2 className="text-lg font-bold text-white flex items-center gap-2">
                                 <CircleHelp className="w-5 h-5 text-blue-400" />
-                                Viewer Guide (Updated)
+                                Viewer Guide
                             </h2>
                             <button
                                 onClick={() => setIsOpen(false)}
@@ -46,7 +46,7 @@ export const HelpGuide: React.FC = () => {
                         </div>
 
                         {/* Content */}
-                        <div className="p-6 space-y-6">
+                        <div className="p-6 space-y-6 overflow-y-auto">
 
                             {/* Mouse Controls */}
                             <div className="space-y-3">
@@ -125,7 +125,7 @@ export const HelpGuide: React.FC = () => {
                         </div>
 
                         {/* Footer */}
-                        <div className="p-4 bg-neutral-950/50 border-t border-neutral-800 text-center">
+                        <div className="p-4 bg-neutral-950/50 border-t border-neutral-800 text-center flex-shrink-0">
                             <p className="text-[10px] text-neutral-500">
                                 Press <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-300">Esc</kbd> to close
                             </p>
