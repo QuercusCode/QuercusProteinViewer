@@ -91,6 +91,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     const isMounted = useRef(true);
 
     const measurementsRef = useRef<MeasurementData[]>([]);
+    const measurementRepsRef = useRef<any[]>([]); // Track NGL Representations for cleanup
     const selectedAtomsRef = useRef<any[]>([]);
 
     // Helper to find atom
@@ -112,31 +113,39 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         const atom2 = findAtom(m.atom2.chain, m.atom2.resNo, m.atom2.atomName);
 
         if (atom1 && atom2 && stageRef.current) {
-            try {
-                const shape = new window.NGL.Shape(m.shapeId);
+            // Use Native NGL Distance Representation (Most Robust)
+            // This bypasses Shape primitive issues by using built-in measurement rendering
+            // We need atom indices for this
+            let idx1 = -1;
+            let idx2 = -1;
 
-                const start = [atom1.x, atom1.y, atom1.z];
-                const end = [atom2.x, atom2.y, atom2.z];
-                const color = [1, 1, 0]; // Yellow
+            if (componentRef.current && componentRef.current.structure) {
+                // We need to find the correct atom proxy indices
+                // We can iterate again or optimize. Since we have findAtom, let's just get the index from the proxy.
+                // IMPORTANT: findAtom returns an AtomProxy which has .index property
+                if (atom1 && typeof atom1.index === 'number') idx1 = atom1.index;
+                if (atom2 && typeof atom2.index === 'number') idx2 = atom2.index;
+            }
 
-                // 1. Wireframe Line (Always visible, no lighting)
-                // This ensures "Just a simple line" is seen even if shading fails
-                if (typeof shape.addLine === 'function') {
-                    shape.addLine(start, end, color);
+            if (idx1 !== -1 && idx2 !== -1) {
+                const params = {
+                    labelUnit: 'angstrom',
+                    labelSize: 2.0,
+                    labelColor: 'white',
+                    color: 'yellow',
+                    atomPair: [[idx1, idx2]],
+                    opacity: 1.0
+                };
+
+                const distanceRep = componentRef.current.addRepresentation("distance", params);
+                // Store the representation so we can remove it later
+                // We can cheat and attach the measurement ID to the representation object wrapper
+                if (distanceRep) {
+                    measurementRepsRef.current.push(distanceRep);
                 }
-
-                // 2. Solid Cylinder (For thickness/3D effect)
-                // We keep this for quality, but the wireframe guarantees 1px visibility at minimum
-                shape.addCylinder(start, end, color, 0.2);
-
-                // Label
-                const mp = [(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2];
-                shape.addText(mp, [1, 1, 1], 2.0, `${m.distance.toFixed(2)} A`);
-
-                const shapeComp = stageRef.current.addComponentFromObject(shape);
-                shapeComp.addRepresentation("buffer", { depthTest: false, opacity: 1.0, side: "double" }); // Double-sided for visibility
-            } catch (e) {
-                console.warn("Failed to draw measurement", e);
+            } else {
+                // Fallback to Shape if indices fail (unlikely)
+                console.warn("Could not find atom indices for distance rep");
             }
         }
     };
@@ -713,9 +722,26 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         clearMeasurements: () => {
             measurementsRef.current = [];
             selectedAtomsRef.current = [];
+
+            // 1. Remove Representations (Distance Lines)
+            if (componentRef.current) {
+                const comp = componentRef.current;
+                measurementRepsRef.current.forEach(rep => {
+                    try {
+                        comp.removeRepresentation(rep);
+                        // Also try removing from the internal reprList if removeRepresentation doesn't fully work (NGL quirk)
+                        // But mostly removeRepresentation is enough
+                    } catch (e) {
+                        console.warn("Failed to remove measurement representation", e);
+                    }
+                });
+                measurementRepsRef.current = [];
+            }
+
+            // 2. Remove selection spheres (Shapes)
             if (stageRef.current) {
                 stageRef.current.eachComponent((comp: any) => {
-                    if (comp.name && comp.name.startsWith("measure-")) {
+                    if (comp.name && (comp.name.startsWith("measure-") || comp.name.startsWith("sel-"))) {
                         stageRef.current.removeComponent(comp);
                     }
                 });

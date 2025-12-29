@@ -517,28 +517,30 @@ export const Controls: React.FC<ControlsProps> = ({
                     <div className="space-y-3">
                         <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Analysis</label>
 
-                        <button
-                            onClick={() => setIsMeasurementMode(!isMeasurementMode)}
-                            className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isMeasurementMode ? 'bg-amber-500/10 border-amber-500 text-amber-500' : `${cardBg} hover:opacity-80`}`}
-                        >
-                            <span className="text-xs font-medium">Measure</span>
-                            <Ruler className="w-3.5 h-3.5" />
-                        </button>
+                        <div className="grid grid-cols-2 gap-2">
+                            <button
+                                onClick={() => setIsMeasurementMode(!isMeasurementMode)}
+                                className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isMeasurementMode ? 'bg-amber-500/10 border-amber-500 text-amber-500' : `${cardBg} hover:opacity-80`}`}
+                            >
+                                <span className="text-xs font-medium">Measure</span>
+                                <Ruler className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                                onClick={onToggleContactMap}
+                                className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
+                            >
+                                <span className="text-xs font-medium">Map</span>
+                                <Grid3X3 className="w-3.5 h-3.5" />
+                            </button>
+                        </div>
                         {isMeasurementMode && (
                             <button
                                 onClick={onClearMeasurements}
-                                className={`col-span-2 flex items-center justify-center gap-2 border py-1.5 rounded-lg text-xs font-medium transition-colors ${isLightMode ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-red-900/30 text-red-400 border-red-900/50 hover:bg-red-900/50'}`}
+                                className={`w-full flex items-center justify-center gap-2 border py-1.5 rounded-lg text-xs font-medium transition-colors ${isLightMode ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-red-900/30 text-red-400 border-red-900/50 hover:bg-red-900/50'}`}
                             >
                                 <Trash2 className="w-3 h-3" /> Clear Measurements
                             </button>
                         )}
-                        <button
-                            onClick={onToggleContactMap}
-                            className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
-                        >
-                            <span className="text-xs font-medium">Contact Map</span>
-                            <Grid3X3 className="w-3.5 h-3.5" />
-                        </button>
                     </div>
 
                     {/* Sequence Viewer */}
