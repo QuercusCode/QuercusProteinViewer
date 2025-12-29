@@ -3,7 +3,7 @@ import { ProteinViewer, type RepresentationType, type ColoringType, type Protein
 import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
 import { HelpGuide } from './components/HelpGuide';
-import { getShareableURL, parseURLState } from './utils/urlManager';
+import { parseURLState } from './utils/urlManager';
 import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Movie } from './types';
 
 function App() {
@@ -88,32 +88,7 @@ function App() {
     }
   };
 
-  const handleShare = () => {
-    if (!viewerRef.current) return;
 
-    // Capture current state
-    const orientation = viewerRef.current.getCameraOrientation();
-    const measurements = viewerRef.current.getMeasurements();
-
-    const url = getShareableURL({
-      pdbId,
-      representation,
-      coloring,
-      orientation,
-      isSpinning,
-      showLigands,
-      showSurface,
-      customColors,
-      measurements
-    });
-
-    navigator.clipboard.writeText(url).then(() => {
-      alert("Link copied to clipboard!");
-    }).catch(err => {
-      console.error("Failed to copy link", err);
-      prompt("Copy this link:", url);
-    });
-  };
 
   // Snapshot Gallery State
   // Snapshot & Movie Gallery State
@@ -501,7 +476,6 @@ function App() {
         movies={movies}
         onDownloadMovie={handleDownloadMovie}
         onDeleteMovie={handleDeleteMovie}
-        onShare={handleShare}
         isSpinning={isSpinning}
         setIsSpinning={setIsSpinning}
         isCleanMode={isCleanMode}

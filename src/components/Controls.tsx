@@ -21,8 +21,7 @@ import {
     Video,
     X,
     Loader2,
-    ImageIcon,
-    Link
+    ImageIcon
 } from 'lucide-react';
 import type { RepresentationType, ColoringType } from './ProteinViewer';
 import type { ChainInfo, CustomColorRule, Snapshot, Movie } from '../types';
@@ -68,7 +67,6 @@ interface ControlsProps {
     movies: Movie[];
     onDownloadMovie: (id: string) => void;
     onDeleteMovie: (id: string) => void;
-    onShare: () => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -111,8 +109,7 @@ export const Controls: React.FC<ControlsProps> = ({
     onToggleContactMap,
     movies,
     onDownloadMovie,
-    onDeleteMovie,
-    onShare
+    onDeleteMovie
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const sessionInputRef = useRef<HTMLInputElement>(null);
@@ -586,9 +583,6 @@ export const Controls: React.FC<ControlsProps> = ({
                         </button>
                         <button onClick={() => sessionInputRef.current?.click()} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
                             <Upload className="w-3.5 h-3.5" /> Load
-                        </button>
-                        <button onClick={onShare} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`} title="Copy Link">
-                            <Link className="w-3.5 h-3.5" /> Share
                         </button>
                         <input type="file" accept=".json" className="hidden" ref={sessionInputRef} onChange={(e) => e.target.files?.[0] && onLoadSession(e.target.files[0])} />
                     </div>
