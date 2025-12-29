@@ -972,6 +972,23 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                 chainCount: component.structure.chainStore.count
                             });
 
+                            if (component.structure.atomCount === 0) {
+                                console.warn("Loaded structure has 0 atoms.");
+                                if (currentFile) {
+                                    // Check if it might be a Structure Factors file
+                                    const fileContent = await currentFile.text(); // Re-read text safe here since it already loaded
+                                    if (!fileContent.includes('_atom_site')) {
+                                        const isSF = currentFile.name.includes('-sf') || fileContent.includes('_refln');
+                                        const msg = isSF
+                                            ? "This appears to be a Structure Factors file (diffraction data), not a coordinate model. Please upload the model file (usually .pdb or .cif without '-sf')."
+                                            : "The file was parsed but contains no atoms. Please check the file format.";
+
+                                        if (isMounted.current) setError(msg);
+                                        return;
+                                    }
+                                }
+                            }
+
                             component.structure.eachChain((c: any) => {
                                 if (seenChains.has(c.chainname)) return;
                                 seenChains.add(c.chainname);
