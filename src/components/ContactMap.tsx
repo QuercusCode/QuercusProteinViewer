@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { X, ZoomIn, ZoomOut, Maximize, Download, Settings, Grid3X3, Check } from 'lucide-react';
+import { X, ZoomIn, ZoomOut, Maximize, Download, Settings, Grid3X3, Check, FileText } from 'lucide-react';
 import type { ChainInfo } from '../types';
 
 interface ContactMapProps {
@@ -224,6 +224,38 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         document.body.removeChild(a);
     };
 
+    const handleDownloadCSV = () => {
+        if (!distanceData) return;
+        const { matrix, labels } = distanceData;
+
+        // CSV Header
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Chain1,ResNo1,Residue1,Chain2,ResNo2,Residue2,Distance(A)\n";
+
+        // Generate Rows (Upper Triangle only to avoid duplicates, including diagonal)
+        for (let i = 0; i < matrix.length; i++) {
+            for (let j = i; j < matrix.length; j++) {
+                // Export any interaction < 15A to capture all potential contacts of interest
+                // This covers close (<5), proximal (5-8), and distal/near (8-15) contacts
+                const dist = matrix[i][j];
+                if (dist <= 15.0) {
+                    const l1 = labels[i];
+                    const l2 = labels[j];
+                    const row = `${l1.chain},${l1.resNo},${l1.label},${l2.chain},${l2.resNo},${l2.label},${dist.toFixed(3)}`;
+                    csvContent += row + "\n";
+                }
+            }
+        }
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `interaction_data_${new Date().toISOString().slice(0, 10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
     // Render Overlay (Crosshair) - Light
     useEffect(() => {
         if (!distanceData || !overlayCanvasRef.current) return;
@@ -436,6 +468,13 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                             )}
                         </div>
 
+                        <button
+                            onClick={handleDownloadCSV}
+                            className={`p-2 rounded-lg transition-colors ${isLightMode ? 'hover:bg-neutral-100 text-neutral-600' : 'hover:bg-neutral-800 text-neutral-400'}`}
+                            title="Download Data (CSV)"
+                        >
+                            <FileText className="w-5 h-5" />
+                        </button>
                         <button
                             onClick={handleDownload}
                             className={`p-2 rounded-lg transition-colors ${isLightMode ? 'hover:bg-neutral-100 text-neutral-600' : 'hover:bg-neutral-800 text-neutral-400'}`}
