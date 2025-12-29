@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { X, ZoomIn, ZoomOut, Maximize, Download, Grid3X3, Check, FileText } from 'lucide-react';
+import { X, ZoomIn, ZoomOut, Maximize, Download, Grid3X3, Check, FileText, Code } from 'lucide-react';
 import type { ChainInfo } from '../types';
+import { generatePyMOLScript } from '../utils/pymolGenerator';
 
 interface ContactMapProps {
     isOpen: boolean;
@@ -470,6 +471,27 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
     if (!isOpen) return null;
 
+    const handleExportPyMOL = () => {
+        if (!distanceData) return;
+
+        const scriptContent = generatePyMOLScript({
+            distanceData,
+            filters,
+            thresholds: { contact: contactThreshold, proximal: proximalThreshold },
+            showIntraChain
+        });
+
+        const blob = new Blob([scriptContent], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'contact_map_view.pml';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm animate-in fade-in">
             <div className={`relative w-full max-w-6xl h-[90vh] rounded-xl shadow-2xl flex flex-col overflow-hidden ${isLightMode ? 'bg-white text-neutral-900' : 'bg-neutral-900 text-white border border-neutral-800'}`}>
@@ -495,6 +517,13 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                         >
                             <FileText className="w-4 h-4" />
                             <span className="hidden sm:inline">Export CSV</span>
+                        </button>
+                        <button
+                            onClick={handleExportPyMOL}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isLightMode ? 'bg-green-100 hover:bg-green-200 text-green-700' : 'bg-green-900/30 hover:bg-green-900/50 text-green-400'}`}
+                        >
+                            <Code className="w-4 h-4" />
+                            <span className="hidden sm:inline">PyMOL Script</span>
                         </button>
                         <button
                             onClick={handleDownload}

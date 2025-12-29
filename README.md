@@ -27,7 +27,7 @@ A high-performance, interactive 3D Protein Structure Viewer built for modern res
   - **Interaction Filtering**: Isolate specific chemical bonds (e.g., "Show only Salt Bridges") to reduce noise and find critical contacts.
   - **Interface Focus Mode**: Toggle to hide intra-chain interactions, instantly highlighting binding interfaces between subunits.
   - **3D Sync**: Clicking a pixel on the map draws a connection line between the residues in the 3D viewer.
-  - Export interaction data as CSV or download the map as an image.
+  - **Export Data**: Download interaction lists (CSV), high-res heatmap images (PNG), or **PyMOL Scripts (.pml)** for publication-quality renders.
 - **Distance Measurement**: Click any two atoms to measure the precise Angstrom distance.
 - **Sequence Viewer**: Browse the amino acid sequence, hover to identify residues, and click to highlight them in 3D.
 - **Ligand Focus**: Automatically detect and zoom into ligand binding sites.
