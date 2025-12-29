@@ -21,7 +21,8 @@ import {
     Video,
     X,
     Loader2,
-    ImageIcon
+    ImageIcon,
+    Grid3X3
 } from 'lucide-react';
 import type { RepresentationType, ColoringType } from './ProteinViewer';
 import type { ChainInfo, CustomColorRule, Snapshot, Movie } from '../types';
@@ -112,7 +113,8 @@ export const Controls: React.FC<ControlsProps> = ({
     onLoadSession,
     movies,
     onDownloadMovie,
-    onDeleteMovie
+    onDeleteMovie,
+    onToggleContactMap
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const sessionInputRef = useRef<HTMLInputElement>(null);
@@ -530,6 +532,13 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <Trash2 className="w-3 h-3" /> Clear Measurements
                             </button>
                         )}
+                        <button
+                            onClick={onToggleContactMap}
+                            className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
+                        >
+                            <span className="text-xs font-medium">Contact Map</span>
+                            <Grid3X3 className="w-3.5 h-3.5" />
+                        </button>
                     </div>
 
                     {/* Sequence Viewer */}
