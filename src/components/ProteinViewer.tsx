@@ -116,10 +116,21 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 const shape = new window.NGL.Shape(m.shapeId);
 
 
-                // Solid Line for Visibility
-                const start = [atom1.x, atom1.y, atom1.z];
-                const end = [atom2.x, atom2.y, atom2.z];
-                shape.addCylinder(start, end, [1, 1, 0], 0.4); // Yellow cylinder, thicker
+                // Robust Line: Pearl Necklace (Overlapping Spheres)
+                // Used to guarantee visibility if Cylinders are failing
+                const steps = Math.ceil(m.distance * 5); // ~0.2A spacing
+                const delta = [
+                    (atom2.x - atom1.x) / steps,
+                    (atom2.y - atom1.y) / steps,
+                    (atom2.z - atom1.z) / steps
+                ];
+
+                for (let i = 0; i <= steps; i++) {
+                    const x = atom1.x + delta[0] * i;
+                    const y = atom1.y + delta[1] * i;
+                    const z = atom1.z + delta[2] * i;
+                    shape.addSphere([x, y, z], [1, 0.84, 0], 0.15); // Golden Yellow
+                }
 
                 // Label
                 const mp = [(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2];
