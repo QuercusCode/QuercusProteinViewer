@@ -13,8 +13,8 @@ export type RepresentationType = 'cartoon' | 'licorice' | 'backbone' | 'spacefil
 export type ColoringType = 'chainid' | 'element' | 'residue' | 'secondary' | 'hydrophobicity' | 'structure' | 'bfactor' | 'charge';
 
 export interface MeasurementData {
-    atom1: { chain: string, resNo: number, atomName: string, x: number, y: number, z: number };
-    atom2: { chain: string, resNo: number, atomName: string, x: number, y: number, z: number };
+    atom1: { chain: string, resNo: number, atomName: string, x: number, y: number, z: number, index?: number };
+    atom2: { chain: string, resNo: number, atomName: string, x: number, y: number, z: number, index?: number };
     distance: number;
     shapeId: string;
 }
@@ -947,13 +947,27 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             // MEASUREMENT MODE LOGIC
             if (isMeasurementMode) {
                 console.log("Measurement Mode Click:", atom);
-                selectedAtomsRef.current.push(atom);
+
+                // IMPORTANT: NGL reuses the same AtomProxy object for performance during iteration.
+                // We MUST clone the data immediately, otherwise both references in our array will 
+                // point to the same updated object (the last clicked atom), resulting in distance 0.
+                const atomData = {
+                    chainname: atom.chainname,
+                    resno: atom.resno,
+                    atomname: atom.atomname,
+                    x: atom.x,
+                    y: atom.y,
+                    z: atom.z,
+                    index: atom.index // Store index directly!
+                };
+
+                selectedAtomsRef.current.push(atomData);
 
                 // Highlight the selected atom temporarily?
                 // Maybe draw a small sphere?
                 const shapeId = `sel-${Date.now()}`;
                 const shape = new window.NGL.Shape(shapeId);
-                shape.addSphere([atom.x, atom.y, atom.z], [1, 0.5, 0], 0.5); // Orange selection
+                shape.addSphere([atom.x, atom.y, atom.z], [1, 0.5, 0], 0.3); // Orange selection
                 const comp = stage.addComponentFromObject(shape);
                 comp.addRepresentation("buffer", { depthTest: false });
                 // Track this temp shape to remove later? 
@@ -968,8 +982,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
                     const mData: MeasurementData = {
-                        atom1: { chain: a1.chainname, resNo: a1.resno, atomName: a1.atomname, x: a1.x, y: a1.y, z: a1.z },
-                        atom2: { chain: a2.chainname, resNo: a2.resno, atomName: a2.atomname, x: a2.x, y: a2.y, z: a2.z },
+                        atom1: { chain: a1.chainname, resNo: a1.resno, atomName: a1.atomname, x: a1.x, y: a1.y, z: a1.z, index: a1.index },
+                        atom2: { chain: a2.chainname, resNo: a2.resno, atomName: a2.atomname, x: a2.x, y: a2.y, z: a2.z, index: a2.index },
                         distance: dist,
                         shapeId: `measure-${Date.now()}`
                     };
