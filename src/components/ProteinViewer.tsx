@@ -907,17 +907,27 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         console.log(`Detected extension: ${rawExt} -> Parsed as: ${ext}`);
 
                         // Manual loading to prevent NGL File object issues
-                        // Data URI loading - The most robust method
-                        // Treats the file logic exactly like a URL, bypassing NGL's internal File/Blob parsing
-                        const dataUrl = await new Promise<string>((resolve, reject) => {
+                        // Blob URL loading - The standard "Golden Path" for local files
+                        // Creates a temporary URL (blob:...) that NGL treats as a network resource.
+                        // Bypasses File object handling AND Data URI limits.
+                        const fileContent = await new Promise<ArrayBuffer>((resolve, reject) => {
                             const reader = new FileReader();
-                            reader.onload = (e) => resolve(e.target?.result as string);
+                            reader.onload = (e) => resolve(e.target?.result as ArrayBuffer);
                             reader.onerror = (e) => reject(e);
-                            reader.readAsDataURL(currentFile);
+                            reader.readAsArrayBuffer(currentFile);
                         });
 
-                        console.log(`Loading via Data URI (length: ${dataUrl.length}) as ${ext}`);
-                        return await stage.loadFile(dataUrl, { defaultRepresentation: false, ext });
+                        const blob = new Blob([fileContent], { type: 'text/plain' });
+                        const objectUrl = URL.createObjectURL(blob);
+
+                        console.log(`Loading via Object URL: ${objectUrl} as ${ext}`);
+                        // Important: Pass 'ext' to ensure NGL knows how to parse this blob URL
+                        try {
+                            return await stage.loadFile(objectUrl, { defaultRepresentation: false, ext, name: 'structure' });
+                        } finally {
+                            // URL.revokeObjectURL(objectUrl); // Keep alive while NGL processes it, maybe revoke in cleanup if needed
+                            // For safety in this context, we let the browser clean it up or revoke on next load
+                        }
                     }
 
                     if (currentPdbId) {
