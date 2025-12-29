@@ -907,34 +907,33 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         console.log(`Detected extension: ${rawExt} -> Parsed as: ${ext}`);
 
                         // Manual loading to prevent NGL File object issues
-                        // Debugging: Read as Text to verify content
-                        const fileContent = await new Promise<string>((resolve, reject) => {
+                        // Robust Binary Loading
+                        // We read as ArrayBuffer to handle all file types correctly (PDB/CIF/BinaryCIF)
+                        const fileContent = await new Promise<ArrayBuffer>((resolve, reject) => {
                             const reader = new FileReader();
-                            reader.onload = (e) => resolve(e.target?.result as string);
+                            reader.onload = (e) => resolve(e.target?.result as ArrayBuffer);
                             reader.onerror = (e) => reject(e);
-                            reader.readAsText(currentFile);
+                            reader.readAsArrayBuffer(currentFile);
                         });
 
-                        // Log first 500 chars to check for "data_" header
-                        console.log("File Content Header (first 500 chars):", fileContent.substring(0, 500));
-
-                        // Check if it looks like a CIF
-                        if (!fileContent.includes("data_") && ext === 'mmcif') {
-                            console.warn("WARNING: File does not start with 'data_'. Is this a valid CIF? content-start:", fileContent.substring(0, 50));
-                        }
-
-                        const blob = new Blob([fileContent], { type: 'text/plain' });
+                        const blob = new Blob([fileContent], { type: 'application/octet-stream' });
                         const objectUrl = URL.createObjectURL(blob);
 
-                        console.log(`Loading via Object URL (Text Blob): ${objectUrl} as ${ext}`);
-                        // Important: Pass 'ext' to ensure NGL knows how to parse this blob URL
+                        console.log(`Loading via Object URL (Binary): ${objectUrl} as ${ext}`);
+
+                        // Generic name with correct extension helps NGL parser
+                        const safeName = `structure.${ext}`;
                         try {
-                            return await stage.loadFile(objectUrl, { defaultRepresentation: false, ext, name: 'structure' });
+                            return await stage.loadFile(objectUrl, {
+                                defaultRepresentation: false,
+                                ext,
+                                name: safeName
+                            });
                         } finally {
-                            // URL.revokeObjectURL(objectUrl); // Keep alive while NGL processes it, maybe revoke in cleanup if needed
-                            // For safety in this context, we let the browser clean it up or revoke on next load
+                            // URL.revokeObjectURL(objectUrl);
                         }
                     }
+
 
                     if (currentPdbId) {
                         const cleanId = String(currentPdbId).trim().toLowerCase();
