@@ -237,6 +237,10 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         }
         ctx.stroke();
 
+        // Check for Single Chain Mode
+        const uniqueChains = new Set(distanceData.labels.map(l => l.chain));
+        const isSingleChain = uniqueChains.size === 1;
+
         // Draw Contacts
         for (let i = 0; i < size; i++) {
             for (let j = i; j < size; j++) {
@@ -273,7 +277,11 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                     // Draw with specific color for filtered mode
                     ctx.fillStyle = color;
                     ctx.fillRect(j * P, i * P, P, P);
-                    if (i !== j) ctx.fillRect(i * P, j * P, P, P);
+
+                    // Only draw symmetric lower triangle if NOT single chain
+                    if (!isSingleChain && i !== j) {
+                        ctx.fillRect(i * P, j * P, P, P);
+                    }
 
                 } else {
                     // Default "Show All" Mode (Blue Heatmap)
@@ -285,7 +293,9 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                         }
 
                         ctx.fillRect(j * P, i * P, P, P);
-                        if (i !== j) {
+
+                        // Only draw symmetric lower triangle if NOT single chain
+                        if (!isSingleChain && i !== j) {
                             ctx.fillRect(i * P, j * P, P, P);
                         }
                     }
