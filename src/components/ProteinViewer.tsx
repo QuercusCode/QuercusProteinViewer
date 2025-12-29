@@ -907,20 +907,26 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         console.log(`Detected extension: ${rawExt} -> Parsed as: ${ext}`);
 
                         // Manual loading to prevent NGL File object issues
-                        // Blob URL loading - The standard "Golden Path" for local files
-                        // Creates a temporary URL (blob:...) that NGL treats as a network resource.
-                        // Bypasses File object handling AND Data URI limits.
-                        const fileContent = await new Promise<ArrayBuffer>((resolve, reject) => {
+                        // Debugging: Read as Text to verify content
+                        const fileContent = await new Promise<string>((resolve, reject) => {
                             const reader = new FileReader();
-                            reader.onload = (e) => resolve(e.target?.result as ArrayBuffer);
+                            reader.onload = (e) => resolve(e.target?.result as string);
                             reader.onerror = (e) => reject(e);
-                            reader.readAsArrayBuffer(currentFile);
+                            reader.readAsText(currentFile);
                         });
+
+                        // Log first 500 chars to check for "data_" header
+                        console.log("File Content Header (first 500 chars):", fileContent.substring(0, 500));
+
+                        // Check if it looks like a CIF
+                        if (!fileContent.includes("data_") && ext === 'mmcif') {
+                            console.warn("WARNING: File does not start with 'data_'. Is this a valid CIF? content-start:", fileContent.substring(0, 50));
+                        }
 
                         const blob = new Blob([fileContent], { type: 'text/plain' });
                         const objectUrl = URL.createObjectURL(blob);
 
-                        console.log(`Loading via Object URL: ${objectUrl} as ${ext}`);
+                        console.log(`Loading via Object URL (Text Blob): ${objectUrl} as ${ext}`);
                         // Important: Pass 'ext' to ensure NGL knows how to parse this blob URL
                         try {
                             return await stage.loadFile(objectUrl, { defaultRepresentation: false, ext, name: 'structure' });
