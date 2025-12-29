@@ -890,7 +890,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 let component;
                 if (currentFile) {
                     console.log("Loading from file:", currentFile.name);
-                    component = await stage.loadFile(currentFile, { defaultRepresentation: false });
+                    let ext = currentFile.name.split('.').pop()?.toLowerCase() || 'pdb';
+                    if (ext === 'ent') ext = 'pdb';
+                    if (ext === 'mmcif') ext = 'cif';
+                    component = await stage.loadFile(currentFile, { defaultRepresentation: false, ext });
                 } else if (currentPdbId) {
                     const cleanId = String(currentPdbId).trim().toLowerCase();
                     if (cleanId.length < 3) {
