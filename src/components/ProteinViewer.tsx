@@ -83,20 +83,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     const isMounted = useRef(true);
 
 
-    const selectedAtomsRef = useRef<any[]>([]);
+
 
     // Helper to find atom
-    const findAtom = (chain: string, resNo: number, atomName: string) => {
-        if (!componentRef.current) return null;
-        let found: any = null;
-        const selection = new window.NGL.Selection(`${resNo}:${chain} and .${atomName}`);
-        if (componentRef.current && componentRef.current.structure) {
-            componentRef.current.structure.eachAtom((atom: any) => {
-                found = atom;
-            }, selection);
-        }
-        return found;
-    };
+
 
 
 
