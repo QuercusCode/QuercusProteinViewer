@@ -887,25 +887,42 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             const currentFile = file;
 
             try {
-                let component;
-                if (currentFile) {
-                    console.log("Loading from file:", currentFile.name);
-                    component = await stage.loadFile(currentFile, { defaultRepresentation: false });
-                } else if (currentPdbId) {
-                    const cleanId = String(currentPdbId).trim().toLowerCase();
-                    if (cleanId.length < 3) {
-                        if (isMounted.current) setLoading(false);
-                        return;
+                // Generic Loader Function
+                const loadStructure = async () => {
+                    if (currentFile) {
+                        console.log("Loading from file:", currentFile.name);
+                        // Detect extension
+                        const rawExt = currentFile.name.split('.').pop()?.toLowerCase() || 'pdb';
+                        let ext = rawExt;
+
+                        // Normalize extensions
+                        if (rawExt === 'cif' || rawExt === 'mmcif') {
+                            ext = 'mmcif'; // Explicitly tell NGL to use mmCIF parser
+                        } else if (rawExt === 'ent') {
+                            ext = 'pdb';
+                        }
+
+                        console.log(`Detected extension: ${rawExt} -> Parsed as: ${ext}`);
+                        return await stage.loadFile(currentFile, { defaultRepresentation: false, ext });
                     }
 
-                    const AVAILABLE_LOCAL_PDBS = ['2b3p', '4hhb'];
-                    let url = `https://files.rcsb.org/download/${cleanId}.pdb`;
-                    if (AVAILABLE_LOCAL_PDBS.includes(cleanId)) {
-                        url = `./${cleanId}.pdb`;
+                    if (currentPdbId) {
+                        const cleanId = String(currentPdbId).trim().toLowerCase();
+                        if (cleanId.length < 3) return null;
+
+                        const AVAILABLE_LOCAL_PDBS = ['2b3p', '4hhb'];
+                        let url = `https://files.rcsb.org/download/${cleanId}.pdb`;
+                        if (AVAILABLE_LOCAL_PDBS.includes(cleanId)) {
+                            url = `./${cleanId}.pdb`;
+                        }
+                        console.log(`Fetching from: ${url}`);
+                        return await stage.loadFile(url, { defaultRepresentation: false });
                     }
-                    console.log(`Fetching from: ${url}`);
-                    component = await stage.loadFile(url, { defaultRepresentation: false });
-                } else {
+                    return null;
+                };
+
+                const component = await loadStructure();
+                if (!component) {
                     if (isMounted.current) setLoading(false);
                     return;
                 }
