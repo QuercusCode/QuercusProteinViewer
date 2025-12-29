@@ -892,7 +892,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     console.log("Loading from file:", currentFile.name);
                     let ext = currentFile.name.split('.').pop()?.toLowerCase() || 'pdb';
                     if (ext === 'ent') ext = 'pdb';
-                    if (ext === 'mmcif') ext = 'cif';
+                    if (ext === 'cif') ext = 'mmcif'; // Force mmCIF parser for protein structures
                     component = await stage.loadFile(currentFile, { defaultRepresentation: false, ext });
                 } else if (currentPdbId) {
                     const cleanId = String(currentPdbId).trim().toLowerCase();
@@ -916,7 +916,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             console.warn("PDB load failed, trying CIF...", e);
                             const cifUrl = `https://files.rcsb.org/download/${cleanId}.cif`;
                             console.log(`Fetching CIF: ${cifUrl}`);
-                            component = await stage.loadFile(cifUrl, { defaultRepresentation: false });
+                            component = await stage.loadFile(cifUrl, { defaultRepresentation: false, ext: 'mmcif' });
                         }
                     }
                 } else {
