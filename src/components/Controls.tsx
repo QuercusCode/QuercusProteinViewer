@@ -529,7 +529,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                 onClick={onToggleContactMap}
                                 className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
                             >
-                                <span className="text-xs font-medium">Map</span>
+                                <span className="text-xs font-medium">Contact Map</span>
                                 <Grid3X3 className="w-3.5 h-3.5" />
                             </button>
                         </div>
