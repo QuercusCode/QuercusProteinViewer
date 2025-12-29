@@ -120,9 +120,13 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             const shape = new window.NGL.Shape(id);
             console.log("Shape created:", shape);
 
-            console.log("Adding cylinder from", [atom1.x, atom1.y, atom1.z], "to", [atom2.x, atom2.y, atom2.z]);
-            shape.addCylinder([atom1.x, atom1.y, atom1.z], [atom2.x, atom2.y, atom2.z], [1, 0, 1], 2.0);
-            console.log("Cylinder added");
+
+            console.log("Adding TEST SPHERES at atom positions");
+            // Add large spheres at each atom instead of cylinder
+            shape.addSphere([atom1.x, atom1.y, atom1.z], [1, 0, 1], 5.0);
+            shape.addSphere([atom2.x, atom2.y, atom2.z], [1, 0, 1], 5.0);
+            console.log("Spheres added");
+
 
             shape.addText([(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2], [1, 1, 1], 1.5, `${m.distance} A`);
             console.log("Text added");
