@@ -58,6 +58,7 @@ export interface ProteinViewerRef {
     addResidue: (chainName: string, resType: string) => Promise<Blob | null>;
     recordTurntable: (duration?: number) => Promise<Blob>;
     clearMeasurements: () => void;
+    visualizeContact: (chainA: string, resA: number, chainB: string, resB: number) => void;
 }
 
 
@@ -92,6 +93,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     const measurementsRef = useRef<MeasurementData[]>([]);
     const measurementRepsRef = useRef<any[]>([]); // Track NGL Representations for cleanup
+    const contactLineRepRef = useRef<any>(null); // Track single contact line representation
     const selectedAtomsRef = useRef<any[]>([]);
 
     // Helper to find atom
@@ -721,6 +723,58 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             const finalPdb = cleanPdb.trimEnd() + '\n' + newLines.join('\n') + '\nEND';
 
             return new Blob([finalPdb], { type: 'text/plain' });
+        },
+
+        visualizeContact: (chainA: string, resA: number, chainB: string, resB: number) => {
+            if (!componentRef.current) return;
+            const comp = componentRef.current;
+
+            // 1. Clean up previous contact line
+            if (contactLineRepRef.current) {
+                try {
+                    comp.removeRepresentation(contactLineRepRef.current);
+                } catch (e) { }
+                contactLineRepRef.current = null;
+            }
+
+            // 2. Find Atoms (Prefer CA, fallback to center or first atom)
+            const getAtomIndex = (c: string, r: number) => {
+                let idx: number | null = null;
+                // Try CA
+                const a1 = findAtom(c, r, 'CA');
+                if (a1) return a1.index;
+                // Try CB
+                const a2 = findAtom(c, r, 'CB');
+                if (a2) return a2.index;
+                // Any atom
+                if (comp.structure) {
+                    const sel = new window.NGL.Selection(`${r}:${c}`);
+                    comp.structure.eachAtom((atom: any) => {
+                        if (idx === null) idx = atom.index;
+                    }, sel);
+                }
+                return idx;
+            };
+
+            const idx1 = getAtomIndex(chainA, resA);
+            const idx2 = getAtomIndex(chainB, resB);
+
+            if (idx1 !== null && idx2 !== null) {
+                const params = {
+                    labelVisible: false, // Clean look, just the line
+                    color: '#06b6d4', // Cyan-500
+                    atomPair: [[idx1, idx2]],
+                    opacity: 0.8,
+                    linewidth: 5.0 // Thicker line for emphasis
+                };
+
+                try {
+                    const rep = comp.addRepresentation("distance", params);
+                    contactLineRepRef.current = rep;
+                } catch (e) {
+                    console.warn("Failed to visual contact", e);
+                }
+            }
         },
 
         clearMeasurements: () => {

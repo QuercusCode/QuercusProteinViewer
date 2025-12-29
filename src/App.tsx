@@ -271,16 +271,12 @@ function App() {
 
 
 
-  const handlePixelClick = (chainA: string, resA: number, _chainB: string, _resB: number) => {
-    // Highlight both residues
-    // viewerRef.current?.highlightResiduePair(chainA, resA, chainB, resB); 
-    // Current API only highlights one. Let's highlight one or toggle.
-    // Or: Highlight A, then small timeout Highlight B?
-    // Better: Update ProteinViewer to accept highlightResiduePair?
-    // For now, just click A (simplification)
-    viewerRef.current?.highlightResidue(chainA, resA);
-    // Ideally we want to draw a line between them too...
-    // Maybe set MeasurementMode?
+  const handlePixelClick = (chainA: string, resA: number, chainB: string, resB: number) => {
+    // 1. Visualize the Contact Line
+    viewerRef.current?.visualizeContact(chainA, resA, chainB, resB);
+
+    // 2. Log selection
+    console.log(`Contact Map Interaction: ${chainA}:${resA} <-> ${chainB}:${resB}`);
   };
 
   // Session Management
