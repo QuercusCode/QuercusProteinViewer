@@ -119,14 +119,14 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 // Solid Line for Visibility
                 const start = [atom1.x, atom1.y, atom1.z];
                 const end = [atom2.x, atom2.y, atom2.z];
-                shape.addCylinder(start, end, [1, 1, 0], 0.1); // Yellow cylinder
+                shape.addCylinder(start, end, [1, 1, 0], 0.4); // Yellow cylinder, thicker
 
                 // Label
                 const mp = [(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2];
-                shape.addText(mp, [1, 1, 1], 2.0, `${m.distance.toFixed(2)} Å`);
+                shape.addText(mp, [1, 1, 1], 2.0, `${m.distance.toFixed(2)} A`);
 
                 const shapeComp = stageRef.current.addComponentFromObject(shape);
-                shapeComp.addRepresentation("buffer", { depthTest: false }); // Always visible
+                shapeComp.addRepresentation("buffer", { depthTest: false, opacity: 1.0 }); // Always visible
             } catch (e) {
                 console.warn("Failed to draw measurement", e);
             }
