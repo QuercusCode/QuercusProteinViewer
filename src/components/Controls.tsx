@@ -187,11 +187,7 @@ export const Controls: React.FC<ControlsProps> = ({
         setPdbId(localPdbId);
     };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            onUpload(e.target.files[0]);
-        }
-    };
+
 
     const addCustomRule = (e: React.FormEvent) => {
         e.preventDefault();
