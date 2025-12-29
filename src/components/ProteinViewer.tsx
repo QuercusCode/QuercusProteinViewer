@@ -950,6 +950,12 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             const chains: ChainInfo[] = [];
                             const seenChains = new Set<string>();
 
+                            console.log("Structure details:", {
+                                atomCount: component.structure.atomCount,
+                                modelCount: component.structure.modelStore.count,
+                                chainCount: component.structure.chainStore.count
+                            });
+
                             component.structure.eachChain((c: any) => {
                                 if (seenChains.has(c.chainname)) return;
                                 seenChains.add(c.chainname);
