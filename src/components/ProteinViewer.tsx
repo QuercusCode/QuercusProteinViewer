@@ -104,49 +104,41 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         return found;
     };
 
-    const drawMeasurement = (m: MeasurementData, stage: any) => {
+    const drawMeasurement = (m: MeasurementData) => {
         console.log("=== DRAW MEASUREMENT START ===");
         console.log("Measurement data:", m);
+
         const atom1 = findAtom(m.atom1.chain, m.atom1.resNo, m.atom1.atomName);
         const atom2 = findAtom(m.atom2.chain, m.atom2.resNo, m.atom2.atomName);
         console.log("Found atom1:", atom1);
         console.log("Found atom2:", atom2);
 
-        if (atom1 && atom2) {
-            // Safe ID generation (Math.random is safer than crypto in some contexts)
-            const id = "distance-" + Math.random().toString(36).substring(2, 9);
-            console.log("Creating shape with ID:", id);
+        if (atom1 && atom2 && componentRef.current) {
+            try {
+                // Use NGL's built-in distance representation
+                const atomPair = [
+                    [atom1.index],
+                    [atom2.index]
+                ];
 
-            const shape = new window.NGL.Shape(id);
-            console.log("Shape created:", shape);
+                console.log("Adding distance representation for atoms:", atomPair);
+                const distanceRepr = componentRef.current.addRepresentation("distance", {
+                    atomPair: atomPair,
+                    color: "yellow",
+                    labelColor: "white",
+                    labelSize: 1.5,
+                    labelUnit: "angstrom",
+                    opacity: 1.0
+                });
 
-
-            console.log("Creating line with spheres from", [atom1.x, atom1.y, atom1.z], "to", [atom2.x, atom2.y, atom2.z]);
-
-            // Create line effect using chain of spheres (since cylinders don't render)
-            const numSpheres = 50; // More spheres for continuous line
-            for (let i = 0; i <= numSpheres; i++) {
-                const t = i / numSpheres;
-                const x = atom1.x + t * (atom2.x - atom1.x);
-                const y = atom1.y + t * (atom2.y - atom1.y);
-                const z = atom1.z + t * (atom2.z - atom1.z);
-                shape.addSphere([x, y, z], [1, 1, 0], 0.8); // Larger overlapping yellow spheres
+                console.log("Distance representation added successfully:", distanceRepr);
+                console.log("=== DRAW MEASUREMENT END ===");
+                return distanceRepr;
+            } catch (e) {
+                console.error("Failed to add distance representation:", e);
             }
-            console.log("Sphere chain added - count:", numSpheres + 1);
-
-
-            shape.addText([(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2], [1, 1, 1], 1.5, `${m.distance} A`);
-            console.log("Text added");
-
-            const shapeComp = stage.addComponentFromObject(shape);
-            console.log("Component added to stage:", shapeComp);
-
-            shapeComp.addRepresentation("buffer", { depthTest: false, opacity: 1.0 });
-            console.log("Representation added - COMPLETE");
-            console.log("=== DRAW MEASUREMENT END ===");
-            return shapeComp;
         }
-        console.log("WARNING: Atoms not found, cannot draw measurement");
+        console.log("WARNING: Atoms not found or component not ready");
         return null;
     };
 
@@ -724,7 +716,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 if (c.name.startsWith("distance-")) stageRef.current.removeComponent(c);
             });
 
-            measurements.forEach(m => drawMeasurement(m, stageRef.current));
+            measurements.forEach(m => drawMeasurement(m));
         }
     }));
 
@@ -948,7 +940,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         };
 
                         measurementsRef.current.push(newMeasurement);
-                        drawMeasurement(newMeasurement, stage);
+                        drawMeasurement(newMeasurement);
 
                         selectedAtomsRef.current = [];
                     } catch (e) {
