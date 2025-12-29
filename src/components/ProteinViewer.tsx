@@ -899,12 +899,23 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     }
 
                     const AVAILABLE_LOCAL_PDBS = ['2b3p', '4hhb'];
-                    let url = `https://files.rcsb.org/download/${cleanId}.pdb`;
                     if (AVAILABLE_LOCAL_PDBS.includes(cleanId)) {
-                        url = `./${cleanId}.pdb`;
+                        const url = `./${cleanId}.pdb`;
+                        console.log(`Fetching local: ${url}`);
+                        component = await stage.loadFile(url, { defaultRepresentation: false });
+                    } else {
+                        // Try loading PDB first, then CIF (fallback for large structures)
+                        const pdbUrl = `https://files.rcsb.org/download/${cleanId}.pdb`;
+                        try {
+                            console.log(`Fetching PDB: ${pdbUrl}`);
+                            component = await stage.loadFile(pdbUrl, { defaultRepresentation: false });
+                        } catch (e) {
+                            console.warn("PDB load failed, trying CIF...", e);
+                            const cifUrl = `https://files.rcsb.org/download/${cleanId}.cif`;
+                            console.log(`Fetching CIF: ${cifUrl}`);
+                            component = await stage.loadFile(cifUrl, { defaultRepresentation: false });
+                        }
                     }
-                    console.log(`Fetching from: ${url}`);
-                    component = await stage.loadFile(url, { defaultRepresentation: false });
                 } else {
                     if (isMounted.current) setLoading(false);
                     return;
