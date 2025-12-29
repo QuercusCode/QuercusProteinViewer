@@ -110,32 +110,33 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
         const atom1 = findAtom(m.atom1.chain, m.atom1.resNo, m.atom1.atomName);
         const atom2 = findAtom(m.atom2.chain, m.atom2.resNo, m.atom2.atomName);
-        console.log("Found atom1:", atom1);
-        console.log("Found atom2:", atom2);
+        console.log("Found atom1:", atom1, "index:", atom1?.index);
+        console.log("Found atom2:", atom2, "index:", atom2?.index);
 
         if (atom1 && atom2 && componentRef.current) {
             try {
-                // Use NGL's built-in distance representation
-                const atomPair = [
-                    [atom1.index],
-                    [atom2.index]
-                ];
+                // NGL distance representation expects atomPair as [[index1, index2]]
+                const atomPair = [[atom1.index, atom2.index]];
 
-                console.log("Adding distance representation for atoms:", atomPair);
+                console.log("Adding distance representation with atomPair:", atomPair);
                 const distanceRepr = componentRef.current.addRepresentation("distance", {
                     atomPair: atomPair,
                     color: "yellow",
                     labelColor: "white",
-                    labelSize: 1.5,
+                    labelSize: 2.0,
                     labelUnit: "angstrom",
+                    lineOpacity: 1.0,
+                    linewidth: 3,
                     opacity: 1.0
                 });
 
                 console.log("Distance representation added successfully:", distanceRepr);
+                console.log("Distance representation parameters:", distanceRepr.getParameters());
                 console.log("=== DRAW MEASUREMENT END ===");
                 return distanceRepr;
             } catch (e) {
                 console.error("Failed to add distance representation:", e);
+                console.error("Error stack:", (e as Error).stack);
             }
         }
         console.log("WARNING: Atoms not found or component not ready");
