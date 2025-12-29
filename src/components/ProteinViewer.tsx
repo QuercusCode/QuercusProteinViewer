@@ -116,13 +116,11 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 const shape = new window.NGL.Shape(m.shapeId);
 
 
-                // Simple Line (Tube) via Path
-                // This creates a smooth tube between points properly
-                const path = [
-                    [atom1.x, atom1.y, atom1.z],
-                    [atom2.x, atom2.y, atom2.z]
-                ];
-                shape.addPath(path, [1, 1, 0], 0.15); // Tube with radius 0.15
+                // Solid Cylinder (Reliable)
+                // Reverting to cylinder as addPath likely crashed (not supported in all NGL versions on Shape)
+                const start = [atom1.x, atom1.y, atom1.z];
+                const end = [atom2.x, atom2.y, atom2.z];
+                shape.addCylinder(start, end, [1, 1, 0], 0.2); // Yellow, radius 0.2
 
                 // Label
                 const mp = [(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2];
