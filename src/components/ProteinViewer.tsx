@@ -105,16 +105,22 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     };
 
     const drawMeasurement = (m: MeasurementData, stage: any) => {
+        console.log("DEBUG: drawing measurement", m);
         const atom1 = findAtom(m.atom1.chain, m.atom1.resNo, m.atom1.atomName);
         const atom2 = findAtom(m.atom2.chain, m.atom2.resNo, m.atom2.atomName);
 
         if (atom1 && atom2) {
-            const shape = new window.NGL.Shape("distance-" + crypto.randomUUID());
+            // Safe ID generation
+            const id = "distance-" + Math.random().toString(36).substring(2, 9);
+            console.log("DEBUG: atoms found, adding shape", id);
+            const shape = new window.NGL.Shape(id);
             shape.addCylinder([atom1.x, atom1.y, atom1.z], [atom2.x, atom2.y, atom2.z], [1, 0.8, 0], 0.2);
             shape.addText([(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2], [1, 1, 1], 1.5, `${m.distance} A`);
             const shapeComp = stage.addComponentFromObject(shape);
             shapeComp.addRepresentation("buffer");
             return shapeComp;
+        } else {
+            console.warn("DEBUG: atoms NOT found for measurement", m);
         }
         return null;
     };
@@ -920,7 +926,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         drawMeasurement(newMeasurement, stage);
 
                         selectedAtomsRef.current = [];
-                    } catch (e) { selectedAtomsRef.current = []; }
+                    } catch (e) {
+                        console.error("DEBUG: Measurement failed", e);
+                        selectedAtomsRef.current = [];
+                    }
                 }
                 // Do NOT trigger onAtomClick
                 return;
