@@ -21,7 +21,8 @@ import {
     Video,
     X,
     Loader2,
-    ImageIcon
+    ImageIcon,
+    Link
 } from 'lucide-react';
 import type { RepresentationType, ColoringType } from './ProteinViewer';
 import type { ChainInfo, CustomColorRule, Snapshot, Movie } from '../types';
@@ -51,7 +52,6 @@ interface ControlsProps {
     setShowLigands: (show: boolean) => void;
     onFocusLigands: () => void;
     onRecordMovie: (duration: number) => void;
-
     isRecording: boolean;
     proteinTitle: string | null;
     snapshots: Snapshot[];
@@ -68,6 +68,7 @@ interface ControlsProps {
     movies: Movie[];
     onDownloadMovie: (id: string) => void;
     onDeleteMovie: (id: string) => void;
+    onShare: () => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -111,6 +112,7 @@ export const Controls: React.FC<ControlsProps> = ({
     movies,
     onDownloadMovie,
     onDeleteMovie,
+    onShare
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const sessionInputRef = useRef<HTMLInputElement>(null);
@@ -583,7 +585,10 @@ export const Controls: React.FC<ControlsProps> = ({
                             <Download className="w-3.5 h-3.5" /> Save Session
                         </button>
                         <button onClick={() => sessionInputRef.current?.click()} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
-                            <Upload className="w-3.5 h-3.5" /> Load Session
+                            <Upload className="w-3.5 h-3.5" /> Load
+                        </button>
+                        <button onClick={onShare} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`} title="Copy Link">
+                            <Link className="w-3.5 h-3.5" /> Share
                         </button>
                         <input type="file" accept=".json" className="hidden" ref={sessionInputRef} onChange={(e) => e.target.files?.[0] && onLoadSession(e.target.files[0])} />
                     </div>

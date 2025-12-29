@@ -3,6 +3,7 @@ import { ProteinViewer, type RepresentationType, type ColoringType, type Protein
 import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
 import { HelpGuide } from './components/HelpGuide';
+import { getShareableURL, parseURLState } from './utils/urlManager';
 import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Movie } from './types';
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
   const [file, setFile] = useState<File | null>(null);
   const [representation, setRepresentation] = useState<RepresentationType>('cartoon');
   const [coloring, setColoring] = useState<ColoringType>('chainid');
+  const [hasRestoredState, setHasRestoredState] = useState(false); // Track if we need to apply matrix
   const [resetKey, setResetKey] = useState(0);
   const [isMeasurementMode, setIsMeasurementMode] = useState(false);
 
@@ -28,6 +30,24 @@ function App() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [isCleanMode, setIsCleanMode] = useState(false);
   const [showContactMap, setShowContactMap] = useState(false);
+
+  // Parse URL State on Mount
+  useEffect(() => {
+    const state = parseURLState();
+    if (state.pdbId) setPdbId(state.pdbId);
+    if (state.representation) setRepresentation(state.representation);
+    if (state.coloring) setColoring(state.coloring);
+    if (state.isSpinning) setIsSpinning(true);
+    if (state.showLigands) setShowLigands(true);
+    if (state.showSurface) setShowSurface(true);
+
+    // Defer matrix application until load confirms
+    if (state.orientation) {
+      setHasRestoredState(true);
+      // We'll apply this in handleLoadComplete
+      (window as any).__pendingOrientation = state.orientation;
+    }
+  }, []);
 
   // Snapshot Gallery State
   // Snapshot & Movie Gallery State
@@ -322,11 +342,52 @@ function App() {
   };
 
   const handleStructureLoaded = (info: StructureInfo) => {
-    setChains(info.chains);
-    setLigands(info.ligands || []);
+    const hasChains = info.chains && info.chains.length > 0;
+
+    if (hasChains) {
+      setChains(info.chains);
+      setLigands(info.ligands);
+      setCustomColors([]); // Clear custom colors on new load
+
+      // Restore Orientation if pending
+      if (hasRestoredState && (window as any).__pendingOrientation && viewerRef.current) {
+        try {
+          // Small delay to ensure render
+          setTimeout(() => {
+            viewerRef.current?.setCameraOrientation((window as any).__pendingOrientation);
+            setHasRestoredState(false);
+            delete (window as any).__pendingOrientation;
+          }, 500);
+        } catch (e) { console.warn("App: Failed to restore orientation", e); }
+      }
+    } else {
+      console.warn("App: Loaded structure has no chains?", info);
+    }
   };
 
+  const handleShare = () => {
+    if (!viewerRef.current) return;
 
+    // Capture curent matrix
+    const orientation = viewerRef.current.getCameraOrientation();
+
+    const url = getShareableURL({
+      pdbId,
+      representation,
+      coloring,
+      orientation,
+      isSpinning,
+      showLigands,
+      showSurface
+    });
+
+    navigator.clipboard.writeText(url).then(() => {
+      alert("Link copied to clipboard!");
+    }).catch(err => {
+      console.error("Failed to copy link", err);
+      prompt("Copy this link:", url);
+    });
+  };
 
 
   const handleSequenceResidueClick = (chain: string, resNo: number) => {
@@ -420,6 +481,7 @@ function App() {
         movies={movies}
         onDownloadMovie={handleDownloadMovie}
         onDeleteMovie={handleDeleteMovie}
+        onShare={handleShare}
         isSpinning={isSpinning}
         setIsSpinning={setIsSpinning}
         isCleanMode={isCleanMode}
