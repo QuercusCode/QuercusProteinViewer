@@ -907,22 +907,17 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         console.log(`Detected extension: ${rawExt} -> Parsed as: ${ext}`);
 
                         // Manual loading to prevent NGL File object issues
-                        // We read as ArrayBuffer for safety, then wrap in a synthetic File object
-                        // This ensures 'name' exists and mimics a perfect upload
-                        const fileContent = await new Promise<ArrayBuffer>((resolve, reject) => {
+                        // Data URI loading - The most robust method
+                        // Treats the file logic exactly like a URL, bypassing NGL's internal File/Blob parsing
+                        const dataUrl = await new Promise<string>((resolve, reject) => {
                             const reader = new FileReader();
-                            reader.onload = (e) => resolve(e.target?.result as ArrayBuffer);
+                            reader.onload = (e) => resolve(e.target?.result as string);
                             reader.onerror = (e) => reject(e);
-                            reader.readAsArrayBuffer(currentFile);
+                            reader.readAsDataURL(currentFile);
                         });
 
-                        // Create a clean "File" object with a safe name
-                        // We force the extension in the filename to ensure auto-detection works if 'ext' param is ignored
-                        const safeName = `structure.${ext}`;
-                        const safeFile = new File([fileContent], safeName, { type: 'chemical/x-mmcif' });
-
-                        console.log(`Loading synthetic file: ${safeName} as ${ext}`);
-                        return await stage.loadFile(safeFile, { defaultRepresentation: false, ext });
+                        console.log(`Loading via Data URI (length: ${dataUrl.length}) as ${ext}`);
+                        return await stage.loadFile(dataUrl, { defaultRepresentation: false, ext });
                     }
 
                     if (currentPdbId) {
