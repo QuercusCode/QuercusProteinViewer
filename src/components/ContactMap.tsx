@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { X, ZoomIn, ZoomOut, Maximize, Download, Grid3X3, Check, FileText } from 'lucide-react';
+import { X, ZoomIn, ZoomOut, Maximize, Download, Grid3X3, Check, FileText, Menu } from 'lucide-react';
 import type { ChainInfo } from '../types';
 
 interface ContactMapProps {
@@ -471,6 +471,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     if (!isOpen) return null;
 
 
+    const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm animate-in fade-in">
@@ -491,28 +492,38 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                     </div>
 
                     <div className="flex items-center gap-2">
+                        {/* Mobile Menu Toggle */}
                         <button
-                            onClick={handleDownloadCSV}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isLightMode ? 'bg-neutral-100 hover:bg-neutral-200 text-neutral-600' : 'bg-neutral-800 hover:bg-neutral-700 text-neutral-300'}`}
+                            onClick={() => setShowMobileSidebar(!showMobileSidebar)}
+                            className={`md:hidden p-2 rounded-lg transition-colors ${showMobileSidebar ? (isLightMode ? 'bg-blue-100 text-blue-600' : 'bg-blue-900/40 text-blue-400') : (isLightMode ? 'bg-neutral-100 text-neutral-600' : 'bg-neutral-800 text-neutral-300')}`}
                         >
-                            <FileText className="w-4 h-4" />
-                            <span className="hidden sm:inline">Export CSV</span>
-                        </button>
-                        <button
-                            onClick={handleDownload}
-                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isLightMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white'}`}
-                        >
-                            <Download className="w-4 h-4" />
-                            <span className="hidden sm:inline">Save Image</span>
+                            <Menu className="w-5 h-5" />
                         </button>
 
-                        <div className={`w-px h-6 mx-2 ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-700'}`} />
+                        <div className="hidden md:flex items-center gap-2">
+                            <button
+                                onClick={handleDownloadCSV}
+                                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isLightMode ? 'bg-neutral-100 hover:bg-neutral-200 text-neutral-600' : 'bg-neutral-800 hover:bg-neutral-700 text-neutral-300'}`}
+                            >
+                                <FileText className="w-4 h-4" />
+                                <span className="hidden sm:inline">Export CSV</span>
+                            </button>
+                            <button
+                                onClick={handleDownload}
+                                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isLightMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white'}`}
+                            >
+                                <Download className="w-4 h-4" />
+                                <span className="hidden sm:inline">Save Image</span>
+                            </button>
+                            <div className={`w-px h-6 mx-2 ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-700'}`} />
+                        </div>
+
                         <button onClick={onClose} className="p-2 hover:bg-red-500/10 hover:text-red-500 opacity-60 hover:opacity-100 rounded-lg transition-colors"><X className="w-6 h-6" /></button>
                     </div>
                 </div>
 
                 {/* Main Content: Flex Row */}
-                <div className="flex flex-1 overflow-hidden">
+                <div className="flex flex-1 overflow-hidden relative">
 
                     {/* Left Column: Map Area */}
                     <div className={`flex-1 overflow-auto relative p-0 ${isLightMode ? 'bg-neutral-50' : 'bg-black/20'}`}>
@@ -606,7 +617,17 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                     </div>
 
                     {/* Right Column: Control Sidebar */}
-                    <div className={`w-80 flex flex-col border-l overflow-y-auto ${isLightMode ? 'bg-white border-neutral-100' : 'bg-neutral-900 border-neutral-800'}`}>
+                    {/* Mobile Overlay */}
+                    {showMobileSidebar && (
+                        <div className="absolute inset-0 bg-black/50 z-40 md:hidden animate-in fade-in" onClick={() => setShowMobileSidebar(false)} />
+                    )}
+
+                    <div className={`
+                        absolute inset-y-0 right-0 z-50 w-80 shadow-2xl transition-transform duration-300 ease-in-out md:shadow-none
+                        ${showMobileSidebar ? 'translate-x-0' : 'translate-x-full'} md:translate-x-0 md:relative md:flex md:flex-col md:border-l md:overflow-y-auto
+                        flex flex-col border-l overflow-y-auto
+                        ${isLightMode ? 'bg-white border-neutral-100' : 'bg-neutral-900 border-neutral-800'}
+                    `}>
 
                         {/* Section: View & Zoom */}
                         <div className="p-4 border-b border-neutral-100 dark:border-neutral-800 space-y-4">
