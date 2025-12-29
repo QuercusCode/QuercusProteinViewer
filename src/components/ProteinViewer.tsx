@@ -773,9 +773,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 return idx;
             };
 
-            // Use 'CB' (Beta Carbon) if available for better side-chain indication
-            const idx1 = getSafeAtomIndex(chainA, resA, 'CB');
-            const idx2 = getSafeAtomIndex(chainB, resB, 'CB');
+            // Use 'CA' (Alpha Carbon) to match the Contact Map data generation (getAtomCoordinates uses CA)
+            // and the visual backbone (Cartoon/Ribbon).
+            const idx1 = getSafeAtomIndex(chainA, resA, 'CA');
+            const idx2 = getSafeAtomIndex(chainB, resB, 'CA');
 
             if (idx1 !== null && idx2 !== null) {
                 const params = {
