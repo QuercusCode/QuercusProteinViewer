@@ -114,25 +114,12 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         if (atom1 && atom2 && stageRef.current) {
             try {
                 const shape = new window.NGL.Shape(m.shapeId);
-                const dx = atom2.x - atom1.x;
-                const dy = atom2.y - atom1.y;
-                const dz = atom2.z - atom1.z;
-                const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-                // Dashed Line: Segments
-                const dashLength = 0.5;
-                const gapLength = 0.3;
-                const steps = Math.floor(dist / (dashLength + gapLength));
 
-                for (let i = 0; i < steps; i++) {
-                    const t1 = i * (dashLength + gapLength) / dist;
-                    const t2 = (i * (dashLength + gapLength) + dashLength) / dist;
-
-                    const p1 = [atom1.x + t1 * dx, atom1.y + t1 * dy, atom1.z + t1 * dz];
-                    const p2 = [atom1.x + t2 * dx, atom1.y + t2 * dy, atom1.z + t2 * dz];
-
-                    shape.addCylinder(p1, p2, [1, 1, 0], 0.1); // Yellow cylinder
-                }
+                // Solid Line for Visibility
+                const start = [atom1.x, atom1.y, atom1.z];
+                const end = [atom2.x, atom2.y, atom2.z];
+                shape.addCylinder(start, end, [1, 1, 0], 0.1); // Yellow cylinder
 
                 // Label
                 const mp = [(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2];
