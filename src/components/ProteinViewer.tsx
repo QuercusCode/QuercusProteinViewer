@@ -67,7 +67,6 @@ export interface ProteinViewerRef {
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     pdbId,
     file,
-    fileType,
     representation = 'cartoon',
     coloring = 'chainid',
     customColors = [],
@@ -892,22 +891,16 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 // Generic Loader Function
                 const loadStructure = async () => {
                     if (currentFile) {
-                        console.log("Loading from file:", currentFile.name, "Force Type:", fileType);
+                        console.log("Loading from file:", currentFile.name);
                         // Detect extension
                         const rawExt = currentFile.name.split('.').pop()?.toLowerCase() || 'pdb';
-                        let ext = fileType || rawExt;
+                        let ext = rawExt;
 
                         // Normalize extensions
-                        if (ext === 'cif' || ext === 'mmcif') {
-                            ext = 'mmcif'; // Explicitly tell NGL to use mmCIF parser
-                        } else if (ext === 'ent') {
+                        if (ext === 'ent') {
                             ext = 'pdb';
                         }
 
-                        console.log(`Detected extension: ${rawExt} -> Parsed as: ${ext}`);
-
-                        // Manual loading to prevent NGL File object issues
-                        // Robust Binary Loading
                         // We read as ArrayBuffer to handle all file types correctly (PDB/CIF/BinaryCIF)
                         const fileContent = await new Promise<ArrayBuffer>((resolve, reject) => {
                             const reader = new FileReader();
@@ -919,9 +912,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         const blob = new Blob([fileContent], { type: 'application/octet-stream' });
                         const objectUrl = URL.createObjectURL(blob);
 
-                        console.log(`Loading via Object URL (Binary): ${objectUrl} as ${ext}`);
+                        console.log(`Loading via Object URL: ${objectUrl} as ${ext}`);
 
-                        // Generic name with correct extension helps NGL parser
                         const safeName = `structure.${ext}`;
                         try {
                             return await stage.loadFile(objectUrl, {
