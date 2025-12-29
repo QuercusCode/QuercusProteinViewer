@@ -1,4 +1,5 @@
-import type { RepresentationType, ColoringType } from '../components/ProteinViewer';
+import type { RepresentationType, ColoringType, MeasurementData } from '../components/ProteinViewer';
+import type { CustomColorRule } from '../types';
 
 export interface AppState {
     pdbId: string;
@@ -8,6 +9,8 @@ export interface AppState {
     isSpinning: boolean;
     showLigands: boolean;
     showSurface: boolean;
+    customColors?: CustomColorRule[];
+    measurements?: MeasurementData[];
 }
 
 /**
@@ -36,6 +39,24 @@ export const getShareableURL = (state: AppState): string => {
         } catch (e) {
             console.warn("Failed to serialize camera orientation", e);
         }
+    }
+
+    // 4. Custom Colors (Encoded JSON)
+    if (state.customColors && state.customColors.length > 0) {
+        try {
+            const json = JSON.stringify(state.customColors);
+            const b64 = btoa(json);
+            params.set('cust', b64);
+        } catch (e) { console.warn("Failed to serialize custom colors", e); }
+    }
+
+    // 5. Measurements (Encoded JSON)
+    if (state.measurements && state.measurements.length > 0) {
+        try {
+            const json = JSON.stringify(state.measurements);
+            const b64 = btoa(json);
+            params.set('meas', b64);
+        } catch (e) { console.warn("Failed to serialize measurements", e); }
     }
 
     const url = new URL(window.location.href);
@@ -74,6 +95,24 @@ export const parseURLState = (): Partial<AppState> => {
         } catch (e) {
             console.warn("Failed to parse camera orientation from URL", e);
         }
+    }
+
+    // 4. Custom Colors
+    const cust = params.get('cust');
+    if (cust) {
+        try {
+            const json = atob(cust);
+            state.customColors = JSON.parse(json);
+        } catch (e) { console.warn("Failed to parse custom colors", e); }
+    }
+
+    // 5. Measurements
+    const meas = params.get('meas');
+    if (meas) {
+        try {
+            const json = atob(meas);
+            state.measurements = JSON.parse(json);
+        } catch (e) { console.warn("Failed to parse measurements", e); }
     }
 
     return state;

@@ -12,6 +12,12 @@ declare global {
 export type RepresentationType = 'cartoon' | 'licorice' | 'backbone' | 'spacefill' | 'surface' | 'ribbon';
 export type ColoringType = 'chainid' | 'element' | 'residue' | 'secondary' | 'hydrophobicity' | 'structure' | 'bfactor' | 'charge';
 
+export interface MeasurementData {
+    atom1: { chain: string, resNo: number, atomName: string };
+    atom2: { chain: string, resNo: number, atomName: string };
+    distance: number;
+}
+
 interface ProteinViewerProps {
     pdbId?: string;
     file?: File;
@@ -47,6 +53,8 @@ export interface ProteinViewerRef {
     getAtomPositionByIndex: (atomIndex: number) => { x: number, y: number, z: number } | null;
     addResidue: (chainName: string, resType: string) => Promise<Blob | null>;
     recordTurntable: (duration?: number) => Promise<Blob>;
+    getMeasurements: () => MeasurementData[];
+    setMeasurements: (measurements: MeasurementData[]) => void;
 
 }
 
@@ -78,6 +86,38 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     const componentRef = useRef<any>(null);
     const highlightComponentRef = useRef<any>(null);
     const isMounted = useRef(true);
+
+    // Measurements State
+    const measurementsRef = useRef<MeasurementData[]>([]);
+    const selectedAtomsRef = useRef<any[]>([]);
+
+    // Helper to find atom
+    const findAtom = (chain: string, resNo: number, atomName: string) => {
+        if (!componentRef.current) return null;
+        let found: any = null;
+        const selection = new window.NGL.Selection(`${resNo}:${chain} and .${atomName}`);
+        if (componentRef.current && componentRef.current.structure) {
+            componentRef.current.structure.eachAtom((atom: any) => {
+                found = atom;
+            }, selection);
+        }
+        return found;
+    };
+
+    const drawMeasurement = (m: MeasurementData, stage: any) => {
+        const atom1 = findAtom(m.atom1.chain, m.atom1.resNo, m.atom1.atomName);
+        const atom2 = findAtom(m.atom2.chain, m.atom2.resNo, m.atom2.atomName);
+
+        if (atom1 && atom2) {
+            const shape = new window.NGL.Shape("distance-" + crypto.randomUUID());
+            shape.addCylinder([atom1.x, atom1.y, atom1.z], [atom2.x, atom2.y, atom2.z], [1, 0.8, 0], 0.2);
+            shape.addText([(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2], [1, 1, 1], 1.5, `${m.distance} A`);
+            const shapeComp = stage.addComponentFromObject(shape);
+            shapeComp.addRepresentation("buffer");
+            return shapeComp;
+        }
+        return null;
+    };
 
     const [internalLoading, setInternalLoading] = React.useState(false);
     const [internalError, setInternalError] = React.useState<string | null>(null);
@@ -597,7 +637,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 return null;
             }
 
-            // Find last serial number
+
             const lines = originalPdb.split('\n');
             let lastSerial = 0;
             // Scan from bottom
@@ -643,6 +683,17 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             const finalPdb = cleanPdb.trimEnd() + '\n' + newLines.join('\n') + '\nEND';
 
             return new Blob([finalPdb], { type: 'text/plain' });
+        },
+        getMeasurements: () => measurementsRef.current,
+        setMeasurements: (measurements: MeasurementData[]) => {
+            if (!stageRef.current) return;
+            measurementsRef.current = measurements;
+            // Clear existing shapes
+            stageRef.current.eachComponent((c: any) => {
+                if (c.name.startsWith("distance-")) stageRef.current.removeComponent(c);
+            });
+
+            measurements.forEach(m => drawMeasurement(m, stageRef.current));
         }
     }));
 
@@ -829,8 +880,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
 
 
-    const selectedAtomsRef = useRef<any[]>([]);
-
     useEffect(() => {
         if (!stageRef.current) return;
         const stage = stageRef.current;
@@ -857,14 +906,19 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     try {
                         const v1 = new Vector3(atom1.x, atom1.y, atom1.z);
                         const v2 = new Vector3(atom2.x, atom2.y, atom2.z);
-                        const distance = v1.distanceTo(v2).toFixed(2);
+                        const distVal = v1.distanceTo(v2);
+                        const distance = distVal.toFixed(2);
                         console.log(`Measured distance: ${distance} A`);
-                        const shape = new window.NGL.Shape("distance-shape");
-                        shape.addCylinder([atom1.x, atom1.y, atom1.z], [atom2.x, atom2.y, atom2.z], [1, 0.8, 0], 0.2);
-                        shape.addText([(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2], [1, 1, 1], 1.5, `${distance} A`);
-                        const shapeComp = stage.addComponentFromObject(shape);
-                        shapeComp.addRepresentation("buffer");
-                        shapeComp.autoView();
+
+                        const newMeasurement: MeasurementData = {
+                            atom1: { chain: atom1.chainname, resNo: atom1.resno, atomName: atom1.atomname },
+                            atom2: { chain: atom2.chainname, resNo: atom2.resno, atomName: atom2.atomname },
+                            distance: Number(distance)
+                        };
+
+                        measurementsRef.current.push(newMeasurement);
+                        drawMeasurement(newMeasurement, stage);
+
                         selectedAtomsRef.current = [];
                     } catch (e) { selectedAtomsRef.current = []; }
                 }

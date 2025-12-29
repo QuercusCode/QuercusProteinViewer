@@ -40,14 +40,80 @@ function App() {
     if (state.isSpinning) setIsSpinning(true);
     if (state.showLigands) setShowLigands(true);
     if (state.showSurface) setShowSurface(true);
+    if (state.customColors) setCustomColors(state.customColors);
 
-    // Defer matrix application until load confirms
+    // Defer matrix & measurements application until load confirms
     if (state.orientation) {
       setHasRestoredState(true);
-      // We'll apply this in handleLoadComplete
       (window as any).__pendingOrientation = state.orientation;
     }
+    if (state.measurements) {
+      setHasRestoredState(true);
+      (window as any).__pendingMeasurements = state.measurements;
+    }
   }, []);
+
+  // ... (lines 53-343) ...
+
+  const handleStructureLoaded = (info: StructureInfo) => {
+    const hasChains = info.chains && info.chains.length > 0;
+
+    if (hasChains) {
+      setChains(info.chains);
+      setLigands(info.ligands);
+      // setCustomColors([]); // REMOVED: Do not clear custom colors if we just restored them! 
+      // Actually, we should only clear if not restoring? 
+      // If we loaded from URL, customColors are set. 
+      // If we upload a file or change PDB manually, we reset customColors in handlePdbIdChange/handleUpload.
+      // So here we should NOT clear them.
+
+      // Restore Orientation & Measurements if pending
+      if (hasRestoredState && viewerRef.current) {
+        try {
+          setTimeout(() => {
+            if ((window as any).__pendingOrientation) {
+              viewerRef.current?.setCameraOrientation((window as any).__pendingOrientation);
+              delete (window as any).__pendingOrientation;
+            }
+            if ((window as any).__pendingMeasurements) {
+              viewerRef.current?.setMeasurements((window as any).__pendingMeasurements);
+              delete (window as any).__pendingMeasurements;
+            }
+            setHasRestoredState(false);
+          }, 500);
+        } catch (e) { console.warn("App: Failed to restore state", e); }
+      }
+    } else {
+      console.warn("App: Loaded structure has no chains?", info);
+    }
+  };
+
+  const handleShare = () => {
+    if (!viewerRef.current) return;
+
+    // Capture current state
+    const orientation = viewerRef.current.getCameraOrientation();
+    const measurements = viewerRef.current.getMeasurements();
+
+    const url = getShareableURL({
+      pdbId,
+      representation,
+      coloring,
+      orientation,
+      isSpinning,
+      showLigands,
+      showSurface,
+      customColors,
+      measurements
+    });
+
+    navigator.clipboard.writeText(url).then(() => {
+      alert("Link copied to clipboard!");
+    }).catch(err => {
+      console.error("Failed to copy link", err);
+      prompt("Copy this link:", url);
+    });
+  };
 
   // Snapshot Gallery State
   // Snapshot & Movie Gallery State
@@ -341,53 +407,7 @@ function App() {
     }
   };
 
-  const handleStructureLoaded = (info: StructureInfo) => {
-    const hasChains = info.chains && info.chains.length > 0;
 
-    if (hasChains) {
-      setChains(info.chains);
-      setLigands(info.ligands);
-      setCustomColors([]); // Clear custom colors on new load
-
-      // Restore Orientation if pending
-      if (hasRestoredState && (window as any).__pendingOrientation && viewerRef.current) {
-        try {
-          // Small delay to ensure render
-          setTimeout(() => {
-            viewerRef.current?.setCameraOrientation((window as any).__pendingOrientation);
-            setHasRestoredState(false);
-            delete (window as any).__pendingOrientation;
-          }, 500);
-        } catch (e) { console.warn("App: Failed to restore orientation", e); }
-      }
-    } else {
-      console.warn("App: Loaded structure has no chains?", info);
-    }
-  };
-
-  const handleShare = () => {
-    if (!viewerRef.current) return;
-
-    // Capture curent matrix
-    const orientation = viewerRef.current.getCameraOrientation();
-
-    const url = getShareableURL({
-      pdbId,
-      representation,
-      coloring,
-      orientation,
-      isSpinning,
-      showLigands,
-      showSurface
-    });
-
-    navigator.clipboard.writeText(url).then(() => {
-      alert("Link copied to clipboard!");
-    }).catch(err => {
-      console.error("Failed to copy link", err);
-      prompt("Copy this link:", url);
-    });
-  };
 
 
   const handleSequenceResidueClick = (chain: string, resNo: number) => {
