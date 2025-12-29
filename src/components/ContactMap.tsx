@@ -74,6 +74,13 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     const [proximalThreshold, setProximalThreshold] = useState(8);
     const [showGrid, setShowGrid] = useState(true);
     const [showIntraChain, setShowIntraChain] = useState(true);
+    const [filters, setFilters] = useState({
+        all: true,
+        hydrophobic: false,
+        saltBridge: false,
+        piStacking: false,
+        disulfide: false
+    });
     const [showSettings, setShowSettings] = useState(false);
 
     // Initial Data Calculation
@@ -241,22 +248,51 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
                 const dist = matrix[i][j];
 
-                if (dist < proximalThreshold) {
-                    if (dist < contactThreshold) {
-                        ctx.fillStyle = isLightMode ? '#1e3a8a' : '#60a5fa';
-                    } else {
-                        ctx.fillStyle = isLightMode ? '#94a3b8' : '#475569';
-                    }
+                // Filtering Logic
+                if (dist > proximalThreshold && filters.all) continue; // Skip if too far and showing all (optimization)
 
+                if (!filters.all) {
+                    // Specific Filter Mode
+                    const typeData = getInteractionType(labels[i].label, labels[j].label, dist);
+
+                    if (!typeData) continue; // Not a recognized interaction type
+
+                    // Check if this type corresponds to an active filter
+                    // Note: Mapping type strings to filter keys
+                    let match = false;
+                    let color = '#a3a3a3'; // Fallback
+
+                    if (typeData.type === 'Salt Bridge' && filters.saltBridge) { match = true; color = '#ef4444'; } // red-500
+                    else if (typeData.type === 'Disulfide Bond' && filters.disulfide) { match = true; color = '#eab308'; } // yellow-500
+                    else if (typeData.type === 'Hydrophobic Contact' && filters.hydrophobic) { match = true; color = '#22c55e'; } // green-500
+                    else if ((typeData.type === 'Pi-Stacking' || typeData.type === 'Cation-Pi Interaction') && filters.piStacking) { match = true; color = '#a855f7'; } // purple-500
+
+                    if (!match) continue; // Skip if filter not active
+
+                    // Draw with specific color for filtered mode
+                    ctx.fillStyle = color;
                     ctx.fillRect(j * P, i * P, P, P);
-                    if (i !== j) {
-                        ctx.fillRect(i * P, j * P, P, P);
+                    if (i !== j) ctx.fillRect(i * P, j * P, P, P);
+
+                } else {
+                    // Default "Show All" Mode (Blue Heatmap)
+                    if (dist < proximalThreshold) {
+                        if (dist < contactThreshold) {
+                            ctx.fillStyle = isLightMode ? '#1e3a8a' : '#60a5fa';
+                        } else {
+                            ctx.fillStyle = isLightMode ? '#94a3b8' : '#475569';
+                        }
+
+                        ctx.fillRect(j * P, i * P, P, P);
+                        if (i !== j) {
+                            ctx.fillRect(i * P, j * P, P, P);
+                        }
                     }
                 }
             }
         }
 
-    }, [distanceData, scale, isLightMode, contactThreshold, proximalThreshold, showGrid, showIntraChain]);
+    }, [distanceData, scale, isLightMode, contactThreshold, proximalThreshold, showGrid, showIntraChain, filters]);
 
 
     const handleDownload = () => {
@@ -501,6 +537,59 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                                                 onChange={(e) => setProximalThreshold(parseFloat(e.target.value))}
                                                 className="w-full h-1.5 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-slate-500"
                                             />
+                                        </div>
+
+                                        <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800 space-y-2">
+                                            <div className="text-[10px] font-bold uppercase opacity-50 tracking-wider mb-1">Filters</div>
+
+                                            <label className="flex items-center gap-2 text-xs cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={filters.all}
+                                                    onChange={(e) => setFilters({ ...filters, all: e.target.checked, hydrophobic: false, saltBridge: false, piStacking: false, disulfide: false })}
+                                                    className="rounded border-neutral-300 text-blue-600 focus:ring-0"
+                                                />
+                                                <span className={filters.all ? 'font-bold' : ''}>Show All Interactions</span>
+                                            </label>
+
+                                            <div className={`space-y-1.5 pl-2 border-l-2 ${filters.all ? 'opacity-50 pointer-events-none' : ''} border-neutral-100 dark:border-neutral-800`}>
+                                                <label className="flex items-center gap-2 text-xs cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded p-1 -ml-1 transition-colors">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={filters.saltBridge}
+                                                        onChange={(e) => setFilters(prev => ({ ...prev, all: false, saltBridge: e.target.checked }))}
+                                                        className="rounded border-neutral-300 text-red-500 focus:ring-0"
+                                                    />
+                                                    <span className="text-red-500">Salt Bridge</span>
+                                                </label>
+                                                <label className="flex items-center gap-2 text-xs cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded p-1 -ml-1 transition-colors">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={filters.disulfide}
+                                                        onChange={(e) => setFilters(prev => ({ ...prev, all: false, disulfide: e.target.checked }))}
+                                                        className="rounded border-neutral-300 text-yellow-500 focus:ring-0"
+                                                    />
+                                                    <span className="text-yellow-500">Disulfide Bond</span>
+                                                </label>
+                                                <label className="flex items-center gap-2 text-xs cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded p-1 -ml-1 transition-colors">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={filters.hydrophobic}
+                                                        onChange={(e) => setFilters(prev => ({ ...prev, all: false, hydrophobic: e.target.checked }))}
+                                                        className="rounded border-neutral-300 text-green-500 focus:ring-0"
+                                                    />
+                                                    <span className="text-green-500">Hydrophobic</span>
+                                                </label>
+                                                <label className="flex items-center gap-2 text-xs cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded p-1 -ml-1 transition-colors">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={filters.piStacking}
+                                                        onChange={(e) => setFilters(prev => ({ ...prev, all: false, piStacking: e.target.checked }))}
+                                                        className="rounded border-neutral-300 text-purple-500 focus:ring-0"
+                                                    />
+                                                    <span className="text-purple-500">Pi-Stacking</span>
+                                                </label>
+                                            </div>
                                         </div>
 
                                         <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800 space-y-2">
