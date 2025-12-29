@@ -16,7 +16,7 @@ function App() {
   const [coloring, setColoring] = useState<ColoringType>('chainid');
   const [hasRestoredState, setHasRestoredState] = useState(false); // Track if we need to apply matrix
   const [resetKey, setResetKey] = useState(0);
-  const [isMeasurementMode, setIsMeasurementMode] = useState(false);
+
 
   const [isLightMode, setIsLightMode] = useState(() => {
     return localStorage.getItem('theme') === 'light';
@@ -47,10 +47,6 @@ function App() {
       setHasRestoredState(true);
       (window as any).__pendingOrientation = state.orientation;
     }
-    if (state.measurements) {
-      setHasRestoredState(true);
-      (window as any).__pendingMeasurements = state.measurements;
-    }
   }, []);
 
   // ... (lines 53-343) ...
@@ -74,10 +70,6 @@ function App() {
             if ((window as any).__pendingOrientation) {
               viewerRef.current?.setCameraOrientation((window as any).__pendingOrientation);
               delete (window as any).__pendingOrientation;
-            }
-            if ((window as any).__pendingMeasurements) {
-              viewerRef.current?.setMeasurements((window as any).__pendingMeasurements);
-              delete (window as any).__pendingMeasurements;
             }
             setHasRestoredState(false);
           }, 500);
@@ -134,9 +126,7 @@ function App() {
       return;
     }
 
-    if (isMeasurementMode) {
-      // ... existing measurement logic ...
-    }
+
 
     // Annotation Logic
 
@@ -310,15 +300,6 @@ function App() {
         pdbId: String(pdbId || ""),
         representation: String(representation),
         coloring: String(coloring),
-        isMeasurementMode: Boolean(isMeasurementMode),
-        isLightMode: Boolean(isLightMode),
-        showSurface: Boolean(showSurface),
-        showLigands: Boolean(showLigands),
-        isSpinning: Boolean(isSpinning),
-        isCleanMode: Boolean(isCleanMode),
-        customColors: customColors || {},
-        chains: Array.isArray(chains) ? chains : [],
-
         orientation: safeOrientation,
         timestamp: Date.now()
       };
@@ -455,8 +436,7 @@ function App() {
         ligands={ligands}
         customColors={customColors}
         setCustomColors={setCustomColors}
-        isMeasurementMode={isMeasurementMode}
-        setIsMeasurementMode={setIsMeasurementMode}
+
         isLightMode={isLightMode}
         setIsLightMode={setIsLightMode}
         highlightedResidue={highlightedResidue}
@@ -495,7 +475,7 @@ function App() {
         customColors={customColors}
         onStructureLoaded={handleStructureLoaded}
         resetCamera={resetKey}
-        isMeasurementMode={isMeasurementMode}
+
         onAtomClick={handleAtomClick}
 
         backgroundColor={isLightMode ? "white" : "black"}

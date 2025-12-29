@@ -12,11 +12,7 @@ declare global {
 export type RepresentationType = 'cartoon' | 'licorice' | 'backbone' | 'spacefill' | 'surface' | 'ribbon';
 export type ColoringType = 'chainid' | 'element' | 'residue' | 'secondary' | 'hydrophobicity' | 'structure' | 'bfactor' | 'charge';
 
-export interface MeasurementData {
-    atom1: { chain: string, resNo: number, atomName: string };
-    atom2: { chain: string, resNo: number, atomName: string };
-    distance: number;
-}
+
 
 interface ProteinViewerProps {
     pdbId?: string;
@@ -33,7 +29,7 @@ interface ProteinViewerProps {
     error?: string | null;
     setError?: (error: string | null) => void;
     resetCamera?: number;
-    isMeasurementMode?: boolean;
+
     onAtomClick: (info: { chain: string; resNo: number; resName: string; atomIndex: number; position?: { x: number, y: number, z: number } } | null) => void;
     backgroundColor?: string;
     showSurface?: boolean;
@@ -53,8 +49,7 @@ export interface ProteinViewerRef {
     getAtomPositionByIndex: (atomIndex: number) => { x: number, y: number, z: number } | null;
     addResidue: (chainName: string, resType: string) => Promise<Blob | null>;
     recordTurntable: (duration?: number) => Promise<Blob>;
-    getMeasurements: () => MeasurementData[];
-    setMeasurements: (measurements: MeasurementData[]) => void;
+
 
 }
 
@@ -73,7 +68,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     error: externalError,
     setError: setExternalError,
     resetCamera,
-    isMeasurementMode = false,
+
     onAtomClick,
     backgroundColor = "black",
     showSurface = false,
@@ -87,8 +82,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     const highlightComponentRef = useRef<any>(null);
     const isMounted = useRef(true);
 
-    // Measurements State
-    const measurementsRef = useRef<MeasurementData[]>([]);
+
     const selectedAtomsRef = useRef<any[]>([]);
 
     // Helper to find atom
@@ -104,61 +98,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         return found;
     };
 
-    const drawMeasurement = (m: MeasurementData) => {
-        console.log("=== DRAW MEASUREMENT START ===");
-        console.log("Measurement data:", m);
 
-        const atom1 = findAtom(m.atom1.chain, m.atom1.resNo, m.atom1.atomName);
-        const atom2 = findAtom(m.atom2.chain, m.atom2.resNo, m.atom2.atomName);
-        console.log("Found atom1:", atom1, "coords:", atom1?.x, atom1?.y, atom1?.z);
-        console.log("Found atom2:", atom2, "coords:", atom2?.x, atom2?.y, atom2?.z);
-
-        if (atom1 && atom2 && stageRef.current) {
-            try {
-                const id = "distance-" + Math.random().toString(36).substring(2, 9);
-                const shape = new window.NGL.Shape(id);
-
-                // Calculate distance for proper spacing
-                const dx = atom2.x - atom1.x;
-                const dy = atom2.y - atom1.y;
-                const dz = atom2.z - atom1.z;
-                const distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
-
-                // Create MANY overlapping spheres for solid line
-                const sphereRadius = 0.5;
-                const numSpheres = Math.max(100, Math.floor(distance / 0.2)); // At least 100 spheres
-
-                console.log(`Creating ${numSpheres} spheres for distance ${distance.toFixed(2)} Å`);
-
-                for (let i = 0; i <= numSpheres; i++) {
-                    const t = i / numSpheres;
-                    const x = atom1.x + t * dx;
-                    const y = atom1.y + t * dy;
-                    const z = atom1.z + t * dz;
-                    shape.addSphere([x, y, z], [1, 1, 0], sphereRadius); // Yellow
-                }
-
-                // Add text label at midpoint
-                shape.addText(
-                    [(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2],
-                    [1, 1, 1],
-                    2.0,
-                    `${m.distance} Å`
-                );
-
-                const shapeComp = stageRef.current.addComponentFromObject(shape);
-                shapeComp.addRepresentation("buffer", { depthTest: false, opacity: 1.0 });
-
-                console.log(`Sphere line created with ${numSpheres + 1} spheres`);
-                console.log("=== DRAW MEASUREMENT END ===");
-                return shapeComp;
-            } catch (e) {
-                console.error("Failed to create measurement:", e);
-            }
-        }
-        console.log("WARNING: Atoms not found or stage not ready");
-        return null;
-    };
 
     const [internalLoading, setInternalLoading] = React.useState(false);
     const [internalError, setInternalError] = React.useState<string | null>(null);
@@ -725,17 +665,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             return new Blob([finalPdb], { type: 'text/plain' });
         },
-        getMeasurements: () => measurementsRef.current,
-        setMeasurements: (measurements: MeasurementData[]) => {
-            if (!stageRef.current) return;
-            measurementsRef.current = measurements;
-            // Clear existing shapes
-            stageRef.current.eachComponent((c: any) => {
-                if (c.name.startsWith("distance-")) stageRef.current.removeComponent(c);
-            });
 
-            measurements.forEach(m => drawMeasurement(m));
-        }
     }));
 
     useEffect(() => {
@@ -928,47 +858,14 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         const handleClick = (pickingProxy: any) => {
             if (!pickingProxy || !pickingProxy.atom) {
                 // Only clear highlight if we are NOT in measurement mode and clicked background
-                if (!isMeasurementMode && onAtomClick) onAtomClick(null);
+                if (onAtomClick) onAtomClick(null);
                 return;
             }
             const atom = pickingProxy.atom;
             console.log("DEBUG: Clicked Atom:", atom);
             console.log("DEBUG: Atom Coords:", atom.x, atom.y, atom.z);
 
-            // Measurement Mode Logic takes precedence
-            if (isMeasurementMode) {
-                console.log("Atom clicked (Measure):", atom);
-                const Vector3 = window.NGL.Vector3;
-                selectedAtomsRef.current.push(atom);
-                const currentSelection = selectedAtomsRef.current;
-                if (currentSelection.length === 2) {
-                    const atom1 = currentSelection[0];
-                    const atom2 = currentSelection[1];
-                    try {
-                        const v1 = new Vector3(atom1.x, atom1.y, atom1.z);
-                        const v2 = new Vector3(atom2.x, atom2.y, atom2.z);
-                        const distVal = v1.distanceTo(v2);
-                        const distance = distVal.toFixed(2);
-                        console.log(`Measured distance: ${distance} A`);
 
-                        const newMeasurement: MeasurementData = {
-                            atom1: { chain: atom1.chainname, resNo: atom1.resno, atomName: atom1.atomname },
-                            atom2: { chain: atom2.chainname, resNo: atom2.resno, atomName: atom2.atomname },
-                            distance: Number(distance)
-                        };
-
-                        measurementsRef.current.push(newMeasurement);
-                        drawMeasurement(newMeasurement);
-
-                        selectedAtomsRef.current = [];
-                    } catch (e) {
-                        console.error("DEBUG: Measurement failed", e);
-                        selectedAtomsRef.current = [];
-                    }
-                }
-                // Do NOT trigger onAtomClick
-                return;
-            }
 
             // Standard Interaction (Bi-directional Sync)
             if (onAtomClick) {
@@ -998,7 +895,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             stage.signals.clicked.remove(handleClick);
 
         };
-    }, [isMeasurementMode, onAtomClick]);
+    }, [onAtomClick]);
 
 
     const updateRepresentation = (specificComponent?: any) => {

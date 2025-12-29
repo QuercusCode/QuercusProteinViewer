@@ -13,7 +13,7 @@ import {
     Plus,
     RefreshCw,
     RotateCcw,
-    Ruler,
+
     Search,
     Sun,
     Trash2,
@@ -39,8 +39,7 @@ interface ControlsProps {
     ligands: string[];
     customColors: CustomColorRule[];
     setCustomColors: (colors: CustomColorRule[]) => void;
-    isMeasurementMode: boolean;
-    setIsMeasurementMode: (mode: boolean) => void;
+
     isLightMode: boolean;
     setIsLightMode: (mode: boolean) => void;
     highlightedResidue: { chain: string; resNo: number; resName?: string } | null;
@@ -82,8 +81,7 @@ export const Controls: React.FC<ControlsProps> = ({
     ligands,
     customColors,
     setCustomColors,
-    isMeasurementMode,
-    setIsMeasurementMode,
+
     isLightMode,
     setIsLightMode,
     highlightedResidue,
@@ -514,13 +512,7 @@ export const Controls: React.FC<ControlsProps> = ({
 
                         {/* Tools */}
                         <div className="grid grid-cols-2 gap-2">
-                            <button
-                                onClick={() => setIsMeasurementMode(!isMeasurementMode)}
-                                className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isMeasurementMode ? 'bg-amber-500/10 border-amber-500 text-amber-500' : `${cardBg} hover:opacity-80`}`}
-                            >
-                                <span className="text-xs font-medium">Measure</span>
-                                <Ruler className="w-3.5 h-3.5" />
-                            </button>
+
                             <button
                                 onClick={onToggleContactMap}
                                 className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}

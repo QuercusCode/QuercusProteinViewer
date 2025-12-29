@@ -1,4 +1,4 @@
-import type { RepresentationType, ColoringType, MeasurementData } from '../components/ProteinViewer';
+import type { RepresentationType, ColoringType } from '../components/ProteinViewer';
 import type { CustomColorRule } from '../types';
 
 export interface AppState {
@@ -10,7 +10,7 @@ export interface AppState {
     showLigands: boolean;
     showSurface: boolean;
     customColors?: CustomColorRule[];
-    measurements?: MeasurementData[];
+
 }
 
 /**
@@ -50,14 +50,7 @@ export const getShareableURL = (state: AppState): string => {
         } catch (e) { console.warn("Failed to serialize custom colors", e); }
     }
 
-    // 5. Measurements (Encoded JSON)
-    if (state.measurements && state.measurements.length > 0) {
-        try {
-            const json = JSON.stringify(state.measurements);
-            const b64 = btoa(json);
-            params.set('meas', b64);
-        } catch (e) { console.warn("Failed to serialize measurements", e); }
-    }
+
 
     const url = new URL(window.location.href);
     url.search = params.toString();
@@ -106,14 +99,7 @@ export const parseURLState = (): Partial<AppState> => {
         } catch (e) { console.warn("Failed to parse custom colors", e); }
     }
 
-    // 5. Measurements
-    const meas = params.get('meas');
-    if (meas) {
-        try {
-            const json = atob(meas);
-            state.measurements = JSON.parse(json);
-        } catch (e) { console.warn("Failed to parse measurements", e); }
-    }
+
 
     return state;
 };
