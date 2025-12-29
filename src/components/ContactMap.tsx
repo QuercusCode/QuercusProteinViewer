@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { X, ZoomIn, ZoomOut, Maximize, Download, Settings, Grid3X3, Check, FileText } from 'lucide-react';
+import { X, ZoomIn, ZoomOut, Maximize, Download, Grid3X3, Check, FileText } from 'lucide-react';
 import type { ChainInfo } from '../types';
 
 interface ContactMapProps {
@@ -74,6 +74,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     const [proximalThreshold, setProximalThreshold] = useState(8);
     const [showGrid, setShowGrid] = useState(true);
     const [showIntraChain, setShowIntraChain] = useState(true);
+
     const [filters, setFilters] = useState({
         all: true,
         hydrophobic: false,
@@ -81,7 +82,6 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         piStacking: false,
         disulfide: false
     });
-    const [showSettings, setShowSettings] = useState(false);
 
     // Initial Data Calculation
     useEffect(() => {
@@ -472,7 +472,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm animate-in fade-in">
-            <div className={`relative w-full max-w-5xl h-[90vh] rounded-xl shadow-2xl flex flex-col overflow-hidden ${isLightMode ? 'bg-white text-neutral-900' : 'bg-neutral-900 text-white border border-neutral-800'}`}>
+            <div className={`relative w-full max-w-6xl h-[90vh] rounded-xl shadow-2xl flex flex-col overflow-hidden ${isLightMode ? 'bg-white text-neutral-900' : 'bg-neutral-900 text-white border border-neutral-800'}`}>
 
                 {/* Header */}
                 <div className={`flex items-center justify-between px-6 py-4 border-b ${isLightMode ? 'bg-white border-neutral-100' : 'bg-neutral-900 border-neutral-800'}`}>
@@ -483,154 +483,25 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                         <div>
                             <h3 className="font-bold text-lg">Contact Map</h3>
                             <p className="text-xs opacity-60">
-                                {distanceData ? `${distanceData.size} Residues` : 'Loading Map...'}
+                                {distanceData ? `${distanceData.size} Residues • ${distanceData.labels.length > 0 ? new Set(distanceData.labels.map(l => l.chain)).size : 0} Chains` : 'Loading Map...'}
                             </p>
                         </div>
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <div className={`flex items-center rounded-lg p-1 ${isLightMode ? 'bg-neutral-100' : 'bg-neutral-800'}`}>
-                            <button onClick={() => setScale(s => Math.max(1, s - 1))} className={`p-2 rounded-md transition-all shadow-sm ${isLightMode ? 'hover:bg-white text-neutral-600' : 'hover:bg-neutral-700 text-neutral-300'}`}><ZoomOut className="w-4 h-4" /></button>
-                            <span className="w-12 text-center text-xs font-mono font-medium opacity-70">{scale}x</span>
-                            <button onClick={() => setScale(s => Math.min(20, s + 1))} className={`p-2 rounded-md transition-all shadow-sm ${isLightMode ? 'hover:bg-white text-neutral-600' : 'hover:bg-neutral-700 text-neutral-300'}`}><ZoomIn className="w-4 h-4" /></button>
-                        </div>
-
-                        <div className={`w-px h-6 mx-2 ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-700'}`} />
-
-                        {/* Tools */}
-                        <div className="relative">
-                            <button
-                                onClick={() => setShowSettings(!showSettings)}
-                                className={`p-2 rounded-lg transition-colors ${showSettings ? (isLightMode ? 'bg-blue-100 text-blue-600' : 'bg-blue-900/40 text-blue-400') : (isLightMode ? 'hover:bg-neutral-100 text-neutral-600' : 'hover:bg-neutral-800 text-neutral-400')}`}
-                                title="Settings"
-                            >
-                                <Settings className="w-5 h-5" />
-                            </button>
-
-                            {/* Settings Popover */}
-                            {showSettings && (
-                                <div className={`absolute top-full right-0 mt-2 w-64 p-4 rounded-xl shadow-xl z-50 animate-in fade-in zoom-in-95 border ${isLightMode ? 'bg-white border-neutral-100' : 'bg-neutral-900 border-neutral-800'}`}>
-                                    <h4 className="font-bold text-xs uppercase opacity-50 mb-3 tracking-wider">Map Settings</h4>
-
-                                    <div className="space-y-4">
-                                        <div className="space-y-1">
-                                            <div className="flex justify-between text-xs">
-                                                <span>Contact Threshold</span>
-                                                <span className="font-mono">{contactThreshold} Å</span>
-                                            </div>
-                                            <input
-                                                type="range" min="3" max="10" step="0.5"
-                                                value={contactThreshold}
-                                                onChange={(e) => setContactThreshold(parseFloat(e.target.value))}
-                                                className="w-full h-1.5 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-                                            />
-                                        </div>
-
-                                        <div className="space-y-1">
-                                            <div className="flex justify-between text-xs">
-                                                <span>Proximal Threshold</span>
-                                                <span className="font-mono">{proximalThreshold} Å</span>
-                                            </div>
-                                            <input
-                                                type="range" min={contactThreshold} max="15" step="0.5"
-                                                value={proximalThreshold}
-                                                onChange={(e) => setProximalThreshold(parseFloat(e.target.value))}
-                                                className="w-full h-1.5 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-slate-500"
-                                            />
-                                        </div>
-
-                                        <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800 space-y-2">
-                                            <div className="text-[10px] font-bold uppercase opacity-50 tracking-wider mb-1">Filters</div>
-
-                                            <label className="flex items-center gap-2 text-xs cursor-pointer">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={filters.all}
-                                                    onChange={(e) => setFilters({ ...filters, all: e.target.checked, hydrophobic: false, saltBridge: false, piStacking: false, disulfide: false })}
-                                                    className="rounded border-neutral-300 text-blue-600 focus:ring-0"
-                                                />
-                                                <span className={filters.all ? 'font-bold' : ''}>Show All Interactions</span>
-                                            </label>
-
-                                            <div className={`space-y-1.5 pl-2 border-l-2 ${filters.all ? 'opacity-50 pointer-events-none' : ''} border-neutral-100 dark:border-neutral-800`}>
-                                                <label className="flex items-center gap-2 text-xs cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded p-1 -ml-1 transition-colors">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={filters.saltBridge}
-                                                        onChange={(e) => setFilters(prev => ({ ...prev, all: false, saltBridge: e.target.checked }))}
-                                                        className="rounded border-neutral-300 text-red-500 focus:ring-0"
-                                                    />
-                                                    <span className="text-red-500">Salt Bridge</span>
-                                                </label>
-                                                <label className="flex items-center gap-2 text-xs cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded p-1 -ml-1 transition-colors">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={filters.disulfide}
-                                                        onChange={(e) => setFilters(prev => ({ ...prev, all: false, disulfide: e.target.checked }))}
-                                                        className="rounded border-neutral-300 text-yellow-500 focus:ring-0"
-                                                    />
-                                                    <span className="text-yellow-500">Disulfide Bond</span>
-                                                </label>
-                                                <label className="flex items-center gap-2 text-xs cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded p-1 -ml-1 transition-colors">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={filters.hydrophobic}
-                                                        onChange={(e) => setFilters(prev => ({ ...prev, all: false, hydrophobic: e.target.checked }))}
-                                                        className="rounded border-neutral-300 text-green-500 focus:ring-0"
-                                                    />
-                                                    <span className="text-green-500">Hydrophobic</span>
-                                                </label>
-                                                <label className="flex items-center gap-2 text-xs cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded p-1 -ml-1 transition-colors">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={filters.piStacking}
-                                                        onChange={(e) => setFilters(prev => ({ ...prev, all: false, piStacking: e.target.checked }))}
-                                                        className="rounded border-neutral-300 text-purple-500 focus:ring-0"
-                                                    />
-                                                    <span className="text-purple-500">Pi-Stacking</span>
-                                                </label>
-                                            </div>
-                                        </div>
-
-                                        <div className="pt-2 border-t border-neutral-100 dark:border-neutral-800 space-y-2">
-                                            <button
-                                                onClick={() => setShowGrid(!showGrid)}
-                                                className={`w-full flex items-center justify-between p-2 rounded-lg text-xs font-medium transition-colors ${showGrid ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'}`}
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    <Grid3X3 className="w-4 h-4" /> Show Grid
-                                                </div>
-                                                {showGrid && <Check className="w-3 h-3" />}
-                                            </button>
-
-                                            <button
-                                                onClick={() => setShowIntraChain(!showIntraChain)}
-                                                className={`w-full flex items-center justify-between p-2 rounded-lg text-xs font-medium transition-colors ${!showIntraChain ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800'}`}
-                                            >
-                                                <div className="flex items-center gap-2">
-                                                    <Maximize className="w-4 h-4" /> Interface Focus
-                                                </div>
-                                                {!showIntraChain && <Check className="w-3 h-3" />}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
                         <button
                             onClick={handleDownloadCSV}
-                            className={`p-2 rounded-lg transition-colors ${isLightMode ? 'hover:bg-neutral-100 text-neutral-600' : 'hover:bg-neutral-800 text-neutral-400'}`}
-                            title="Download Data (CSV)"
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isLightMode ? 'bg-neutral-100 hover:bg-neutral-200 text-neutral-600' : 'bg-neutral-800 hover:bg-neutral-700 text-neutral-300'}`}
                         >
-                            <FileText className="w-5 h-5" />
+                            <FileText className="w-4 h-4" />
+                            <span className="hidden sm:inline">Export CSV</span>
                         </button>
                         <button
                             onClick={handleDownload}
-                            className={`p-2 rounded-lg transition-colors ${isLightMode ? 'hover:bg-neutral-100 text-neutral-600' : 'hover:bg-neutral-800 text-neutral-400'}`}
-                            title="Download Image"
+                            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isLightMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white'}`}
                         >
-                            <Download className="w-5 h-5" />
+                            <Download className="w-4 h-4" />
+                            <span className="hidden sm:inline">Save Image</span>
                         </button>
 
                         <div className={`w-px h-6 mx-2 ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-700'}`} />
@@ -638,150 +509,208 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                     </div>
                 </div>
 
-                {/* Main Content Area - Grid Layout for Sticky Axes & Chain Bars */}
-                <div className={`flex-1 overflow-auto relative p-0 ${isLightMode ? 'bg-neutral-50' : 'bg-black/20'}`}>
-                    {loading ? (
-                        <div className={`absolute inset-0 flex items-center justify-center z-10 ${isLightMode ? 'bg-white/80' : 'bg-black/80'}`}>
-                            <div className="flex flex-col items-center gap-3">
-                                <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full" />
-                                <span className={`text-sm font-medium ${isLightMode ? 'text-blue-600' : 'text-blue-400'}`}>Computing Interactions...</span>
-                            </div>
-                        </div>
-                    ) : distanceData && (
-                        <div className="inline-grid grid-cols-[2rem_3rem_1fr] grid-rows-[2rem_2rem_1fr]">
+                {/* Main Content: Flex Row */}
+                <div className="flex flex-1 overflow-hidden">
 
-                            {/* CORNERS (Sticky) */}
-                            {/* Row 1, Col 1+2 (Chain Bar Corner) */}
-                            <div className={`col-span-2 sticky top-0 left-0 z-30 ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-900'}`} style={{ gridRow: 1 }} />
-                            {/* Row 2, Col 1+2 (Axis Corner) */}
-                            <div className={`col-span-2 sticky top-8 left-0 z-30 ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-900'} border-b ${isLightMode ? 'border-neutral-200' : 'border-neutral-800'}`} style={{ gridRow: 2 }} />
-
-
-                            {/* 1. TOP CHAIN BARS (Sticky Top) */}
-                            {/* Grid Row 1, Col 3 */}
-                            <div className={`sticky top-0 z-20 h-8 relative whitespace-nowrap overflow-hidden ${isLightMode ? 'bg-neutral-100/80 backdrop-blur' : 'bg-neutral-900/80 backdrop-blur'}`} style={{ gridColumn: 3, width: distanceData.size * scale }}>
-                                {chainRanges.map((range, idx) => (
-                                    <div
-                                        key={`top-chain-${idx}`}
-                                        className={`absolute h-full flex items-center justify-center border-l first:border-l-0 ${isLightMode ? 'border-neutral-300 text-neutral-600' : 'border-neutral-700 text-neutral-400'}`}
-                                        style={{
-                                            left: range.start * scale,
-                                            width: (range.end - range.start) * scale
-                                        }}
-                                    >
-                                        <span className="text-xs font-bold px-2 truncate">Chain {range.chain}</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* 2. TOP AXIS (Sticky Top - Offset by 2rem) */}
-                            {/* Grid Row 2, Col 3 */}
-                            <div className={`sticky top-8 z-20 h-8 relative border-b ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`} style={{ gridColumn: 3, width: distanceData.size * scale }}>
-                                {Axes?.x}
-                            </div>
-
-                            {/* 3. LEFT CHAIN BARS (Sticky Left) */}
-                            {/* Grid Row 3, Col 1 */}
-                            <div className={`sticky left-0 z-20 w-8 relative overflow-hidden ${isLightMode ? 'bg-neutral-100/80 backdrop-blur' : 'bg-neutral-900/80 backdrop-blur'}`} style={{ gridRow: 3, height: distanceData.size * scale }}>
-                                {chainRanges.map((range, idx) => (
-                                    <div
-                                        key={`left-chain-${idx}`}
-                                        className={`absolute w-full flex items-center justify-center border-t first:border-t-0 ${isLightMode ? 'border-neutral-300 text-neutral-600' : 'border-neutral-700 text-neutral-400'}`}
-                                        style={{
-                                            top: range.start * scale,
-                                            height: (range.end - range.start) * scale
-                                        }}
-                                    >
-                                        <span className="text-xs font-bold -rotate-90 whitespace-nowrap">Chain {range.chain}</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* 4. LEFT AXIS (Sticky Left - Offset by 2rem) */}
-                            {/* Grid Row 3, Col 2 */}
-                            <div className={`sticky left-8 z-20 w-12 relative border-r ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`} style={{ gridRow: 3, height: distanceData.size * scale }}>
-                                {Axes?.y}
-                            </div>
-
-                            {/* 5. MAIN MAP (Scrolls) */}
-                            {/* Grid Row 3, Col 3 */}
-                            <div className="relative" style={{ gridRow: 3, gridColumn: 3, width: distanceData.size * scale, height: distanceData.size * scale }}>
-                                <canvas
-                                    ref={mapCanvasRef}
-                                    className="absolute inset-0 pointer-events-none image-pixelated"
-                                    style={{ imageRendering: 'pixelated' }}
-                                />
-                                <canvas
-                                    ref={overlayCanvasRef}
-                                    onMouseMove={handleMouseMove}
-                                    onMouseLeave={() => setHoverPos(null)}
-                                    onClick={handleClick}
-                                    className="absolute inset-0 cursor-crosshair image-pixelated"
-                                    style={{ imageRendering: 'pixelated' }}
-                                />
-                            </div>
-                        </div>
-                    )}
-
-
-                    {/* Floating Info Card */}
-                    {hoverPos && distanceData && (
-                        <div className={`absolute bottom-6 right-6 backdrop-blur shadow-xl border rounded-lg p-4 flex flex-col gap-1 w-64 z-50 ${isLightMode ? 'bg-white/95 border-neutral-100' : 'bg-neutral-800/95 border-neutral-700'}`}>
-                            <div className={`flex items-center justify-between pb-2 border-b ${isLightMode ? 'border-neutral-100' : 'border-neutral-700'}`}>
-                                <span className="text-xs font-bold uppercase opacity-50 tracking-wider">Interaction</span>
-                                <span className={`text-sm font-bold ${distanceData.matrix[hoverPos.i][hoverPos.j] < 5 ? 'text-blue-500' : 'opacity-70'}`}>
-                                    {distanceData.matrix[hoverPos.i][hoverPos.j].toFixed(2)} Å
-                                </span>
-                            </div>
-
-                            {/* Guessed Type */}
-                            {(() => {
-                                const interaction = getInteractionType(
-                                    distanceData.labels[hoverPos.i].label,
-                                    distanceData.labels[hoverPos.j].label,
-                                    distanceData.matrix[hoverPos.i][hoverPos.j]
-                                );
-                                return interaction ? (
-                                    <div className={`mt-2 px-2 py-1 rounded text-xs font-bold text-center border ${interaction.color} ${interaction.bg.replace('/10', '/5')} border-current opacity-80`}>
-                                        {interaction.type}
-                                    </div>
-                                ) : null;
-                            })()}
-
-                            <div className="grid grid-cols-2 gap-4 pt-2">
-                                <div>
-                                    <span className="text-[10px] opacity-50 uppercase">Residue 1</span>
-                                    <div className="font-mono text-sm">
-                                        <span className="text-blue-500 font-bold mr-1">{distanceData.labels[hoverPos.i].chain}</span>
-                                        {distanceData.labels[hoverPos.i].label}
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <span className="text-[10px] opacity-50 uppercase">Residue 2</span>
-                                    <div className="font-mono text-sm">
-                                        <span className="text-blue-500 font-bold mr-1">{distanceData.labels[hoverPos.j].chain}</span>
-                                        {distanceData.labels[hoverPos.j].label}
-                                    </div>
+                    {/* Left Column: Map Area */}
+                    <div className={`flex-1 overflow-auto relative p-0 ${isLightMode ? 'bg-neutral-50' : 'bg-black/20'}`}>
+                        {loading ? (
+                            <div className={`absolute inset-0 flex items-center justify-center z-10 ${isLightMode ? 'bg-white/80' : 'bg-black/80'}`}>
+                                <div className="flex flex-col items-center gap-3">
+                                    <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full" />
+                                    <span className={`text-sm font-medium ${isLightMode ? 'text-blue-600' : 'text-blue-400'}`}>Computing Interactions...</span>
                                 </div>
                             </div>
-                        </div>
-                    )}
-                </div>
+                        ) : distanceData && (
+                            <div className="inline-grid grid-cols-[2rem_3rem_1fr] grid-rows-[2rem_2rem_1fr]">
 
-                {/* Footer Legend */}
-                <div className={`border-t px-6 py-3 flex items-center justify-center gap-8 text-xs font-medium ${isLightMode ? 'bg-white border-neutral-100 text-neutral-600' : 'bg-neutral-900 border-neutral-800 text-neutral-400'}`}>
-                    <div className="flex items-center gap-2">
-                        <div className={`w-3 h-3 rounded-sm ${isLightMode ? 'bg-[#1e3a8a]' : 'bg-blue-400'}`}></div>
-                        <span>Close Contact (&lt; {contactThreshold} Å)</span>
+                                {/* CORNERS (Sticky) */}
+                                <div className={`col-span-2 sticky top-0 left-0 z-30 ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-900'}`} style={{ gridRow: 1 }} />
+                                <div className={`col-span-2 sticky top-8 left-0 z-30 ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-900'} border-b ${isLightMode ? 'border-neutral-200' : 'border-neutral-800'}`} style={{ gridRow: 2 }} />
+
+                                {/* 1. TOP CHAIN BARS */}
+                                <div className={`sticky top-0 z-20 h-8 relative whitespace-nowrap overflow-hidden ${isLightMode ? 'bg-neutral-100/80 backdrop-blur' : 'bg-neutral-900/80 backdrop-blur'}`} style={{ gridColumn: 3, width: distanceData.size * scale }}>
+                                    {chainRanges.map((range, idx) => (
+                                        <div
+                                            key={`top-chain-${idx}`}
+                                            className={`absolute h-full flex items-center justify-center border-l first:border-l-0 ${isLightMode ? 'border-neutral-300 text-neutral-600' : 'border-neutral-700 text-neutral-400'}`}
+                                            style={{
+                                                left: range.start * scale,
+                                                width: (range.end - range.start) * scale
+                                            }}
+                                        >
+                                            <span className="text-xs font-bold px-2 truncate">Chain {range.chain}</span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* 2. TOP AXIS */}
+                                <div className={`sticky top-8 z-20 h-8 relative border-b ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`} style={{ gridColumn: 3, width: distanceData.size * scale }}>
+                                    {Axes?.x}
+                                </div>
+
+                                {/* 3. LEFT CHAIN BARS */}
+                                <div className={`sticky left-0 z-20 w-8 relative overflow-hidden ${isLightMode ? 'bg-neutral-100/80 backdrop-blur' : 'bg-neutral-900/80 backdrop-blur'}`} style={{ gridRow: 3, height: distanceData.size * scale }}>
+                                    {chainRanges.map((range, idx) => (
+                                        <div
+                                            key={`left-chain-${idx}`}
+                                            className={`absolute w-full flex items-center justify-center border-t first:border-t-0 ${isLightMode ? 'border-neutral-300 text-neutral-600' : 'border-neutral-700 text-neutral-400'}`}
+                                            style={{
+                                                top: range.start * scale,
+                                                height: (range.end - range.start) * scale
+                                            }}
+                                        >
+                                            <span className="text-xs font-bold -rotate-90 whitespace-nowrap">Chain {range.chain}</span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* 4. LEFT AXIS */}
+                                <div className={`sticky left-8 z-20 w-12 relative border-r ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`} style={{ gridRow: 3, height: distanceData.size * scale }}>
+                                    {Axes?.y}
+                                </div>
+
+                                {/* 5. MAIN MAP */}
+                                <div className="relative" style={{ gridRow: 3, gridColumn: 3, width: distanceData.size * scale, height: distanceData.size * scale }}>
+                                    <canvas ref={mapCanvasRef} className="absolute inset-0 pointer-events-none image-pixelated" style={{ imageRendering: 'pixelated' }} />
+                                    <canvas ref={overlayCanvasRef} onMouseMove={handleMouseMove} onMouseLeave={() => setHoverPos(null)} onClick={handleClick} className="absolute inset-0 cursor-crosshair image-pixelated" style={{ imageRendering: 'pixelated' }} />
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Persistent Floating Tooltip inside Map Area */}
+                        {hoverPos && distanceData && (
+                            <div className={`absolute bottom-6 right-6 backdrop-blur shadow-xl border rounded-lg p-4 flex flex-col gap-1 w-64 z-50 pointer-events-none ${isLightMode ? 'bg-white/95 border-neutral-100' : 'bg-neutral-800/95 border-neutral-700'}`}>
+                                <div className={`flex items-center justify-between pb-2 border-b ${isLightMode ? 'border-neutral-100' : 'border-neutral-700'}`}>
+                                    <span className="text-xs font-bold uppercase opacity-50 tracking-wider">Interaction</span>
+                                    <span className={`text-sm font-bold ${distanceData.matrix[hoverPos.i][hoverPos.j] < 5 ? 'text-blue-500' : 'opacity-70'}`}>
+                                        {distanceData.matrix[hoverPos.i][hoverPos.j].toFixed(2)} Å
+                                    </span>
+                                </div>
+                                {(() => {
+                                    const interaction = getInteractionType(distanceData.labels[hoverPos.i].label, distanceData.labels[hoverPos.j].label, distanceData.matrix[hoverPos.i][hoverPos.j]);
+                                    return interaction ? (
+                                        <div className={`mt-2 px-2 py-1 rounded text-xs font-bold text-center border ${interaction.color} ${interaction.bg.replace('/10', '/5')} border-current opacity-80`}>
+                                            {interaction.type}
+                                        </div>
+                                    ) : null;
+                                })()}
+                                <div className="grid grid-cols-2 gap-4 pt-2">
+                                    <div><span className="text-[10px] opacity-50 uppercase">Residue 1</span><div className="font-mono text-sm"><span className="text-blue-500 font-bold mr-1">{distanceData?.labels[hoverPos.i].chain}</span>{distanceData?.labels[hoverPos.i].label}</div></div>
+                                    <div className="text-right"><span className="text-[10px] opacity-50 uppercase">Residue 2</span><div className="font-mono text-sm"><span className="text-blue-500 font-bold mr-1">{distanceData?.labels[hoverPos.j].chain}</span>{distanceData?.labels[hoverPos.j].label}</div></div>
+                                </div>
+                            </div>
+                        )}
                     </div>
-                    <div className="flex items-center gap-2">
-                        <div className={`w-3 h-3 rounded-sm ${isLightMode ? 'bg-[#94a3b8]' : 'bg-slate-600'}`}></div>
-                        <span>Proximal ({contactThreshold} - {proximalThreshold} Å)</span>
+
+                    {/* Right Column: Control Sidebar */}
+                    <div className={`w-80 flex flex-col border-l overflow-y-auto ${isLightMode ? 'bg-white border-neutral-100' : 'bg-neutral-900 border-neutral-800'}`}>
+
+                        {/* Section: View & Zoom */}
+                        <div className="p-4 border-b border-neutral-100 dark:border-neutral-800 space-y-4">
+                            <h4 className="text-xs font-bold uppercase opacity-50 tracking-wider">View Options</h4>
+
+                            <div className={`flex items-center justify-between p-1 rounded-lg ${isLightMode ? 'bg-neutral-100' : 'bg-neutral-800'}`}>
+                                <button onClick={() => setScale(s => Math.max(1, s - 1))} className="p-2 hover:bg-white dark:hover:bg-neutral-700 rounded-md transition-all"><ZoomOut className="w-4 h-4" /></button>
+                                <span className="text-xs font-mono font-medium opacity-70">Scale: {scale}x</span>
+                                <button onClick={() => setScale(s => Math.min(20, s + 1))} className="p-2 hover:bg-white dark:hover:bg-neutral-700 rounded-md transition-all"><ZoomIn className="w-4 h-4" /></button>
+                            </div>
+
+                            <button
+                                onClick={() => setShowGrid(!showGrid)}
+                                className={`w-full flex items-center justify-between p-3 rounded-lg text-sm font-medium transition-colors ${showGrid ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500'}`}
+                            >
+                                <div className="flex items-center gap-2"><Grid3X3 className="w-4 h-4" /> Show Grid</div>
+                                {showGrid && <Check className="w-4 h-4" />}
+                            </button>
+
+                            <button
+                                onClick={() => setShowIntraChain(!showIntraChain)}
+                                className={`w-full flex items-center justify-between p-3 rounded-lg text-sm font-medium transition-colors ${!showIntraChain ? 'bg-purple-50 text-purple-600 ring-1 ring-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:ring-purple-900' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500'}`}
+                            >
+                                <div className="flex items-center gap-2"><Maximize className="w-4 h-4" /> Interface Focus</div>
+                                {!showIntraChain && <Check className="w-4 h-4" />}
+                            </button>
+                        </div>
+
+                        {/* Section: Filters */}
+                        <div className={`p-4 border-b border-neutral-100 dark:border-neutral-800 space-y-4 ${filters.all ? '' : 'bg-blue-50/50 dark:bg-blue-900/10'}`}>
+                            <div className="flex items-center justify-between">
+                                <h4 className="text-xs font-bold uppercase opacity-50 tracking-wider">Interaction Filters</h4>
+                                {!filters.all && <button onClick={() => setFilters({ ...filters, all: true })} className="text-[10px] text-blue-500 hover:underline">Reset All</button>}
+                            </div>
+
+                            <label className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${filters.all ? (isLightMode ? 'bg-neutral-100 font-medium' : 'bg-neutral-800 font-medium') : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/50'}`}>
+                                <div className={`w-5 h-5 rounded border flex items-center justify-center ${filters.all ? 'bg-blue-500 border-blue-500 text-white' : 'border-neutral-300 dark:border-neutral-600'}`}>
+                                    <input
+                                        type="checkbox"
+                                        checked={filters.all}
+                                        onChange={(e) => setFilters({ ...filters, all: e.target.checked, hydrophobic: false, saltBridge: false, piStacking: false, disulfide: false })}
+                                        className="hidden"
+                                    />
+                                    {filters.all && <Check className="w-3.5 h-3.5" />}
+                                </div>
+                                <span className="text-sm">Show All Interactions</span>
+                            </label>
+
+                            <div className={`space-y-2 ${filters.all ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
+                                {[
+                                    { id: 'saltBridge', label: 'Salt Bridge', color: 'text-red-500', bg: 'bg-red-500' },
+                                    { id: 'disulfide', label: 'Disulfide Bond', color: 'text-yellow-500', bg: 'bg-yellow-500' },
+                                    { id: 'hydrophobic', label: 'Hydrophobic', color: 'text-green-500', bg: 'bg-green-500' },
+                                    { id: 'piStacking', label: 'Pi-Stacking', color: 'text-purple-500', bg: 'bg-purple-500' }
+                                ].map((item) => (
+                                    <label key={item.id} className="flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors">
+                                        <div className={`w-5 h-5 rounded border flex items-center justify-center ${filters[item.id as keyof typeof filters] ? `${item.bg} border-transparent text-white` : 'border-neutral-300 dark:border-neutral-600'}`}>
+                                            <input
+                                                type="checkbox"
+                                                checked={filters[item.id as keyof typeof filters]}
+                                                onChange={(e) => setFilters(prev => ({ ...prev, all: false, [item.id]: e.target.checked }))}
+                                                className="hidden"
+                                            />
+                                            {filters[item.id as keyof typeof filters] && <Check className="w-3.5 h-3.5" />}
+                                        </div>
+                                        <span className={`text-sm ${item.color} font-medium`}>{item.label}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Section: Sensitivity */}
+                        <div className="p-4 space-y-6">
+                            <h4 className="text-xs font-bold uppercase opacity-50 tracking-wider">Map Sensitivity</h4>
+
+                            <div className="space-y-2">
+                                <div className="flex justify-between text-xs font-medium">
+                                    <span>Contact Threshold</span>
+                                    <span className="text-blue-500">{contactThreshold} Å</span>
+                                </div>
+                                <input
+                                    type="range" min="3" max="10" step="0.5"
+                                    value={contactThreshold}
+                                    onChange={(e) => setContactThreshold(parseFloat(e.target.value))}
+                                    className="w-full h-1.5 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                />
+                                <div className="text-[10px] opacity-50">Defines close contacts (Dark Blue).</div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <div className="flex justify-between text-xs font-medium">
+                                    <span>Proximal Threshold</span>
+                                    <span className="text-slate-500">{proximalThreshold} Å</span>
+                                </div>
+                                <input
+                                    type="range" min={contactThreshold} max="15" step="0.5"
+                                    value={proximalThreshold}
+                                    onChange={(e) => setProximalThreshold(parseFloat(e.target.value))}
+                                    className="w-full h-1.5 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-slate-500"
+                                />
+                                <div className="text-[10px] opacity-50">Defines nearby residues (Light Blue).</div>
+                            </div>
+                        </div>
+
                     </div>
-                    <div className="flex items-center gap-2">
-                        <div className={`w-3 h-3 border rounded-sm ${isLightMode ? 'bg-white border-neutral-200' : 'bg-neutral-900 border-neutral-700'}`}></div>
-                        <span>Distal / No Contact (&gt; {proximalThreshold} Å)</span>
-                    </div>
+
                 </div>
             </div>
         </div>
