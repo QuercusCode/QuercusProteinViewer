@@ -116,28 +116,20 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 const shape = new window.NGL.Shape(m.shapeId);
 
 
-                // Robust Line: Pearl Necklace (Overlapping Spheres)
-                // Used to guarantee visibility if Cylinders are failing
-                const steps = Math.ceil(m.distance * 5); // ~0.2A spacing
-                const delta = [
-                    (atom2.x - atom1.x) / steps,
-                    (atom2.y - atom1.y) / steps,
-                    (atom2.z - atom1.z) / steps
+                // Simple Line (Tube) via Path
+                // This creates a smooth tube between points properly
+                const path = [
+                    [atom1.x, atom1.y, atom1.z],
+                    [atom2.x, atom2.y, atom2.z]
                 ];
-
-                for (let i = 0; i <= steps; i++) {
-                    const x = atom1.x + delta[0] * i;
-                    const y = atom1.y + delta[1] * i;
-                    const z = atom1.z + delta[2] * i;
-                    shape.addSphere([x, y, z], [1, 0.84, 0], 0.15); // Golden Yellow
-                }
+                shape.addPath(path, [1, 1, 0], 0.15); // Tube with radius 0.15
 
                 // Label
                 const mp = [(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2];
                 shape.addText(mp, [1, 1, 1], 2.0, `${m.distance.toFixed(2)} A`);
 
                 const shapeComp = stageRef.current.addComponentFromObject(shape);
-                shapeComp.addRepresentation("buffer", { depthTest: false, opacity: 1.0 }); // Always visible
+                shapeComp.addRepresentation("buffer", { depthTest: false, opacity: 1.0, side: "double" }); // Double-sided for visibility
             } catch (e) {
                 console.warn("Failed to draw measurement", e);
             }
