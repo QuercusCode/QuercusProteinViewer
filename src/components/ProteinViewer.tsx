@@ -906,415 +906,407 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     console.log(`Fetching from: ${url}`);
                     component = await stage.loadFile(url, { defaultRepresentation: false });
                 } else {
-                } catch (e) {
-                    console.warn("PDB load failed, trying CIF...", e);
-                    const cifUrl = `https://files.rcsb.org/download/${cleanId}.cif`;
-                    console.log(`Fetching CIF: ${cifUrl}`);
-                    component = await stage.loadFile(cifUrl, { defaultRepresentation: false, ext: 'mmcif' });
+                    if (isMounted.current) setLoading(false);
+                    return;
                 }
-            }
-                } else {
-                if (isMounted.current) setLoading(false);
-        return;
-    }
 
                 if (component && isMounted.current) {
-        console.log("Component loaded. Type:", component.type);
-        componentRef.current = component;
+                    console.log("Component loaded. Type:", component.type);
+                    componentRef.current = component;
 
-        if (component.structure && onStructureLoaded) {
-            try {
-                const chains: ChainInfo[] = [];
-                const seenChains = new Set<string>();
+                    if (component.structure && onStructureLoaded) {
+                        try {
+                            const chains: ChainInfo[] = [];
+                            const seenChains = new Set<string>();
 
-                component.structure.eachChain((c: any) => {
-                    if (seenChains.has(c.chainname)) return;
-                    seenChains.add(c.chainname);
+                            component.structure.eachChain((c: any) => {
+                                if (seenChains.has(c.chainname)) return;
+                                seenChains.add(c.chainname);
 
-                    let seq = "";
-                    let minSeq = Infinity;
-                    let maxSeq = -Infinity;
+                                let seq = "";
+                                let minSeq = Infinity;
+                                let maxSeq = -Infinity;
 
+                                try {
+                                    c.eachResidue((r: any) => {
+                                        let resNo = r.resno;
+                                        if (resNo === undefined && typeof r.getResno === 'function') {
+                                            resNo = r.getResno();
+                                        }
+
+                                        if (typeof resNo === 'number') {
+                                            if (resNo < minSeq) minSeq = resNo;
+                                            if (resNo > maxSeq) maxSeq = resNo;
+                                        }
+
+                                        let resName = 'X';
+                                        if (r.getResname1) resName = r.getResname1();
+                                        else if (r.resname) resName = r.resname[0];
+                                        seq += resName;
+                                    });
+                                } catch (eRes) {
+                                    console.warn(`Residue iteration failed for chain ${c.chainname}`, eRes);
+                                }
+
+                                if (minSeq === Infinity) minSeq = 0;
+                                if (maxSeq === -Infinity) maxSeq = 0;
+
+                                console.log(`Chain ${c.chainname}: Range ${minSeq}-${maxSeq}, SeqLen: ${seq.length}`);
+                                chains.push({ name: c.chainname, min: minSeq, max: maxSeq, sequence: seq });
+                            });
+
+                            // Extract Ligands
+                            const ligandSet = new Set<string>();
+                            component.structure.eachResidue((r: any) => {
+                                // Basic filter for ligands: isHetero and not Water/Ion (generic check)
+                                // NGL might mark waters as hetero. Typical water names: HOH, WAT, TIP
+                                const invalidLigands = ['HOH', 'WAT', 'TIP', 'SOL', 'DOD'];
+                                if (r.isHetero() && !invalidLigands.includes(r.resname)) {
+                                    ligandSet.add(r.resname);
+                                }
+                            });
+                            const ligands = Array.from(ligandSet).sort();
+
+                            onStructureLoaded({ chains, ligands });
+                        } catch (e) { console.warn("Chain parsing error", e); }
+                    }
+
+                    console.log("Applying initial representation...");
                     try {
-                        c.eachResidue((r: any) => {
-                            let resNo = r.resno;
-                            if (resNo === undefined && typeof r.getResno === 'function') {
-                                resNo = r.getResno();
-                            }
-
-                            if (typeof resNo === 'number') {
-                                if (resNo < minSeq) minSeq = resNo;
-                                if (resNo > maxSeq) maxSeq = resNo;
-                            }
-
-                            let resName = 'X';
-                            if (r.getResname1) resName = r.getResname1();
-                            else if (r.resname) resName = r.resname[0];
-                            seq += resName;
-                        });
-                    } catch (eRes) {
-                        console.warn(`Residue iteration failed for chain ${c.chainname}`, eRes);
+                        updateRepresentation(component);
+                    } catch (reprErr) {
+                        console.error("Initial representation failure:", reprErr);
                     }
 
-                    if (minSeq === Infinity) minSeq = 0;
-                    if (maxSeq === -Infinity) maxSeq = 0;
-
-                    console.log(`Chain ${c.chainname}: Range ${minSeq}-${maxSeq}, SeqLen: ${seq.length}`);
-                    chains.push({ name: c.chainname, min: minSeq, max: maxSeq, sequence: seq });
-                });
-
-                // Extract Ligands
-                const ligandSet = new Set<string>();
-                component.structure.eachResidue((r: any) => {
-                    // Basic filter for ligands: isHetero and not Water/Ion (generic check)
-                    // NGL might mark waters as hetero. Typical water names: HOH, WAT, TIP
-                    const invalidLigands = ['HOH', 'WAT', 'TIP', 'SOL', 'DOD'];
-                    if (r.isHetero() && !invalidLigands.includes(r.resname)) {
-                        ligandSet.add(r.resname);
-                    }
-                });
-                const ligands = Array.from(ligandSet).sort();
-
-                onStructureLoaded({ chains, ligands });
-            } catch (e) { console.warn("Chain parsing error", e); }
-        }
-
-        console.log("Applying initial representation...");
-        try {
-            updateRepresentation(component);
-        } catch (reprErr) {
-            console.error("Initial representation failure:", reprErr);
-        }
-
-        setTimeout(() => {
-            if (!isMounted.current) return;
-            try {
-                console.log("AutoView & Resize...");
-                stage.handleResize();
-                component.autoView();
-                if (stage.viewer) stage.viewer.requestRender();
-            } catch (e) { console.warn("AutoView failed", e); }
-        }, 1000);
-    }
-} catch (err) {
-    if (isMounted.current) {
-        console.error("Load Error (caught):", err);
-        setError(`Failed to load: ${err instanceof Error ? err.message : String(err)}`);
-    }
-} finally {
-    if (isMounted.current) setLoading(false);
-}
+                    setTimeout(() => {
+                        if (!isMounted.current) return;
+                        try {
+                            console.log("AutoView & Resize...");
+                            stage.handleResize();
+                            component.autoView();
+                            if (stage.viewer) stage.viewer.requestRender();
+                        } catch (e) { console.warn("AutoView failed", e); }
+                    }, 1000);
+                }
+            } catch (err) {
+                if (isMounted.current) {
+                    console.error("Load Error (caught):", err);
+                    setError(`Failed to load: ${err instanceof Error ? err.message : String(err)}`);
+                }
+            } finally {
+                if (isMounted.current) setLoading(false);
+            }
         };
 
-if (file || (pdbId && String(pdbId).length >= 3)) {
-    loadStructure();
-} else {
-    if (stageRef.current) stageRef.current.removeAllComponents();
-    componentRef.current = null;
-}
+        if (file || (pdbId && String(pdbId).length >= 3)) {
+            loadStructure();
+        } else {
+            if (stageRef.current) stageRef.current.removeAllComponents();
+            componentRef.current = null;
+        }
     }, [pdbId, file]);
 
 
 
-useEffect(() => {
-    if (!stageRef.current) return;
-    const stage = stageRef.current;
+    useEffect(() => {
+        if (!stageRef.current) return;
+        const stage = stageRef.current;
 
-    const handleClick = (pickingProxy: any) => {
-        if (!pickingProxy || !pickingProxy.atom) {
-            // Only clear highlight if we are NOT in measurement mode and clicked background
-            if (onAtomClick) onAtomClick(null);
-            return;
-        }
-        const atom = pickingProxy.atom;
+        const handleClick = (pickingProxy: any) => {
+            if (!pickingProxy || !pickingProxy.atom) {
+                // Only clear highlight if we are NOT in measurement mode and clicked background
+                if (onAtomClick) onAtomClick(null);
+                return;
+            }
+            const atom = pickingProxy.atom;
 
-        // MEASUREMENT MODE LOGIC
-        if (isMeasurementMode) {
-            console.log("Measurement Mode Click:", atom);
+            // MEASUREMENT MODE LOGIC
+            if (isMeasurementMode) {
+                console.log("Measurement Mode Click:", atom);
 
-            // IMPORTANT: NGL reuses the same AtomProxy object for performance during iteration.
-            // We MUST clone the data immediately, otherwise both references in our array will 
-            // point to the same updated object (the last clicked atom), resulting in distance 0.
-            const atomData = {
-                chainname: atom.chainname,
-                resno: atom.resno,
-                atomname: atom.atomname,
-                x: atom.x,
-                y: atom.y,
-                z: atom.z,
-                index: atom.index // Store index directly!
-            };
-
-            selectedAtomsRef.current.push(atomData);
-
-            // Highlight the selected atom temporarily?
-            // Maybe draw a small sphere?
-            const shapeId = `sel-${Date.now()}`;
-            const shape = new window.NGL.Shape(shapeId);
-            shape.addSphere([atom.x, atom.y, atom.z], [1, 0.5, 0], 0.3); // Orange selection
-            const comp = stage.addComponentFromObject(shape);
-            comp.addRepresentation("buffer", { depthTest: false });
-            // Track this temp shape to remove later? 
-            // For now just leave it until measurement is done or cleared.
-
-            if (selectedAtomsRef.current.length === 2) {
-                const a1 = selectedAtomsRef.current[0];
-                const a2 = selectedAtomsRef.current[1];
-                const dx = a1.x - a2.x;
-                const dy = a1.y - a2.y;
-                const dz = a1.z - a2.z;
-                const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-
-                const mData: MeasurementData = {
-                    atom1: { chain: a1.chainname, resNo: a1.resno, atomName: a1.atomname, x: a1.x, y: a1.y, z: a1.z, index: a1.index },
-                    atom2: { chain: a2.chainname, resNo: a2.resno, atomName: a2.atomname, x: a2.x, y: a2.y, z: a2.z, index: a2.index },
-                    distance: dist,
-                    shapeId: `measure-${Date.now()}`
+                // IMPORTANT: NGL reuses the same AtomProxy object for performance during iteration.
+                // We MUST clone the data immediately, otherwise both references in our array will 
+                // point to the same updated object (the last clicked atom), resulting in distance 0.
+                const atomData = {
+                    chainname: atom.chainname,
+                    resno: atom.resno,
+                    atomname: atom.atomname,
+                    x: atom.x,
+                    y: atom.y,
+                    z: atom.z,
+                    index: atom.index // Store index directly!
                 };
 
-                measurementsRef.current.push(mData);
-                drawMeasurement(mData);
+                selectedAtomsRef.current.push(atomData);
 
-                // Clear selection
-                selectedAtomsRef.current = [];
-                // Optionally clear the temp spheres? 
-                // Currently clearMeasurements clears ALL measurement- components. 
-                // We should name our shapes consistently.
-            }
-            return;
-        }
+                // Highlight the selected atom temporarily?
+                // Maybe draw a small sphere?
+                const shapeId = `sel-${Date.now()}`;
+                const shape = new window.NGL.Shape(shapeId);
+                shape.addSphere([atom.x, atom.y, atom.z], [1, 0.5, 0], 0.3); // Orange selection
+                const comp = stage.addComponentFromObject(shape);
+                comp.addRepresentation("buffer", { depthTest: false });
+                // Track this temp shape to remove later? 
+                // For now just leave it until measurement is done or cleared.
 
-        console.log("DEBUG: Clicked Atom:", atom);
+                if (selectedAtomsRef.current.length === 2) {
+                    const a1 = selectedAtomsRef.current[0];
+                    const a2 = selectedAtomsRef.current[1];
+                    const dx = a1.x - a2.x;
+                    const dy = a1.y - a2.y;
+                    const dz = a1.z - a2.z;
+                    const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-
-
-        // Standard Interaction (Bi-directional Sync)
-        if (onAtomClick) {
-            // Try to get exact click position, or fall back to atom center
-            let pos = null;
-            if (pickingProxy.position) {
-                pos = { x: pickingProxy.position.x, y: pickingProxy.position.y, z: pickingProxy.position.z };
-            } else if (atom) {
-                pos = { x: atom.x, y: atom.y, z: atom.z };
-            }
-
-            console.log("DEBUG: Final Position for Click:", pos);
-
-            onAtomClick({
-                chain: atom.chainname,
-                resNo: atom.resno,
-                resName: atom.resname,
-                atomIndex: atom.index,
-                position: pos || undefined
-            });
-        }
-    };
-
-    stage.signals.clicked.add(handleClick);
-
-    return () => {
-        stage.signals.clicked.remove(handleClick);
-
-    };
-}, [onAtomClick, isMeasurementMode]);
-
-
-const updateRepresentation = (specificComponent?: any) => {
-    if (!isMounted.current) return;
-    const component = specificComponent || componentRef.current;
-    if (!component || !component.structure) return;
-
-    const NGL = window.NGL;
-
-    // Stable Color Palettes
-    const CHAIN_COLORS = [
-        0x1f77b4, 0xff7f0e, 0x2ca02c, 0xd62728, 0x9467bd,
-        0x8c564b, 0xe377c2, 0x7f7f7f, 0xbcbd22, 0x17becf,
-        0xFA8072, 0x00FF7F, 0xFFD700, 0x4B0082, 0xFF1493,
-        0x008080, 0xCD5C5C, 0x000080, 0xDAA520, 0x32CD32
-    ];
-
-    const ELEMENT_COLORS: { [key: string]: number } = {
-        'C': 0x909090,
-        'O': 0xFF0D0D,
-        'N': 0x3050F8,
-        'S': 0xFFFF30,
-        'P': 0xFFA500,
-        'H': 0xFFFFFF,
-        'DEFAULT': 0xCCCCCC
-    };
-
-    try {
-        component.removeAllRepresentations();
-        highlightComponentRef.current = null;
-
-        let repType = representation || 'cartoon';
-        let currentColoring = coloring;
-
-        // Handle special 1crn case (legacy support)
-        if (coloring === 'chainid' && pdbId && pdbId.toLowerCase().includes('1crn')) {
-            currentColoring = 'element';
-            repType = 'licorice';
-        }
-
-        // Map 'structure' to NGL's 'sstruc'
-        if (currentColoring === 'structure') {
-            currentColoring = 'sstruc';
-        }
-
-        // Strategy: Unified Custom Scheme
-        // For simple coloring modes (chainid, element), we use a purely manual scheme
-        // This ensures that "base" colors are identical whether a custom rule exists or not.
-
-        if (currentColoring === 'chainid' || currentColoring === 'element' || currentColoring === 'charge') {
-            const schemeId = `unified-scheme-${Date.now()}`;
-
-            // Pre-calculate custom colors for fast lookup
-            const customColorMap = new Map<number, number>();
-            if (customColors?.length > 0) {
-                customColors.forEach(rule => {
-                    if (!rule.color || !rule.target) return;
-                    try {
-                        const colorHex = new NGL.Color(rule.color).getHex();
-                        const selection = new NGL.Selection(rule.target);
-                        component.structure.eachAtom((atom: any) => {
-                            customColorMap.set(atom.index, colorHex);
-                        }, selection);
-                    } catch (e) { }
-                });
-            }
-
-            try {
-                const registeredSchemeId = NGL.ColormakerRegistry.addScheme(function (this: any) {
-                    this.atomColor = (atom: any) => {
-                        // 1. Custom Override (Highest Priority)
-                        if (customColorMap.has(atom.index)) {
-                            return customColorMap.get(atom.index);
-                        }
-
-                        // 2. Charge Coloring
-                        if (currentColoring === 'charge') {
-                            const resName = atom.resname;
-                            // Positive: Blue
-                            if (['ARG', 'LYS', 'HIS'].includes(resName)) return 0x0000FF;
-                            // Negative: Red
-                            if (['ASP', 'GLU'].includes(resName)) return 0xFF0000;
-                            // Neutral: White/Grey
-                            return 0xCCCCCC;
-                        }
-
-
-
-                        // 3. Base Coloring (Stable)
-                        if (currentColoring === 'element') {
-                            return ELEMENT_COLORS[atom.element] || ELEMENT_COLORS['DEFAULT'];
-                        }
-
-                        // Default: Chain ID
-                        return CHAIN_COLORS[(atom.chainIndex || 0) % CHAIN_COLORS.length];
+                    const mData: MeasurementData = {
+                        atom1: { chain: a1.chainname, resNo: a1.resno, atomName: a1.atomname, x: a1.x, y: a1.y, z: a1.z, index: a1.index },
+                        atom2: { chain: a2.chainname, resNo: a2.resno, atomName: a2.atomname, x: a2.x, y: a2.y, z: a2.z, index: a2.index },
+                        distance: dist,
+                        shapeId: `measure-${Date.now()}`
                     };
-                }, schemeId);
 
-                console.log(`Applying Unified Scheme: ${repType}, ID: ${registeredSchemeId}`);
-                component.addRepresentation(repType, { color: registeredSchemeId, sele: "*" });
+                    measurementsRef.current.push(mData);
+                    drawMeasurement(mData);
 
-            } catch (e) {
-                console.warn("Unified Scheme failed, falling back to standard", e);
-                component.addRepresentation(repType, { color: currentColoring, sele: "*" });
-            }
-
-        } else {
-            // FALLBACK: Layered Strategy for complex types (structure, hydrophobicity, etc.)
-            // These are harder to replicate manually, so we accept minor shifts or use the layered approach.
-            // We'll stick to the "Base + Custom Layers" approach from Attempt 1 for these edge cases.
-
-            // 1. Define Base Selection
-            let baseSelection = "*";
-            if (customColors?.length > 0) {
-                const exclusionList = customColors
-                    .filter(c => c.target)
-                    .map(c => `(${c.target})`)
-                    .join(" or ");
-                if (exclusionList) baseSelection = `not (${exclusionList})`;
-            }
-
-            // 2. Apply Base
-            try {
-                if (baseSelection !== "not ()") { // Only if something remains
-                    component.addRepresentation(repType, { color: currentColoring, sele: baseSelection });
+                    // Clear selection
+                    selectedAtomsRef.current = [];
+                    // Optionally clear the temp spheres? 
+                    // Currently clearMeasurements clears ALL measurement- components. 
+                    // We should name our shapes consistently.
                 }
-            } catch (e) { }
+                return;
+            }
 
-            // 3. Apply Custom Layers
-            if (customColors?.length > 0) {
-                customColors.forEach(rule => {
-                    if (rule.color && rule.target) {
-                        try {
-                            component.addRepresentation(repType, { color: rule.color, sele: rule.target });
-                        } catch (e) { }
-                    }
+            console.log("DEBUG: Clicked Atom:", atom);
+
+
+
+            // Standard Interaction (Bi-directional Sync)
+            if (onAtomClick) {
+                // Try to get exact click position, or fall back to atom center
+                let pos = null;
+                if (pickingProxy.position) {
+                    pos = { x: pickingProxy.position.x, y: pickingProxy.position.y, z: pickingProxy.position.z };
+                } else if (atom) {
+                    pos = { x: atom.x, y: atom.y, z: atom.z };
+                }
+
+                console.log("DEBUG: Final Position for Click:", pos);
+
+                onAtomClick({
+                    chain: atom.chainname,
+                    resNo: atom.resno,
+                    resName: atom.resname,
+                    atomIndex: atom.index,
+                    position: pos || undefined
                 });
             }
-        }
-
-        const tryApply = (r: string, c: string, sele: string, params: any = {}) => {
-            try {
-                component.addRepresentation(r, { color: c, sele: sele, ...params });
-            } catch (e) { }
         };
 
-        // --- Visualization Overlays ---
+        stage.signals.clicked.add(handleClick);
 
-        // Surface Overlay
-        if (showSurface) {
-            console.log("Adding Surface Overlay...");
-            tryApply('surface', 'white', "*", { opacity: 0.4, depthWrite: false, side: 'front' });
+        return () => {
+            stage.signals.clicked.remove(handleClick);
+
+        };
+    }, [onAtomClick, isMeasurementMode]);
+
+
+    const updateRepresentation = (specificComponent?: any) => {
+        if (!isMounted.current) return;
+        const component = specificComponent || componentRef.current;
+        if (!component || !component.structure) return;
+
+        const NGL = window.NGL;
+
+        // Stable Color Palettes
+        const CHAIN_COLORS = [
+            0x1f77b4, 0xff7f0e, 0x2ca02c, 0xd62728, 0x9467bd,
+            0x8c564b, 0xe377c2, 0x7f7f7f, 0xbcbd22, 0x17becf,
+            0xFA8072, 0x00FF7F, 0xFFD700, 0x4B0082, 0xFF1493,
+            0x008080, 0xCD5C5C, 0x000080, 0xDAA520, 0x32CD32
+        ];
+
+        const ELEMENT_COLORS: { [key: string]: number } = {
+            'C': 0x909090,
+            'O': 0xFF0D0D,
+            'N': 0x3050F8,
+            'S': 0xFFFF30,
+            'P': 0xFFA500,
+            'H': 0xFFFFFF,
+            'DEFAULT': 0xCCCCCC
+        };
+
+        try {
+            component.removeAllRepresentations();
+            highlightComponentRef.current = null;
+
+            let repType = representation || 'cartoon';
+            let currentColoring = coloring;
+
+            // Handle special 1crn case (legacy support)
+            if (coloring === 'chainid' && pdbId && pdbId.toLowerCase().includes('1crn')) {
+                currentColoring = 'element';
+                repType = 'licorice';
+            }
+
+            // Map 'structure' to NGL's 'sstruc'
+            if (currentColoring === 'structure') {
+                currentColoring = 'sstruc';
+            }
+
+            // Strategy: Unified Custom Scheme
+            // For simple coloring modes (chainid, element), we use a purely manual scheme
+            // This ensures that "base" colors are identical whether a custom rule exists or not.
+
+            if (currentColoring === 'chainid' || currentColoring === 'element' || currentColoring === 'charge') {
+                const schemeId = `unified-scheme-${Date.now()}`;
+
+                // Pre-calculate custom colors for fast lookup
+                const customColorMap = new Map<number, number>();
+                if (customColors?.length > 0) {
+                    customColors.forEach(rule => {
+                        if (!rule.color || !rule.target) return;
+                        try {
+                            const colorHex = new NGL.Color(rule.color).getHex();
+                            const selection = new NGL.Selection(rule.target);
+                            component.structure.eachAtom((atom: any) => {
+                                customColorMap.set(atom.index, colorHex);
+                            }, selection);
+                        } catch (e) { }
+                    });
+                }
+
+                try {
+                    const registeredSchemeId = NGL.ColormakerRegistry.addScheme(function (this: any) {
+                        this.atomColor = (atom: any) => {
+                            // 1. Custom Override (Highest Priority)
+                            if (customColorMap.has(atom.index)) {
+                                return customColorMap.get(atom.index);
+                            }
+
+                            // 2. Charge Coloring
+                            if (currentColoring === 'charge') {
+                                const resName = atom.resname;
+                                // Positive: Blue
+                                if (['ARG', 'LYS', 'HIS'].includes(resName)) return 0x0000FF;
+                                // Negative: Red
+                                if (['ASP', 'GLU'].includes(resName)) return 0xFF0000;
+                                // Neutral: White/Grey
+                                return 0xCCCCCC;
+                            }
+
+
+
+                            // 3. Base Coloring (Stable)
+                            if (currentColoring === 'element') {
+                                return ELEMENT_COLORS[atom.element] || ELEMENT_COLORS['DEFAULT'];
+                            }
+
+                            // Default: Chain ID
+                            return CHAIN_COLORS[(atom.chainIndex || 0) % CHAIN_COLORS.length];
+                        };
+                    }, schemeId);
+
+                    console.log(`Applying Unified Scheme: ${repType}, ID: ${registeredSchemeId}`);
+                    component.addRepresentation(repType, { color: registeredSchemeId, sele: "*" });
+
+                } catch (e) {
+                    console.warn("Unified Scheme failed, falling back to standard", e);
+                    component.addRepresentation(repType, { color: currentColoring, sele: "*" });
+                }
+
+            } else {
+                // FALLBACK: Layered Strategy for complex types (structure, hydrophobicity, etc.)
+                // These are harder to replicate manually, so we accept minor shifts or use the layered approach.
+                // We'll stick to the "Base + Custom Layers" approach from Attempt 1 for these edge cases.
+
+                // 1. Define Base Selection
+                let baseSelection = "*";
+                if (customColors?.length > 0) {
+                    const exclusionList = customColors
+                        .filter(c => c.target)
+                        .map(c => `(${c.target})`)
+                        .join(" or ");
+                    if (exclusionList) baseSelection = `not (${exclusionList})`;
+                }
+
+                // 2. Apply Base
+                try {
+                    if (baseSelection !== "not ()") { // Only if something remains
+                        component.addRepresentation(repType, { color: currentColoring, sele: baseSelection });
+                    }
+                } catch (e) { }
+
+                // 3. Apply Custom Layers
+                if (customColors?.length > 0) {
+                    customColors.forEach(rule => {
+                        if (rule.color && rule.target) {
+                            try {
+                                component.addRepresentation(repType, { color: rule.color, sele: rule.target });
+                            } catch (e) { }
+                        }
+                    });
+                }
+            }
+
+            const tryApply = (r: string, c: string, sele: string, params: any = {}) => {
+                try {
+                    component.addRepresentation(r, { color: c, sele: sele, ...params });
+                } catch (e) { }
+            };
+
+            // --- Visualization Overlays ---
+
+            // Surface Overlay
+            if (showSurface) {
+                console.log("Adding Surface Overlay...");
+                tryApply('surface', 'white', "*", { opacity: 0.4, depthWrite: false, side: 'front' });
+            }
+
+            // Ligand Highlight
+            if (showLigands) {
+                console.log("Adding Ligand Highlight...");
+                // "ligand" keyword in NGL (non-polymer)
+                // Filter out Water/Ions if wanted: ligand and not (water or ion)
+                tryApply('ball+stick', 'element', 'ligand and not (water or ion)', { scale: 2.0 });
+            }
+
+
+            if (stageRef.current?.viewer) {
+                stageRef.current.viewer.requestRender();
+            }
+
+        } catch (e) {
+            console.error("Critical error in updateRepresentation:", e);
         }
+    };
 
-        // Ligand Highlight
-        if (showLigands) {
-            console.log("Adding Ligand Highlight...");
-            // "ligand" keyword in NGL (non-polymer)
-            // Filter out Water/Ions if wanted: ligand and not (water or ion)
-            tryApply('ball+stick', 'element', 'ligand and not (water or ion)', { scale: 2.0 });
+    useEffect(() => {
+        updateRepresentation();
+    }, [representation, coloring, customColors, showSurface, showLigands]);
+
+    useEffect(() => {
+        if (stageRef.current && resetCamera) {
+            try { stageRef.current.autoView(); } catch (e) { }
         }
+    }, [resetCamera]);
 
-
-        if (stageRef.current?.viewer) {
-            stageRef.current.viewer.requestRender();
-        }
-
-    } catch (e) {
-        console.error("Critical error in updateRepresentation:", e);
-    }
-};
-
-useEffect(() => {
-    updateRepresentation();
-}, [representation, coloring, customColors, showSurface, showLigands]);
-
-useEffect(() => {
-    if (stageRef.current && resetCamera) {
-        try { stageRef.current.autoView(); } catch (e) { }
-    }
-}, [resetCamera]);
-
-return (
-    <div className={clsx("relative w-full h-full", className)}>
-        <div ref={containerRef} className="w-full h-full" />
-        {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
-                <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
-            </div>
-        )}
-        {error && (
-            <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                <div className="bg-red-900/80 text-white px-4 py-2 rounded-lg border border-red-500 backdrop-blur-sm shadow-xl">
-                    {error}
+    return (
+        <div className={clsx("relative w-full h-full", className)}>
+            <div ref={containerRef} className="w-full h-full" />
+            {loading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
+                    <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
                 </div>
-            </div>
-        )}
-    </div>
-);
+            )}
+            {error && (
+                <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                    <div className="bg-red-900/80 text-white px-4 py-2 rounded-lg border border-red-500 backdrop-blur-sm shadow-xl">
+                        {error}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
 });
 ProteinViewer.displayName = 'ProteinViewer';
