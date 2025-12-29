@@ -124,15 +124,15 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             console.log("Creating line with spheres from", [atom1.x, atom1.y, atom1.z], "to", [atom2.x, atom2.y, atom2.z]);
 
             // Create line effect using chain of spheres (since cylinders don't render)
-            const numSpheres = 20;
+            const numSpheres = 50; // More spheres for continuous line
             for (let i = 0; i <= numSpheres; i++) {
                 const t = i / numSpheres;
                 const x = atom1.x + t * (atom2.x - atom1.x);
                 const y = atom1.y + t * (atom2.y - atom1.y);
                 const z = atom1.z + t * (atom2.z - atom1.z);
-                shape.addSphere([x, y, z], [1, 1, 0], 0.3); // Yellow spheres
+                shape.addSphere([x, y, z], [1, 1, 0], 0.8); // Larger overlapping yellow spheres
             }
-            console.log("Sphere chain added");
+            console.log("Sphere chain added - count:", numSpheres + 1);
 
 
             shape.addText([(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2], [1, 1, 1], 1.5, `${m.distance} A`);
