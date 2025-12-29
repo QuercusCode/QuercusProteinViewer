@@ -779,15 +779,14 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             const idx2 = getSafeAtomIndex(chainB, resB, 'CA');
 
             if (idx1 !== null && idx2 !== null) {
-                const params = {
-                    labelVisible: false,
-                    color: '#22d3ee', // Cyan-400 (brighter)
-                    atomPair: [[idx1, idx2]],
-                    opacity: 1.0,
-                    linewidth: 5.0
-                };
-
                 try {
+                    const params = {
+                        labelVisible: false,
+                        color: '#d946ef', // Magenta-500 (High visibility)
+                        atomPair: [[idx1, idx2]],
+                        opacity: 1.0,
+                        linewidth: 5.0
+                    };
                     const rep = comp.addRepresentation("distance", params);
                     contactLineRepRef.current = rep;
                 } catch (e) {
