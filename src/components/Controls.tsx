@@ -30,7 +30,7 @@ import type { ChainInfo, CustomColorRule, Snapshot, Movie } from '../types';
 interface ControlsProps {
     pdbId: string;
     setPdbId: (id: string) => void;
-    onUpload: (file: File) => void;
+    onUpload: (file: File, isCif?: boolean) => void;
     representation: RepresentationType;
     setRepresentation: (type: RepresentationType) => void;
     coloring: ColoringType;
@@ -117,6 +117,7 @@ export const Controls: React.FC<ControlsProps> = ({
     onToggleContactMap
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const cifInputRef = useRef<HTMLInputElement>(null);
     const sessionInputRef = useRef<HTMLInputElement>(null);
     const [localPdbId, setLocalPdbId] = React.useState(pdbId);
     const [previewSnapshot, setPreviewSnapshot] = useState<Snapshot | null>(null);
@@ -312,15 +313,31 @@ export const Controls: React.FC<ControlsProps> = ({
                                 Load
                             </button>
                         </form>
-                        <div className="relative">
-                            <input type="file" accept=".pdb,.cif,.ent,.mmcif" className="hidden" ref={fileInputRef} onChange={handleFileChange} />
-                            <button
-                                onClick={() => fileInputRef.current?.click()}
-                                className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all group ${cardBg} hover:opacity-80`}
-                            >
-                                <Upload className="w-4 h-4 group-hover:text-blue-500 transition-colors" />
-                                <span className="text-xs font-medium">Upload PDB/CIF</span>
-                            </button>
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="relative">
+                                <input type="file" accept=".pdb,.ent" className="hidden" ref={fileInputRef} onChange={(e) => {
+                                    if (e.target.files?.[0]) onUpload(e.target.files[0], false);
+                                }} />
+                                <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all group ${cardBg} hover:opacity-80`}
+                                >
+                                    <Upload className="w-4 h-4 group-hover:text-blue-500 transition-colors" />
+                                    <span className="text-xs font-medium">PDB</span>
+                                </button>
+                            </div>
+                            <div className="relative">
+                                <input type="file" accept=".cif,.mmcif" className="hidden" ref={cifInputRef} onChange={(e) => {
+                                    if (e.target.files?.[0]) onUpload(e.target.files[0], true);
+                                }} />
+                                <button
+                                    onClick={() => cifInputRef.current?.click()}
+                                    className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all group ${cardBg} hover:opacity-80`}
+                                >
+                                    <Upload className="w-4 h-4 group-hover:text-purple-500 transition-colors" />
+                                    <span className="text-xs font-medium">CIF</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 

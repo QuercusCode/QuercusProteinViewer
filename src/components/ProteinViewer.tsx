@@ -24,6 +24,7 @@ export interface MeasurementData {
 interface ProteinViewerProps {
     pdbId?: string;
     file?: File;
+    fileType?: string; // e.g. 'pdb' or 'mmcif'
     representation?: string;
     coloring?: string;
     customColors?: CustomColorRule[];
@@ -66,6 +67,7 @@ export interface ProteinViewerRef {
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     pdbId,
     file,
+    fileType,
     representation = 'cartoon',
     coloring = 'chainid',
     customColors = [],
@@ -890,15 +892,15 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 // Generic Loader Function
                 const loadStructure = async () => {
                     if (currentFile) {
-                        console.log("Loading from file:", currentFile.name);
+                        console.log("Loading from file:", currentFile.name, "Force Type:", fileType);
                         // Detect extension
                         const rawExt = currentFile.name.split('.').pop()?.toLowerCase() || 'pdb';
-                        let ext = rawExt;
+                        let ext = fileType || rawExt;
 
                         // Normalize extensions
-                        if (rawExt === 'cif' || rawExt === 'mmcif') {
+                        if (ext === 'cif' || ext === 'mmcif') {
                             ext = 'mmcif'; // Explicitly tell NGL to use mmCIF parser
-                        } else if (rawExt === 'ent') {
+                        } else if (ext === 'ent') {
                             ext = 'pdb';
                         }
 

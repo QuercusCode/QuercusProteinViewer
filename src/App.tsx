@@ -103,13 +103,16 @@ function App() {
   const [ligands, setLigands] = useState<string[]>([]);
   const [customColors, setCustomColors] = useState<CustomColorRule[]>([]);
 
+  const [fileType, setFileType] = useState<'pdb' | 'mmcif'>('pdb');
+
   const handleResetView = () => {
     setResetKey(prev => prev + 1);
     setResetKey(prev => prev + 1);
   };
 
-  const handleUpload = (uploadedFile: File) => {
+  const handleUpload = (uploadedFile: File, isCif?: boolean) => {
     setFile(uploadedFile);
+    setFileType(isCif ? 'mmcif' : 'pdb');
     setPdbId(''); // Clear PDB ID when file is uploaded
     setChains([]);
     setLigands([]);
@@ -473,6 +476,7 @@ function App() {
         ref={viewerRef}
         pdbId={pdbId}
         file={file || undefined}
+        fileType={fileType}
         representation={representation}
         coloring={coloring}
         customColors={customColors}
