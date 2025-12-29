@@ -889,11 +889,49 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             try {
                 let component;
                 if (currentFile) {
-                    console.log("Loading from file:", currentFile.name);
-                    let ext = currentFile.name.split('.').pop()?.toLowerCase() || 'pdb';
-                    if (ext === 'ent') ext = 'pdb';
-                    if (ext === 'cif') ext = 'mmcif'; // Force mmCIF parser for protein structures
-                    component = await stage.loadFile(currentFile, { defaultRepresentation: false, ext });
+                    console.log("Loading from file (Manual Read):", currentFile.name);
+
+                    // robust manual read to ensure content exists and ext is enforced
+                    const loadFileManually = () => {
+                        return new Promise<any>((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = async (e) => {
+                                try {
+                                    const text = e.target?.result as string;
+                                    if (!text) {
+                                        reject(new Error("File is empty"));
+                                        return;
+                                    }
+
+                                    // Determine extension
+                                    let ext = currentFile.name.split('.').pop()?.toLowerCase() || 'pdb';
+                                    if (ext === 'cif') ext = 'mmcif'; // Enforce mmcif for .cif files
+                                    if (ext === 'ent') ext = 'pdb';
+
+                                    console.log(`Read ${text.length} chars. Parsing as ${ext}...`);
+
+                                    // Load as Blob
+                                    const blob = new Blob([text], { type: 'text/plain' });
+                                    const comp = await stage.loadFile(blob, { defaultRepresentation: false, ext: ext });
+                                    resolve(comp);
+                                } catch (err) {
+                                    reject(err);
+                                }
+                            };
+                            reader.onerror = (err) => reject(err);
+                            reader.readAsText(currentFile);
+                        });
+                    };
+
+                    try {
+                        component = await loadFileManually();
+                    } catch (readErr: any) {
+                        console.error("Manual file read failed:", readErr);
+                        if (isMounted.current) setError(`Failed to read file: ${readErr.message}`);
+                        setLoading(false);
+                        return;
+                    }
+
                 } else if (currentPdbId) {
                     const cleanId = String(currentPdbId).trim().toLowerCase();
                     if (cleanId.length < 3) {
