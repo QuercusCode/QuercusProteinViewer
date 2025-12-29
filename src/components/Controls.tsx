@@ -441,7 +441,24 @@ export const Controls: React.FC<ControlsProps> = ({
                                         bfactor: "Red = Flexible/Mobile, Blue = Rigid/Stable.",
                                         charge: "Blue = Positive (Basic), Red = Negative (Acidic)."
                                     };
-                                    return descriptions[coloring] || "Select a coloring mode";
+
+                                    const getGradient = (type: string) => {
+                                        if (type === 'hydrophobicity') return 'linear-gradient(to right, #ff0000, #ffffff)';
+                                        if (type === 'bfactor') return 'linear-gradient(to right, #ff0000, #0000ff)';
+                                        if (type === 'charge') return 'linear-gradient(to right, #0000ff, #ffffff, #ff0000)';
+                                        return null;
+                                    };
+
+                                    const gradient = getGradient(coloring);
+
+                                    return (
+                                        <div className="flex flex-col gap-1.5">
+                                            <span>{descriptions[coloring] || "Select a coloring mode"}</span>
+                                            {gradient && (
+                                                <div className="w-full h-1.5 rounded-full shadow-sm border border-black/5 dark:border-white/5" style={{ background: gradient }} />
+                                            )}
+                                        </div>
+                                    );
                                 })()}
                             </div>
                         </div>
