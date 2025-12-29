@@ -16,6 +16,7 @@ function App() {
   const [coloring, setColoring] = useState<ColoringType>('chainid');
   const [hasRestoredState, setHasRestoredState] = useState(false); // Track if we need to apply matrix
   const [resetKey, setResetKey] = useState(0);
+  const [isMeasurementMode, setIsMeasurementMode] = useState(false);
 
 
   const [isLightMode, setIsLightMode] = useState(() => {
@@ -141,6 +142,10 @@ function App() {
         setHighlightedResidue(null);
         viewerRef.current?.clearHighlight();
       } else {
+        if (isMeasurementMode) {
+          return; // ProteinViewer handles measurement logic directly
+        }
+
         // Select new
         console.log("App: Atom Clicked", info);
         setHighlightedResidue({ chain: info.chain, resNo: info.resNo, resName: info.resName });
@@ -436,7 +441,9 @@ function App() {
         ligands={ligands}
         customColors={customColors}
         setCustomColors={setCustomColors}
-
+        isMeasurementMode={isMeasurementMode}
+        setIsMeasurementMode={setIsMeasurementMode}
+        onClearMeasurements={() => viewerRef.current?.clearMeasurements()}
         isLightMode={isLightMode}
         setIsLightMode={setIsLightMode}
         highlightedResidue={highlightedResidue}
@@ -477,6 +484,7 @@ function App() {
         resetCamera={resetKey}
 
         onAtomClick={handleAtomClick}
+        isMeasurementMode={isMeasurementMode}
 
         backgroundColor={isLightMode ? "white" : "black"}
         showSurface={showSurface}

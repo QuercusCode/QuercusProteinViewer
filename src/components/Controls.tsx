@@ -13,6 +13,7 @@ import {
     Plus,
     RefreshCw,
     RotateCcw,
+    Ruler,
 
     Search,
     Sun,
@@ -39,6 +40,9 @@ interface ControlsProps {
     ligands: string[];
     customColors: CustomColorRule[];
     setCustomColors: (colors: CustomColorRule[]) => void;
+    isMeasurementMode: boolean;
+    setIsMeasurementMode: (mode: boolean) => void;
+    onClearMeasurements: () => void;
 
     isLightMode: boolean;
     setIsLightMode: (mode: boolean) => void;
@@ -81,6 +85,9 @@ export const Controls: React.FC<ControlsProps> = ({
     ligands,
     customColors,
     setCustomColors,
+    isMeasurementMode,
+    setIsMeasurementMode,
+    onClearMeasurements,
 
     isLightMode,
     setIsLightMode,
@@ -510,258 +517,263 @@ export const Controls: React.FC<ControlsProps> = ({
                     <div className="space-y-3">
                         <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Analysis</label>
 
-                        {/* Tools */}
-                        <div className="grid grid-cols-2 gap-2">
-
+                        <button
+                            onClick={() => setIsMeasurementMode(!isMeasurementMode)}
+                            className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isMeasurementMode ? 'bg-amber-500/10 border-amber-500 text-amber-500' : `${cardBg} hover:opacity-80`}`}
+                        >
+                            <span className="text-xs font-medium">Measure</span>
+                            <Ruler className="w-3.5 h-3.5" />
+                        </button>
+                        {isMeasurementMode && (
                             <button
-                                onClick={onToggleContactMap}
-                                className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
+                                onClick={onClearMeasurements}
+                                className={`col-span-2 flex items-center justify-center gap-2 border py-1.5 rounded-lg text-xs font-medium transition-colors ${isLightMode ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-red-900/30 text-red-400 border-red-900/50 hover:bg-red-900/50'}`}
                             >
-                                <span className="text-xs font-medium">Contact Map</span>
-                                <Maximize className="w-3.5 h-3.5" />
-                            </button>
-                        </div>
-
-                        {/* Sequence Viewer */}
-                        <div className="rounded-lg border overflow-hidden flex flex-col ${cardBg}">
-                            <div className={`px-3 py-2 flex items-center justify-between ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-800'}`}>
-                                <span className={`text-xs font-bold ${subtleText}`}>Sequence Viewer</span>
-                                <select
-                                    value={viewSequenceChain}
-                                    onChange={(e) => setViewSequenceChain(e.target.value)}
-                                    className={`bg-transparent border-none text-[10px] outline-none cursor-pointer text-right ${subtleText}`}
-                                >
-                                    <option value="">All Chains</option>
-                                    {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
-                                </select>
-                            </div>
-                            <div className={`h-32 p-2 overflow-y-auto scrollbar-thin ${cardBg}`} ref={sequenceContainerRef}>
-                                {chains.length === 0 ? <p className={`italic text-[10px] ${subtleText}`}>No sequence data</p> : (
-                                    chains.filter(c => viewSequenceChain ? c.name === viewSequenceChain : true).map(c => (
-                                        <div key={c.name} className="mb-2">
-                                            <div className="text-[10px] font-bold text-blue-500 mb-0.5 sticky top-0 bg-inherit z-10">Chain {c.name}</div>
-                                            <div className="flex flex-wrap text-[10px] font-mono leading-none">
-                                                {c.sequence.split('').map((char, idx) => {
-                                                    const resNo = c.min + idx;
-                                                    const isHighlighted = highlightedResidue?.chain === c.name && highlightedResidue.resNo === resNo;
-                                                    return (
-                                                        <span
-                                                            key={idx}
-                                                            ref={(el) => { if (el) residueRefs.current.set(`${c.name}-${resNo}`, el); }}
-                                                            onClick={() => onResidueClick(c.name, resNo)}
-                                                            className={`w-5 h-5 flex items-center justify-center cursor-pointer rounded-sm transition-colors ${isHighlighted ? 'bg-blue-600 text-white font-bold' : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'}`}
-                                                            title={`${char}${resNo}`}
-                                                        >
-                                                            {char}
-                                                        </span>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 5. FOOTER (Sessions & Exports) - Fixed at bottom */}
-                <div className={`flex-none p-4 border-t space-y-3 ${isLightMode ? 'border-neutral-200 bg-white/50' : 'border-neutral-800 bg-neutral-900/50'}`}>
-
-                    {/* Session Controls */}
-                    <div className="flex gap-2">
-                        <button onClick={onSaveSession} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
-                            <Download className="w-3.5 h-3.5" /> Save Session
-                        </button>
-                        <button onClick={() => sessionInputRef.current?.click()} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
-                            <Upload className="w-3.5 h-3.5" /> Load
-                        </button>
-                        <input type="file" accept=".json" className="hidden" ref={sessionInputRef} onChange={(e) => e.target.files?.[0] && onLoadSession(e.target.files[0])} />
-                    </div>
-
-                    <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
-
-                    {/* ACTIONS ROW 1: Reset & Snapshot */}
-                    <div className="flex gap-2">
-                        <button onClick={onResetView} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}>
-                            <RotateCcw className="w-4 h-4" /> Reset
-                        </button>
-                        <button onClick={onSnapshot} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:text-blue-500 hover:border-blue-500/50`}>
-                            <Camera className="w-4 h-4" /> Snapshot
-                        </button>
-                        {/* Mini Gallery Trigger if snapshot exists */}
-                        {snapshots.length > 0 && (
-                            <button onClick={() => setPreviewSnapshot(snapshots[snapshots.length - 1])} className="px-3 border rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800">
-                                <ImageIcon className="w-4 h-4" />
+                                <Trash2 className="w-3 h-3" /> Clear Measurements
                             </button>
                         )}
                     </div>
 
-                    {/* ACTIONS ROW 2: Recording */}
-                    <div className="flex items-center gap-2">
-                        <div className={`flex items-center gap-2 pl-2 pr-1 py-1 border rounded-lg ${cardBg}`}>
-                            <span className={`text-[10px] font-bold ${subtleText}`}>SEC</span>
-                            <input
-                                type="number"
-                                min="1"
-                                max="60"
-                                value={recordDuration / 1000}
-                                onChange={(e) => setRecordDuration(Math.max(1, Number(e.target.value)) * 1000)}
-                                disabled={isRecording}
-                                className={`w-8 bg-transparent text-center text-xs outline-none font-mono ${isRecording ? 'opacity-50' : ''}`}
-                            />
+                    {/* Sequence Viewer */}
+                    <div className="rounded-lg border overflow-hidden flex flex-col ${cardBg}">
+                        <div className={`px-3 py-2 flex items-center justify-between ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-800'}`}>
+                            <span className={`text-xs font-bold ${subtleText}`}>Sequence Viewer</span>
+                            <select
+                                value={viewSequenceChain}
+                                onChange={(e) => setViewSequenceChain(e.target.value)}
+                                className={`bg-transparent border-none text-[10px] outline-none cursor-pointer text-right ${subtleText}`}
+                            >
+                                <option value="">All Chains</option>
+                                {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
+                            </select>
                         </div>
-                        <button
-                            onClick={() => onRecordMovie(recordDuration)}
+                        <div className={`h-32 p-2 overflow-y-auto scrollbar-thin ${cardBg}`} ref={sequenceContainerRef}>
+                            {chains.length === 0 ? <p className={`italic text-[10px] ${subtleText}`}>No sequence data</p> : (
+                                chains.filter(c => viewSequenceChain ? c.name === viewSequenceChain : true).map(c => (
+                                    <div key={c.name} className="mb-2">
+                                        <div className="text-[10px] font-bold text-blue-500 mb-0.5 sticky top-0 bg-inherit z-10">Chain {c.name}</div>
+                                        <div className="flex flex-wrap text-[10px] font-mono leading-none">
+                                            {c.sequence.split('').map((char, idx) => {
+                                                const resNo = c.min + idx;
+                                                const isHighlighted = highlightedResidue?.chain === c.name && highlightedResidue.resNo === resNo;
+                                                return (
+                                                    <span
+                                                        key={idx}
+                                                        ref={(el) => { if (el) residueRefs.current.set(`${c.name}-${resNo}`, el); }}
+                                                        onClick={() => onResidueClick(c.name, resNo)}
+                                                        className={`w-5 h-5 flex items-center justify-center cursor-pointer rounded-sm transition-colors ${isHighlighted ? 'bg-blue-600 text-white font-bold' : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'}`}
+                                                        title={`${char}${resNo}`}
+                                                    >
+                                                        {char}
+                                                    </span>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* 5. FOOTER (Sessions & Exports) - Fixed at bottom */}
+            <div className={`flex-none p-4 border-t space-y-3 ${isLightMode ? 'border-neutral-200 bg-white/50' : 'border-neutral-800 bg-neutral-900/50'}`}>
+
+                {/* Session Controls */}
+                <div className="flex gap-2">
+                    <button onClick={onSaveSession} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
+                        <Download className="w-3.5 h-3.5" /> Save Session
+                    </button>
+                    <button onClick={() => sessionInputRef.current?.click()} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
+                        <Upload className="w-3.5 h-3.5" /> Load
+                    </button>
+                    <input type="file" accept=".json" className="hidden" ref={sessionInputRef} onChange={(e) => e.target.files?.[0] && onLoadSession(e.target.files[0])} />
+                </div>
+
+                <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
+
+                {/* ACTIONS ROW 1: Reset & Snapshot */}
+                <div className="flex gap-2">
+                    <button onClick={onResetView} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}>
+                        <RotateCcw className="w-4 h-4" /> Reset
+                    </button>
+                    <button onClick={onSnapshot} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:text-blue-500 hover:border-blue-500/50`}>
+                        <Camera className="w-4 h-4" /> Snapshot
+                    </button>
+                    {/* Mini Gallery Trigger if snapshot exists */}
+                    {snapshots.length > 0 && (
+                        <button onClick={() => setPreviewSnapshot(snapshots[snapshots.length - 1])} className="px-3 border rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800">
+                            <ImageIcon className="w-4 h-4" />
+                        </button>
+                    )}
+                </div>
+
+                {/* ACTIONS ROW 2: Recording */}
+                <div className="flex items-center gap-2">
+                    <div className={`flex items-center gap-2 pl-2 pr-1 py-1 border rounded-lg ${cardBg}`}>
+                        <span className={`text-[10px] font-bold ${subtleText}`}>SEC</span>
+                        <input
+                            type="number"
+                            min="1"
+                            max="60"
+                            value={recordDuration / 1000}
+                            onChange={(e) => setRecordDuration(Math.max(1, Number(e.target.value)) * 1000)}
                             disabled={isRecording}
-                            className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all text-xs font-medium ${isRecording ? 'bg-red-500 text-white border-red-500' : `${cardBg} hover:text-red-500 hover:border-red-500/50`}`}
+                            className={`w-8 bg-transparent text-center text-xs outline-none font-mono ${isRecording ? 'opacity-50' : ''}`}
+                        />
+                    </div>
+                    <button
+                        onClick={() => onRecordMovie(recordDuration)}
+                        disabled={isRecording}
+                        className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all text-xs font-medium ${isRecording ? 'bg-red-500 text-white border-red-500' : `${cardBg} hover:text-red-500 hover:border-red-500/50`}`}
+                    >
+                        {isRecording ? <Loader2 className="w-4 h-4 animate-spin" /> : <Video className="w-4 h-4" />}
+                        {isRecording ? 'Recording...' : 'Record Movie'}
+                    </button>
+                </div>
+            </div>
+
+            {/* Snapshot Gallery - Full View */}
+            {snapshots.length > 0 && (
+                <div className={`space-y-2 pt-2 border-t ${isLightMode ? 'border-neutral-200' : 'bg-neutral-800'}`}>
+                    <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText} flex items-center gap-2`}>
+                        <ImageIcon className="w-3.5 h-3.5" /> Gallery ({snapshots.length})
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                        {snapshots.map(snap => (
+                            <div key={snap.id} className="group relative aspect-video rounded-lg overflow-hidden border border-neutral-700/50 bg-neutral-900 cursor-pointer" onClick={() => setPreviewSnapshot(snap)}>
+                                <img src={snap.url} alt="Snapshot" className="w-full h-full object-cover" />
+                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setPreviewSnapshot(snap); }}
+                                        className="p-1.5 bg-neutral-600 hover:bg-neutral-500 text-white rounded-full transition-colors"
+                                        title="Preview"
+                                    >
+                                        <Eye className="w-3 h-3" />
+                                    </button>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onDownloadSnapshot(snap.id); }}
+                                        className="p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-full transition-colors"
+                                        title="Download"
+                                    >
+                                        <Download className="w-3 h-3" />
+                                    </button>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onDeleteSnapshot(snap.id); }}
+                                        className="p-1.5 bg-red-600/80 hover:bg-red-500/80 text-white rounded-full transition-colors"
+                                        title="Delete"
+                                    >
+                                        <Trash2 className="w-3 h-3" />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Movie Gallery - Full View */}
+            {movies.length > 0 && (
+                <div className={`space-y-2 pt-2 border-t ${isLightMode ? 'border-neutral-200' : 'bg-neutral-800'}`}>
+                    <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText} flex items-center gap-2`}>
+                        <Video className="w-3.5 h-3.5" /> Movies ({movies.length})
+                    </label>
+                    <div className="grid grid-cols-1 gap-2">
+                        {movies.map(movie => (
+                            <div key={movie.id} className="group relative rounded-lg overflow-hidden border border-neutral-700/50 bg-neutral-900 flex items-center p-2 gap-2 cursor-pointer" onClick={() => setPreviewMovie(movie)}>
+                                <div className="w-16 h-10 bg-black rounded flex items-center justify-center relative overflow-hidden">
+                                    <video src={movie.url} className="w-full h-full object-cover" muted />
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                                        <div className="w-4 h-4 rounded-full bg-white/80 flex items-center justify-center pl-0.5">
+                                            <div className="w-0 h-0 border-t-[3px] border-t-transparent border-l-[5px] border-l-black border-b-[3px] border-b-transparent" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="text-[10px] font-medium text-white truncate">Movie {movie.id.slice(0, 4)}</div>
+                                    <div className="text-[9px] text-neutral-400">{Math.round(movie.duration)}s • {movie.format}</div>
+                                </div>
+                                <div className="flex gap-1">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setPreviewMovie(movie); }}
+                                        className="p-1.5 bg-neutral-600 hover:bg-neutral-500 text-white rounded transition-colors"
+                                        title="Play"
+                                    >
+                                        <Video className="w-3 h-3" />
+                                    </button>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onDownloadMovie(movie.id); }}
+                                        className="p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors"
+                                        title="Download"
+                                    >
+                                        <Download className="w-3 h-3" />
+                                    </button>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); onDeleteMovie(movie.id); }}
+                                        className="p-1.5 bg-red-600/80 hover:bg-red-500/80 text-white rounded transition-colors"
+                                        title="Delete"
+                                    >
+                                        <Trash2 className="w-3 h-3" />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+        </div >
+
+
+            {/* Snapshot Preview Modal */ }
+    {
+        previewSnapshot && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setPreviewSnapshot(null)}>
+                <div className="relative max-w-4xl max-h-[90vh] w-full rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+                    <button
+                        onClick={() => setPreviewSnapshot(null)}
+                        className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+                    <img src={previewSnapshot.url} alt="Preview" className="w-full h-full object-contain bg-neutral-900" />
+                    <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-center gap-4">
+                        <button
+                            onClick={() => onDownloadSnapshot(previewSnapshot.id)}
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
                         >
-                            {isRecording ? <Loader2 className="w-4 h-4 animate-spin" /> : <Video className="w-4 h-4" />}
-                            {isRecording ? 'Recording...' : 'Record Movie'}
+                            <Download className="w-4 h-4" /> Download
                         </button>
                     </div>
                 </div>
+            </div>
+        )
+    }
 
-                {/* Snapshot Gallery - Full View */}
-                {snapshots.length > 0 && (
-                    <div className={`space-y-2 pt-2 border-t ${isLightMode ? 'border-neutral-200' : 'bg-neutral-800'}`}>
-                        <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText} flex items-center gap-2`}>
-                            <ImageIcon className="w-3.5 h-3.5" /> Gallery ({snapshots.length})
-                        </label>
-                        <div className="grid grid-cols-2 gap-2">
-                            {snapshots.map(snap => (
-                                <div key={snap.id} className="group relative aspect-video rounded-lg overflow-hidden border border-neutral-700/50 bg-neutral-900 cursor-pointer" onClick={() => setPreviewSnapshot(snap)}>
-                                    <img src={snap.url} alt="Snapshot" className="w-full h-full object-cover" />
-                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); setPreviewSnapshot(snap); }}
-                                            className="p-1.5 bg-neutral-600 hover:bg-neutral-500 text-white rounded-full transition-colors"
-                                            title="Preview"
-                                        >
-                                            <Eye className="w-3 h-3" />
-                                        </button>
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); onDownloadSnapshot(snap.id); }}
-                                            className="p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-full transition-colors"
-                                            title="Download"
-                                        >
-                                            <Download className="w-3 h-3" />
-                                        </button>
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); onDeleteSnapshot(snap.id); }}
-                                            className="p-1.5 bg-red-600/80 hover:bg-red-500/80 text-white rounded-full transition-colors"
-                                            title="Delete"
-                                        >
-                                            <Trash2 className="w-3 h-3" />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+    {/* Movie Preview Modal */ }
+    {
+        previewMovie && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setPreviewMovie(null)}>
+                <div className="relative max-w-4xl max-h-[90vh] w-full rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 bg-black" onClick={e => e.stopPropagation()}>
+                    <button
+                        onClick={() => setPreviewMovie(null)}
+                        className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+                    <video src={previewMovie.url} controls autoPlay className="w-full h-full object-contain bg-neutral-900 max-h-[80vh]" />
+                    <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-center gap-4">
+                        <button
+                            onClick={() => onDownloadMovie(previewMovie.id)}
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
+                        >
+                            <Download className="w-4 h-4" /> Download
+                        </button>
                     </div>
-                )}
-
-                {/* Movie Gallery - Full View */}
-                {movies.length > 0 && (
-                    <div className={`space-y-2 pt-2 border-t ${isLightMode ? 'border-neutral-200' : 'bg-neutral-800'}`}>
-                        <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText} flex items-center gap-2`}>
-                            <Video className="w-3.5 h-3.5" /> Movies ({movies.length})
-                        </label>
-                        <div className="grid grid-cols-1 gap-2">
-                            {movies.map(movie => (
-                                <div key={movie.id} className="group relative rounded-lg overflow-hidden border border-neutral-700/50 bg-neutral-900 flex items-center p-2 gap-2 cursor-pointer" onClick={() => setPreviewMovie(movie)}>
-                                    <div className="w-16 h-10 bg-black rounded flex items-center justify-center relative overflow-hidden">
-                                        <video src={movie.url} className="w-full h-full object-cover" muted />
-                                        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                                            <div className="w-4 h-4 rounded-full bg-white/80 flex items-center justify-center pl-0.5">
-                                                <div className="w-0 h-0 border-t-[3px] border-t-transparent border-l-[5px] border-l-black border-b-[3px] border-b-transparent" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="text-[10px] font-medium text-white truncate">Movie {movie.id.slice(0, 4)}</div>
-                                        <div className="text-[9px] text-neutral-400">{Math.round(movie.duration)}s • {movie.format}</div>
-                                    </div>
-                                    <div className="flex gap-1">
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); setPreviewMovie(movie); }}
-                                            className="p-1.5 bg-neutral-600 hover:bg-neutral-500 text-white rounded transition-colors"
-                                            title="Play"
-                                        >
-                                            <Video className="w-3 h-3" />
-                                        </button>
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); onDownloadMovie(movie.id); }}
-                                            className="p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors"
-                                            title="Download"
-                                        >
-                                            <Download className="w-3 h-3" />
-                                        </button>
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); onDeleteMovie(movie.id); }}
-                                            className="p-1.5 bg-red-600/80 hover:bg-red-500/80 text-white rounded transition-colors"
-                                            title="Delete"
-                                        >
-                                            <Trash2 className="w-3 h-3" />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </div >
-
-
-            {/* Snapshot Preview Modal */}
-            {
-                previewSnapshot && (
-                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setPreviewSnapshot(null)}>
-                        <div className="relative max-w-4xl max-h-[90vh] w-full rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
-                            <button
-                                onClick={() => setPreviewSnapshot(null)}
-                                className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
-                            >
-                                <X className="w-6 h-6" />
-                            </button>
-                            <img src={previewSnapshot.url} alt="Preview" className="w-full h-full object-contain bg-neutral-900" />
-                            <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-center gap-4">
-                                <button
-                                    onClick={() => onDownloadSnapshot(previewSnapshot.id)}
-                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
-                                >
-                                    <Download className="w-4 h-4" /> Download
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )
-            }
-
-            {/* Movie Preview Modal */}
-            {
-                previewMovie && (
-                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setPreviewMovie(null)}>
-                        <div className="relative max-w-4xl max-h-[90vh] w-full rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 bg-black" onClick={e => e.stopPropagation()}>
-                            <button
-                                onClick={() => setPreviewMovie(null)}
-                                className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
-                            >
-                                <X className="w-6 h-6" />
-                            </button>
-                            <video src={previewMovie.url} controls autoPlay className="w-full h-full object-contain bg-neutral-900 max-h-[80vh]" />
-                            <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-center gap-4">
-                                <button
-                                    onClick={() => onDownloadMovie(previewMovie.id)}
-                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
-                                >
-                                    <Download className="w-4 h-4" /> Download
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                )
-            }
+                </div>
+            </div>
+        )
+    }
         </>
     );
 };

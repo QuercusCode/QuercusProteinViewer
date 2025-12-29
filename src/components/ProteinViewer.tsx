@@ -12,6 +12,13 @@ declare global {
 export type RepresentationType = 'cartoon' | 'licorice' | 'backbone' | 'spacefill' | 'surface' | 'ribbon';
 export type ColoringType = 'chainid' | 'element' | 'residue' | 'secondary' | 'hydrophobicity' | 'structure' | 'bfactor' | 'charge';
 
+export interface MeasurementData {
+    atom1: { chain: string, resNo: number, atomName: string, x: number, y: number, z: number };
+    atom2: { chain: string, resNo: number, atomName: string, x: number, y: number, z: number };
+    distance: number;
+    shapeId: string;
+}
+
 
 
 interface ProteinViewerProps {
@@ -35,6 +42,7 @@ interface ProteinViewerProps {
     showSurface?: boolean;
     showLigands?: boolean;
     isSpinning?: boolean;
+    isMeasurementMode?: boolean;
 }
 
 export interface ProteinViewerRef {
@@ -49,8 +57,7 @@ export interface ProteinViewerRef {
     getAtomPositionByIndex: (atomIndex: number) => { x: number, y: number, z: number } | null;
     addResidue: (chainName: string, resType: string) => Promise<Blob | null>;
     recordTurntable: (duration?: number) => Promise<Blob>;
-
-
+    clearMeasurements: () => void;
 }
 
 
@@ -74,6 +81,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     showSurface = false,
     showLigands = false,
     isSpinning = false,
+    isMeasurementMode = false,
 
 }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -82,10 +90,61 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     const highlightComponentRef = useRef<any>(null);
     const isMounted = useRef(true);
 
-
-
+    const measurementsRef = useRef<MeasurementData[]>([]);
+    const selectedAtomsRef = useRef<any[]>([]);
 
     // Helper to find atom
+    const findAtom = (chain: string, resNo: number, atomName: string) => {
+        if (!componentRef.current) return null;
+        let found: any = null;
+        // Selection string must be robust
+        const selection = new window.NGL.Selection(`${resNo}:${chain} and .${atomName}`);
+        if (componentRef.current && componentRef.current.structure) {
+            componentRef.current.structure.eachAtom((atom: any) => {
+                found = atom;
+            }, selection);
+        }
+        return found;
+    };
+
+    const drawMeasurement = (m: MeasurementData) => {
+        const atom1 = findAtom(m.atom1.chain, m.atom1.resNo, m.atom1.atomName);
+        const atom2 = findAtom(m.atom2.chain, m.atom2.resNo, m.atom2.atomName);
+
+        if (atom1 && atom2 && stageRef.current) {
+            try {
+                const shape = new window.NGL.Shape(m.shapeId);
+                const dx = atom2.x - atom1.x;
+                const dy = atom2.y - atom1.y;
+                const dz = atom2.z - atom1.z;
+                const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+                // Dashed Line: Segments
+                const dashLength = 0.5;
+                const gapLength = 0.3;
+                const steps = Math.floor(dist / (dashLength + gapLength));
+
+                for (let i = 0; i < steps; i++) {
+                    const t1 = i * (dashLength + gapLength) / dist;
+                    const t2 = (i * (dashLength + gapLength) + dashLength) / dist;
+
+                    const p1 = [atom1.x + t1 * dx, atom1.y + t1 * dy, atom1.z + t1 * dz];
+                    const p2 = [atom1.x + t2 * dx, atom1.y + t2 * dy, atom1.z + t2 * dz];
+
+                    shape.addCylinder(p1, p2, [1, 1, 0], 0.1); // Yellow cylinder
+                }
+
+                // Label
+                const mp = [(atom1.x + atom2.x) / 2, (atom1.y + atom2.y) / 2, (atom1.z + atom2.z) / 2];
+                shape.addText(mp, [1, 1, 1], 2.0, `${m.distance.toFixed(2)} Å`);
+
+                const shapeComp = stageRef.current.addComponentFromObject(shape);
+                shapeComp.addRepresentation("buffer", { depthTest: false }); // Always visible
+            } catch (e) {
+                console.warn("Failed to draw measurement", e);
+            }
+        }
+    };
 
 
 
@@ -656,6 +715,17 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             return new Blob([finalPdb], { type: 'text/plain' });
         },
 
+        clearMeasurements: () => {
+            measurementsRef.current = [];
+            selectedAtomsRef.current = [];
+            if (stageRef.current) {
+                stageRef.current.eachComponent((comp: any) => {
+                    if (comp.name && comp.name.startsWith("measure-")) {
+                        stageRef.current.removeComponent(comp);
+                    }
+                });
+            }
+        }
     }));
 
     useEffect(() => {
@@ -852,8 +922,50 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 return;
             }
             const atom = pickingProxy.atom;
+
+            // MEASUREMENT MODE LOGIC
+            if (isMeasurementMode) {
+                console.log("Measurement Mode Click:", atom);
+                selectedAtomsRef.current.push(atom);
+
+                // Highlight the selected atom temporarily?
+                // Maybe draw a small sphere?
+                const shapeId = `sel-${Date.now()}`;
+                const shape = new window.NGL.Shape(shapeId);
+                shape.addSphere([atom.x, atom.y, atom.z], [1, 0.5, 0], 0.5); // Orange selection
+                const comp = stage.addComponentFromObject(shape);
+                comp.addRepresentation("buffer", { depthTest: false });
+                // Track this temp shape to remove later? 
+                // For now just leave it until measurement is done or cleared.
+
+                if (selectedAtomsRef.current.length === 2) {
+                    const a1 = selectedAtomsRef.current[0];
+                    const a2 = selectedAtomsRef.current[1];
+                    const dx = a1.x - a2.x;
+                    const dy = a1.y - a2.y;
+                    const dz = a1.z - a2.z;
+                    const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+                    const mData: MeasurementData = {
+                        atom1: { chain: a1.chainname, resNo: a1.resno, atomName: a1.atomname, x: a1.x, y: a1.y, z: a1.z },
+                        atom2: { chain: a2.chainname, resNo: a2.resno, atomName: a2.atomname, x: a2.x, y: a2.y, z: a2.z },
+                        distance: dist,
+                        shapeId: `measure-${Date.now()}`
+                    };
+
+                    measurementsRef.current.push(mData);
+                    drawMeasurement(mData);
+
+                    // Clear selection
+                    selectedAtomsRef.current = [];
+                    // Optionally clear the temp spheres? 
+                    // Currently clearMeasurements clears ALL measurement- components. 
+                    // We should name our shapes consistently.
+                }
+                return;
+            }
+
             console.log("DEBUG: Clicked Atom:", atom);
-            console.log("DEBUG: Atom Coords:", atom.x, atom.y, atom.z);
 
 
 
@@ -885,7 +997,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             stage.signals.clicked.remove(handleClick);
 
         };
-    }, [onAtomClick]);
+    }, [onAtomClick, isMeasurementMode]);
 
 
     const updateRepresentation = (specificComponent?: any) => {
