@@ -484,7 +484,7 @@ function App() {
         onAtomClick={handleAtomClick}
         isMeasurementMode={isMeasurementMode}
 
-        backgroundColor={isLightMode ? "white" : "black"}
+        backgroundColor={isLightMode ? "#f3f4f6" : "black"}
         showSurface={showSurface}
         showLigands={showLigands}
         isSpinning={isSpinning}
