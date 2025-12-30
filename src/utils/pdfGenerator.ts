@@ -121,9 +121,14 @@ const addSection = (
     // 2. Add Image
     const desiredImgWidth = 120; // Slightly larger to accommodate axes
     const desiredImgHeight = 120;
+
+    // Calculate Center X
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const centerX = (pageWidth - desiredImgWidth) / 2;
+
     const imgY = startY + 10;
 
-    doc.addImage(mapImg, 'PNG', margin, imgY, desiredImgWidth, desiredImgHeight);
+    doc.addImage(mapImg, 'PNG', centerX, imgY, desiredImgWidth, desiredImgHeight);
 
     // 3. Generate Table Data
     const tableRows = [] as any[];
