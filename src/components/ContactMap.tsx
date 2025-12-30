@@ -12,6 +12,7 @@ interface ContactMapProps {
     onPixelClick?: (chainA: string, resA: number, chainB: string, resB: number) => void;
     isLightMode: boolean;
     proteinName?: string;
+    getSnapshot?: () => Promise<string | null>;
 }
 
 
@@ -22,7 +23,8 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     getContactData,
     onPixelClick,
     isLightMode,
-    proteinName = "Protein Structure"
+    proteinName = "Protein Structure",
+    getSnapshot
 }) => {
     const mapCanvasRef = useRef<HTMLCanvasElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -437,8 +439,13 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     }, [distanceData, scale, isLightMode, contactThreshold, proximalThreshold, showGrid, showIntraChain, filters]);
 
 
-    const handleGenerateReport = () => {
+    const handleGenerateReport = async () => {
         if (!distanceData || !mapCanvasRef.current) return;
+
+        let snapshot = null;
+        if (getSnapshot) {
+            snapshot = await getSnapshot();
+        }
 
         // Calculate Metadata
         const labels = distanceData.labels;
@@ -450,7 +457,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
             chains: uniqueChains
         };
 
-        generateProteinReport(proteinName, mapCanvasRef.current, distanceData, metadata);
+        generateProteinReport(proteinName, mapCanvasRef.current, distanceData, metadata, snapshot);
     };
 
     const handleDownload = () => {

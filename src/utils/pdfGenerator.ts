@@ -99,75 +99,226 @@ const drawMapToDataURL = (
     return canvas.toDataURL("image/png");
 };
 
-const addInstructionPage = (doc: jsPDF, proteinName: string, metadata: ProteinMetadata) => {
-    const margin = 20;
-    let y = 30;
-
-    // 1. Title
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(24);
-    doc.text("Protein Contact Map Report", margin, y);
-    y += 15;
-
-    // 2. Protein Overview Box
-    doc.setDrawColor(200, 200, 200);
-    doc.setFillColor(245, 247, 250); // Light gray/blue bg
-    doc.rect(margin, y, 170, 45, 'FD');
-
-    doc.setFontSize(14);
-    doc.setTextColor(50, 50, 50);
-    doc.text(`Structure: ${proteinName}`, margin + 10, y + 15);
-
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "normal");
-    doc.text(`Total Residues: ${metadata.residueCount}`, margin + 10, y + 25);
-    doc.text(`Chains: ${metadata.chains.join(', ')} (${metadata.chainCount} total)`, margin + 10, y + 32);
-
-    // Add Placeholder for Function/Ligands since we don't have it, but user asked for structure info
-    // If it's a PDB code (4 chars), we can suggest checking RCSB
-    if (proteinName.length === 4) {
-        doc.text(`Source: RCSB PDB (ID: ${proteinName})`, margin + 10, y + 39);
-    }
-
-    y += 60;
-
-    // 3. Interaction Types Guide
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
-    doc.setTextColor(0, 0, 0);
-    doc.text("Understanding Interactions", margin, y);
-    y += 15;
-
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "normal");
-    doc.text("This report utilizes a distance-based algorithm to identify non-covalent and covalent interactions critical for protein stability and folding. Below is a guide to the interaction types mapped in this analysis:", margin, y, { maxWidth: 170 });
-    y += 20;
-
-    // Legend Items
-    const addLegendItem = (color: string, title: string, desc: string) => {
-        // Color Box
-        doc.setFillColor(color);
-        doc.rect(margin, y, 5, 5, 'F');
-
-        // Title
-        doc.setFont("helvetica", "bold");
-        doc.text(title, margin + 10, y + 4);
-
-        // Desc
-        doc.setFont("helvetica", "normal");
-        const splitDesc = doc.splitTextToSize(desc, 150);
-        doc.text(splitDesc, margin + 10, y + 10);
-
-        y += 10 + (splitDesc.length * 5);
+const calculateStats = (data: InteractionData) => {
+    const stats: Record<string, number> = {
+        'Salt Bridge': 0,
+        'Disulfide Bond': 0,
+        'Hydrophobic Contact': 0,
+        'Pi-Stacking': 0,
+        'Cation-Pi Interaction': 0,
+        'Close Contact': 0
     };
 
-    addLegendItem("#ef4444", "Salt Bridge (Ionic)", "Strong electrostatic attraction between oppositely charged residues (Asp/Glu vs Arg/Lys/His) within 4.0 Å. Key for thermal stability.");
-    addLegendItem("#eab308", "Disulfide Bond", "Covalent bond between the sulfur atoms of two Cysteine residues (~2.05 Å). Provides significant structural rigidity.");
-    addLegendItem("#22c55e", "Hydrophobic Cluster", "Association of non-polar residues (Leu, Val, Ile, Phe, Met) driven by the exclusion of water. The primary driving force of protein folding.");
-    addLegendItem("#a855f7", "Pi-Stacking / Cation-Pi", "Interactions involving aromatic rings (Phe, Tyr, Trp). Includes Parallel/T-shaped stacking and cation-pi interactions with positive residues.");
-    addLegendItem("#3b82f6", "Close Contact (Van der Waals)", "Generic close packing of atoms (< 5.0 Å) not classified above. Represents general steric packing and complementarity.");
+    const { matrix, labels } = data;
+    const size = data.size;
 
-    // New Page for content
+    for (let i = 0; i < size; i++) {
+        for (let j = i + 1; j < size; j++) {
+            const dist = matrix[i][j];
+            if (dist > 8.0) continue;
+
+            const l1 = labels[i];
+            const l2 = labels[j];
+            const typeData = getInteractionType(l1.label, l2.label, dist);
+
+            if (typeData) {
+                if (stats[typeData.type] !== undefined) {
+                    stats[typeData.type]++;
+                }
+            } else if (dist < 5.0) {
+                stats['Close Contact']++;
+            }
+        }
+    }
+    return stats;
+};
+
+const addSequenceView = (doc: jsPDF, labels: any[], startY: number) => {
+    const margin = 20;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const maxWidth = pageWidth - (margin * 2);
+
+    let x = margin;
+    let y = startY;
+    const boxSize = 6;
+    const fontSize = 4;
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Sequence & Secondary Structure", margin, y - 5);
+
+    doc.setFont("courier", "normal");
+    doc.setFontSize(fontSize);
+
+    // Legend
+    const legendY = y - 5;
+    const legendX = margin + 80;
+    doc.setFontSize(8);
+    // Helix
+    doc.setFillColor(239, 68, 68); // Red-500
+    doc.rect(legendX, legendY - 3, 4, 4, 'F');
+    doc.text("Helix", legendX + 5, legendY);
+    // Sheet
+    doc.setFillColor(234, 179, 8); // Yellow-500
+    doc.rect(legendX + 20, legendY - 3, 4, 4, 'F');
+    doc.text("Sheet", legendX + 25, legendY);
+    // Coil
+    doc.setFillColor(229, 231, 235); // Gray-200
+    doc.rect(legendX + 40, legendY - 3, 4, 4, 'F');
+    doc.text("Coil", legendX + 45, legendY);
+
+
+    labels.forEach((l) => {
+        // Parse residue name (e.g. "ALA") to 1-letter code if possible, or just keep 3
+        const parts = l.label.split(' ');
+        const resName3 = parts[0];
+        // Simple map (incomplete, just illustrative)
+        const map: any = { 'ALA': 'A', 'ARG': 'R', 'ASN': 'N', 'ASP': 'D', 'CYS': 'C', 'GLU': 'E', 'GLN': 'Q', 'GLY': 'G', 'HIS': 'H', 'ILE': 'I', 'LEU': 'L', 'LYS': 'K', 'MET': 'M', 'PHE': 'F', 'PRO': 'P', 'SER': 'S', 'THR': 'T', 'TRP': 'W', 'TYR': 'Y', 'VAL': 'V' };
+        const letter = map[resName3] || '?';
+
+        // Color
+        const ss = (l.ss || '').toLowerCase();
+        if (ss === 'h') doc.setFillColor(239, 68, 68); // Red
+        else if (ss === 's' || ss === 'e') doc.setFillColor(234, 179, 8); // Yellow
+        else doc.setFillColor(243, 244, 246); // Gray-100 (Coil)
+
+        // Check if next box fits
+        if (x + boxSize > margin + maxWidth) {
+            x = margin;
+            y += boxSize + 1;
+
+            // Check page break
+            if (y > doc.internal.pageSize.getHeight() - 20) {
+                doc.addPage();
+                y = 20;
+            }
+        }
+
+        doc.rect(x, y, boxSize, boxSize, 'F');
+        doc.setTextColor(0, 0, 0);
+        doc.text(letter, x + 1.5, y + 4);
+
+        x += boxSize + 0.5;
+    });
+
+    return y + boxSize + 10;
+};
+
+const addInstructionPage = (
+    doc: jsPDF,
+    proteinName: string,
+    metadata: ProteinMetadata,
+    stats: Record<string, number>,
+    snapshot: string | null,
+    labels: any[]
+) => {
+    const margin = 20;
+    let y = 20;
+
+    // 1. Header
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("Protein Contact Analysis Report", margin, y);
+    y += 10;
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100);
+    doc.text(`Generated on ${new Date().toLocaleDateString()}`, margin, y);
+    y += 15;
+
+    // 2. Main Layout: Left (Info) vs Right (Snapshot)
+    const midX = 105;
+
+    // -- Stats Box (Left) --
+    doc.setDrawColor(200);
+    doc.setFillColor(248, 250, 252); // Slate-50
+    doc.rect(margin, y, 80, 75, 'FD'); // Background box
+
+    let innerY = y + 10;
+    const leftPad = margin + 5;
+
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    doc.setFont("helvetica", "bold");
+    doc.text("Structure Overview", leftPad, innerY);
+    innerY += 8;
+
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.text(`Name: ${proteinName}`, leftPad, innerY); innerY += 5;
+    doc.text(`Residues: ${metadata.residueCount}`, leftPad, innerY); innerY += 5;
+    doc.text(`Chains: ${metadata.chains.join(', ')}`, leftPad, innerY); innerY += 10;
+
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "bold");
+    doc.text("Interaction Counts", leftPad, innerY);
+    innerY += 8;
+
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+
+    const printStat = (label: string, count: number, color: string) => {
+        doc.setFillColor(color);
+        doc.circle(leftPad + 2, innerY - 1, 1.5, 'F');
+        doc.text(`${label}: ${count}`, leftPad + 8, innerY);
+        innerY += 5;
+    };
+
+    printStat("Salt Bridges", stats['Salt Bridge'], "#ef4444");
+    printStat("Disulfide Bonds", stats['Disulfide Bond'], "#eab308");
+    printStat("Hydrophobic Clusters", stats['Hydrophobic Contact'], "#22c55e");
+    printStat("Pi-Stacking", stats['Pi-Stacking'] + stats['Cation-Pi Interaction'], "#a855f7");
+
+    // -- 3D Snapshot (Right) --
+    if (snapshot) {
+        // Fit within box roughly 80x80
+        const imgSize = 75;
+        // Draw border
+        doc.setDrawColor(200);
+        doc.rect(midX, y, imgSize, imgSize);
+        doc.addImage(snapshot, 'PNG', midX, y, imgSize, imgSize);
+        doc.setFontSize(8);
+        doc.setTextColor(100);
+        doc.text("Fig 1. 3D Structure Snapshot", midX, y + imgSize + 5);
+    }
+
+    y += 90;
+
+    // 3. Sequence View
+    y = addSequenceView(doc, labels, y);
+
+    y += 10;
+
+    // 4. Interaction Legend (Bottom)
+    // Check space
+    if (y > doc.internal.pageSize.getHeight() - 60) {
+        doc.addPage();
+        y = 20;
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.setTextColor(0);
+    doc.text("Guide to Analysis", margin, y);
+    y += 10;
+
+    const addLegendItem = (color: string, title: string, desc: string) => {
+        doc.setFillColor(color);
+        doc.rect(margin, y, 4, 4, 'F');
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.text(title, margin + 8, y + 3);
+        doc.setFont("helvetica", "normal");
+        const splitDesc = doc.splitTextToSize(desc, 150);
+        doc.text(splitDesc, margin + 8, y + 8);
+        y += 8 + (splitDesc.length * 4);
+    };
+
+    addLegendItem("#ef4444", "Salt Bridge (Ionic)", "< 4.0Å. Strong electrostatic attraction. Critical for stability.");
+    addLegendItem("#eab308", "Disulfide Bond", "~2.0Å. Covalent bond between Cysteines. Provides rigidity.");
+    addLegendItem("#22c55e", "Hydrophobic Cluster", "Non-polar residue packing. Primary driving force of folding.");
+    addLegendItem("#a855f7", "Pi-Stacking", "Aromatic ring interactions. Stabilizes core and interfaces.");
+
     doc.addPage();
 };
 
@@ -259,35 +410,28 @@ export const generateProteinReport = (
     proteinName: string,
     _canvasIgnored: HTMLCanvasElement,
     data: InteractionData,
-    metadata: ProteinMetadata
+    metadata: ProteinMetadata,
+    snapshot: string | null = null
 ) => {
     const doc = new jsPDF();
     const isLightMode = false; // Force DARK MODE for Maps (User Request)
 
-    // PAGE 1: Instruction & Overview
-    addInstructionPage(doc, proteinName, metadata);
+    // Data Prep
+    const stats = calculateStats(data);
 
-    // Section 1: All Interactions
-    // Note: We might be on Page 2 now automatically, or not. addInstructionPage added a page at the end.
-    // So we are currently on a blank Page 2.
-    // We can start render at top of this new page.
+    // PAGE 1: Enhanced Instruction & Overview
+    addInstructionPage(doc, proteinName, metadata, stats, snapshot, data.labels);
+
+    // SECTIONS
 
     const allFilter = (t: string | null) => t !== null && t !== 'Close Contact';
     addSection(doc, "All Significant Interactions", data, allFilter, isLightMode, false, 20);
 
-    // 2. Salt Bridge
     addSection(doc, "Salt Bridges (Ionic Interactions)", data, (t) => t === 'Salt Bridge', isLightMode, true);
-
-    // 3. Disulfide
     addSection(doc, "Disulfide Bonds (Covalent)", data, (t) => t === 'Disulfide Bond', isLightMode, true);
-
-    // 4. Hydrophobic
     addSection(doc, "Hydrophobic Clusters", data, (t) => t === 'Hydrophobic Contact', isLightMode, true);
-
-    // 5. Pi-Stacking
     addSection(doc, "Pi-Stacking & Cation-Pi", data, (t) => t === 'Pi-Stacking' || t === 'Cation-Pi Interaction', isLightMode, true);
 
-    // Save
     const safeName = proteinName.replace(/[^a-z0-9]/yi, '_').toLowerCase();
     doc.save(`${safeName}_full_report.pdf`);
 };
