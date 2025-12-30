@@ -191,38 +191,48 @@ const addSequenceView = (doc: jsPDF, labels: any[], startY: number) => {
     let x = margin;
     let y = startY;
     const boxSize = 6;
-    const fontSize = 4;
 
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(0);
-    doc.text("Sequence & Secondary Structure", margin, y - 5);
+    doc.text("Sequence & Secondary Structure", margin, y); // Removed -5
+    y += 7; // Move down for legend
 
-    // Legend - Move to Top Right of this section
-    const legendY = y - 5;
-    const legendRightX = pageWidth - margin;
+    // Legend Row (Below Header)
+    const legendY = y;
+    let legendX = margin;
 
-    doc.setFontSize(8);
+    doc.setFontSize(9);
     doc.setFont("helvetica", "normal");
 
     // SS Legend
-    doc.setFillColor(229, 231, 235); doc.rect(legendRightX - 30, legendY - 3, 4, 4, 'F');
-    doc.text("Coil", legendRightX - 24, legendY);
-    doc.setFillColor(234, 179, 8); doc.rect(legendRightX - 60, legendY - 3, 4, 4, 'F');
-    doc.text("Sheet", legendRightX - 54, legendY);
-    doc.setFillColor(239, 68, 68); doc.rect(legendRightX - 90, legendY - 3, 4, 4, 'F');
-    doc.text("Helix", legendRightX - 84, legendY);
+    doc.text("Secondary Structure:", legendX, legendY);
+    legendX += 35;
 
-    // Hydrophobicity Legend (Mini Gradient)
-    const gradX = legendRightX - 140;
-    doc.text("Hydrophobicity:", gradX - 25, legendY);
-    // Draw Gradient Bar manually
-    doc.setFillColor(59, 130, 246); doc.rect(gradX, legendY - 3, 6, 4, 'F'); // Blue
-    doc.setFillColor(255, 255, 255); doc.rect(gradX + 6, legendY - 3, 6, 4, 'F'); // White
-    doc.setFillColor(249, 115, 22); doc.rect(gradX + 12, legendY - 3, 6, 4, 'F'); // Orange
+    doc.setFillColor(239, 68, 68); doc.rect(legendX, legendY - 3, 4, 4, 'F');
+    doc.text("Helix", legendX + 5, legendY); legendX += 20;
 
+    doc.setFillColor(234, 179, 8); doc.rect(legendX, legendY - 3, 4, 4, 'F');
+    doc.text("Sheet", legendX + 5, legendY); legendX += 20;
 
-    doc.setFont("courier", "normal");
+    doc.setFillColor(229, 231, 235); doc.rect(legendX, legendY - 3, 4, 4, 'F');
+    doc.text("Coil", legendX + 5, legendY); legendX += 25;
+
+    // Hydro Legend
+    doc.text("Hydrophobicity:", legendX, legendY); legendX += 28;
+    // Gradient
+    doc.setFillColor(59, 130, 246); doc.rect(legendX, legendY - 3, 6, 4, 'F');
+    doc.setFillColor(255, 255, 255); doc.rect(legendX + 6, legendY - 3, 6, 4, 'F');
+    doc.setFillColor(249, 115, 22); doc.rect(legendX + 12, legendY - 3, 6, 4, 'F');
+    // Labels
+    doc.setFontSize(7);
+    doc.text("Hydrophilic", legendX, legendY + 4);
+    doc.text("Hydrophobic", legendX + 12, legendY + 4);
+
+    y += 10; // Space after legend
+
+    const fontSize = 8; // Increased from 4
+    doc.setFont("courier", "bold");
     doc.setFontSize(fontSize);
 
     let currentChain = "";
