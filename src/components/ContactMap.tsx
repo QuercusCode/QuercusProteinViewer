@@ -13,6 +13,7 @@ interface ContactMapProps {
     isLightMode: boolean;
     proteinName?: string;
     getSnapshot?: () => Promise<string | null>;
+    getShareableLink?: () => string;
 }
 
 
@@ -24,7 +25,8 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     onPixelClick,
     isLightMode,
     proteinName = "Protein Structure",
-    getSnapshot
+    getSnapshot,
+    getShareableLink
 }) => {
     const mapCanvasRef = useRef<HTMLCanvasElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -473,7 +475,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
         const finalName = customName || proteinName;
         // Pass current URL for QR Code
-        const currentUrl = window.location.href;
+        const currentUrl = getShareableLink ? getShareableLink() : window.location.href;
         generateProteinReport(finalName, mapCanvasRef.current, distanceData, metadata, snapshot, currentUrl);
     };
 

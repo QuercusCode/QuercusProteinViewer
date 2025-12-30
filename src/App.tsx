@@ -3,7 +3,7 @@ import { ProteinViewer, type RepresentationType, type ColoringType, type Protein
 import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
 import { HelpGuide } from './components/HelpGuide';
-import { parseURLState } from './utils/urlManager';
+import { parseURLState, getShareableURL } from './utils/urlManager';
 import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Movie } from './types';
 
 function App() {
@@ -510,6 +510,18 @@ function App() {
             const reader = new FileReader();
             reader.onloadend = () => resolve(reader.result as string);
             reader.readAsDataURL(blob);
+          });
+        }}
+        getShareableLink={() => {
+          return getShareableURL({
+            pdbId,
+            representation,
+            coloring,
+            isSpinning,
+            showLigands,
+            showSurface,
+            customColors,
+            orientation: viewerRef.current?.getCameraOrientation()
           });
         }}
       />
