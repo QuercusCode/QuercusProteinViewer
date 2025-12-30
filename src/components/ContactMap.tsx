@@ -851,8 +851,9 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                     )}
 
                     <div className={`
-                        absolute inset-y-0 right-0 z-[100] w-full max-w-[320px] md:w-80 shadow-2xl transition-transform duration-300 ease-in-out md:shadow-none
-                        ${showMobileSidebar ? 'translate-x-0' : 'translate-x-full'} md:translate-x-0 md:relative md:flex md:flex-col md:border-l md:overflow-y-auto
+                        fixed inset-y-0 right-0 z-[100] h-full w-[85%] max-w-[320px] shadow-2xl transition-transform duration-300 ease-in-out 
+                        md:relative md:inset-auto md:right-auto md:w-80 md:h-auto md:shadow-none md:z-auto
+                        ${showMobileSidebar ? 'translate-x-0' : 'translate-x-full'} md:translate-x-0 md:flex md:flex-col md:border-l md:overflow-y-auto
                         flex flex-col border-l overflow-y-auto
                         ${isLightMode ? 'bg-white border-neutral-100' : 'bg-neutral-900 border-neutral-800'}
                     `}>
