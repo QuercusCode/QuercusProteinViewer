@@ -891,6 +891,18 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                                     <div className="w-3 h-3 rounded-full bg-yellow-500" />
                                     <span className="text-[10px] font-medium opacity-80">Sheet</span>
                                 </div>
+                                <div className={`flex items-center gap-2 px-2 py-1.5 rounded border ${isLightMode ? 'bg-pink-50 border-pink-100' : 'bg-pink-900/10 border-pink-900/20'}`}>
+                                    <div className="w-3 h-3 rounded-full bg-pink-400" />
+                                    <span className="text-[10px] font-medium opacity-80">3-10 Helix</span>
+                                </div>
+                                <div className={`flex items-center gap-2 px-2 py-1.5 rounded border ${isLightMode ? 'bg-purple-50 border-purple-100' : 'bg-purple-900/10 border-purple-900/20'}`}>
+                                    <div className="w-3 h-3 rounded-full bg-purple-500" />
+                                    <span className="text-[10px] font-medium opacity-80">Pi Helix</span>
+                                </div>
+                                <div className={`flex items-center gap-2 px-2 py-1.5 rounded border ${isLightMode ? 'bg-blue-50 border-blue-100' : 'bg-blue-900/10 border-blue-900/20'}`}>
+                                    <div className="w-3 h-3 rounded-full bg-blue-200" />
+                                    <span className="text-[10px] font-medium opacity-80">Turn</span>
+                                </div>
                             </div>
 
                             {/* Contact Distance */}
