@@ -145,34 +145,68 @@ const addSequenceView = (doc: jsPDF, labels: any[], startY: number) => {
 
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
+    doc.setTextColor(0);
     doc.text("Sequence & Secondary Structure", margin, y - 5);
+
+    // Legend - Move to Top Right of this section
+    // Check if we have enough space or need to move it? 
+    // Let's put it on the same Y level as the header but aligned right.
+    const legendY = y - 5;
+    const legendRightX = pageWidth - margin;
+
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+
+    // Right-aligned, stacking leftwards
+    // Coil
+    doc.setFillColor(229, 231, 235); doc.rect(legendRightX - 30, legendY - 3, 4, 4, 'F');
+    doc.text("Coil", legendRightX - 24, legendY);
+    // Sheet
+    doc.setFillColor(234, 179, 8); doc.rect(legendRightX - 60, legendY - 3, 4, 4, 'F');
+    doc.text("Sheet", legendRightX - 54, legendY);
+    // Helix
+    doc.setFillColor(239, 68, 68); doc.rect(legendRightX - 90, legendY - 3, 4, 4, 'F');
+    doc.text("Helix", legendRightX - 84, legendY);
+
 
     doc.setFont("courier", "normal");
     doc.setFontSize(fontSize);
 
-    // Legend
-    const legendY = y - 5;
-    const legendX = margin + 80;
-    doc.setFontSize(8);
-    // Helix
-    doc.setFillColor(239, 68, 68); // Red-500
-    doc.rect(legendX, legendY - 3, 4, 4, 'F');
-    doc.text("Helix", legendX + 5, legendY);
-    // Sheet
-    doc.setFillColor(234, 179, 8); // Yellow-500
-    doc.rect(legendX + 20, legendY - 3, 4, 4, 'F');
-    doc.text("Sheet", legendX + 25, legendY);
-    // Coil
-    doc.setFillColor(229, 231, 235); // Gray-200
-    doc.rect(legendX + 40, legendY - 3, 4, 4, 'F');
-    doc.text("Coil", legendX + 45, legendY);
-
+    let currentChain = "";
 
     labels.forEach((l) => {
-        // Parse residue name (e.g. "ALA") to 1-letter code if possible, or just keep 3
+        // Chain Change Detection
+        if (l.chain !== currentChain) {
+            // If not first chain, add extra spacing
+            if (currentChain !== "") {
+                y += boxSize + 12; // Gap between chains
+                x = margin;
+            } else {
+                y += 5; // Initial gap after header
+            }
+
+            // Draw Chain Header
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.setTextColor(50);
+            doc.text(`Chain ${l.chain}`, margin, y - 2);
+            doc.setFont("courier", "normal");
+            doc.setFontSize(fontSize);
+            doc.setTextColor(0);
+
+            currentChain = l.chain;
+
+            // Check page break for new chain block
+            if (y > doc.internal.pageSize.getHeight() - 20) {
+                doc.addPage();
+                y = 20;
+                doc.text(`Chain ${l.chain} (cont.)`, margin, y - 2);
+            }
+        }
+
+        // Parse residue name
         const parts = l.label.split(' ');
         const resName3 = parts[0];
-        // Simple map (incomplete, just illustrative)
         const map: any = { 'ALA': 'A', 'ARG': 'R', 'ASN': 'N', 'ASP': 'D', 'CYS': 'C', 'GLU': 'E', 'GLN': 'Q', 'GLY': 'G', 'HIS': 'H', 'ILE': 'I', 'LEU': 'L', 'LYS': 'K', 'MET': 'M', 'PHE': 'F', 'PRO': 'P', 'SER': 'S', 'THR': 'T', 'TRP': 'W', 'TYR': 'Y', 'VAL': 'V' };
         const letter = map[resName3] || '?';
 
@@ -273,6 +307,7 @@ const addInstructionPage = (
     printStat("Disulfide Bonds", stats['Disulfide Bond'], "#eab308");
     printStat("Hydrophobic Clusters", stats['Hydrophobic Contact'], "#22c55e");
     printStat("Pi-Stacking", stats['Pi-Stacking'] + stats['Cation-Pi Interaction'], "#a855f7");
+    printStat("Pi-Stacking & Cation-Pi", stats['Pi-Stacking'] + stats['Cation-Pi Interaction'], "#a855f7");
 
     // -- 3D Snapshot (Right) --
     if (snapshot) {
@@ -298,14 +333,18 @@ const addInstructionPage = (
             const offsetY = (boxSize - drawH) / 2;
 
             doc.addImage(snapshot, 'PNG', midX + offsetX, y + offsetY, drawW, drawH);
+
+            // Caption - Closer & Prominent
+            doc.setFont("helvetica", "bold"); // Bold
+            doc.setFontSize(9);
+            doc.setTextColor(50);
+            // Move closer (+2 instead of +5)
+            doc.text("Fig 1. 3D Structure Snapshot", midX, y + boxSize + 3);
+
         } catch (e) {
-            // Fallback if getImageProperties fails (e.g. invalid data)
+            // Fallback
             doc.addImage(snapshot, 'PNG', midX, y, boxSize, boxSize);
         }
-
-        doc.setFontSize(8);
-        doc.setTextColor(100);
-        doc.text("Fig 1. 3D Structure Snapshot", midX, y + boxSize + 5);
     }
 
     y += 90;
