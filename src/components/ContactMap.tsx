@@ -349,8 +349,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     };
 
 
-    // Render Base Map (Theme Aware) ... existing ...
-
+    // Render Base Map (Theme Aware)
     useEffect(() => {
         if (!distanceData || !mapCanvasRef.current) return;
         const ctx = mapCanvasRef.current.getContext('2d', { alpha: false });
@@ -387,16 +386,6 @@ export const ContactMap: React.FC<ContactMapProps> = ({
             };
 
             // Draw "Voxels" (Bars)
-            // Iterate back to front to handle occlusion (Painter's Algo)
-            // Back = small r+c ? No, standard Painter's is usually furthest first.
-            // In isometric (r-c, r+c), furthest usually means smallest Z?
-            // Actually simpler: iterate r from 0->N, c from 0->N. 
-            // Wait, standard 2D loop order (0,0) -> (N,N) implies top-left to bottom-right.
-            // In iso, (0,0) is top-center. (N,N) is bottom-center. (N,0) and (0,N) are sides.
-            // Drawing order: y from 0 to N, x from 0 to N guarantees back-to-front?
-            // Let's stick to simple row-major, might need tweaking if overlap looks wrong.
-
-            // Optimization: Only draw if distance < contactThreshold * 3 (skip empty valleys)
             const maxDrawDist = contactThreshold * 3;
 
             for (let r = 0; r < size; r++) {
@@ -405,25 +394,17 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                     if (dist > maxDrawDist) continue; // Skip valleys
 
                     // Calculate Height (Inverse Distance)
-                    // Closer = Taller. 
-                    // height 0 to 10.
-                    // If dist < 5, height is high.
                     const h = Math.max(0, (maxDrawDist - dist) / 2); // Empirical scaling
 
                     const pos = toIso(r, c, 0); // Base position
                     const top = toIso(r, c, h); // Top position
 
-                    // Draw Pillar
                     // Color based on height/distance
                     let color = '#3b82f6'; // Blue
                     if (dist < 5) color = '#ef4444'; // Red for tight contacts
                     else if (dist < 8) color = '#eab308'; // Yellow
 
                     ctx.fillStyle = color;
-
-                    // Simple "Bar": Just a line or rect? A full bar is expensive (3 quads).
-                    // Draw a thick line or circle for performance?
-                    // Let's try 3-face cube logic or just simple vertical bar.
 
                     // Simple Vertical Bar (2D fake 3D)
                     const w = isoScale * 1.5;
@@ -551,7 +532,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
         const a = document.createElement('a');
         a.href = url;
-        a.download = `contact - map - ${new Date().toISOString().slice(0, 10)}.png`;
+        a.download = `contact-map-${new Date().toISOString().slice(0, 10)}.png`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -574,7 +555,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                 if (dist <= 15.0) {
                     const l1 = labels[i];
                     const l2 = labels[j];
-                    const row = `${l1.chain},${l1.resNo},${l1.label},${l2.chain},${l2.resNo},${l2.label},${dist.toFixed(3)} `;
+                    const row = `${l1.chain},${l1.resNo},${l1.label},${l2.chain},${l2.resNo},${l2.label},${dist.toFixed(3)}`;
                     csvContent += row + "\n";
                 }
             }
@@ -672,9 +653,9 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         return {
             x: ticks.map(t => {
                 const data = labels[t];
-                const label = showChain ? `${data?.chain}:${data?.resNo} ` : data?.resNo;
+                const label = showChain ? `${data?.chain}:${data?.resNo}` : data?.resNo;
                 return (
-                    <div key={`x - ${t} `} className="absolute text-[10px] text-neutral-500 font-medium transform -translate-x-1/2 flex flex-col items-center" style={{ left: (t * scale) + (scale / 2) }}>
+                    <div key={`x-${t}`} className="absolute text-[10px] text-neutral-500 font-medium transform -translate-x-1/2 flex flex-col items-center" style={{ left: (t * scale) + (scale / 2) }}>
                         <span className="whitespace-nowrap mb-0.5">{label}</span>
                         <div className="h-1 w-px bg-neutral-300"></div>
                     </div>
@@ -682,9 +663,9 @@ export const ContactMap: React.FC<ContactMapProps> = ({
             }),
             y: ticks.map(t => {
                 const data = labels[t];
-                const label = showChain ? `${data?.chain}:${data?.resNo} ` : data?.resNo;
+                const label = showChain ? `${data?.chain}:${data?.resNo}` : data?.resNo;
                 return (
-                    <div key={`y - ${t} `} className="absolute text-[10px] text-neutral-500 font-medium transform -translate-y-1/2 flex items-center justify-end w-12 right-0 pr-1" style={{ top: (t * scale) + (scale / 2) }}>
+                    <div key={`y-${t}`} className="absolute text-[10px] text-neutral-500 font-medium transform -translate-y-1/2 flex items-center justify-end w-12 right-0 pr-1" style={{ top: (t * scale) + (scale / 2) }}>
                         <span className="whitespace-nowrap">{label}</span>
                         <div className="h-px w-1 bg-neutral-300 ml-1"></div>
                     </div>
@@ -716,17 +697,14 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
     if (!isOpen) return null;
 
-
-
-
     return (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm animate-in fade-in">
-            <div className={`relative w - full max - w - 6xl h - [90vh] rounded - xl shadow - 2xl flex flex - col overflow - hidden ${isLightMode ? 'bg-white text-neutral-900' : 'bg-neutral-900 text-white border border-neutral-800'} `}>
+            <div className={`relative w-full max-w-6xl h-[90vh] rounded-xl shadow-2xl flex flex-col overflow-hidden ${isLightMode ? 'bg-white text-neutral-900' : 'bg-neutral-900 text-white border border-neutral-800'}`}>
 
                 {/* Header */}
-                <div className={`flex items - center justify - between px - 6 py - 4 border - b ${isLightMode ? 'bg-white border-neutral-100' : 'bg-neutral-900 border-neutral-800'} `}>
+                <div className={`flex items-center justify-between px-6 py-4 border-b ${isLightMode ? 'bg-white border-neutral-100' : 'bg-neutral-900 border-neutral-800'}`}>
                     <div className="flex items-center gap-3">
-                        <div className={`p - 2 rounded - lg ${isLightMode ? 'bg-blue-50 text-blue-600' : 'bg-blue-900/20 text-blue-400'} `}>
+                        <div className={`p-2 rounded-lg ${isLightMode ? 'bg-blue-50 text-blue-600' : 'bg-blue-900/20 text-blue-400'}`}>
                             <Maximize className="w-5 h-5" />
                         </div>
                         <div>
@@ -741,7 +719,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                         {/* Mobile Menu Toggle */}
                         <button
                             onClick={() => setShowMobileSidebar(!showMobileSidebar)}
-                            className={`md:hidden p - 2 rounded - lg transition - colors ${showMobileSidebar ? (isLightMode ? 'bg-blue-100 text-blue-600' : 'bg-blue-900/40 text-blue-400') : (isLightMode ? 'bg-neutral-100 text-neutral-600' : 'bg-neutral-800 text-neutral-300')} `}
+                            className={`md:hidden p-2 rounded-lg transition-colors ${showMobileSidebar ? (isLightMode ? 'bg-blue-100 text-blue-600' : 'bg-blue-900/40 text-blue-400') : (isLightMode ? 'bg-neutral-100 text-neutral-600' : 'bg-neutral-800 text-neutral-300')}`}
                         >
                             <Menu className="w-5 h-5" />
                         </button>
@@ -749,19 +727,19 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                         <div className="hidden md:flex items-center gap-2">
                             <button
                                 onClick={handleDownloadCSV}
-                                className={`flex items - center gap - 2 px - 3 py - 2 rounded - lg text - sm font - medium transition - colors ${isLightMode ? 'bg-neutral-100 hover:bg-neutral-200 text-neutral-600' : 'bg-neutral-800 hover:bg-neutral-700 text-neutral-300'} `}
+                                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isLightMode ? 'bg-neutral-100 hover:bg-neutral-200 text-neutral-600' : 'bg-neutral-800 hover:bg-neutral-700 text-neutral-300'}`}
                             >
                                 <FileText className="w-4 h-4" />
                                 <span className="hidden sm:inline">Export CSV</span>
                             </button>
                             <button
                                 onClick={handleDownload}
-                                className={`flex items - center gap - 2 px - 3 py - 2 rounded - lg text - sm font - medium transition - colors ${isLightMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white'} `}
+                                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isLightMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white'}`}
                             >
                                 <Download className="w-4 h-4" />
                                 <span className="hidden sm:inline">Save Image</span>
                             </button>
-                            <div className={`w - px h - 6 mx - 2 ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-700'} `} />
+                            <div className={`w-px h-6 mx-2 ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-700'}`} />
                         </div>
 
                         <button onClick={onClose} className="p-2 hover:bg-red-500/10 hover:text-red-500 opacity-60 hover:opacity-100 rounded-lg transition-colors"><X className="w-6 h-6" /></button>
@@ -772,26 +750,26 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                 <div className="flex flex-1 overflow-hidden relative">
 
                     {/* Left Column: Map Area */}
-                    <div ref={scrollContainerRef} className={`flex - 1 overflow - auto relative p - 0 ${isLightMode ? 'bg-neutral-50' : 'bg-black/20'} `}>
+                    <div ref={scrollContainerRef} className={`flex-1 overflow-auto relative p-0 ${isLightMode ? 'bg-neutral-50' : 'bg-black/20'}`}>
                         {loading ? (
-                            <div className={`absolute inset - 0 flex items - center justify - center z - 10 ${isLightMode ? 'bg-white/80' : 'bg-black/80'} `}>
+                            <div className={`absolute inset-0 flex items-center justify-center z-10 ${isLightMode ? 'bg-white/80' : 'bg-black/80'}`}>
                                 <div className="flex flex-col items-center gap-3">
                                     <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full" />
-                                    <span className={`text - sm font - medium ${isLightMode ? 'text-blue-600' : 'text-blue-400'} `}>Computing Interactions...</span>
+                                    <span className={`text-sm font-medium ${isLightMode ? 'text-blue-600' : 'text-blue-400'}`}>Computing Interactions...</span>
                                 </div>
                             </div>
                         ) : distanceData && (
                             <div className="inline-grid grid-cols-[2rem_0.5rem_3rem_1fr] grid-rows-[2rem_0.5rem_2rem_1fr]">
 
                                 {/* CORNERS (Sticky Block) */}
-                                <div className={`col - span - 3 row - span - 3 sticky top - 0 left - 0 z - 30 ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-900'} border - b border - r ${isLightMode ? 'border-neutral-200' : 'border-neutral-800'} `} style={{ gridRow: '1 / span 3', gridColumn: '1 / span 3' }} />
+                                <div className={`col-span-3 row-span-3 sticky top-0 left-0 z-30 ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-900'} border-b border-r ${isLightMode ? 'border-neutral-200' : 'border-neutral-800'}`} style={{ gridRow: '1 / span 3', gridColumn: '1 / span 3' }} />
 
                                 {/* 1. TOP CHAIN BARS */}
-                                <div className={`sticky top - 0 z - 20 h - 8 relative whitespace - nowrap overflow - hidden ${isLightMode ? 'bg-neutral-100/80 backdrop-blur' : 'bg-neutral-900/80 backdrop-blur'} `} style={{ gridRow: 1, gridColumn: 4, width: distanceData.size * scale }}>
+                                <div className={`sticky top-0 z-20 h-8 relative whitespace-nowrap overflow-hidden ${isLightMode ? 'bg-neutral-100/80 backdrop-blur' : 'bg-neutral-900/80 backdrop-blur'}`} style={{ gridRow: 1, gridColumn: 4, width: distanceData.size * scale }}>
                                     {chainRanges.map((range, idx) => (
                                         <div
-                                            key={`top - chain - ${idx} `}
-                                            className={`absolute h - full flex items - center justify - center border - l first: border - l - 0 ${isLightMode ? 'border-neutral-300 text-neutral-600' : 'border-neutral-700 text-neutral-400'} `}
+                                            key={`top-chain-${idx}`}
+                                            className={`absolute h-full flex items-center justify-center border-l first:border-l-0 ${isLightMode ? 'border-neutral-300 text-neutral-600' : 'border-neutral-700 text-neutral-400'}`}
                                             style={{
                                                 left: range.start * scale,
                                                 width: (range.end - range.start) * scale
@@ -803,21 +781,21 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                                 </div>
 
                                 {/* 2. TOP SS TRACK */}
-                                <div className={`sticky top - 8 z - 20 h - 2 relative ${isLightMode ? 'bg-white' : 'bg-neutral-950'} `} style={{ gridRow: 2, gridColumn: 4, width: distanceData.size * scale }}>
+                                <div className={`sticky top-8 z-20 h-2 relative ${isLightMode ? 'bg-white' : 'bg-neutral-950'}`} style={{ gridRow: 2, gridColumn: 4, width: distanceData.size * scale }}>
                                     <canvas ref={topSSCanvasRef} className="absolute inset-0 w-full h-full block" />
                                 </div>
 
                                 {/* 3. TOP AXIS */}
-                                <div className={`sticky top - 10 z - 20 h - 8 relative border - b ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'} `} style={{ gridRow: 3, gridColumn: 4, width: distanceData.size * scale }}>
+                                <div className={`sticky top-10 z-20 h-8 relative border-b ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`} style={{ gridRow: 3, gridColumn: 4, width: distanceData.size * scale }}>
                                     {Axes?.x}
                                 </div>
 
                                 {/* 4. LEFT CHAIN BARS */}
-                                <div className={`sticky left - 0 z - 20 w - 8 relative overflow - hidden ${isLightMode ? 'bg-neutral-100/80 backdrop-blur' : 'bg-neutral-900/80 backdrop-blur'} `} style={{ gridRow: 4, gridColumn: 1, height: distanceData.size * scale }}>
+                                <div className={`sticky left-0 z-20 w-8 relative overflow-hidden ${isLightMode ? 'bg-neutral-100/80 backdrop-blur' : 'bg-neutral-900/80 backdrop-blur'}`} style={{ gridRow: 4, gridColumn: 1, height: distanceData.size * scale }}>
                                     {chainRanges.map((range, idx) => (
                                         <div
-                                            key={`left - chain - ${idx} `}
-                                            className={`absolute w - full flex items - center justify - center border - t first: border - t - 0 ${isLightMode ? 'border-neutral-300 text-neutral-600' : 'border-neutral-700 text-neutral-400'} `}
+                                            key={`left-chain-${idx}`}
+                                            className={`absolute w-full flex items-center justify-center border-t first:border-t-0 ${isLightMode ? 'border-neutral-300 text-neutral-600' : 'border-neutral-700 text-neutral-400'}`}
                                             style={{
                                                 top: range.start * scale,
                                                 height: (range.end - range.start) * scale
@@ -829,12 +807,12 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                                 </div>
 
                                 {/* 5. LEFT SS TRACK */}
-                                <div className={`sticky left - 8 z - 20 w - 2 relative ${isLightMode ? 'bg-white' : 'bg-neutral-950'} `} style={{ gridRow: 4, gridColumn: 2, height: distanceData.size * scale }}>
+                                <div className={`sticky left-8 z-20 w-2 relative ${isLightMode ? 'bg-white' : 'bg-neutral-950'}`} style={{ gridRow: 4, gridColumn: 2, height: distanceData.size * scale }}>
                                     <canvas ref={leftSSCanvasRef} className="absolute inset-0 w-full h-full block" />
                                 </div>
 
                                 {/* 6. LEFT AXIS */}
-                                <div className={`sticky left - 10 z - 20 w - 12 relative border - r ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'} `} style={{ gridRow: 4, gridColumn: 3, height: distanceData.size * scale }}>
+                                <div className={`sticky left-10 z-20 w-12 relative border-r ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`} style={{ gridRow: 4, gridColumn: 3, height: distanceData.size * scale }}>
                                     {Axes?.y}
                                 </div>
 
@@ -849,7 +827,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                         {/* MINI MAP NAVIGATOR (Sticky Bottom-Right) */}
                         {distanceData && (
                             <div
-                                className={`sticky bottom - 6 left - [calc(100 % -170px)] z - [60] w - [150px] h - [150px] shadow - 2xl rounded - lg border overflow - hidden transition - opacity duration - 300 group hover: opacity - 100 ${isLightMode ? 'bg-white border-neutral-200' : 'bg-neutral-900/90 border-neutral-800'} `}
+                                className={`sticky bottom-6 left-[calc(100%-170px)] z-[60] w-[150px] h-[150px] shadow-2xl rounded-lg border overflow-hidden transition-opacity duration-300 group hover:opacity-100 ${isLightMode ? 'bg-white border-neutral-200' : 'bg-neutral-900/90 border-neutral-800'}`}
                                 style={{
                                     marginBottom: '1.5rem',
                                     marginLeft: 'auto',
@@ -878,23 +856,23 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                         {/* Floating Tooltip (Follows Cursor) */}
                         {hoverPos && distanceData && (
                             <div
-                                className={`fixed z - [70] w - 64 backdrop - blur - md shadow - xl border rounded - lg p - 4 flex flex - col gap - 1 pointer - events - none transition - transform duration - 75 ease - out ${isLightMode ? 'bg-white/90 border-neutral-200/50' : 'bg-neutral-900/90 border-neutral-700/50'} `}
+                                className={`fixed z-[70] w-64 backdrop-blur-md shadow-xl border rounded-lg p-4 flex flex-col gap-1 pointer-events-none transition-transform duration-75 ease-out ${isLightMode ? 'bg-white/90 border-neutral-200/50' : 'bg-neutral-900/90 border-neutral-700/50'}`}
                                 style={{
                                     // Basic clamping to keep it on screen
                                     left: Math.min(hoverPos.x + 20, window.innerWidth - 270),
                                     top: Math.min(hoverPos.y + 20, window.innerHeight - 200),
                                 }}
                             >
-                                <div className={`flex items - center justify - between pb - 2 border - b ${isLightMode ? 'border-neutral-200/50' : 'border-neutral-700/50'} `}>
+                                <div className={`flex items-center justify-between pb-2 border-b ${isLightMode ? 'border-neutral-200/50' : 'border-neutral-700/50'}`}>
                                     <span className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Interaction</span>
-                                    <span className={`text - sm font - bold ${distanceData.matrix[hoverPos.i][hoverPos.j] < 5 ? 'text-blue-500' : 'opacity-70'} `}>
+                                    <span className={`text-sm font-bold ${distanceData.matrix[hoverPos.i][hoverPos.j] < 5 ? 'text-blue-500' : 'opacity-70'}`}>
                                         {distanceData.matrix[hoverPos.i][hoverPos.j].toFixed(2)} Å
                                     </span>
                                 </div>
                                 {(() => {
                                     const interaction = getInteractionType(distanceData.labels[hoverPos.i].label, distanceData.labels[hoverPos.j].label, distanceData.matrix[hoverPos.i][hoverPos.j]);
                                     return interaction ? (
-                                        <div className={`mt - 2 px - 2 py - 1 rounded text - xs font - bold text - center border ${interaction.color} ${interaction.bg.replace('/10', '/5')} border - current opacity - 80`}>
+                                        <div className={`mt-2 px-2 py-1 rounded text-xs font-bold text-center border ${interaction.color} ${interaction.bg.replace('/10', '/5')} border-current opacity-80`}>
                                             {interaction.type}
                                         </div>
                                     ) : null;
@@ -914,17 +892,17 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                     )}
 
                     <div className={`
-                        absolute inset - y - 0 right - 0 z - 50 w - 80 shadow - 2xl transition - transform duration - 300 ease -in -out md: shadow - none
-                        ${showMobileSidebar ? 'translate-x-0' : 'translate-x-full'} md: translate - x - 0 md:relative md:flex md: flex - col md: border - l md: overflow - y - auto
-                        flex flex - col border - l overflow - y - auto
+                        absolute inset-y-0 right-0 z-50 w-80 shadow-2xl transition-transform duration-300 ease-in-out md:shadow-none
+                        ${showMobileSidebar ? 'translate-x-0' : 'translate-x-full'} md:translate-x-0 md:relative md:flex md:flex-col md:border-l md:overflow-y-auto
+                        flex flex-col border-l overflow-y-auto
                         ${isLightMode ? 'bg-white border-neutral-100' : 'bg-neutral-900 border-neutral-800'}
-`}>
+                    `}>
 
                         {/* Section: View & Zoom */}
                         <div className="p-3 border-b border-neutral-100 dark:border-neutral-800 space-y-3">
                             <h4 className="text-xs font-bold uppercase opacity-50 tracking-wider">View Options</h4>
 
-                            <div className={`flex items - center justify - between p - 1 rounded - lg mb - 3 ${isLightMode ? 'bg-neutral-100' : 'bg-neutral-800'} `}>
+                            <div className={`flex items-center justify-between p-1 rounded-lg mb-3 ${isLightMode ? 'bg-neutral-100' : 'bg-neutral-800'}`}>
                                 <button onClick={() => setScale(s => Math.max(1, s - 1))} className="p-1.5 hover:bg-white dark:hover:bg-neutral-700 rounded-md transition-all"><ZoomOut className="w-4 h-4" /></button>
                                 <span className="text-xs font-mono font-medium opacity-70">{scale}x</span>
                                 <button onClick={() => setScale(s => Math.min(20, s + 1))} className="p-1.5 hover:bg-white dark:hover:bg-neutral-700 rounded-md transition-all"><ZoomIn className="w-4 h-4" /></button>
@@ -932,7 +910,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
                             <button
                                 onClick={() => setShowTerrain(!showTerrain)}
-                                className={`w - full flex items - center justify - between px - 3 py - 2 rounded - lg text - xs font - medium transition - colors ${showTerrain ? 'bg-blue-50 text-blue-600 ring-1 ring-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:ring-blue-900' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500'} `}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors ${showTerrain ? 'bg-blue-50 text-blue-600 ring-1 ring-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:ring-blue-900' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500'}`}
                             >
                                 <div className="flex items-center gap-2"><Activity className="w-4 h-4" /> 3D Terrain Mode</div>
                                 {showTerrain && <Check className="w-3 h-3" />}
@@ -940,7 +918,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
                             <button
                                 onClick={() => setShowGrid(!showGrid)}
-                                className={`w - full flex items - center justify - between px - 3 py - 2 rounded - lg text - xs font - medium transition - colors ${showGrid ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500'} `}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors ${showGrid ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500'}`}
                             >
                                 <div className="flex items-center gap-2"><Grid3X3 className="w-4 h-4" /> Show Grid</div>
                                 {showGrid && <Check className="w-3 h-3" />}
@@ -948,7 +926,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
                             <button
                                 onClick={() => setShowIntraChain(!showIntraChain)}
-                                className={`w - full flex items - center justify - between px - 3 py - 2 rounded - lg text - xs font - medium transition - colors ${!showIntraChain ? 'bg-purple-50 text-purple-600 ring-1 ring-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:ring-purple-900' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500'} `}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors ${!showIntraChain ? 'bg-purple-50 text-purple-600 ring-1 ring-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:ring-purple-900' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500'}`}
                             >
                                 <div className="flex items-center gap-2"><Maximize className="w-4 h-4" /> Interface Focus</div>
                                 {!showIntraChain && <Check className="w-3 h-3" />}
@@ -961,34 +939,34 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
                             {/* Secondary Structure */}
                             <div className="grid grid-cols-2 gap-2">
-                                <div className={`flex items - center gap - 2 px - 2 py - 1.5 rounded border ${isLightMode ? 'bg-red-50 border-red-100' : 'bg-red-900/10 border-red-900/20'} `}>
+                                <div className={`flex items-center gap-2 px-2 py-1.5 rounded border ${isLightMode ? 'bg-red-50 border-red-100' : 'bg-red-900/10 border-red-900/20'}`}>
                                     <div className="w-3 h-3 rounded-full bg-red-500" />
                                     <span className="text-[10px] font-medium opacity-80">Helix</span>
                                 </div>
-                                <div className={`flex items - center gap - 2 px - 2 py - 1.5 rounded border ${isLightMode ? 'bg-yellow-50 border-yellow-100' : 'bg-yellow-900/10 border-yellow-900/20'} `}>
+                                <div className={`flex items-center gap-2 px-2 py-1.5 rounded border ${isLightMode ? 'bg-yellow-50 border-yellow-100' : 'bg-yellow-900/10 border-yellow-900/20'}`}>
                                     <div className="w-3 h-3 rounded-full bg-yellow-500" />
                                     <span className="text-[10px] font-medium opacity-80">Sheet</span>
                                 </div>
-                                <div className={`flex items - center gap - 2 px - 2 py - 1.5 rounded border ${isLightMode ? 'bg-pink-50 border-pink-100' : 'bg-pink-900/10 border-pink-900/20'} `}>
+                                <div className={`flex items-center gap-2 px-2 py-1.5 rounded border ${isLightMode ? 'bg-pink-50 border-pink-100' : 'bg-pink-900/10 border-pink-900/20'}`}>
                                     <div className="w-3 h-3 rounded-full bg-pink-400" />
                                     <span className="text-[10px] font-medium opacity-80">3-10 Helix</span>
                                 </div>
-                                <div className={`flex items - center gap - 2 px - 2 py - 1.5 rounded border ${isLightMode ? 'bg-purple-50 border-purple-100' : 'bg-purple-900/10 border-purple-900/20'} `}>
+                                <div className={`flex items-center gap-2 px-2 py-1.5 rounded border ${isLightMode ? 'bg-purple-50 border-purple-100' : 'bg-purple-900/10 border-purple-900/20'}`}>
                                     <div className="w-3 h-3 rounded-full bg-purple-500" />
                                     <span className="text-[10px] font-medium opacity-80">Pi Helix</span>
                                 </div>
-                                <div className={`flex items - center gap - 2 px - 2 py - 1.5 rounded border ${isLightMode ? 'bg-blue-50 border-blue-100' : 'bg-blue-900/10 border-blue-900/20'} `}>
+                                <div className={`flex items-center gap-2 px-2 py-1.5 rounded border ${isLightMode ? 'bg-blue-50 border-blue-100' : 'bg-blue-900/10 border-blue-900/20'}`}>
                                     <div className="w-3 h-3 rounded-full bg-blue-200" />
                                     <span className="text-[10px] font-medium opacity-80">Turn</span>
                                 </div>
-                                <div className={`flex items - center gap - 2 px - 2 py - 1.5 rounded border ${isLightMode ? 'bg-neutral-50 border-neutral-100' : 'bg-neutral-900/10 border-neutral-900/20'} `}>
-                                    <div className={`w - 3 h - 3 rounded - full border ${isLightMode ? 'bg-white border-neutral-300' : 'bg-neutral-950 border-neutral-700'} `} />
+                                <div className={`flex items-center gap-2 px-2 py-1.5 rounded border ${isLightMode ? 'bg-neutral-50 border-neutral-100' : 'bg-neutral-900/10 border-neutral-900/20'}`}>
+                                    <div className={`w-3 h-3 rounded-full border ${isLightMode ? 'bg-white border-neutral-300' : 'bg-neutral-950 border-neutral-700'}`} />
                                     <span className="text-[10px] font-medium opacity-80">Coil</span>
                                 </div>
                             </div>
 
                             {/* Contact Distance */}
-                            <div className={`p - 2 rounded border flex flex - col gap - 1.5 ${isLightMode ? 'bg-neutral-50 border-neutral-100' : 'bg-neutral-800/50 border-neutral-800'} `}>
+                            <div className={`p-2 rounded border flex flex-col gap-1.5 ${isLightMode ? 'bg-neutral-50 border-neutral-100' : 'bg-neutral-800/50 border-neutral-800'}`}>
                                 <div className="flex items-center justify-between text-[10px] opacity-70">
                                     <span>Close (&lt;{contactThreshold}Å)</span>
                                     <span>Distal (&lt;{proximalThreshold}Å)</span>
@@ -998,14 +976,14 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                         </div>
 
                         {/* Section: Filters */}
-                        <div className={`p - 3 border - b border - neutral - 100 dark: border - neutral - 800 space - y - 3 ${filters.all ? '' : 'bg-blue-50/50 dark:bg-blue-900/10'} `}>
+                        <div className={`p-3 border-b border-neutral-100 dark:border-neutral-800 space-y-3 ${filters.all ? '' : 'bg-blue-50/50 dark:bg-blue-900/10'}`}>
                             <div className="flex items-center justify-between">
                                 <h4 className="text-xs font-bold uppercase opacity-50 tracking-wider">Interaction Filters</h4>
                                 {!filters.all && <button onClick={() => setFilters({ ...filters, all: true })} className="text-[10px] text-blue-500 hover:underline">Reset All</button>}
                             </div>
 
-                            <label className={`flex items - center gap - 3 px - 3 py - 2 rounded - lg cursor - pointer transition - colors ${filters.all ? (isLightMode ? 'bg-neutral-100 font-medium' : 'bg-neutral-800 font-medium') : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/50'} `}>
-                                <div className={`w - 4 h - 4 rounded border flex items - center justify - center ${filters.all ? 'bg-blue-500 border-blue-500 text-white' : 'border-neutral-300 dark:border-neutral-600'} `}>
+                            <label className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors ${filters.all ? (isLightMode ? 'bg-neutral-100 font-medium' : 'bg-neutral-800 font-medium') : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/50'}`}>
+                                <div className={`w-4 h-4 rounded border flex items-center justify-center ${filters.all ? 'bg-blue-500 border-blue-500 text-white' : 'border-neutral-300 dark:border-neutral-600'}`}>
                                     <input
                                         type="checkbox"
                                         checked={filters.all}
@@ -1024,8 +1002,8 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                                     { id: 'hydrophobic', label: 'Hydrophobic', color: 'bg-green-500', activeClass: 'text-green-600 bg-green-50 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-900/30' },
                                     { id: 'piStacking', label: 'Pi-Stacking', color: 'bg-purple-500', activeClass: 'text-purple-600 bg-purple-50 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-900/30' },
                                 ].map((f) => (
-                                    <label key={f.id} className={`flex items - center gap - 3 px - 3 py - 2 rounded - lg cursor - pointer transition - all border border - transparent ${filters[f.id as keyof typeof filters] ? f.activeClass : 'opacity-60 hover:opacity-100 hover:bg-neutral-50 dark:hover:bg-neutral-800/50'} `}>
-                                        <div className={`w - 4 h - 4 rounded border flex items - center justify - center ${filters[f.id as keyof typeof filters] ? `border-current` : 'border-neutral-300 dark:border-neutral-600'} `}>
+                                    <label key={f.id} className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all border border-transparent ${filters[f.id as keyof typeof filters] ? f.activeClass : 'opacity-60 hover:opacity-100 hover:bg-neutral-50 dark:hover:bg-neutral-800/50'}`}>
+                                        <div className={`w-4 h-4 rounded border flex items-center justify-center ${filters[f.id as keyof typeof filters] ? `border-current` : 'border-neutral-300 dark:border-neutral-600'}`}>
                                             <input
                                                 type="checkbox"
                                                 checked={filters[f.id as keyof typeof filters] as boolean}
@@ -1036,7 +1014,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                                                 }}
                                                 className="hidden"
                                             />
-                                            {filters[f.id as keyof typeof filters] && <div className={`w - 2 h - 2 rounded - full ${f.color} `} />}
+                                            {filters[f.id as keyof typeof filters] && <div className={`w-2 h-2 rounded-full ${f.color}`} />}
                                         </div>
                                         <span className="text-xs font-medium">{f.label}</span>
                                     </label>
