@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { X, ZoomIn, ZoomOut, Maximize, Download, Grid3X3, Check, FileText, Menu } from 'lucide-react';
+import { X, ZoomIn, ZoomOut, Maximize, Download, Grid3X3, Check, FileText, Menu, BookOpen } from 'lucide-react';
 import type { ChainInfo } from '../types';
+import { generateProteinReport } from '../utils/pdfGenerator';
 
 interface ContactMapProps {
     isOpen: boolean;
@@ -9,6 +10,7 @@ interface ContactMapProps {
     getContactData: () => Promise<{ x: number[], y: number[], z: number[], labels: string[], ss: string[] }[]>;
     onPixelClick?: (chainA: string, resA: number, chainB: string, resB: number) => void;
     isLightMode: boolean;
+    proteinName?: string;
 }
 
 const getInteractionType = (label1: string, label2: string, dist: number) => {
@@ -59,7 +61,8 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     onClose,
     getContactData,
     onPixelClick,
-    isLightMode
+    isLightMode,
+    proteinName = "Protein Structure"
 }) => {
     const mapCanvasRef = useRef<HTMLCanvasElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -474,6 +477,11 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     }, [distanceData, scale, isLightMode, contactThreshold, proximalThreshold, showGrid, showIntraChain, filters]);
 
 
+    const handleGenerateReport = () => {
+        if (!distanceData || !mapCanvasRef.current) return;
+        generateProteinReport(proteinName, mapCanvasRef.current, distanceData);
+    };
+
     const handleDownload = () => {
         if (!mapCanvasRef.current) return;
 
@@ -683,6 +691,13 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                             >
                                 <FileText className="w-4 h-4" />
                                 <span className="hidden sm:inline">Export CSV</span>
+                            </button>
+                            <button
+                                onClick={handleGenerateReport}
+                                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isLightMode ? 'bg-neutral-100 hover:bg-neutral-200 text-neutral-600' : 'bg-neutral-800 hover:bg-neutral-700 text-neutral-300'}`}
+                            >
+                                <BookOpen className="w-4 h-4" />
+                                <span className="hidden sm:inline">PDF Report</span>
                             </button>
                             <button
                                 onClick={handleDownload}

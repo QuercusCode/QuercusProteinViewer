@@ -501,6 +501,7 @@ function App() {
         getContactData={getAtomDataWrapper}
         onPixelClick={handlePixelClick}
         isLightMode={isLightMode}
+        proteinName={file ? file.name : pdbId}
       />
 
 
