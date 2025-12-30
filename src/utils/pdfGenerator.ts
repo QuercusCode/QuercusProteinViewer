@@ -135,7 +135,8 @@ const addSection = (
     const { matrix, labels } = data;
 
     // We can't list ALL hydrophobic contacts (thousands). We need a limit.
-    const MAX_ROWS = 100;
+    // UPDATE: User wants ALL interactions.
+    // const MAX_ROWS = 100;
 
     for (let i = 0; i < matrix.length; i++) {
         for (let j = i + 1; j < matrix.length; j++) {
@@ -166,11 +167,12 @@ const addSection = (
     tableRows.sort((a, b) => parseFloat(a.dist) - parseFloat(b.dist));
 
     // Slice
-    const displayRows = tableRows.slice(0, MAX_ROWS);
+    // const displayRows = tableRows.slice(0, MAX_ROWS);
+    const displayRows = tableRows;
 
     doc.setFontSize(10);
     const summaryY = imgY + desiredImgHeight + 10;
-    doc.text(`Identified Interactions (${tableRows.length} total, top ${displayRows.length} shown)`, margin, summaryY);
+    doc.text(`Identified Interactions (${tableRows.length} total)`, margin, summaryY);
 
     autoTable(doc, {
         startY: summaryY + 5,
