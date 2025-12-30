@@ -63,11 +63,16 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 }) => {
     const mapCanvasRef = useRef<HTMLCanvasElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const miniMapCanvasRef = useRef<HTMLCanvasElement>(null);
 
     const [loading, setLoading] = useState(false);
     const [scale, setScale] = useState(2);
     const [distanceData, setDistanceData] = useState<{ matrix: number[][], size: number, labels: { resNo: number, chain: string, label: string, ss: string }[] } | null>(null);
     const [hoverPos, setHoverPos] = useState<{ i: number, j: number, x: number, y: number } | null>(null);
+
+    // MiniMap State
+    const [miniView, setMiniView] = useState<{ x: number, y: number, w: number, h: number } | null>(null);
 
     // Settings State
     const [contactThreshold, setContactThreshold] = useState(5);
@@ -229,6 +234,118 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         }
 
     }, [distanceData, scale]);
+
+    // --- MINI MAP LOGIC ---
+
+    // 1. Initial Render of MiniMap (Static Heatmap)
+    useEffect(() => {
+        if (!distanceData || !miniMapCanvasRef.current) return;
+        const ctx = miniMapCanvasRef.current.getContext('2d', { alpha: false });
+        if (!ctx) return;
+
+        const { matrix, size } = distanceData;
+        const miniSize = 150; // Fixed width/height for mini-map
+        miniMapCanvasRef.current.width = miniSize;
+        miniMapCanvasRef.current.height = miniSize;
+
+        // Use ImageData for fast pixel pushing
+        const imgData = ctx.createImageData(miniSize, miniSize);
+        const data = imgData.data;
+        const step = size / miniSize; // Sampling step
+
+        const bg = isLightMode ? 255 : 23; // #171717
+
+        for (let y = 0; y < miniSize; y++) {
+            for (let x = 0; x < miniSize; x++) {
+                // Map mini-coord to real matrix coord
+                const rY = Math.floor(y * step);
+                const rX = Math.floor(x * step);
+
+                // If out of bounds or invalid
+                if (rY >= size || rX >= size) continue;
+
+                const dist = matrix[rY][rX];
+                const i = (y * miniSize + x) * 4;
+
+                // Simple Greyscale/Blue logic for visibility
+                if (dist < contactThreshold) {
+                    // Blue (Close)
+                    data[i] = 59; data[i + 1] = 130; data[i + 2] = 246; data[i + 3] = 255; // #3b82f6
+                } else if (dist < proximalThreshold) {
+                    // Light Blue
+                    data[i] = 147; data[i + 1] = 197; data[i + 2] = 253; data[i + 3] = 255;
+                } else {
+                    // Background
+                    data[i] = bg; data[i + 1] = bg; data[i + 2] = bg; data[i + 3] = 255;
+                }
+                // Draw Diagonal
+                if (Math.abs(rX - rY) < (size * 0.02)) {
+                    data[i] = 200; data[i + 1] = 200; data[i + 2] = 200; data[i + 3] = 255;
+                }
+            }
+        }
+        ctx.putImageData(imgData, 0, 0);
+
+    }, [distanceData, contactThreshold, proximalThreshold, isLightMode]);
+
+    // 2. Sync Viewport Rect & Scroll Handling
+    const handleScroll = () => {
+        if (!scrollContainerRef.current || !distanceData) return;
+        const container = scrollContainerRef.current;
+        const totalW = distanceData.size * scale;
+        const totalH = distanceData.size * scale;
+
+        // Container Viewport
+        const vW = container.clientWidth;
+        const vH = container.clientHeight;
+        const sL = container.scrollLeft;
+        const sT = container.scrollTop;
+
+        // Calculate fractions
+        const xPct = sL / totalW;
+        const yPct = sT / totalH;
+        const wPct = vW / totalW;
+        const hPct = vH / totalH;
+
+        setMiniView({
+            x: xPct * 150,
+            y: yPct * 150,
+            w: Math.min(150, wPct * 150),
+            h: Math.min(150, hPct * 150)
+        });
+    };
+
+    // Attach Scroll Listener
+    useEffect(() => {
+        const el = scrollContainerRef.current;
+        if (el) {
+            el.addEventListener('scroll', handleScroll);
+            // Initial calc
+            handleScroll();
+        }
+        return () => el?.removeEventListener('scroll', handleScroll);
+    }, [distanceData, scale]);
+
+    // 3. MiniMap Interaction (Click to Jump)
+    const handleMiniMapClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!scrollContainerRef.current || !distanceData) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+
+        const xPct = clickX / 150;
+        const yPct = clickY / 150;
+
+        const totalW = distanceData.size * scale;
+        const totalH = distanceData.size * scale;
+
+        // Center the view on click
+        scrollContainerRef.current.scrollTo({
+            left: (xPct * totalW) - (scrollContainerRef.current.clientWidth / 2),
+            top: (yPct * totalH) - (scrollContainerRef.current.clientHeight / 2),
+            behavior: 'auto'
+        });
+    };
 
 
     // Render Base Map (Theme Aware) ... existing ...
@@ -585,7 +702,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                 <div className="flex flex-1 overflow-hidden relative">
 
                     {/* Left Column: Map Area */}
-                    <div className={`flex-1 overflow-auto relative p-0 ${isLightMode ? 'bg-neutral-50' : 'bg-black/20'}`}>
+                    <div ref={scrollContainerRef} className={`flex-1 overflow-auto relative p-0 ${isLightMode ? 'bg-neutral-50' : 'bg-black/20'}`}>
                         {loading ? (
                             <div className={`absolute inset-0 flex items-center justify-center z-10 ${isLightMode ? 'bg-white/80' : 'bg-black/80'}`}>
                                 <div className="flex flex-col items-center gap-3">
@@ -656,6 +773,35 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                                     <canvas ref={mapCanvasRef} className="absolute inset-0 pointer-events-none image-pixelated" style={{ imageRendering: 'pixelated' }} />
                                     <canvas ref={overlayCanvasRef} onMouseMove={handleMouseMove} onMouseLeave={() => setHoverPos(null)} onClick={handleClick} className="absolute inset-0 cursor-crosshair image-pixelated" style={{ imageRendering: 'pixelated' }} />
                                 </div>
+                            </div>
+                        )}
+
+                        {/* MINI MAP NAVIGATOR (Sticky Bottom-Right) */}
+                        {distanceData && (
+                            <div
+                                className={`sticky bottom-6 left-[calc(100%-170px)] z-[60] w-[150px] h-[150px] shadow-2xl rounded-lg border overflow-hidden transition-opacity duration-300 group hover:opacity-100 ${isLightMode ? 'bg-white border-neutral-200' : 'bg-neutral-900/90 border-neutral-800'}`}
+                                style={{
+                                    marginBottom: '1.5rem',
+                                    marginLeft: 'auto',
+                                    marginRight: '1.5rem',
+                                    // Only show if content is bigger than viewport
+                                    display: (distanceData.size * scale > (scrollContainerRef.current?.clientWidth || 0)) ? 'block' : 'none'
+                                }}
+                                onClick={handleMiniMapClick}
+                            >
+                                <canvas ref={miniMapCanvasRef} className="absolute inset-0 w-full h-full pointer-events-none" style={{ imageRendering: 'pixelated' }} />
+                                {/* Viewport Rect */}
+                                {miniView && (
+                                    <div
+                                        className="absolute border-2 border-red-500 bg-red-500/10 cursor-move transition-transform duration-75"
+                                        style={{
+                                            left: 0, top: 0,
+                                            width: miniView.w,
+                                            height: miniView.h,
+                                            transform: `translate(${miniView.x}px, ${miniView.y}px)`
+                                        }}
+                                    />
+                                )}
                             </div>
                         )}
 
