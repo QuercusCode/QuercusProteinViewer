@@ -18,7 +18,7 @@ export interface ProteinMetadata {
 // Helper: Draw map to an offscreen canvas
 const drawMapToDataURL = (
     data: InteractionData,
-    filterFn: (type: string | null) => boolean,
+    filterFn: (type: string | null, l1?: any, l2?: any) => boolean,
     isLightMode: boolean
 ): string => {
     const canvas = document.createElement('canvas');
@@ -84,11 +84,11 @@ const drawMapToDataURL = (
             // Filter
             const typeData = getInteractionType(l1.label, l2.label, dist);
 
-            if (filterFn(typeData ? typeData.type : null)) {
+            if (filterFn(typeData ? typeData.type : null, l1, l2)) {
                 if (typeData) {
                     ctx.fillStyle = typeData.hex || '#60a5fa'; // Fallback blue
                     ctx.fillRect(offsetX + (j * P), offsetY + (i * P), P, P);
-                } else if (dist < 5.0 && filterFn('Close Contact')) {
+                } else if (dist < 5.0 && filterFn('Close Contact', l1, l2)) {
                     // Blue heatmap for generic close contacts
                     ctx.fillStyle = isLightMode ? '#60a5fa' : '#3b82f6';
                     ctx.fillRect(offsetX + (j * P), offsetY + (i * P), P, P);
@@ -490,7 +490,7 @@ const addSection = (
     doc: jsPDF,
     title: string,
     data: InteractionData,
-    filterFn: (type: string | null) => boolean,
+    filterFn: (type: string | null, l1?: any, l2?: any) => boolean,
     isLightMode: boolean,
     newPage: boolean = true,
     startY: number = 20
@@ -536,7 +536,7 @@ const addSection = (
             const type = typeData ? typeData.type : 'Close Contact';
 
             // Filter Row
-            if (filterFn(type)) {
+            if (filterFn(type, l1, l2)) {
                 // If generic "All" view, skip 'Close Contact' logs to save space for important stuff
                 if (title.includes("All") && type === "Close Contact") continue;
 
@@ -610,6 +610,15 @@ export const generateProteinReport = async (
     addSection(doc, "Disulfide Bonds (Covalent)", data, (t) => t === 'Disulfide Bond', isLightMode, true);
     addSection(doc, "Hydrophobic Clusters", data, (t) => t === 'Hydrophobic Contact', isLightMode, true);
     addSection(doc, "Pi-Stacking & Cation-Pi", data, (t) => t === 'Pi-Stacking' || t === 'Cation-Pi Interaction', isLightMode, true);
+
+    // INTERFACE ANALYSIS (New)
+    // Only show if there are multiple chains
+    if (metadata.chainCount > 1) {
+        addSection(doc, "Interface Analysis (Chain Interactions)", data, (_t, l1, l2) => {
+            if (l1 && l2 && l1.chain !== l2.chain) return true;
+            return false;
+        }, isLightMode, true);
+    }
 
     const safeName = proteinName.replace(/[^a-z0-9]/yi, '_').toLowerCase();
     doc.save(`${safeName}_full_report.pdf`);
