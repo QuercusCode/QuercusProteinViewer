@@ -17,18 +17,51 @@ const drawMapToDataURL = (
     const canvas = document.createElement('canvas');
     const P = 2; // Pixel scale for high res
     const size = data.size;
-    canvas.width = size * P;
-    canvas.height = size * P;
+    const padding = 50; // Space for axes
+
+    canvas.width = (size * P) + padding;
+    canvas.height = (size * P) + padding;
     const ctx = canvas.getContext('2d', { alpha: false });
 
-    if (!ctx) return '';
+    if (!ctx) return ''; // Should never happen
 
-    // Bg
+    // 1. Background
     ctx.fillStyle = isLightMode ? '#ffffff' : '#171717';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Diagonals & Grid not strictly needed for print, but helpful context
-    // Let's keep it simple: just the dots.
+    // 2. Axes Lines
+    const axisColor = isLightMode ? '#000000' : '#ffffff';
+    ctx.strokeStyle = axisColor;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    // Y Axis
+    ctx.moveTo(padding - 5, 0);
+    ctx.lineTo(padding - 5, size * P);
+    // X Axis
+    ctx.moveTo(padding, size * P + 5);
+    ctx.lineTo(canvas.width, size * P + 5);
+    ctx.stroke();
+
+    // 3. Axes Labels (Simplified: 0, 50, 100...)
+    ctx.fillStyle = axisColor;
+    ctx.font = '24px Arial'; // Large font for scaled down image
+    ctx.textAlign = 'right';
+
+    // Y Labels
+    for (let i = 0; i < size; i += 50) {
+        ctx.fillText(i.toString(), padding - 15, (i * P) + 10);
+    }
+    // X Labels
+    ctx.textAlign = 'center';
+    for (let i = 0; i < size; i += 50) {
+        ctx.fillText(i.toString(), padding + (i * P), (size * P) + 40);
+    }
+
+
+    // 4. Draw Pixels (Upper Diagonal Only)
+    // Offset everything by padding
+    const offsetX = padding;
+    const offsetY = 0;
 
     const { matrix, labels } = data;
 
@@ -43,21 +76,15 @@ const drawMapToDataURL = (
             // Filter
             const typeData = getInteractionType(l1.label, l2.label, dist);
 
-            // Check if we should draw this
-            // Special case: "All" -> Draw everything
-            // types: 'Salt Bridge', 'Disulfide Bond', 'Hydrophobic Contact', 'Pi-Stacking', 'Cation-Pi Interaction', 'Close Contact'
-
             if (filterFn(typeData ? typeData.type : null)) {
                 if (typeData) {
                     ctx.fillStyle = typeData.hex || '#60a5fa'; // Fallback blue
-                    ctx.fillRect(j * P, i * P, P, P);
-                    // Mirror for symmetry
-                    ctx.fillRect(i * P, j * P, P, P);
+                    ctx.fillRect(offsetX + (j * P), offsetY + (i * P), P, P);
+                    // NO MIRRORING (User Request: Upper Diagonal Only)
                 } else if (dist < 5.0 && filterFn('Close Contact')) {
-                    // Blue heatmap for generic close contacts if allowd
+                    // Blue heatmap for generic close contacts
                     ctx.fillStyle = isLightMode ? '#60a5fa' : '#3b82f6';
-                    ctx.fillRect(j * P, i * P, P, P);
-                    ctx.fillRect(i * P, j * P, P, P);
+                    ctx.fillRect(offsetX + (j * P), offsetY + (i * P), P, P);
                 }
             }
         }
@@ -90,8 +117,8 @@ const addSection = (
     const mapImg = drawMapToDataURL(data, filterFn, isLightMode);
 
     // 2. Add Image
-    const desiredImgWidth = 100; // Fixed size
-    const desiredImgHeight = 100;
+    const desiredImgWidth = 120; // Slightly larger to accommodate axes
+    const desiredImgHeight = 120;
     const imgY = startY + 10;
 
     doc.addImage(mapImg, 'PNG', margin, imgY, desiredImgWidth, desiredImgHeight);
