@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { X, ZoomIn, ZoomOut, Maximize, Download, Grid3X3, Check, FileText, Menu, Activity } from 'lucide-react';
+import { X, ZoomIn, ZoomOut, Maximize, Download, Grid3X3, Check, FileText, Menu } from 'lucide-react';
 import type { ChainInfo } from '../types';
 
 interface ContactMapProps {
@@ -78,7 +78,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     const [contactThreshold, setContactThreshold] = useState(5);
     const [proximalThreshold, setProximalThreshold] = useState(8);
     const [showGrid, setShowGrid] = useState(true);
-    const [showTerrain, setShowTerrain] = useState(false);
+
     const [showIntraChain, setShowIntraChain] = useState(true);
     const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
@@ -370,55 +370,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         ctx.fillStyle = bg;
         ctx.fillRect(0, 0, mapCanvasRef.current.width, mapCanvasRef.current.height);
 
-        // --- 3D TERRAIN MODE ---
-        if (showTerrain) {
-            // Isometric Projection Constants
-            const isoScale = P * 0.8; // Slightly smaller to fit
-            const ox = mapCanvasRef.current.width / 2;
-            const oy = mapCanvasRef.current.height * 0.2; // Start higher up
 
-            // Helper to project (x, y, z) -> (screenX, screenY)
-            // x = row, y = col, z = height (inverse distance)
-            const toIso = (r: number, c: number, h: number) => {
-                const isoX = (r - c) * isoScale * Math.cos(Math.PI / 6);
-                const isoY = (r + c) * isoScale * Math.sin(Math.PI / 6) - (h * isoScale * 2);
-                return { x: ox + isoX, y: oy + isoY };
-            };
-
-            // Draw "Voxels" (Bars)
-            const maxDrawDist = contactThreshold * 3;
-
-            for (let r = 0; r < size; r++) {
-                for (let c = 0; c < size; c++) {
-                    const dist = matrix[r][c];
-                    if (dist > maxDrawDist) continue; // Skip valleys
-
-                    // Calculate Height (Inverse Distance)
-                    const h = Math.max(0, (maxDrawDist - dist) / 2); // Empirical scaling
-
-                    const pos = toIso(r, c, 0); // Base position
-                    const top = toIso(r, c, h); // Top position
-
-                    // Color based on height/distance
-                    let color = '#3b82f6'; // Blue
-                    if (dist < 5) color = '#ef4444'; // Red for tight contacts
-                    else if (dist < 8) color = '#eab308'; // Yellow
-
-                    ctx.fillStyle = color;
-
-                    // Simple Vertical Bar (2D fake 3D)
-                    const w = isoScale * 1.5;
-                    ctx.fillRect(pos.x - w / 2, top.y, w, pos.y - top.y);
-
-                    // Top Cap
-                    ctx.fillStyle = isLightMode ? '#ffffff' : '#000000';
-                    ctx.globalAlpha = 0.3;
-                    ctx.fillRect(pos.x - w / 2, top.y, w, 2);
-                    ctx.globalAlpha = 1.0;
-                }
-            }
-            return; // Skip standard 2D drawing
-        }
 
 
         // Draw Grid Lines (Light Grey)
@@ -519,7 +471,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
             }
         }
 
-    }, [distanceData, scale, isLightMode, contactThreshold, proximalThreshold, showGrid, showIntraChain, filters, showTerrain]);
+    }, [distanceData, scale, isLightMode, contactThreshold, proximalThreshold, showGrid, showIntraChain, filters]);
 
 
     const handleDownload = () => {
@@ -908,13 +860,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                                 <button onClick={() => setScale(s => Math.min(20, s + 1))} className="p-1.5 hover:bg-white dark:hover:bg-neutral-700 rounded-md transition-all"><ZoomIn className="w-4 h-4" /></button>
                             </div>
 
-                            <button
-                                onClick={() => setShowTerrain(!showTerrain)}
-                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors ${showTerrain ? 'bg-blue-50 text-blue-600 ring-1 ring-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:ring-blue-900' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500'}`}
-                            >
-                                <div className="flex items-center gap-2"><Activity className="w-4 h-4" /> 3D Terrain Mode</div>
-                                {showTerrain && <Check className="w-3 h-3" />}
-                            </button>
+
 
                             <button
                                 onClick={() => setShowGrid(!showGrid)}
