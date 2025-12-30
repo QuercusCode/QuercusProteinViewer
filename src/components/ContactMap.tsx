@@ -519,7 +519,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
             }
         }
 
-    }, [distanceData, scale, isLightMode, contactThreshold, proximalThreshold, showGrid, showIntraChain, filters]);
+    }, [distanceData, scale, isLightMode, contactThreshold, proximalThreshold, showGrid, showIntraChain, filters, showTerrain]);
 
 
     const handleDownload = () => {
