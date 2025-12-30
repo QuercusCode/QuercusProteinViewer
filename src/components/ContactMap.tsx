@@ -698,105 +698,137 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                     `}>
 
                         {/* Section: View & Zoom */}
-                        <div className="p-4 border-b border-neutral-100 dark:border-neutral-800 space-y-4">
+                        <div className="p-3 border-b border-neutral-100 dark:border-neutral-800 space-y-3">
                             <h4 className="text-xs font-bold uppercase opacity-50 tracking-wider">View Options</h4>
 
                             <div className={`flex items-center justify-between p-1 rounded-lg ${isLightMode ? 'bg-neutral-100' : 'bg-neutral-800'}`}>
-                                <button onClick={() => setScale(s => Math.max(1, s - 1))} className="p-2 hover:bg-white dark:hover:bg-neutral-700 rounded-md transition-all"><ZoomOut className="w-4 h-4" /></button>
-                                <span className="text-xs font-mono font-medium opacity-70">Scale: {scale}x</span>
-                                <button onClick={() => setScale(s => Math.min(20, s + 1))} className="p-2 hover:bg-white dark:hover:bg-neutral-700 rounded-md transition-all"><ZoomIn className="w-4 h-4" /></button>
+                                <button onClick={() => setScale(s => Math.max(1, s - 1))} className="p-1.5 hover:bg-white dark:hover:bg-neutral-700 rounded-md transition-all"><ZoomOut className="w-4 h-4" /></button>
+                                <span className="text-xs font-mono font-medium opacity-70">{scale}x</span>
+                                <button onClick={() => setScale(s => Math.min(20, s + 1))} className="p-1.5 hover:bg-white dark:hover:bg-neutral-700 rounded-md transition-all"><ZoomIn className="w-4 h-4" /></button>
                             </div>
 
                             <button
                                 onClick={() => setShowGrid(!showGrid)}
-                                className={`w-full flex items-center justify-between p-3 rounded-lg text-sm font-medium transition-colors ${showGrid ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500'}`}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors ${showGrid ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500'}`}
                             >
                                 <div className="flex items-center gap-2"><Grid3X3 className="w-4 h-4" /> Show Grid</div>
-                                {showGrid && <Check className="w-4 h-4" />}
+                                {showGrid && <Check className="w-3 h-3" />}
                             </button>
 
                             <button
                                 onClick={() => setShowIntraChain(!showIntraChain)}
-                                className={`w-full flex items-center justify-between p-3 rounded-lg text-sm font-medium transition-colors ${!showIntraChain ? 'bg-purple-50 text-purple-600 ring-1 ring-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:ring-purple-900' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500'}`}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-colors ${!showIntraChain ? 'bg-purple-50 text-purple-600 ring-1 ring-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:ring-purple-900' : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500'}`}
                             >
                                 <div className="flex items-center gap-2"><Maximize className="w-4 h-4" /> Interface Focus</div>
-                                {!showIntraChain && <Check className="w-4 h-4" />}
+                                {!showIntraChain && <Check className="w-3 h-3" />}
                             </button>
                         </div>
 
+                        {/* Section: Map Legend */}
+                        <div className="p-3 border-b border-neutral-100 dark:border-neutral-800 space-y-3">
+                            <h4 className="text-xs font-bold uppercase opacity-50 tracking-wider">Map Legend</h4>
+
+                            {/* Secondary Structure */}
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className={`flex items-center gap-2 px-2 py-1.5 rounded border ${isLightMode ? 'bg-red-50 border-red-100' : 'bg-red-900/10 border-red-900/20'}`}>
+                                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                                    <span className="text-[10px] font-medium opacity-80">Helix</span>
+                                </div>
+                                <div className={`flex items-center gap-2 px-2 py-1.5 rounded border ${isLightMode ? 'bg-yellow-50 border-yellow-100' : 'bg-yellow-900/10 border-yellow-900/20'}`}>
+                                    <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                                    <span className="text-[10px] font-medium opacity-80">Sheet</span>
+                                </div>
+                            </div>
+
+                            {/* Contact Distance */}
+                            <div className={`p-2 rounded border flex flex-col gap-1.5 ${isLightMode ? 'bg-neutral-50 border-neutral-100' : 'bg-neutral-800/50 border-neutral-800'}`}>
+                                <div className="flex items-center justify-between text-[10px] opacity-70">
+                                    <span>Close (&lt;{contactThreshold}Å)</span>
+                                    <span>Distal (&lt;{proximalThreshold}Å)</span>
+                                </div>
+                                <div className="h-2 w-full rounded-full bg-gradient-to-r from-blue-800 via-blue-400 to-neutral-200 dark:from-blue-600 dark:via-blue-900 dark:to-neutral-800" />
+                            </div>
+                        </div>
+
                         {/* Section: Filters */}
-                        <div className={`p-4 border-b border-neutral-100 dark:border-neutral-800 space-y-4 ${filters.all ? '' : 'bg-blue-50/50 dark:bg-blue-900/10'}`}>
+                        <div className={`p-3 border-b border-neutral-100 dark:border-neutral-800 space-y-3 ${filters.all ? '' : 'bg-blue-50/50 dark:bg-blue-900/10'}`}>
                             <div className="flex items-center justify-between">
                                 <h4 className="text-xs font-bold uppercase opacity-50 tracking-wider">Interaction Filters</h4>
                                 {!filters.all && <button onClick={() => setFilters({ ...filters, all: true })} className="text-[10px] text-blue-500 hover:underline">Reset All</button>}
                             </div>
 
-                            <label className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${filters.all ? (isLightMode ? 'bg-neutral-100 font-medium' : 'bg-neutral-800 font-medium') : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/50'}`}>
-                                <div className={`w-5 h-5 rounded border flex items-center justify-center ${filters.all ? 'bg-blue-500 border-blue-500 text-white' : 'border-neutral-300 dark:border-neutral-600'}`}>
+                            <label className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-colors ${filters.all ? (isLightMode ? 'bg-neutral-100 font-medium' : 'bg-neutral-800 font-medium') : 'hover:bg-neutral-50 dark:hover:bg-neutral-800/50'}`}>
+                                <div className={`w-4 h-4 rounded border flex items-center justify-center ${filters.all ? 'bg-blue-500 border-blue-500 text-white' : 'border-neutral-300 dark:border-neutral-600'}`}>
                                     <input
                                         type="checkbox"
                                         checked={filters.all}
                                         onChange={(e) => setFilters({ ...filters, all: e.target.checked, hydrophobic: false, saltBridge: false, piStacking: false, disulfide: false })}
                                         className="hidden"
                                     />
-                                    {filters.all && <Check className="w-3.5 h-3.5" />}
+                                    {filters.all && <Check className="w-3 h-3" />}
                                 </div>
-                                <span className="text-sm">Show All Interactions</span>
+                                <span className="text-xs">Show All Interactions</span>
                             </label>
 
-                            <div className={`space-y-2 ${filters.all ? 'opacity-40 grayscale pointer-events-none' : ''}`}>
+                            <div className="grid grid-cols-1 gap-1 pl-2 border-l-2 border-neutral-100 dark:border-neutral-800 ml-2">
                                 {[
-                                    { id: 'saltBridge', label: 'Salt Bridge', color: 'text-red-500', bg: 'bg-red-500' },
-                                    { id: 'disulfide', label: 'Disulfide Bond', color: 'text-yellow-500', bg: 'bg-yellow-500' },
-                                    { id: 'hydrophobic', label: 'Hydrophobic', color: 'text-green-500', bg: 'bg-green-500' },
-                                    { id: 'piStacking', label: 'Pi-Stacking', color: 'text-purple-500', bg: 'bg-purple-500' }
-                                ].map((item) => (
-                                    <label key={item.id} className="flex items-center gap-3 p-2 rounded-lg cursor-pointer hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors">
-                                        <div className={`w-5 h-5 rounded border flex items-center justify-center ${filters[item.id as keyof typeof filters] ? `${item.bg} border-transparent text-white` : 'border-neutral-300 dark:border-neutral-600'}`}>
+                                    { id: 'saltBridge', label: 'Salt Bridge', color: 'bg-red-500', activeClass: 'text-red-600 bg-red-50 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-900/30' },
+                                    { id: 'disulfide', label: 'Disulfide Bond', color: 'bg-yellow-500', activeClass: 'text-yellow-600 bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-900/30' },
+                                    { id: 'hydrophobic', label: 'Hydrophobic', color: 'bg-green-500', activeClass: 'text-green-600 bg-green-50 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-900/30' },
+                                    { id: 'piStacking', label: 'Pi-Stacking', color: 'bg-purple-500', activeClass: 'text-purple-600 bg-purple-50 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-900/30' },
+                                ].map((f) => (
+                                    <label key={f.id} className={`flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer transition-all border border-transparent ${filters[f.id as keyof typeof filters] ? f.activeClass : 'opacity-60 hover:opacity-100 hover:bg-neutral-50 dark:hover:bg-neutral-800/50'}`}>
+                                        <div className={`w-4 h-4 rounded border flex items-center justify-center ${filters[f.id as keyof typeof filters] ? `border-current` : 'border-neutral-300 dark:border-neutral-600'}`}>
                                             <input
                                                 type="checkbox"
-                                                checked={filters[item.id as keyof typeof filters]}
-                                                onChange={(e) => setFilters(prev => ({ ...prev, all: false, [item.id]: e.target.checked }))}
+                                                checked={filters[f.id as keyof typeof filters] as boolean}
+                                                onChange={(e) => {
+                                                    const newState = { ...filters, [f.id]: e.target.checked };
+                                                    if (e.target.checked) newState.all = false;
+                                                    setFilters(newState);
+                                                }}
                                                 className="hidden"
                                             />
-                                            {filters[item.id as keyof typeof filters] && <Check className="w-3.5 h-3.5" />}
+                                            {filters[f.id as keyof typeof filters] && <div className={`w-2 h-2 rounded-full ${f.color}`} />}
                                         </div>
-                                        <span className={`text-sm ${item.color} font-medium`}>{item.label}</span>
+                                        <span className="text-xs font-medium">{f.label}</span>
                                     </label>
                                 ))}
                             </div>
                         </div>
 
                         {/* Section: Sensitivity */}
-                        <div className="p-4 space-y-6">
+                        <div className="p-3 space-y-4">
                             <h4 className="text-xs font-bold uppercase opacity-50 tracking-wider">Map Sensitivity</h4>
 
-                            <div className="space-y-2">
-                                <div className="flex justify-between text-xs font-medium">
-                                    <span>Contact Threshold</span>
-                                    <span className="text-blue-500">{contactThreshold} Å</span>
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <label className="text-xs font-bold">Contact Threshold</label>
+                                    <span className="text-xs font-mono text-blue-500">{contactThreshold} Å</span>
                                 </div>
                                 <input
-                                    type="range" min="3" max="10" step="0.5"
+                                    type="range"
+                                    min="3" max="12" step="0.5"
                                     value={contactThreshold}
-                                    onChange={(e) => setContactThreshold(parseFloat(e.target.value))}
-                                    className="w-full h-1.5 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                                    onChange={(e) => setContactThreshold(Number(e.target.value))}
+                                    className="w-full h-1.5 bg-neutral-200 rounded-lg appearance-none cursor-pointer dark:bg-neutral-700 accent-blue-500"
                                 />
-                                <div className="text-[10px] opacity-50">Defines close contacts (Dark Blue).</div>
+                                <p className="text-[10px] opacity-50">Defines close contacts (Dark Blue).</p>
                             </div>
 
-                            <div className="space-y-2">
-                                <div className="flex justify-between text-xs font-medium">
-                                    <span>Proximal Threshold</span>
-                                    <span className="text-slate-500">{proximalThreshold} Å</span>
+                            <div className="space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <label className="text-xs font-bold">Proximal Threshold</label>
+                                    <span className="text-xs font-mono opacity-70">{proximalThreshold} Å</span>
                                 </div>
                                 <input
-                                    type="range" min={contactThreshold} max="15" step="0.5"
+                                    type="range"
+                                    min="5" max="20" step="1"
                                     value={proximalThreshold}
-                                    onChange={(e) => setProximalThreshold(parseFloat(e.target.value))}
-                                    className="w-full h-1.5 bg-neutral-200 dark:bg-neutral-700 rounded-lg appearance-none cursor-pointer accent-slate-500"
+                                    onChange={(e) => setProximalThreshold(Number(e.target.value))}
+                                    className="w-full h-1.5 bg-neutral-200 rounded-lg appearance-none cursor-pointer dark:bg-neutral-700 accent-neutral-500"
                                 />
-                                <div className="text-[10px] opacity-50">Defines nearby residues (Light Blue).</div>
+                                <p className="text-[10px] opacity-50">Defines nearby residues (Light Blue).</p>
                             </div>
                         </div>
 
