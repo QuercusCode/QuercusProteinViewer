@@ -439,7 +439,18 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
     const handleGenerateReport = () => {
         if (!distanceData || !mapCanvasRef.current) return;
-        generateProteinReport(proteinName, mapCanvasRef.current, distanceData);
+
+        // Calculate Metadata
+        const labels = distanceData.labels;
+        const uniqueChains = Array.from(new Set(labels.map(l => l.chain)));
+
+        const metadata = {
+            residueCount: distanceData.size,
+            chainCount: uniqueChains.length,
+            chains: uniqueChains
+        };
+
+        generateProteinReport(proteinName, mapCanvasRef.current, distanceData, metadata);
     };
 
     const handleDownload = () => {
