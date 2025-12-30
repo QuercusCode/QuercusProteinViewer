@@ -72,19 +72,19 @@ const addSection = (
     data: InteractionData,
     filterFn: (type: string | null) => boolean,
     isLightMode: boolean,
-    isFirstPage = false
+    newPage: boolean = true,
+    startY: number = 20
 ) => {
     const margin = 15;
 
-
-    if (!isFirstPage) {
+    if (newPage) {
         doc.addPage();
     }
 
     // Title
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
-    doc.text(title, margin, 20);
+    doc.text(title, margin, startY);
 
     // 1. Generate Image
     const mapImg = drawMapToDataURL(data, filterFn, isLightMode);
@@ -92,8 +92,9 @@ const addSection = (
     // 2. Add Image
     const desiredImgWidth = 100; // Fixed size
     const desiredImgHeight = 100;
+    const imgY = startY + 10;
 
-    doc.addImage(mapImg, 'PNG', margin, 30, desiredImgWidth, desiredImgHeight);
+    doc.addImage(mapImg, 'PNG', margin, imgY, desiredImgWidth, desiredImgHeight);
 
     // 3. Generate Table Data
     const tableRows = [] as any[];
@@ -115,7 +116,7 @@ const addSection = (
             // Filter Row
             if (filterFn(type)) {
                 // If generic "All" view, skip 'Close Contact' logs to save space for important stuff
-                if (title === "All Interactions" && type === "Close Contact") continue;
+                if (title.includes("All") && type === "Close Contact") continue;
 
                 tableRows.push({
                     res1: `${l1.chain}:${l1.label}`,
@@ -134,10 +135,11 @@ const addSection = (
     const displayRows = tableRows.slice(0, MAX_ROWS);
 
     doc.setFontSize(10);
-    doc.text(`Identified Interactions (${tableRows.length} total, top ${displayRows.length} shown)`, margin, 30 + desiredImgHeight + 10);
+    const summaryY = imgY + desiredImgHeight + 10;
+    doc.text(`Identified Interactions (${tableRows.length} total, top ${displayRows.length} shown)`, margin, summaryY);
 
     autoTable(doc, {
-        startY: 30 + desiredImgHeight + 15,
+        startY: summaryY + 5,
         head: [['Residue A', 'Residue B', 'Dist (Å)', 'Type']],
         body: displayRows.map(r => [r.res1, r.res2, r.dist, r.type]),
         theme: 'striped',
@@ -148,41 +150,37 @@ const addSection = (
 
 export const generateProteinReport = (
     proteinName: string,
-    _canvasIgnored: HTMLCanvasElement, // We draw our own now
+    _canvasIgnored: HTMLCanvasElement,
     data: InteractionData
 ) => {
     const doc = new jsPDF();
-    const isLightMode = true; // Force light mode for print readability? Or pass user pref? Let's assume white paper = light mode.
+    const isLightMode = false; // Force DARK MODE for Maps (User Request)
 
     // Page 1: Overview
     doc.setFont("helvetica", "bold");
     doc.setFontSize(22);
-    doc.text("Protein Analysis Report", 15, 15);
+    doc.text("Protein Analysis Report", 15, 20);
     doc.setFontSize(12);
     doc.setFont("helvetica", "normal");
-    doc.text(proteinName || "Unknown Protein", 15, 22);
+    doc.text(proteinName || "Unknown Protein", 15, 28);
 
-    // Section 1: All Interactions (Salt Bridges, Disulfides, Pi, Hydrophobic)
-    // We allow everything except simple 'Close Contact' to declutter
+    doc.line(15, 32, 195, 32);
+
+    // Section 1: All Interactions (Page 1, below header)
     const allFilter = (t: string | null) => t !== null && t !== 'Close Contact';
-    addSection(doc, "All Significant Interactions", data, allFilter, isLightMode, false);
-    // Wait, first page logic is tricky with title. 
-    // Let's make "All Interactions" start below the main title.
+    addSection(doc, "All Significant Interactions", data, allFilter, isLightMode, false, 45);
 
-    // Let's redefine addSection usage slightly or just manually do Page 1.
-    // Actually, let's just run addSection for everything and rely on auto-paging.
+    // 2. Salt Bridge
+    addSection(doc, "Salt Bridges (Ionic Interactions)", data, (t) => t === 'Salt Bridge', isLightMode, true);
 
-    // 1. Salt Bridge
-    addSection(doc, "Salt Bridges (Ionic Interactions)", data, (t) => t === 'Salt Bridge', isLightMode, true); // true = don't add page first (but we have title)
+    // 3. Disulfide
+    addSection(doc, "Disulfide Bonds (Covalent)", data, (t) => t === 'Disulfide Bond', isLightMode, true);
 
-    // 2. Disulfide
-    addSection(doc, "Disulfide Bonds (Covalent)", data, (t) => t === 'Disulfide Bond', isLightMode, false);
+    // 4. Hydrophobic
+    addSection(doc, "Hydrophobic Clusters", data, (t) => t === 'Hydrophobic Contact', isLightMode, true);
 
-    // 3. Hydrophobic
-    addSection(doc, "Hydrophobic Clusters", data, (t) => t === 'Hydrophobic Contact', isLightMode, false);
-
-    // 4. Pi-Stacking
-    addSection(doc, "Pi-Stacking & Cation-Pi", data, (t) => t === 'Pi-Stacking' || t === 'Cation-Pi Interaction', isLightMode, false);
+    // 5. Pi-Stacking
+    addSection(doc, "Pi-Stacking & Cation-Pi", data, (t) => t === 'Pi-Stacking' || t === 'Cation-Pi Interaction', isLightMode, true);
 
     // Save
     const safeName = proteinName.replace(/[^a-z0-9]/yi, '_').toLowerCase();
