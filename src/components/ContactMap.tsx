@@ -6,7 +6,7 @@ interface ContactMapProps {
     isOpen: boolean;
     onClose: () => void;
     chains: ChainInfo[];
-    getContactData: () => Promise<{ x: number[], y: number[], z: number[], labels: string[] }[]>;
+    getContactData: () => Promise<{ x: number[], y: number[], z: number[], labels: string[], ss: string[] }[]>;
     onPixelClick?: (chainA: string, resA: number, chainB: string, resB: number) => void;
     isLightMode: boolean;
 }
@@ -66,7 +66,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
     const [loading, setLoading] = useState(false);
     const [scale, setScale] = useState(2);
-    const [distanceData, setDistanceData] = useState<{ matrix: number[][], size: number, labels: { resNo: number, chain: string, label: string }[] } | null>(null);
+    const [distanceData, setDistanceData] = useState<{ matrix: number[][], size: number, labels: { resNo: number, chain: string, label: string, ss: string }[] } | null>(null);
     const [hoverPos, setHoverPos] = useState<{ i: number, j: number, x: number, y: number } | null>(null);
 
     // Settings State
@@ -100,14 +100,11 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                     return;
                 }
 
-                const allResidues: { x: number, y: number, z: number, chain: string, resNo: number, label: string }[] = [];
+                const allResidues: { x: number, y: number, z: number, chain: string, resNo: number, label: string, ss: string }[] = [];
 
                 rawChains.forEach((c) => {
                     for (let i = 0; i < c.x.length; i++) {
                         const rawLabel = c.labels[i] || "";
-                        // Expected format: "Chain:ResName ResNo" e.g., "A:ALA 10"
-                        // Or fallback if old format: "ALA 10"
-
                         let chainName = "?";
                         let residueLabel = rawLabel;
 
@@ -119,6 +116,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
                         const parts = residueLabel.trim().split(" ");
                         const resNo = parseInt(parts[parts.length - 1]) || (i + 1);
+                        const ssRaw = c.ss?.[i] || ""; // Safe access
 
                         allResidues.push({
                             x: c.x[i],
@@ -126,11 +124,13 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                             z: c.z[i],
                             chain: chainName,
                             resNo: resNo,
-                            label: residueLabel
+                            label: residueLabel,
+                            ss: ssRaw
                         });
                     }
                 });
 
+                // ... (N check) ...
                 const N = allResidues.length;
                 if (N > 3000) {
                     alert("Protein too large for browser-based contact map.");
@@ -153,13 +153,12 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                 setDistanceData({
                     matrix,
                     size: N,
-                    labels: allResidues.map(r => ({ resNo: r.resNo, chain: r.chain, label: r.label }))
+                    labels: allResidues.map(r => ({ resNo: r.resNo, chain: r.chain, label: r.label, ss: r.ss }))
                 });
 
-                // Auto-scale to fit view (aim for ~600px or fit within container)
+                // ... (scaling) ...
                 const optimalScale = Math.max(1, Math.min(20, Math.floor(600 / N)));
                 setScale(optimalScale);
-
             } catch (e) {
                 console.error("Map computation failed", e);
             } finally {
@@ -170,7 +169,70 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         setTimeout(computeMap, 100);
     }, [isOpen]);
 
-    // Render Base Map (Theme Aware)
+    // Refs for SS Tracks
+    const topSSCanvasRef = useRef<HTMLCanvasElement>(null);
+    const leftSSCanvasRef = useRef<HTMLCanvasElement>(null);
+
+    // Draw SS Tracks
+    useEffect(() => {
+        if (!distanceData || !topSSCanvasRef.current || !leftSSCanvasRef.current) return;
+        const { labels, size } = distanceData;
+        const P = scale;
+
+        // Colors
+        // h: Helix (alpha) -> Red
+        // s: Sheet (beta) -> Yellow/Orange
+        // g: 3-10 helix -> Red/Pink
+        // i: pi-helix -> Red/Purple
+        // b: bridge -> Yellow
+        // t: turn -> Blue/Cyan? (Maybe keep neutral or light blue)
+        // e: extended -> Yellow
+
+        const getColor = (ss: string) => {
+            const c = ss.toLowerCase();
+            if (c === 'h') return '#ef4444'; // Red-500
+            if (c === 'g') return '#f472b6'; // Pink-400
+            if (c === 'i') return '#a855f7'; // Purple-500
+            if (c === 's' || c === 'e' || c === 'b') return '#eab308'; // Yellow-500
+            if (c === 't') return '#bfdbfe'; // Blue-200 (Turn - optional)
+            return null; // Coil/Other -> Transparent
+        };
+
+        // Draw Top Canvas (Horizontal)
+        const ctxTop = topSSCanvasRef.current.getContext('2d');
+        topSSCanvasRef.current.width = size * P;
+        topSSCanvasRef.current.height = 10; // Fixed height (0.5remish)
+        if (ctxTop) {
+            ctxTop.clearRect(0, 0, topSSCanvasRef.current.width, topSSCanvasRef.current.height);
+            labels.forEach((l, i) => {
+                const color = getColor(l.ss);
+                if (color) {
+                    ctxTop.fillStyle = color;
+                    ctxTop.fillRect(i * P, 0, P, 10);
+                }
+            });
+        }
+
+        // Draw Left Canvas (Vertical)
+        const ctxLeft = leftSSCanvasRef.current.getContext('2d');
+        leftSSCanvasRef.current.width = 10;
+        leftSSCanvasRef.current.height = size * P;
+        if (ctxLeft) {
+            ctxLeft.clearRect(0, 0, leftSSCanvasRef.current.width, leftSSCanvasRef.current.height);
+            labels.forEach((l, i) => {
+                const color = getColor(l.ss);
+                if (color) {
+                    ctxLeft.fillStyle = color;
+                    ctxLeft.fillRect(0, i * P, 10, P);
+                }
+            });
+        }
+
+    }, [distanceData, scale]);
+
+
+    // Render Base Map (Theme Aware) ... existing ...
+
     useEffect(() => {
         if (!distanceData || !mapCanvasRef.current) return;
         const ctx = mapCanvasRef.current.getContext('2d', { alpha: false });
@@ -532,14 +594,13 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                                 </div>
                             </div>
                         ) : distanceData && (
-                            <div className="inline-grid grid-cols-[2rem_3rem_1fr] grid-rows-[2rem_2rem_1fr]">
+                            <div className="inline-grid grid-cols-[2rem_0.5rem_3rem_1fr] grid-rows-[2rem_0.5rem_2rem_1fr]">
 
-                                {/* CORNERS (Sticky) */}
-                                <div className={`col-span-2 sticky top-0 left-0 z-30 ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-900'}`} style={{ gridRow: 1 }} />
-                                <div className={`col-span-2 sticky top-8 left-0 z-30 ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-900'} border-b ${isLightMode ? 'border-neutral-200' : 'border-neutral-800'}`} style={{ gridRow: 2 }} />
+                                {/* CORNERS (Sticky Block) */}
+                                <div className={`col-span-3 row-span-3 sticky top-0 left-0 z-30 ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-900'} border-b border-r ${isLightMode ? 'border-neutral-200' : 'border-neutral-800'}`} style={{ gridRow: '1 / span 3', gridColumn: '1 / span 3' }} />
 
                                 {/* 1. TOP CHAIN BARS */}
-                                <div className={`sticky top-0 z-20 h-8 relative whitespace-nowrap overflow-hidden ${isLightMode ? 'bg-neutral-100/80 backdrop-blur' : 'bg-neutral-900/80 backdrop-blur'}`} style={{ gridColumn: 3, width: distanceData.size * scale }}>
+                                <div className={`sticky top-0 z-20 h-8 relative whitespace-nowrap overflow-hidden ${isLightMode ? 'bg-neutral-100/80 backdrop-blur' : 'bg-neutral-900/80 backdrop-blur'}`} style={{ gridRow: 1, gridColumn: 4, width: distanceData.size * scale }}>
                                     {chainRanges.map((range, idx) => (
                                         <div
                                             key={`top-chain-${idx}`}
@@ -554,13 +615,18 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                                     ))}
                                 </div>
 
-                                {/* 2. TOP AXIS */}
-                                <div className={`sticky top-8 z-20 h-8 relative border-b ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`} style={{ gridColumn: 3, width: distanceData.size * scale }}>
+                                {/* 2. TOP SS TRACK */}
+                                <div className={`sticky top-8 z-20 h-2 relative ${isLightMode ? 'bg-white' : 'bg-neutral-950'}`} style={{ gridRow: 2, gridColumn: 4, width: distanceData.size * scale }}>
+                                    <canvas ref={topSSCanvasRef} className="absolute inset-0 w-full h-full block" />
+                                </div>
+
+                                {/* 3. TOP AXIS */}
+                                <div className={`sticky top-10 z-20 h-8 relative border-b ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`} style={{ gridRow: 3, gridColumn: 4, width: distanceData.size * scale }}>
                                     {Axes?.x}
                                 </div>
 
-                                {/* 3. LEFT CHAIN BARS */}
-                                <div className={`sticky left-0 z-20 w-8 relative overflow-hidden ${isLightMode ? 'bg-neutral-100/80 backdrop-blur' : 'bg-neutral-900/80 backdrop-blur'}`} style={{ gridRow: 3, height: distanceData.size * scale }}>
+                                {/* 4. LEFT CHAIN BARS */}
+                                <div className={`sticky left-0 z-20 w-8 relative overflow-hidden ${isLightMode ? 'bg-neutral-100/80 backdrop-blur' : 'bg-neutral-900/80 backdrop-blur'}`} style={{ gridRow: 4, gridColumn: 1, height: distanceData.size * scale }}>
                                     {chainRanges.map((range, idx) => (
                                         <div
                                             key={`left-chain-${idx}`}
@@ -575,13 +641,18 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                                     ))}
                                 </div>
 
-                                {/* 4. LEFT AXIS */}
-                                <div className={`sticky left-8 z-20 w-12 relative border-r ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`} style={{ gridRow: 3, height: distanceData.size * scale }}>
+                                {/* 5. LEFT SS TRACK */}
+                                <div className={`sticky left-8 z-20 w-2 relative ${isLightMode ? 'bg-white' : 'bg-neutral-950'}`} style={{ gridRow: 4, gridColumn: 2, height: distanceData.size * scale }}>
+                                    <canvas ref={leftSSCanvasRef} className="absolute inset-0 w-full h-full block" />
+                                </div>
+
+                                {/* 6. LEFT AXIS */}
+                                <div className={`sticky left-10 z-20 w-12 relative border-r ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`} style={{ gridRow: 4, gridColumn: 3, height: distanceData.size * scale }}>
                                     {Axes?.y}
                                 </div>
 
-                                {/* 5. MAIN MAP */}
-                                <div className="relative" style={{ gridRow: 3, gridColumn: 3, width: distanceData.size * scale, height: distanceData.size * scale }}>
+                                {/* 7. MAIN MAP */}
+                                <div className="relative" style={{ gridRow: 4, gridColumn: 4, width: distanceData.size * scale, height: distanceData.size * scale }}>
                                     <canvas ref={mapCanvasRef} className="absolute inset-0 pointer-events-none image-pixelated" style={{ imageRendering: 'pixelated' }} />
                                     <canvas ref={overlayCanvasRef} onMouseMove={handleMouseMove} onMouseLeave={() => setHoverPos(null)} onClick={handleClick} className="absolute inset-0 cursor-crosshair image-pixelated" style={{ imageRendering: 'pixelated' }} />
                                 </div>

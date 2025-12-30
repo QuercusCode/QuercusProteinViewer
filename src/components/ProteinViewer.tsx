@@ -53,7 +53,7 @@ export interface ProteinViewerRef {
     clearHighlight: () => void;
     getCameraOrientation: () => any;
     setCameraOrientation: (orientation: any) => void;
-    getAtomCoordinates: () => Promise<{ x: number[], y: number[], z: number[], labels: string[] }[]>;
+    getAtomCoordinates: () => Promise<{ x: number[], y: number[], z: number[], labels: string[], ss: string[] }[]>;
     getAtomPosition: (chain: string, resNo: number, atomName?: string) => { x: number, y: number, z: number } | null;
     getAtomPositionByIndex: (atomIndex: number) => { x: number, y: number, z: number } | null;
     addResidue: (chainName: string, resType: string) => Promise<Blob | null>;
@@ -466,7 +466,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         getAtomCoordinates: async () => {
             if (!componentRef.current) return [];
             const component = componentRef.current;
-            const data: { x: number[], y: number[], z: number[], labels: string[] }[] = [];
+            const data: { x: number[], y: number[], z: number[], labels: string[], ss: string[] }[] = [];
 
             // Iterate chains
             component.structure.eachChain((chain: any) => {
@@ -474,6 +474,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 const y: number[] = [];
                 const z: number[] = [];
                 const labels: string[] = [];
+                const ss: string[] = [];
 
                 // Iterate CA atoms
                 chain.eachResidue((res: any) => {
@@ -494,11 +495,14 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         // Robust chain name
                         const cName = chain.chainname || chain.name || chain.id || "?";
                         labels.push(`${cName}:${res.resname} ${res.resno}`);
+
+                        // Capture Secondary Structure (h=helix, s=sheet, etc.)
+                        ss.push(res.sstruc || "");
                     }
                 });
 
                 if (x.length > 0) {
-                    data.push({ x, y, z, labels });
+                    data.push({ x, y, z, labels, ss });
                 }
             });
 
