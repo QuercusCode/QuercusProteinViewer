@@ -7,17 +7,30 @@ import { parseURLState, getShareableURL } from './utils/urlManager';
 import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Movie } from './types';
 
 function App() {
-  const [pdbId, setPdbId] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('pdb') || '2b3p'; // Default to 2b3p (more stable)
-  });
+  // Parse Global URL State Once
+  const initialUrlState = parseURLState();
+
+  const [pdbId, setPdbId] = useState(() => initialUrlState.pdbId || '2b3p');
   const [file, setFile] = useState<File | null>(null);
-  const [representation, setRepresentation] = useState<RepresentationType>('cartoon');
-  const [coloring, setColoring] = useState<ColoringType>('chainid');
-  const [hasRestoredState, setHasRestoredState] = useState(false); // Track if we need to apply matrix
+
+  const [representation, setRepresentation] = useState<RepresentationType>(
+    initialUrlState.representation || 'cartoon'
+  );
+
+  const [coloring, setColoring] = useState<ColoringType>(
+    initialUrlState.coloring || 'chainid'
+  );
+
+  const [hasRestoredState, setHasRestoredState] = useState(!!initialUrlState.orientation);
   const [resetKey, setResetKey] = useState(0);
   const [isMeasurementMode, setIsMeasurementMode] = useState(false);
 
+  useEffect(() => {
+    // Store pending orientation for later application
+    if (initialUrlState.orientation) {
+      (window as any).__pendingOrientation = initialUrlState.orientation;
+    }
+  }, []);
 
   const [isLightMode, setIsLightMode] = useState(() => {
     return localStorage.getItem('theme') === 'light';
@@ -28,27 +41,14 @@ function App() {
   }, [isLightMode]);
 
   // Presentation State
-  const [isSpinning, setIsSpinning] = useState(false);
+  const [isSpinning, setIsSpinning] = useState(initialUrlState.isSpinning || false);
   const [isCleanMode, setIsCleanMode] = useState(false);
   const [showContactMap, setShowContactMap] = useState(false);
 
-  // Parse URL State on Mount
-  useEffect(() => {
-    const state = parseURLState();
-    if (state.pdbId) setPdbId(state.pdbId);
-    if (state.representation) setRepresentation(state.representation);
-    if (state.coloring) setColoring(state.coloring);
-    if (state.isSpinning) setIsSpinning(true);
-    if (state.showLigands) setShowLigands(true);
-    if (state.showSurface) setShowSurface(true);
-    if (state.customColors) setCustomColors(state.customColors);
-
-    // Defer matrix & measurements application until load confirms
-    if (state.orientation) {
-      setHasRestoredState(true);
-      (window as any).__pendingOrientation = state.orientation;
-    }
-  }, []);
+  // Custom Colors need to be initialized too
+  const [customColors, setCustomColors] = useState<CustomColorRule[]>(initialUrlState.customColors || []);
+  const [showLigands, setShowLigands] = useState(initialUrlState.showLigands || false);
+  const [showSurface, setShowSurface] = useState(initialUrlState.showSurface || false);
 
   // ... (lines 53-343) ...
 
@@ -91,17 +91,12 @@ function App() {
   // Visualization Toggles
 
   // Visualization Toggles
-  const [showSurface, setShowSurface] = useState(false);
-  const [showLigands, setShowLigands] = useState(false);
-
   // Tools
-
 
   const [highlightedResidue, setHighlightedResidue] = useState<{ chain: string; resNo: number; resName?: string } | null>(null);
 
   const [chains, setChains] = useState<ChainInfo[]>([]);
   const [ligands, setLigands] = useState<string[]>([]);
-  const [customColors, setCustomColors] = useState<CustomColorRule[]>([]);
 
   const [fileType, setFileType] = useState<'pdb' | 'mmcif'>('pdb');
 
