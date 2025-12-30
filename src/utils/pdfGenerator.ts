@@ -264,9 +264,18 @@ const addInstructionPage = (
     const midX = 105;
 
     // -- Stats Box (Left) --
+    // Calculate Height Dynamically
+    const nameLines = doc.splitTextToSize(`Name: ${proteinName}`, 70);
+    const nameHeight = nameLines.length * 5;
+    // Base height breakdown: 
+    // Top Pad (10) + Struct Header (8) + Name (nameHeight) + Res (5) + Chains (10) + 
+    // Int Header (8) + Stats (25) + Bottom Pad (5) = 71 + nameHeight
+    // Let's compute exact needed height
+    const contentHeight = 10 + 8 + nameHeight + 5 + 10 + 8 + 25 + 5;
+
     doc.setDrawColor(200);
     doc.setFillColor(248, 250, 252); // Slate-50
-    doc.rect(margin, y, 80, 75, 'FD'); // Background box
+    doc.rect(margin, y, 80, contentHeight, 'FD'); // Dynamic Height box
 
     let innerY = y + 10;
     const leftPad = margin + 5;
@@ -281,9 +290,8 @@ const addInstructionPage = (
     doc.setFont("helvetica", "normal");
 
     // Wrap Name
-    const nameLines = doc.splitTextToSize(`Name: ${proteinName}`, 70); // 70px width (box is 80)
     doc.text(nameLines, leftPad, innerY);
-    innerY += (nameLines.length * 5); // Dynamic height adjustment
+    innerY += nameHeight;
 
     doc.text(`Residues: ${metadata.residueCount}`, leftPad, innerY); innerY += 5;
     doc.text(`Chains: ${metadata.chains.join(', ')}`, leftPad, innerY); innerY += 10;
@@ -306,7 +314,6 @@ const addInstructionPage = (
     printStat("Salt Bridges", stats['Salt Bridge'], "#ef4444");
     printStat("Disulfide Bonds", stats['Disulfide Bond'], "#eab308");
     printStat("Hydrophobic Clusters", stats['Hydrophobic Contact'], "#22c55e");
-    printStat("Pi-Stacking", stats['Pi-Stacking'] + stats['Cation-Pi Interaction'], "#a855f7");
     printStat("Pi-Stacking & Cation-Pi", stats['Pi-Stacking'] + stats['Cation-Pi Interaction'], "#a855f7");
 
     // -- 3D Snapshot (Right) --
