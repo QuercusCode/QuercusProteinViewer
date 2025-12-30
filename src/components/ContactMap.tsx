@@ -439,7 +439,21 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     }, [distanceData, scale, isLightMode, contactThreshold, proximalThreshold, showGrid, showIntraChain, filters]);
 
 
-    const handleGenerateReport = async () => {
+    // Modals
+    const [showReportNameModal, setShowReportNameModal] = useState(false);
+    const [reportNameInput, setReportNameInput] = useState("");
+
+    const handleDownloadClick = () => {
+        setReportNameInput(proteinName); // Default to current name
+        setShowReportNameModal(true);
+    };
+
+    const confirmDownload = async () => {
+        setShowReportNameModal(false);
+        await handleGenerateReport(reportNameInput);
+    };
+
+    const handleGenerateReport = async (customName?: string) => {
         if (!distanceData || !mapCanvasRef.current) return;
 
         let snapshot = null;
@@ -457,17 +471,13 @@ export const ContactMap: React.FC<ContactMapProps> = ({
             chains: uniqueChains
         };
 
-        generateProteinReport(proteinName, mapCanvasRef.current, distanceData, metadata, snapshot);
+        const finalName = customName || proteinName;
+        generateProteinReport(finalName, mapCanvasRef.current, distanceData, metadata, snapshot);
     };
 
     const handleDownload = () => {
         if (!mapCanvasRef.current) return;
-
-        // Create a temporary canvas to combine grid and overlay if needed, 
-        // but for now just the map canvas is the most important part.
-        // Actually, let's download exactly what is drawn on the main canvas.
         const url = mapCanvasRef.current.toDataURL('image/png');
-
         const a = document.createElement('a');
         a.href = url;
         a.download = `contact-map-${new Date().toISOString().slice(0, 10)}.png`;
@@ -671,7 +681,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                                 <span className="hidden sm:inline">Export CSV</span>
                             </button>
                             <button
-                                onClick={handleGenerateReport}
+                                onClick={handleDownloadClick}
                                 className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isLightMode ? 'bg-neutral-100 hover:bg-neutral-200 text-neutral-600' : 'bg-neutral-800 hover:bg-neutral-700 text-neutral-300'}`}
                             >
                                 <BookOpen className="w-4 h-4" />
@@ -1000,6 +1010,40 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
                 </div>
             </div>
+            {/* Report Name Modal */}
+            {showReportNameModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className={`p-6 rounded-lg shadow-xl w-96 ${isLightMode ? 'bg-white text-gray-900' : 'bg-neutral-800 text-white'} border border-gray-600`}>
+                        <h3 className="text-lg font-bold mb-4">Name Your Report</h3>
+                        <p className={`text-sm mb-4 ${isLightMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                            Enter a custom name for the PDF file and report title.
+                        </p>
+
+                        <input
+                            type="text"
+                            value={reportNameInput}
+                            onChange={(e) => setReportNameInput(e.target.value)}
+                            className={`w-full p-2 rounded mb-6 border ${isLightMode ? 'bg-gray-50 border-gray-300 text-gray-900' : 'bg-neutral-700 border-gray-600 text-white'} focus:ring-2 focus:ring-blue-500 outline-none`}
+                            placeholder="My Protein Analysis"
+                        />
+
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => setShowReportNameModal(false)}
+                                className={`px-4 py-2 rounded text-sm ${isLightMode ? 'text-gray-600 hover:bg-gray-100' : 'text-gray-300 hover:bg-neutral-700'}`}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmDownload}
+                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium shadow"
+                            >
+                                Generate PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -354,7 +354,11 @@ const addInstructionPage = (
         }
     }
 
-    y += 90;
+    // Dynamic Y increment to prevent overlap
+    // Snapshot area is approx 80-90 high. Info box is contentHeight.
+    // We take the max of both + padding.
+    const neededHeight = Math.max(90, contentHeight + 15);
+    y += neededHeight;
 
     // 3. Sequence View
     y = addSequenceView(doc, labels, y);
