@@ -72,6 +72,9 @@ function App() {
               viewerRef.current?.setCameraOrientation((window as any).__pendingOrientation);
               delete (window as any).__pendingOrientation;
             }
+            if (initialUrlState.measurements) {
+              viewerRef.current?.restoreMeasurements(initialUrlState.measurements);
+            }
             setHasRestoredState(false);
           }, 500);
         } catch (e) { console.warn("App: Failed to restore state", e); }

@@ -851,11 +851,40 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                     )}
 
                     <div className={`
-                        absolute inset-y-0 right-0 z-50 w-80 shadow-2xl transition-transform duration-300 ease-in-out md:shadow-none
+                        absolute inset-y-0 right-0 z-[100] w-full max-w-[320px] md:w-80 shadow-2xl transition-transform duration-300 ease-in-out md:shadow-none
                         ${showMobileSidebar ? 'translate-x-0' : 'translate-x-full'} md:translate-x-0 md:relative md:flex md:flex-col md:border-l md:overflow-y-auto
                         flex flex-col border-l overflow-y-auto
                         ${isLightMode ? 'bg-white border-neutral-100' : 'bg-neutral-900 border-neutral-800'}
                     `}>
+
+
+                        {/* Mobile Actions (Hidden on Desktop) */}
+                        <div className="md:hidden p-3 border-b border-neutral-100 dark:border-neutral-800 space-y-2">
+                            <h4 className="text-xs font-bold uppercase opacity-50 tracking-wider">Actions</h4>
+                            <div className="grid grid-cols-2 gap-2">
+                                <button
+                                    onClick={handleDownloadClick}
+                                    className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${isLightMode ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white'}`}
+                                >
+                                    <BookOpen className="w-4 h-4" />
+                                    <span>PDF Report</span>
+                                </button>
+                                <button
+                                    onClick={handleDownload}
+                                    className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${isLightMode ? 'bg-neutral-100 text-neutral-600' : 'bg-neutral-800 text-neutral-300'}`}
+                                >
+                                    <Download className="w-4 h-4" />
+                                    <span>Image</span>
+                                </button>
+                                <button
+                                    onClick={handleDownloadCSV}
+                                    className={`col-span-2 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${isLightMode ? 'bg-neutral-100 text-neutral-600' : 'bg-neutral-800 text-neutral-300'}`}
+                                >
+                                    <FileText className="w-4 h-4" />
+                                    <span>Export CSV</span>
+                                </button>
+                            </div>
+                        </div>
 
                         {/* Section: View & Zoom */}
                         <div className="p-3 border-b border-neutral-100 dark:border-neutral-800 space-y-3">

@@ -10,7 +10,7 @@ export interface AppState {
     showLigands: boolean;
     showSurface: boolean;
     customColors?: CustomColorRule[];
-
+    measurements?: { atom1: any, atom2: any, distance: number }[];
 }
 
 /**
@@ -50,7 +50,19 @@ export const getShareableURL = (state: AppState): string => {
         } catch (e) { console.warn("Failed to serialize custom colors", e); }
     }
 
-
+    // 5. Measurements (Encoded JSON)
+    if (state.measurements && state.measurements.length > 0) {
+        try {
+            // Simplify measurement data to essential IDs to save space
+            const minimalData = state.measurements.map(m => ({
+                a1: { c: m.atom1.chain, r: m.atom1.resNo, a: m.atom1.atomName },
+                a2: { c: m.atom2.chain, r: m.atom2.resNo, a: m.atom2.atomName }
+            }));
+            const json = JSON.stringify(minimalData);
+            const b64 = btoa(json);
+            params.set('meas', b64);
+        } catch (e) { console.warn("Failed to serialize measurements", e); }
+    }
 
     const url = new URL(window.location.href);
     url.search = params.toString();
@@ -99,7 +111,20 @@ export const parseURLState = (): Partial<AppState> => {
         } catch (e) { console.warn("Failed to parse custom colors", e); }
     }
 
-
+    // 5. Measurements
+    const meas = params.get('meas');
+    if (meas) {
+        try {
+            const json = atob(meas);
+            const minimalData = JSON.parse(json);
+            // Rehydrate to expected format (partial)
+            state.measurements = minimalData.map((m: any) => ({
+                atom1: { chain: m.a1.c, resNo: m.a1.r, atomName: m.a1.a },
+                atom2: { chain: m.a2.c, resNo: m.a2.r, atomName: m.a2.a },
+                distance: 0 // Will be recalculated by viewer
+            }));
+        } catch (e) { console.warn("Failed to parse measurements", e); }
+    }
 
     return state;
 };

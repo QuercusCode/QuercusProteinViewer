@@ -60,6 +60,8 @@ export interface ProteinViewerRef {
     recordTurntable: (duration?: number) => Promise<Blob>;
     clearMeasurements: () => void;
     visualizeContact: (chainA: string, resA: number, chainB: string, resB: number) => void;
+    getMeasurements: () => MeasurementData[];
+    restoreMeasurements: (measurements: { atom1: any, atom2: any }[]) => void;
 }
 
 
@@ -827,6 +829,45 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     }
                 });
             }
+        },
+        getMeasurements: () => measurementsRef.current,
+        restoreMeasurements: (list: { atom1: any, atom2: any }[]) => {
+            if (!componentRef.current || !list || list.length === 0) return;
+            // Clear existing first
+            measurementsRef.current = [];
+
+            // Helper to find atom index
+            const findAtom = (info: any) => {
+                let found: any = null;
+                if (!componentRef.current) return null;
+                // Try precise match first
+                const sel = new window.NGL.Selection(`${info.r}:${info.c} and .${info.a}`);
+                componentRef.current.structure.eachAtom((atom: any) => {
+                    found = atom;
+                }, sel);
+                return found;
+            };
+
+            list.forEach(m => {
+                const a1 = findAtom({ c: m.atom1.chain, r: m.atom1.resNo, a: m.atom1.atomName });
+                const a2 = findAtom({ c: m.atom2.chain, r: m.atom2.resNo, a: m.atom2.atomName });
+
+                if (a1 && a2) {
+                    const dx = a1.x - a2.x;
+                    const dy = a1.y - a2.y;
+                    const dz = a1.z - a2.z;
+                    const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+                    const mData: MeasurementData = {
+                        atom1: { chain: a1.chainname, resNo: a1.resno, atomName: a1.atomname, x: a1.x, y: a1.y, z: a1.z, index: a1.index },
+                        atom2: { chain: a2.chainname, resNo: a2.resno, atomName: a2.atomname, x: a2.x, y: a2.y, z: a2.z, index: a2.index },
+                        distance: dist,
+                        shapeId: `measure-${Date.now()}-${Math.random()}`
+                    };
+                    measurementsRef.current.push(mData);
+                    drawMeasurement(mData);
+                }
+            });
         }
     }));
 
