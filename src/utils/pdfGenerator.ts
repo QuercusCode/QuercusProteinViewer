@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { getInteractionType } from './interactionUtils';
 
 interface InteractionData {
     matrix: number[][];
@@ -7,135 +8,183 @@ interface InteractionData {
     labels: { resNo: number; chain: string; label: string; ss: string }[];
 }
 
-export const generateProteinReport = (
-    proteinName: string,
-    contactMapCanvas: HTMLCanvasElement,
-    data: InteractionData
-) => {
-    // 1. Initialize PDF
-    const doc = new jsPDF();
-    const width = doc.internal.pageSize.getWidth();
-    const height = doc.internal.pageSize.getHeight();
-    const margin = 15;
+// Helper: Draw map to an offscreen canvas
+const drawMapToDataURL = (
+    data: InteractionData,
+    filterFn: (type: string | null) => boolean,
+    isLightMode: boolean
+): string => {
+    const canvas = document.createElement('canvas');
+    const P = 2; // Pixel scale for high res
+    const size = data.size;
+    canvas.width = size * P;
+    canvas.height = size * P;
+    const ctx = canvas.getContext('2d', { alpha: false });
 
-    // --- HEADER ---
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(22);
-    doc.text("Protein Analysis Report", margin, 20);
+    if (!ctx) return '';
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(12);
-    doc.text(`Protein: ${proteinName || "Unknown Structure"}`, margin, 30);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, margin, 36);
-    doc.text(`Residues: ${data.size}`, width - margin - 40, 30);
+    // Bg
+    ctx.fillStyle = isLightMode ? '#ffffff' : '#171717';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Line separator
-    doc.setLineWidth(0.5);
-    doc.line(margin, 42, width - margin, 42);
+    // Diagonals & Grid not strictly needed for print, but helpful context
+    // Let's keep it simple: just the dots.
 
-
-    // --- CONTACT MAP IMAGE ---
-    // Capture the canvas as an image
-    const mapImg = contactMapCanvas.toDataURL("image/png");
-
-    // Calculate aspect ratio to fit page width
-    const imgProps = doc.getImageProperties(mapImg);
-    const pdfImgWidth = width - (margin * 2);
-    const pdfImgHeight = (imgProps.height * pdfImgWidth) / imgProps.width;
-
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.text("Contact Map", margin, 55);
-
-    doc.addImage(mapImg, 'PNG', margin, 60, pdfImgWidth, pdfImgHeight);
-
-
-    // --- INTERACTIONS TABLE ---
-    // Extract "Key Interactions" (Salt Bridges, etc - purely distance based for now < 4A)
-    // We want to avoid listing 10,000 hydrophobic contacts.
-    // Let's filter for:
-    // 1. Inter-chain contacts (Interface) < 5A
-    // 2. Strong Salt Bridges (Arg/Lys <-> Asp/Glu) < 4A
-
-    const relevantInteractions = [] as any[];
     const { matrix, labels } = data;
 
-    // Helper to detect residue type
-    const getResType = (l: string) => l.trim().split(' ')[0].toUpperCase();
-    const POSITIVE = ['ARG', 'LYS', 'HIS'];
-    const NEGATIVE = ['ASP', 'GLU'];
-
-    for (let i = 0; i < matrix.length; i++) {
-        for (let j = i + 1; j < matrix.length; j++) {
+    for (let i = 0; i < size; i++) {
+        for (let j = i; j < size; j++) {
             const dist = matrix[i][j];
-            if (dist > 5.0) continue; // Skip far stuff
+            if (dist > 8.0) continue;
 
             const l1 = labels[i];
             const l2 = labels[j];
 
-            const r1 = getResType(l1.label);
-            const r2 = getResType(l2.label);
+            // Filter
+            const typeData = getInteractionType(l1.label, l2.label, dist);
 
-            let type = "Contact";
-            let score = 0;
+            // Check if we should draw this
+            // Special case: "All" -> Draw everything
+            // types: 'Salt Bridge', 'Disulfide Bond', 'Hydrophobic Contact', 'Pi-Stacking', 'Cation-Pi Interaction', 'Close Contact'
 
-            // Rule 1: Salt Bridge
-            const isSaltBridge = (POSITIVE.includes(r1) && NEGATIVE.includes(r2)) || (POSITIVE.includes(r2) && NEGATIVE.includes(r1));
-
-            if (isSaltBridge && dist < 4.0) {
-                type = "Salt Bridge";
-                score = 10;
-            } else if (l1.chain !== l2.chain) {
-                type = "Interface";
-                score = 5;
-            } else if (dist < 3.5) {
-                type = "Close Contact";
-                score = 1;
-            } else {
-                continue; // Skip generic proximal contacts to save space
+            if (filterFn(typeData ? typeData.type : null)) {
+                if (typeData) {
+                    ctx.fillStyle = typeData.hex || '#60a5fa'; // Fallback blue
+                    ctx.fillRect(j * P, i * P, P, P);
+                    // Mirror for symmetry
+                    ctx.fillRect(i * P, j * P, P, P);
+                } else if (dist < 5.0 && filterFn('Close Contact')) {
+                    // Blue heatmap for generic close contacts if allowd
+                    ctx.fillStyle = isLightMode ? '#60a5fa' : '#3b82f6';
+                    ctx.fillRect(j * P, i * P, P, P);
+                    ctx.fillRect(i * P, j * P, P, P);
+                }
             }
-
-            relevantInteractions.push({
-                res1: `${l1.chain}:${l1.label}`,
-                res2: `${l2.chain}:${l2.label}`,
-                dist: dist.toFixed(2) + " Å",
-                type: type,
-                score: score
-            });
         }
     }
 
-    // Sort by score (Salt bridges first) then distance
-    relevantInteractions.sort((a, b) => {
-        if (b.score !== a.score) return b.score - a.score;
-        return parseFloat(a.dist) - parseFloat(b.dist);
-    });
+    return canvas.toDataURL("image/png");
+};
 
-    // Top 50 only
-    const topInteractions = relevantInteractions.slice(0, 50);
+const addSection = (
+    doc: jsPDF,
+    title: string,
+    data: InteractionData,
+    filterFn: (type: string | null) => boolean,
+    isLightMode: boolean,
+    isFirstPage = false
+) => {
+    const margin = 15;
 
-    // Add Table
-    let tableStartY = 60 + pdfImgHeight + 20;
 
-    // Check if table fits on page, else new page
-    if (tableStartY > height - 50) {
+    if (!isFirstPage) {
         doc.addPage();
-        tableStartY = 20;
     }
 
-    doc.text("Top Significant Interactions", margin, tableStartY - 5);
+    // Title
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text(title, margin, 20);
+
+    // 1. Generate Image
+    const mapImg = drawMapToDataURL(data, filterFn, isLightMode);
+
+    // 2. Add Image
+    const desiredImgWidth = 100; // Fixed size
+    const desiredImgHeight = 100;
+
+    doc.addImage(mapImg, 'PNG', margin, 30, desiredImgWidth, desiredImgHeight);
+
+    // 3. Generate Table Data
+    const tableRows = [] as any[];
+    const { matrix, labels } = data;
+
+    // We can't list ALL hydrophobic contacts (thousands). We need a limit.
+    const MAX_ROWS = 100;
+
+    for (let i = 0; i < matrix.length; i++) {
+        for (let j = i + 1; j < matrix.length; j++) {
+            const dist = matrix[i][j];
+            if (dist > 6.0) continue;
+
+            const l1 = labels[i];
+            const l2 = labels[j];
+            const typeData = getInteractionType(l1.label, l2.label, dist);
+            const type = typeData ? typeData.type : 'Close Contact';
+
+            // Filter Row
+            if (filterFn(type)) {
+                // If generic "All" view, skip 'Close Contact' logs to save space for important stuff
+                if (title === "All Interactions" && type === "Close Contact") continue;
+
+                tableRows.push({
+                    res1: `${l1.chain}:${l1.label}`,
+                    res2: `${l2.chain}:${l2.label}`,
+                    dist: dist.toFixed(2),
+                    type: type
+                });
+            }
+        }
+    }
+
+    // Sort by distance
+    tableRows.sort((a, b) => parseFloat(a.dist) - parseFloat(b.dist));
+
+    // Slice
+    const displayRows = tableRows.slice(0, MAX_ROWS);
+
+    doc.setFontSize(10);
+    doc.text(`Identified Interactions (${tableRows.length} total, top ${displayRows.length} shown)`, margin, 30 + desiredImgHeight + 10);
 
     autoTable(doc, {
-        startY: tableStartY,
-        head: [['Residue A', 'Residue B', 'Distance', 'Type']],
-        body: topInteractions.map(row => [row.res1, row.res2, row.dist, row.type]),
+        startY: 30 + desiredImgHeight + 15,
+        head: [['Residue A', 'Residue B', 'Dist (Å)', 'Type']],
+        body: displayRows.map(r => [r.res1, r.res2, r.dist, r.type]),
         theme: 'striped',
-        headStyles: { fillColor: [59, 130, 246] }, // Blue-500
-        styles: { fontSize: 10 },
+        styles: { fontSize: 8 },
         margin: { left: margin, right: margin }
     });
+};
+
+export const generateProteinReport = (
+    proteinName: string,
+    _canvasIgnored: HTMLCanvasElement, // We draw our own now
+    data: InteractionData
+) => {
+    const doc = new jsPDF();
+    const isLightMode = true; // Force light mode for print readability? Or pass user pref? Let's assume white paper = light mode.
+
+    // Page 1: Overview
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(22);
+    doc.text("Protein Analysis Report", 15, 15);
+    doc.setFontSize(12);
+    doc.setFont("helvetica", "normal");
+    doc.text(proteinName || "Unknown Protein", 15, 22);
+
+    // Section 1: All Interactions (Salt Bridges, Disulfides, Pi, Hydrophobic)
+    // We allow everything except simple 'Close Contact' to declutter
+    const allFilter = (t: string | null) => t !== null && t !== 'Close Contact';
+    addSection(doc, "All Significant Interactions", data, allFilter, isLightMode, false);
+    // Wait, first page logic is tricky with title. 
+    // Let's make "All Interactions" start below the main title.
+
+    // Let's redefine addSection usage slightly or just manually do Page 1.
+    // Actually, let's just run addSection for everything and rely on auto-paging.
+
+    // 1. Salt Bridge
+    addSection(doc, "Salt Bridges (Ionic Interactions)", data, (t) => t === 'Salt Bridge', isLightMode, true); // true = don't add page first (but we have title)
+
+    // 2. Disulfide
+    addSection(doc, "Disulfide Bonds (Covalent)", data, (t) => t === 'Disulfide Bond', isLightMode, false);
+
+    // 3. Hydrophobic
+    addSection(doc, "Hydrophobic Clusters", data, (t) => t === 'Hydrophobic Contact', isLightMode, false);
+
+    // 4. Pi-Stacking
+    addSection(doc, "Pi-Stacking & Cation-Pi", data, (t) => t === 'Pi-Stacking' || t === 'Cation-Pi Interaction', isLightMode, false);
 
     // Save
     const safeName = proteinName.replace(/[^a-z0-9]/yi, '_').toLowerCase();
-    doc.save(`${safeName}_report.pdf`);
+    doc.save(`${safeName}_full_report.pdf`);
 };
