@@ -903,6 +903,10 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                                     <div className="w-3 h-3 rounded-full bg-blue-200" />
                                     <span className="text-[10px] font-medium opacity-80">Turn</span>
                                 </div>
+                                <div className={`flex items-center gap-2 px-2 py-1.5 rounded border ${isLightMode ? 'bg-neutral-50 border-neutral-100' : 'bg-neutral-900/10 border-neutral-900/20'}`}>
+                                    <div className={`w-3 h-3 rounded-full border ${isLightMode ? 'bg-white border-neutral-300' : 'bg-neutral-950 border-neutral-700'}`} />
+                                    <span className="text-[10px] font-medium opacity-80">Coil</span>
+                                </div>
                             </div>
 
                             {/* Contact Distance */}
