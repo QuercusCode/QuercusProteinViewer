@@ -44,17 +44,19 @@ const drawMapToDataURL = (
 
     // 3. Axes Labels (Simplified: 0, 50, 100...)
     ctx.fillStyle = axisColor;
-    ctx.font = '24px Arial'; // Large font for scaled down image
+    ctx.font = '14px Arial'; // Smaller font for cleaner look
     ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
 
     // Y Labels
     for (let i = 0; i < size; i += 50) {
-        ctx.fillText(i.toString(), padding - 15, (i * P) + 10);
+        ctx.fillText(i.toString(), padding - 10, (i * P));
     }
     // X Labels
     ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
     for (let i = 0; i < size; i += 50) {
-        ctx.fillText(i.toString(), padding + (i * P), (size * P) + 40);
+        ctx.fillText(i.toString(), padding + (i * P), (size * P) + 10);
     }
 
 
