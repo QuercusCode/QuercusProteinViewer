@@ -805,11 +805,18 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                             </div>
                         )}
 
-                        {/* Persistent Floating Tooltip inside Map Area */}
+                        {/* Floating Tooltip (Follows Cursor) */}
                         {hoverPos && distanceData && (
-                            <div className={`absolute bottom-6 right-6 backdrop-blur shadow-xl border rounded-lg p-4 flex flex-col gap-1 w-64 z-50 pointer-events-none ${isLightMode ? 'bg-white/95 border-neutral-100' : 'bg-neutral-800/95 border-neutral-700'}`}>
-                                <div className={`flex items-center justify-between pb-2 border-b ${isLightMode ? 'border-neutral-100' : 'border-neutral-700'}`}>
-                                    <span className="text-xs font-bold uppercase opacity-50 tracking-wider">Interaction</span>
+                            <div
+                                className={`fixed z-[70] w-64 backdrop-blur-md shadow-xl border rounded-lg p-4 flex flex-col gap-1 pointer-events-none transition-transform duration-75 ease-out ${isLightMode ? 'bg-white/90 border-neutral-200/50' : 'bg-neutral-900/90 border-neutral-700/50'}`}
+                                style={{
+                                    // Basic clamping to keep it on screen
+                                    left: Math.min(hoverPos.x + 20, window.innerWidth - 270),
+                                    top: Math.min(hoverPos.y + 20, window.innerHeight - 200),
+                                }}
+                            >
+                                <div className={`flex items-center justify-between pb-2 border-b ${isLightMode ? 'border-neutral-200/50' : 'border-neutral-700/50'}`}>
+                                    <span className="text-[10px] font-bold uppercase opacity-50 tracking-wider">Interaction</span>
                                     <span className={`text-sm font-bold ${distanceData.matrix[hoverPos.i][hoverPos.j] < 5 ? 'text-blue-500' : 'opacity-70'}`}>
                                         {distanceData.matrix[hoverPos.i][hoverPos.j].toFixed(2)} Å
                                     </span>
