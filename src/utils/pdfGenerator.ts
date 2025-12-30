@@ -221,13 +221,13 @@ const addSequenceView = (doc: jsPDF, labels: any[], startY: number) => {
     // Hydro Legend
     doc.text("Hydrophobicity:", legendX, legendY); legendX += 28;
     // Gradient
-    doc.setFillColor(59, 130, 246); doc.rect(legendX, legendY - 3, 6, 4, 'F');
-    doc.setFillColor(255, 255, 255); doc.rect(legendX + 6, legendY - 3, 6, 4, 'F');
-    doc.setFillColor(249, 115, 22); doc.rect(legendX + 12, legendY - 3, 6, 4, 'F');
+    doc.setFillColor(59, 130, 246); doc.rect(legendX, legendY - 3, 10, 4, 'F');
+    doc.setFillColor(255, 255, 255); doc.rect(legendX + 10, legendY - 3, 10, 4, 'F');
+    doc.setFillColor(249, 115, 22); doc.rect(legendX + 20, legendY - 3, 10, 4, 'F');
     // Labels
     doc.setFontSize(7);
     doc.text("Hydrophilic", legendX, legendY + 4);
-    doc.text("Hydrophobic", legendX + 12, legendY + 4);
+    doc.text("Hydrophobic", legendX + 22, legendY + 4);
 
     y += 10; // Space after legend
 
@@ -413,8 +413,8 @@ const addInstructionPage = (
             doc.setFont("helvetica", "bold"); // Bold
             doc.setFontSize(9);
             doc.setTextColor(50);
-            // Move closer (+2 instead of +5)
-            doc.text("Fig 1. 3D Structure Snapshot", midX, y + boxSize + 3);
+            // Move closer (Relative to actual image bottom)
+            doc.text("Fig 1. 3D Structure Snapshot", midX, y + offsetY + drawH + 5);
 
         } catch (e) {
             // Fallback
