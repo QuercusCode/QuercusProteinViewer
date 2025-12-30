@@ -588,7 +588,11 @@ export const generateProteinReport = async (
     let qrCodeDataUrl: string | null = null;
     if (currentUrl) {
         try {
-            qrCodeDataUrl = await QRCode.toDataURL(currentUrl, { margin: 1, width: 100 });
+            qrCodeDataUrl = await QRCode.toDataURL(currentUrl, {
+                margin: 2,
+                width: 500,  // Higher resolution for crisp PDF render
+                errorCorrectionLevel: 'M' // Balance between size and robustness
+            });
         } catch (e) {
             console.error("Failed to generate QR Code", e);
         }
