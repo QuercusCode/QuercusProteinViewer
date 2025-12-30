@@ -1046,7 +1046,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
             </div>
             {/* Report Name Modal */}
             {showReportNameModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/50 backdrop-blur-sm">
                     <div className={`p-6 rounded-lg shadow-xl w-96 ${isLightMode ? 'bg-white text-gray-900' : 'bg-neutral-800 text-white'} border border-gray-600`}>
                         <h3 className="text-lg font-bold mb-4">Name Your Report</h3>
                         <p className={`text-sm mb-4 ${isLightMode ? 'text-gray-600' : 'text-gray-400'}`}>
