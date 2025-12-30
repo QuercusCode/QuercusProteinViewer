@@ -472,7 +472,9 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         };
 
         const finalName = customName || proteinName;
-        generateProteinReport(finalName, mapCanvasRef.current, distanceData, metadata, snapshot);
+        // Pass current URL for QR Code
+        const currentUrl = window.location.href;
+        generateProteinReport(finalName, mapCanvasRef.current, distanceData, metadata, snapshot, currentUrl);
     };
 
     const handleDownload = () => {

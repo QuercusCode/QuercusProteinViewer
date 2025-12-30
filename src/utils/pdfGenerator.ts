@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import QRCode from 'qrcode'; // Import QR Code
 import { getInteractionType } from './interactionUtils';
 
 interface InteractionData {
@@ -312,7 +313,8 @@ const addInstructionPage = (
     metadata: ProteinMetadata,
     stats: Record<string, number>,
     snapshot: string | null,
-    labels: any[]
+    labels: any[],
+    qrCodeDataUrl: string | null = null
 ) => {
     const margin = 20;
     let y = 20;
@@ -322,6 +324,22 @@ const addInstructionPage = (
     doc.setFontSize(22);
     doc.text("Protein Contact Analysis Report", margin, y);
     y += 10;
+
+    // QR Code (Top Right of Page) - "Scan to Interact"
+    if (qrCodeDataUrl) {
+        const qrSize = 25;
+        const pageW = doc.internal.pageSize.getWidth();
+        const qrX = pageW - margin - qrSize;
+        const qrY = 15; // Top alignment
+
+        doc.addImage(qrCodeDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
+
+        doc.setFontSize(8);
+        doc.setTextColor(100);
+        doc.text("Scan to Interact", qrX + (qrSize / 2), qrY + qrSize + 4, { align: 'center' });
+        doc.setTextColor(0); // Reset
+    }
+
     doc.setFontSize(10);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(100);
@@ -421,6 +439,8 @@ const addInstructionPage = (
             doc.addImage(snapshot, 'PNG', midX, y, boxSize, boxSize);
         }
     }
+
+
 
     // Dynamic Y increment to prevent overlap
     // Snapshot area is approx 80-90 high. Info box is contentHeight.
@@ -550,12 +570,13 @@ const addSection = (
     });
 };
 
-export const generateProteinReport = (
+export const generateProteinReport = async (
     proteinName: string,
     _canvasIgnored: HTMLCanvasElement,
     data: InteractionData,
     metadata: ProteinMetadata,
-    snapshot: string | null = null
+    snapshot: string | null = null,
+    currentUrl: string | null = null
 ) => {
     const doc = new jsPDF();
     const isLightMode = false; // Force DARK MODE for Maps (User Request)
@@ -563,8 +584,18 @@ export const generateProteinReport = (
     // Data Prep
     const stats = calculateStats(data);
 
+    // Generate QR Code
+    let qrCodeDataUrl: string | null = null;
+    if (currentUrl) {
+        try {
+            qrCodeDataUrl = await QRCode.toDataURL(currentUrl, { margin: 1, width: 100 });
+        } catch (e) {
+            console.error("Failed to generate QR Code", e);
+        }
+    }
+
     // PAGE 1: Enhanced Instruction & Overview
-    addInstructionPage(doc, proteinName, metadata, stats, snapshot, data.labels);
+    addInstructionPage(doc, proteinName, metadata, stats, snapshot, data.labels, qrCodeDataUrl);
 
     // SECTIONS
 
