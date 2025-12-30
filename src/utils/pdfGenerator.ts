@@ -133,6 +133,56 @@ const calculateStats = (data: InteractionData) => {
     return stats;
 };
 
+const KYTE_DOOLITTLE: Record<string, number> = {
+    'ILE': 4.5, 'VAL': 4.2, 'LEU': 3.8, 'PHE': 2.8, 'CYS': 2.5,
+    'MET': 1.9, 'ALA': 1.8, 'GLY': -0.4, 'THR': -0.7, 'SER': -0.8,
+    'TRP': -0.9, 'TYR': -1.3, 'PRO': -1.6, 'HIS': -3.2, 'GLU': -3.5,
+    'GLN': -3.5, 'ASP': -3.5, 'ASN': -3.5, 'LYS': -3.9, 'ARG': -4.5
+};
+
+const getHydrophobicityColor = (resName3: string): number[] => {
+    const val = KYTE_DOOLITTLE[resName3] || 0;
+    // Scale -4.5 (Hydrophilic/Blue) to 4.5 (Hydrophobic/Orange)
+    // Normalize to 0-1
+    const t = (val + 4.5) / 9.0;
+
+    // Simple Gradient: Blue (0, 0, 255) -> White (255, 255, 255) -> Orange (255, 165, 0)
+    if (t < 0.5) {
+        // Blue to White
+        const localT = t * 2;
+        return [
+            Math.round(255 * localT),
+            Math.round(255 * localT + 255 * (1 - localT)), // wait, blue is 0,0,255
+            // Blue: 0, 100ish, 255 -> White: 255, 255, 255
+            // Let's us Cyan-ish Blue: 0, 150, 255
+            255
+        ];
+        // 0->0.5: R goes 0->255. G goes 100->255. B stays 255.
+        // Actually let's use a simpler interpolator
+        // t=0 (Hydrophilic): 59, 130, 246 (Blue-500)
+        // t=0.5 (Neutral): 255, 255, 255
+        // t=1 (Hydrophobic): 249, 115, 22 (Orange-500)
+
+        const c1 = [59, 130, 246];
+        const c2 = [255, 255, 255];
+        return [
+            Math.round(c1[0] + (c2[0] - c1[0]) * localT),
+            Math.round(c1[1] + (c2[1] - c1[1]) * localT),
+            Math.round(c1[2] + (c2[2] - c1[2]) * localT)
+        ];
+    } else {
+        // White to Orange
+        const localT = (t - 0.5) * 2;
+        const c1 = [255, 255, 255];
+        const c2 = [249, 115, 22]; // Orange
+        return [
+            Math.round(c1[0] + (c2[0] - c1[0]) * localT),
+            Math.round(c1[1] + (c2[1] - c1[1]) * localT),
+            Math.round(c1[2] + (c2[2] - c1[2]) * localT)
+        ];
+    }
+};
+
 const addSequenceView = (doc: jsPDF, labels: any[], startY: number) => {
     const margin = 20;
     const pageWidth = doc.internal.pageSize.getWidth();
@@ -149,24 +199,27 @@ const addSequenceView = (doc: jsPDF, labels: any[], startY: number) => {
     doc.text("Sequence & Secondary Structure", margin, y - 5);
 
     // Legend - Move to Top Right of this section
-    // Check if we have enough space or need to move it? 
-    // Let's put it on the same Y level as the header but aligned right.
     const legendY = y - 5;
     const legendRightX = pageWidth - margin;
 
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
 
-    // Right-aligned, stacking leftwards
-    // Coil
+    // SS Legend
     doc.setFillColor(229, 231, 235); doc.rect(legendRightX - 30, legendY - 3, 4, 4, 'F');
     doc.text("Coil", legendRightX - 24, legendY);
-    // Sheet
     doc.setFillColor(234, 179, 8); doc.rect(legendRightX - 60, legendY - 3, 4, 4, 'F');
     doc.text("Sheet", legendRightX - 54, legendY);
-    // Helix
     doc.setFillColor(239, 68, 68); doc.rect(legendRightX - 90, legendY - 3, 4, 4, 'F');
     doc.text("Helix", legendRightX - 84, legendY);
+
+    // Hydrophobicity Legend (Mini Gradient)
+    const gradX = legendRightX - 140;
+    doc.text("Hydrophobicity:", gradX - 25, legendY);
+    // Draw Gradient Bar manually
+    doc.setFillColor(59, 130, 246); doc.rect(gradX, legendY - 3, 6, 4, 'F'); // Blue
+    doc.setFillColor(255, 255, 255); doc.rect(gradX + 6, legendY - 3, 6, 4, 'F'); // White
+    doc.setFillColor(249, 115, 22); doc.rect(gradX + 12, legendY - 3, 6, 4, 'F'); // Orange
 
 
     doc.setFont("courier", "normal");
@@ -179,7 +232,7 @@ const addSequenceView = (doc: jsPDF, labels: any[], startY: number) => {
         if (l.chain !== currentChain) {
             // If not first chain, add extra spacing
             if (currentChain !== "") {
-                y += boxSize + 12; // Gap between chains
+                y += boxSize + 14; // Gap between chains (increased for profile)
                 x = margin;
             } else {
                 y += 5; // Initial gap after header
@@ -210,7 +263,7 @@ const addSequenceView = (doc: jsPDF, labels: any[], startY: number) => {
         const map: any = { 'ALA': 'A', 'ARG': 'R', 'ASN': 'N', 'ASP': 'D', 'CYS': 'C', 'GLU': 'E', 'GLN': 'Q', 'GLY': 'G', 'HIS': 'H', 'ILE': 'I', 'LEU': 'L', 'LYS': 'K', 'MET': 'M', 'PHE': 'F', 'PRO': 'P', 'SER': 'S', 'THR': 'T', 'TRP': 'W', 'TYR': 'Y', 'VAL': 'V' };
         const letter = map[resName3] || '?';
 
-        // Color
+        // 1. SS Box
         const ss = (l.ss || '').toLowerCase();
         if (ss === 'h') doc.setFillColor(239, 68, 68); // Red
         else if (ss === 's' || ss === 'e') doc.setFillColor(234, 179, 8); // Yellow
@@ -219,7 +272,7 @@ const addSequenceView = (doc: jsPDF, labels: any[], startY: number) => {
         // Check if next box fits
         if (x + boxSize > margin + maxWidth) {
             x = margin;
-            y += boxSize + 1;
+            y += boxSize + 4; // Add extra vertical space for the specific hydrophobic strip row
 
             // Check page break
             if (y > doc.internal.pageSize.getHeight() - 20) {
@@ -231,6 +284,11 @@ const addSequenceView = (doc: jsPDF, labels: any[], startY: number) => {
         doc.rect(x, y, boxSize, boxSize, 'F');
         doc.setTextColor(0, 0, 0);
         doc.text(letter, x + 1.5, y + 4);
+
+        // 2. Hydrophobicity Strip (Underneath)
+        const hydroColor = getHydrophobicityColor(resName3);
+        doc.setFillColor(hydroColor[0], hydroColor[1], hydroColor[2]);
+        doc.rect(x, y + boxSize, boxSize, 2, 'F'); // 2px high strip
 
         x += boxSize + 0.5;
     });
