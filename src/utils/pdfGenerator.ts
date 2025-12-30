@@ -245,7 +245,12 @@ const addInstructionPage = (
 
     doc.setFontSize(9);
     doc.setFont("helvetica", "normal");
-    doc.text(`Name: ${proteinName}`, leftPad, innerY); innerY += 5;
+
+    // Wrap Name
+    const nameLines = doc.splitTextToSize(`Name: ${proteinName}`, 70); // 70px width (box is 80)
+    doc.text(nameLines, leftPad, innerY);
+    innerY += (nameLines.length * 5); // Dynamic height adjustment
+
     doc.text(`Residues: ${metadata.residueCount}`, leftPad, innerY); innerY += 5;
     doc.text(`Chains: ${metadata.chains.join(', ')}`, leftPad, innerY); innerY += 10;
 
@@ -272,14 +277,35 @@ const addInstructionPage = (
     // -- 3D Snapshot (Right) --
     if (snapshot) {
         // Fit within box roughly 80x80
-        const imgSize = 75;
-        // Draw border
+        const boxSize = 75;
+
         doc.setDrawColor(200);
-        doc.rect(midX, y, imgSize, imgSize);
-        doc.addImage(snapshot, 'PNG', midX, y, imgSize, imgSize);
+
+        try {
+            const imgProps = doc.getImageProperties(snapshot);
+            const ratio = imgProps.width / imgProps.height;
+
+            let drawW = boxSize;
+            let drawH = boxSize / ratio;
+
+            if (drawH > boxSize) {
+                drawH = boxSize;
+                drawW = boxSize * ratio;
+            }
+
+            // Center it in the 75x75 area
+            const offsetX = (boxSize - drawW) / 2;
+            const offsetY = (boxSize - drawH) / 2;
+
+            doc.addImage(snapshot, 'PNG', midX + offsetX, y + offsetY, drawW, drawH);
+        } catch (e) {
+            // Fallback if getImageProperties fails (e.g. invalid data)
+            doc.addImage(snapshot, 'PNG', midX, y, boxSize, boxSize);
+        }
+
         doc.setFontSize(8);
         doc.setTextColor(100);
-        doc.text("Fig 1. 3D Structure Snapshot", midX, y + imgSize + 5);
+        doc.text("Fig 1. 3D Structure Snapshot", midX, y + boxSize + 5);
     }
 
     y += 90;
