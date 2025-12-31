@@ -46,6 +46,21 @@ function App() {
   const [showContactMap, setShowContactMap] = useState(false);
   const [colorPalette, setColorPalette] = useState<ColorPalette>('standard');
 
+  // Accessibility: Dyslexic Font
+  const [isDyslexicFont, setIsDyslexicFont] = useState(false);
+
+  useEffect(() => {
+    if (isDyslexicFont) {
+      document.body.style.fontFamily = '"Comic Sans MS", "Chalkboard SE", "Comic Neue", sans-serif';
+      document.body.style.letterSpacing = '0.05em';
+      document.body.style.lineHeight = '1.6';
+    } else {
+      document.body.style.fontFamily = '';
+      document.body.style.letterSpacing = '';
+      document.body.style.lineHeight = '';
+    }
+  }, [isDyslexicFont]);
+
   // Custom Colors need to be initialized too
   const [customColors, setCustomColors] = useState<CustomColorRule[]>(initialUrlState.customColors || []);
   const [showLigands, setShowLigands] = useState(initialUrlState.showLigands || false);
@@ -473,6 +488,8 @@ function App() {
         onSaveSession={handleSaveSession}
         onLoadSession={handleLoadSession}
         onToggleContactMap={() => setShowContactMap(true)}
+        isDyslexicFont={isDyslexicFont}
+        setIsDyslexicFont={setIsDyslexicFont}
 
       />
 
