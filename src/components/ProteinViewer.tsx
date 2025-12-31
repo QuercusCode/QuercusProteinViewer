@@ -1137,17 +1137,25 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     // Navigate to residue
                     const residue = atom.residue;
                     if (residue) {
-                        // Priority: CA (Protein) > C3' (RNA/DNA) > P (Backbone fallback) > Original Click
-                        const ca = residue.getAtomByName('CA');
-                        const c3p = residue.getAtomByName("C3'");
-                        const p = residue.getAtomByName('P');
+                        // Priority: CA (Protein) > C3' (RNA/DNA) > P (Backbone fallback)
+                        // MATCH EXACTLY with getAtomCoordinates logic
+                        let bestAtom: any = null;
 
-                        if (ca) targetAtom = ca;
-                        else if (c3p) targetAtom = c3p;
-                        else if (p) targetAtom = p;
+                        residue.eachAtom((a: any) => {
+                            const name = a.atomname;
+                            if (name === 'CA') bestAtom = a;
+                            else if (!bestAtom && name === "C3'") bestAtom = a;
+                            else if (!bestAtom && name === 'P') bestAtom = a;
+                        });
+
+                        if (bestAtom) {
+                            targetAtom = bestAtom;
+                        }
 
                         if (targetAtom !== atom) {
-                            console.log(`Snapping measurement from ${atom.atomname} to ${targetAtom.atomname}`);
+                            console.log(`Snapping measurement from ${atom.atomname} to ${targetAtom.atomname} (Index: ${targetAtom.index})`);
+                        } else {
+                            console.log(`No better backbone atom found. Keeping ${atom.atomname}`);
                         }
                     }
                 } catch (snapErr) {
