@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { X, ZoomIn, ZoomOut, Maximize, Download, Grid3X3, Check, FileText, Menu, BookOpen } from 'lucide-react';
+import { X, ZoomIn, ZoomOut, Maximize, Download, Grid3X3, Check, FileText, Menu, BookOpen, Smartphone } from 'lucide-react';
 import type { ChainInfo } from '../types';
 import { generateProteinReport } from '../utils/pdfGenerator';
 import { getInteractionType } from '../utils/interactionUtils';
@@ -37,6 +37,71 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     const [scale, setScale] = useState(2);
     const [distanceData, setDistanceData] = useState<{ matrix: number[][], size: number, labels: { resNo: number, chain: string, label: string, ss: string }[] } | null>(null);
     const [hoverPos, setHoverPos] = useState<{ i: number, j: number, x: number, y: number } | null>(null);
+
+    // AR Mode (Gyroscope)
+    const [isARMode, setIsARMode] = useState(false);
+    const initialTiltRef = useRef<{ beta: number, gamma: number } | null>(null);
+
+    const handleDeviceOrientation = (event: DeviceOrientationEvent) => {
+        if (!isARMode || !scrollContainerRef.current || !event.beta || !event.gamma) return;
+
+        const container = scrollContainerRef.current;
+        const { beta, gamma } = event; // beta (x-axis tilt), gamma (y-axis tilt)
+
+        // Capture initial "zero" point on first event
+        if (!initialTiltRef.current) {
+            initialTiltRef.current = { beta, gamma };
+            return;
+        }
+
+        const deltaBeta = beta - initialTiltRef.current.beta;
+        const deltaGamma = gamma - initialTiltRef.current.gamma;
+
+        // Sensitivity Factor
+        const speed = 15;
+
+        // Apply Scroll
+        container.scrollTop += deltaBeta * speed * 0.1;
+        container.scrollLeft += deltaGamma * speed * 0.1;
+    };
+
+
+    const toggleARMode = async () => {
+        if (isARMode) {
+            // Turn OFF
+            window.removeEventListener('deviceorientation', handleDeviceOrientation);
+            setIsARMode(false);
+            initialTiltRef.current = null;
+        } else {
+            // Turn ON
+            // iOS 13+ Permission Check
+            if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+                try {
+                    const permissionState = await (DeviceOrientationEvent as any).requestPermission();
+                    if (permissionState === 'granted') {
+                        window.addEventListener('deviceorientation', handleDeviceOrientation);
+                        setIsARMode(true);
+                    } else {
+                        alert("Permission to use gyroscope was denied.");
+                    }
+                } catch (e) {
+                    console.error(e);
+                    alert("Error requesting gyroscope permission.");
+                }
+            } else {
+                // Non-iOS or older devices
+                window.addEventListener('deviceorientation', handleDeviceOrientation);
+                setIsARMode(true);
+            }
+        }
+    };
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            window.removeEventListener('deviceorientation', handleDeviceOrientation);
+        };
+    }, []);
 
     // MiniMap State
     const [miniView, setMiniView] = useState<{ x: number, y: number, w: number, h: number } | null>(null);
@@ -883,6 +948,13 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                                 >
                                     <FileText className="w-4 h-4" />
                                     <span>Export CSV</span>
+                                </button>
+                                <button
+                                    onClick={toggleARMode}
+                                    className={`col-span-2 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${isARMode ? 'bg-purple-600 text-white animate-pulse' : (isLightMode ? 'bg-neutral-100 text-neutral-600' : 'bg-neutral-800 text-neutral-300')}`}
+                                >
+                                    <Smartphone className="w-4 h-4" />
+                                    <span>{isARMode ? 'AR Mode Active (Tilt to Pan)' : 'Enable AR Pan'}</span>
                                 </button>
                             </div>
                         </div>
