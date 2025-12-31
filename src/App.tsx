@@ -2,9 +2,10 @@ import { useState, useRef, useEffect } from 'react';
 import { ProteinViewer, type ProteinViewerRef } from './components/ProteinViewer';
 import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
+import { AISidebar } from './components/AISidebar';
 import { HelpGuide } from './components/HelpGuide';
 import { parseURLState, getShareableURL } from './utils/urlManager';
-import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Movie, ColorPalette, RepresentationType, ColoringType } from './types';
+import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Movie, ColorPalette, RepresentationType, ColoringType, ResidueInfo } from './types';
 
 function App() {
   // Parse Global URL State Once
@@ -44,6 +45,7 @@ function App() {
   const [isSpinning, setIsSpinning] = useState(initialUrlState.isSpinning || false);
   const [isCleanMode, setIsCleanMode] = useState(false);
   const [showContactMap, setShowContactMap] = useState(false);
+  const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
   const [colorPalette, setColorPalette] = useState<ColorPalette>('standard');
 
   // Accessibility: Dyslexic Font
@@ -112,7 +114,7 @@ function App() {
   // Visualization Toggles
   // Tools
 
-  const [highlightedResidue, setHighlightedResidue] = useState<{ chain: string; resNo: number; resName?: string } | null>(null);
+  const [highlightedResidue, setHighlightedResidue] = useState<ResidueInfo | null>(null);
 
   const [chains, setChains] = useState<ChainInfo[]>([]);
   const [ligands, setLigands] = useState<string[]>([]);
@@ -387,8 +389,8 @@ function App() {
 
 
 
-  const handleSequenceResidueClick = (chain: string, resNo: number) => {
-    console.log("App: Sequence Clicked", chain, resNo);
+  const handleSequenceResidueClick = (chain: string, resNo: number, resName?: string) => {
+    console.log("App: Sequence Clicked", chain, resNo, resName);
     console.log("App: Current Highlight", highlightedResidue);
 
     if (highlightedResidue &&
@@ -399,7 +401,7 @@ function App() {
       viewerRef.current?.clearHighlight();
     } else {
       console.log("App: Selecting NEW");
-      setHighlightedResidue({ chain, resNo });
+      setHighlightedResidue({ chain, resNo, resName: resName || 'UNK' });
       viewerRef.current?.highlightResidue(chain, resNo);
     }
   };
@@ -444,6 +446,13 @@ function App() {
 
   return (
     <main className={`w-full h-full relative overflow-hidden transition-colors duration-300 ${isLightMode ? 'bg-neutral-100 text-neutral-900' : 'bg-neutral-950 text-white'}`}>
+      <AISidebar
+        isOpen={isAISidebarOpen}
+        onClose={() => setIsAISidebarOpen(false)}
+        pdbId={pdbId}
+        proteinTitle={proteinTitle}
+        highlightedResidue={highlightedResidue}
+      />
       <Controls
         pdbId={pdbId}
         setPdbId={handlePdbIdChange}
@@ -490,7 +499,8 @@ function App() {
         onToggleContactMap={() => setShowContactMap(true)}
         isDyslexicFont={isDyslexicFont}
         setIsDyslexicFont={setIsDyslexicFont}
-
+        onToggleAISidebar={() => setIsAISidebarOpen(prev => !prev)}
+        isAISidebarOpen={isAISidebarOpen}
       />
 
       <ProteinViewer

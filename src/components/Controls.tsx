@@ -46,7 +46,9 @@ interface ControlsProps {
     isLightMode: boolean;
     setIsLightMode: (mode: boolean) => void;
     highlightedResidue: { chain: string; resNo: number; resName?: string } | null;
-    onResidueClick: (chain: string, resNo: number) => void;
+    onResidueClick: (chain: string, resNo: number, resName?: string) => void;
+    onToggleAISidebar: () => void;
+    isAISidebarOpen: boolean;
     showSurface: boolean;
     setShowSurface: (show: boolean) => void;
     showLigands: boolean;
@@ -596,7 +598,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                                     <span
                                                         key={idx}
                                                         ref={(el) => { if (el) residueRefs.current.set(`${c.name}-${resNo}`, el); }}
-                                                        onClick={() => onResidueClick(c.name, resNo)}
+                                                        onClick={() => onResidueClick(c.name, resNo, char)}
                                                         className={`w-5 h-5 flex items-center justify-center cursor-pointer rounded-sm transition-colors ${isHighlighted ? 'bg-blue-600 text-white font-bold' : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'}`}
                                                         title={`${char}${resNo}`}
                                                     >
