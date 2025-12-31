@@ -1320,6 +1320,44 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     component.addRepresentation(repType, { color: currentColoring, sele: "*" });
                 }
 
+            } else if (currentColoring === 'hydrophobicity' || currentColoring === 'bfactor') {
+                // Custom Scheme for Quantitative Data (Hydrophobicity / B-Factor)
+                const schemeId = `quant-scheme-${Date.now()}`;
+
+                try {
+                    const NGL = window.NGL;
+                    const id = NGL.ColormakerRegistry.addScheme(function (this: any) {
+                        this.atomColor = (atom: any) => {
+                            let value = 0;
+                            if (currentColoring === 'bfactor') {
+                                // Simple normalization for B-factor (approx 0-80 range)
+                                const b = atom.bfactor;
+                                value = Math.max(0, Math.min(1, b / 80.0));
+                            } else {
+                                // Hydrophobicity (Kyte-Doolittle)
+                                const res = atom.resname;
+                                const scale: Record<string, number> = {
+                                    ILE: 4.5, VAL: 4.2, LEU: 3.8, PHE: 2.8, CYS: 2.5,
+                                    MET: 1.9, ALA: 1.8, GLY: -0.4, THR: -0.7, SER: -0.8,
+                                    TRP: -0.9, TYR: -1.3, PRO: -1.6, HIS: -3.2, GLU: -3.5,
+                                    GLN: -3.5, ASP: -3.5, ASN: -3.5, LYS: -3.9, ARG: -4.5
+                                };
+                                const h = scale[res] || 0;
+                                // Normalize -4.5 to 4.5 -> 0 to 1
+                                value = (h + 4.5) / 9.0;
+                            }
+
+                            // Use our shared palette logic
+                            const cssColor = getPaletteColor(value, colorPalette);
+                            return new NGL.Color(cssColor).getHex();
+                        };
+                    }, schemeId);
+
+                    component.addRepresentation(repType, { color: schemeId, sele: "*" });
+                } catch (e) {
+                    component.addRepresentation(repType, { color: currentColoring, sele: "*" });
+                }
+
             } else {
                 // FALLBACK: Layered Strategy for complex types (structure, hydrophobicity, etc.)
                 // These are harder to replicate manually, so we accept minor shifts or use the layered approach.
