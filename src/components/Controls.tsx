@@ -576,7 +576,7 @@ export const Controls: React.FC<ControlsProps> = ({
                             {chains.length === 0 ? <p className={`italic text-[10px] ${subtleText}`}>No sequence data</p> : (
                                 chains.filter(c => viewSequenceChain ? c.name === viewSequenceChain : true).map(c => (
                                     <div key={c.name} className="mb-2">
-                                        <div className="text-[10px] font-bold text-blue-500 mb-0.5 sticky top-0 bg-inherit z-10">Chain {c.name}</div>
+                                        <div className={`text-[10px] font-bold text-blue-500 mb-0.5 sticky top-0 z-10 w-full py-1 ${cardBg} opacity-95 backdrop-blur-sm`}>Chain {c.name}</div>
                                         <div className="flex flex-wrap text-[10px] font-mono leading-none">
                                             {c.sequence.split('').map((char, idx) => {
                                                 const resNo = c.min + idx;
