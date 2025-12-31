@@ -1127,51 +1127,19 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             // MEASUREMENT MODE LOGIC
             if (isMeasurementMode) {
-                console.log("Measurement Mode Click (Raw):", atom);
-
-                // --- SNAP TO BACKBONE (CA) LOGIC ---
-                // User requested that measurements match the Contact Map (which uses CA).
-                // We attempt to find the CA atom for the clicked residue.
-                let targetAtom = atom;
-                try {
-                    // Navigate to residue
-                    const residue = atom.residue;
-                    if (residue) {
-                        // Priority: CA (Protein) > C3' (RNA/DNA) > P (Backbone fallback)
-                        // MATCH EXACTLY with getAtomCoordinates logic
-                        let bestAtom: any = null;
-
-                        residue.eachAtom((a: any) => {
-                            const name = a.atomname;
-                            if (name === 'CA') bestAtom = a;
-                            else if (!bestAtom && name === "C3'") bestAtom = a;
-                            else if (!bestAtom && name === 'P') bestAtom = a;
-                        });
-
-                        if (bestAtom) {
-                            targetAtom = bestAtom;
-                        }
-
-                        if (targetAtom !== atom) {
-                            console.log(`Snapping measurement from ${atom.atomname} to ${targetAtom.atomname} (Index: ${targetAtom.index})`);
-                        } else {
-                            console.log(`No better backbone atom found. Keeping ${atom.atomname}`);
-                        }
-                    }
-                } catch (snapErr) {
-                    console.warn("Snap to CA failed, using original atom", snapErr);
-                }
+                console.log("Measurement Mode Click:", atom);
 
                 // IMPORTANT: NGL reuses the same AtomProxy object for performance during iteration.
-                // We MUST clone the data immediately.
+                // We MUST clone the data immediately, otherwise both references in our array will 
+                // point to the same updated object (the last clicked atom), resulting in distance 0.
                 const atomData = {
-                    chainname: targetAtom.chainname,
-                    resno: targetAtom.resno,
-                    atomname: targetAtom.atomname,
-                    x: targetAtom.x,
-                    y: targetAtom.y,
-                    z: targetAtom.z,
-                    index: targetAtom.index // Store index directly!
+                    chainname: atom.chainname,
+                    resno: atom.resno,
+                    atomname: atom.atomname,
+                    x: atom.x,
+                    y: atom.y,
+                    z: atom.z,
+                    index: atom.index // Store index directly!
                 };
 
                 selectedAtomsRef.current.push(atomData);
