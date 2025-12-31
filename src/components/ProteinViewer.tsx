@@ -1127,19 +1127,43 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             // MEASUREMENT MODE LOGIC
             if (isMeasurementMode) {
-                console.log("Measurement Mode Click:", atom);
+                console.log("Measurement Mode Click (Raw):", atom);
+
+                // --- SNAP TO BACKBONE (CA) LOGIC ---
+                // User requested that measurements match the Contact Map (which uses CA).
+                // We attempt to find the CA atom for the clicked residue.
+                let targetAtom = atom;
+                try {
+                    // Navigate to residue
+                    const residue = atom.residue;
+                    if (residue) {
+                        // Priority: CA (Protein) > C3' (RNA/DNA) > P (Backbone fallback) > Original Click
+                        const ca = residue.getAtomByName('CA');
+                        const c3p = residue.getAtomByName("C3'");
+                        const p = residue.getAtomByName('P');
+
+                        if (ca) targetAtom = ca;
+                        else if (c3p) targetAtom = c3p;
+                        else if (p) targetAtom = p;
+
+                        if (targetAtom !== atom) {
+                            console.log(`Snapping measurement from ${atom.atomname} to ${targetAtom.atomname}`);
+                        }
+                    }
+                } catch (snapErr) {
+                    console.warn("Snap to CA failed, using original atom", snapErr);
+                }
 
                 // IMPORTANT: NGL reuses the same AtomProxy object for performance during iteration.
-                // We MUST clone the data immediately, otherwise both references in our array will 
-                // point to the same updated object (the last clicked atom), resulting in distance 0.
+                // We MUST clone the data immediately.
                 const atomData = {
-                    chainname: atom.chainname,
-                    resno: atom.resno,
-                    atomname: atom.atomname,
-                    x: atom.x,
-                    y: atom.y,
-                    z: atom.z,
-                    index: atom.index // Store index directly!
+                    chainname: targetAtom.chainname,
+                    resno: targetAtom.resno,
+                    atomname: targetAtom.atomname,
+                    x: targetAtom.x,
+                    y: targetAtom.y,
+                    z: targetAtom.z,
+                    index: targetAtom.index // Store index directly!
                 };
 
                 selectedAtomsRef.current.push(atomData);
