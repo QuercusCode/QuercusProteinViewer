@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { X, ZoomIn, ZoomOut, Maximize, Download, Grid3X3, Check, FileText, Menu, BookOpen, Smartphone } from 'lucide-react';
 import type { ChainInfo, ColorPalette } from '../types';
 import { generateProteinReport } from '../utils/pdfGenerator';
@@ -137,13 +137,31 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     });
 
     // Color Palettes (Approximation of D3 scales)
-    const getPaletteColor = (value: number, palette: ColorPalette) => {
+    const getPaletteColor = useCallback((value: number, palette: ColorPalette) => {
         // value is 0.0 to 1.0 (1.0 = closest/strongest contact)
 
         if (palette === 'standard') {
             // Original Blue->Red Heatmap
             return `hsl(${value * 240}, 100%, 50%)`;
         }
+
+        const hexToRgb = (hex: string) => {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : { r: 0, g: 0, b: 0 };
+        };
+
+        const interpolate = (color1: string, color2: string, factor: number) => {
+            const c1 = hexToRgb(color1);
+            const c2 = hexToRgb(color2);
+            const r = Math.round(c1.r + factor * (c2.r - c1.r));
+            const g = Math.round(c1.g + factor * (c2.g - c1.g));
+            const b = Math.round(c1.b + factor * (c2.b - c1.b));
+            return `rgb(${r},${g},${b})`;
+        };
 
         if (palette === 'viridis') {
             // Viridis (Purple -> Blue -> Green -> Yellow)
@@ -168,25 +186,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         }
 
         return `hsl(${value * 240}, 100%, 50%)`;
-    };
-
-    const interpolate = (color1: string, color2: string, factor: number) => {
-        const c1 = hexToRgb(color1);
-        const c2 = hexToRgb(color2);
-        const r = Math.round(c1.r + factor * (c2.r - c1.r));
-        const g = Math.round(c1.g + factor * (c2.g - c1.g));
-        const b = Math.round(c1.b + factor * (c2.b - c1.b));
-        return `rgb(${r},${g},${b})`;
-    };
-
-    const hexToRgb = (hex: string) => {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        } : { r: 0, g: 0, b: 0 };
-    };
+    }, []);
 
     // Initial Data Calculation
     useEffect(() => {
