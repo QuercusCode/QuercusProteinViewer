@@ -1,10 +1,10 @@
-import { useState, useRef, useEffect } from 'react';
-import { ProteinViewer, type RepresentationType, type ColoringType, type ProteinViewerRef } from './components/ProteinViewer';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { ProteinViewer, type ProteinViewerRef } from './components/ProteinViewer';
 import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
 import { HelpGuide } from './components/HelpGuide';
 import { parseURLState, getShareableURL } from './utils/urlManager';
-import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Movie } from './types';
+import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Movie, ColorPalette, RepresentationType, ColoringType } from './types';
 
 function App() {
   // Parse Global URL State Once
@@ -42,9 +42,9 @@ function App() {
 
   // Presentation State
   const [isSpinning, setIsSpinning] = useState(initialUrlState.isSpinning || false);
-  const [isCinematic, setIsCinematic] = useState(false);
   const [isCleanMode, setIsCleanMode] = useState(false);
   const [showContactMap, setShowContactMap] = useState(false);
+  const [colorPalette, setColorPalette] = useState<ColorPalette>('standard');
 
   // Custom Colors need to be initialized too
   const [customColors, setCustomColors] = useState<CustomColorRule[]>(initialUrlState.customColors || []);
@@ -156,7 +156,10 @@ function App() {
     }
   };
 
-
+  const handleHighlightResidue = (chain: string, resNo: number) => {
+    setHighlightedResidue({ chain, resNo, resName: '' });
+    viewerRef.current?.highlightResidue(chain, resNo);
+  };
 
 
   const [proteinTitle, setProteinTitle] = useState<string | null>(null);
@@ -463,10 +466,10 @@ function App() {
         onDeleteMovie={handleDeleteMovie}
         isSpinning={isSpinning}
         setIsSpinning={setIsSpinning}
-        isCinematic={isCinematic}
-        setIsCinematic={setIsCinematic}
         isCleanMode={isCleanMode}
         setIsCleanMode={setIsCleanMode}
+        colorPalette={colorPalette}
+        setColorPalette={setColorPalette}
         onSaveSession={handleSaveSession}
         onLoadSession={handleLoadSession}
         onToggleContactMap={() => setShowContactMap(true)}
@@ -491,7 +494,6 @@ function App() {
         showSurface={showSurface}
         showLigands={showLigands}
         isSpinning={isSpinning}
-        isCinematic={isCinematic}
 
         className="w-full h-full"
       />
@@ -501,8 +503,10 @@ function App() {
         onClose={() => setShowContactMap(false)}
         chains={chains}
         getContactData={getAtomDataWrapper}
+        onHighlightResidue={(chain, resNo) => handleHighlightResidue(chain, resNo)}
         onPixelClick={handlePixelClick}
         isLightMode={isLightMode}
+        colorPalette={colorPalette}
         proteinName={file ? file.name : pdbId}
         getSnapshot={async () => {
           if (!viewerRef.current) return null;

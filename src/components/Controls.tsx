@@ -24,8 +24,7 @@ import {
     ImageIcon,
     Grid3X3
 } from 'lucide-react';
-import type { RepresentationType, ColoringType } from './ProteinViewer';
-import type { ChainInfo, CustomColorRule, Snapshot, Movie } from '../types';
+import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette } from '../types';
 
 interface ControlsProps {
     pdbId: string;
@@ -62,8 +61,6 @@ interface ControlsProps {
     onDeleteSnapshot: (id: string) => void;
     isSpinning: boolean;
     setIsSpinning: (spinning: boolean) => void;
-    isCinematic: boolean;
-    setIsCinematic: (cinematic: boolean) => void;
     isCleanMode: boolean;
     setIsCleanMode: (clean: boolean) => void;
     onSaveSession: () => void;
@@ -72,6 +69,8 @@ interface ControlsProps {
     movies: Movie[];
     onDownloadMovie: (id: string) => void;
     onDeleteMovie: (id: string) => void;
+    colorPalette: ColorPalette;
+    setColorPalette: (palette: ColorPalette) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -109,8 +108,6 @@ export const Controls: React.FC<ControlsProps> = ({
     onDeleteSnapshot,
     isSpinning,
     setIsSpinning,
-    isCinematic,
-    setIsCinematic,
     isCleanMode,
     setIsCleanMode,
     onSaveSession,
@@ -118,7 +115,9 @@ export const Controls: React.FC<ControlsProps> = ({
     movies,
     onDownloadMovie,
     onDeleteMovie,
-    onToggleContactMap
+    onToggleContactMap,
+    colorPalette,
+    setColorPalette
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const sessionInputRef = useRef<HTMLInputElement>(null);
@@ -402,15 +401,6 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <RefreshCw className={`w-3 h-3 ${isSpinning ? 'animate-spin' : ''}`} />
                             </button>
                         </div>
-                        <button
-                            onClick={() => setIsCinematic(!isCinematic)}
-                            className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isCinematic ? 'bg-purple-500/10 border-purple-500 text-purple-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
-                        >
-                            <span className="text-xs font-medium">Cinematic</span>
-                            <div className={`w-2 h-2 rounded-full ${isCinematic ? 'bg-purple-500 animate-pulse' : 'bg-neutral-500'}`} />
-                        </button>
-
-
                         {/* Style & Color Dropdowns */}
                         <div className="space-y-1.5">
                             <span className={`text-[10px] uppercase font-bold ${subtleText}`}>Representation & Color</span>
@@ -438,6 +428,21 @@ export const Controls: React.FC<ControlsProps> = ({
                                     <option value="hydrophobicity">Hydrophobicity</option>
                                     <option value="bfactor">B-Factor</option>
                                     <option value="charge">Charge</option>
+                                </select>
+                            </div>
+
+                            {/* Accessibility Palette Selector */}
+                            <div className="flex items-center justify-between pt-1">
+                                <span className={`text-[10px] uppercase font-bold ${subtleText}`}>Color Palette</span>
+                                <select
+                                    value={colorPalette}
+                                    onChange={(e) => setColorPalette(e.target.value as ColorPalette)}
+                                    className={`w-32 border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
+                                >
+                                    <option value="standard">Standard</option>
+                                    <option value="viridis">Viridis (Deuteranopia)</option>
+                                    <option value="magma">Magma (Contrast)</option>
+                                    <option value="cividis">Cividis (Optimized)</option>
                                 </select>
                             </div>
                             <div className={`p-2 rounded border text-[10px] leading-snug ${isLightMode ? 'bg-neutral-50/50 border-neutral-100 text-neutral-600' : 'bg-neutral-800/50 border-neutral-700/50 text-neutral-400'}`}>

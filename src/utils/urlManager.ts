@@ -1,4 +1,4 @@
-import type { RepresentationType, ColoringType } from '../components/ProteinViewer';
+import type { RepresentationType, ColoringType } from '../types';
 import type { CustomColorRule } from '../types';
 
 export interface AppState {

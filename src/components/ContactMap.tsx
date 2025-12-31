@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { X, ZoomIn, ZoomOut, Maximize, Download, Grid3X3, Check, FileText, Menu, BookOpen, Smartphone } from 'lucide-react';
-import type { ChainInfo } from '../types';
+import type { ChainInfo, ColorPalette } from '../types';
 import { generateProteinReport } from '../utils/pdfGenerator';
 import { getInteractionType } from '../utils/interactionUtils';
 
@@ -14,6 +14,8 @@ interface ContactMapProps {
     proteinName?: string;
     getSnapshot?: () => Promise<string | null>;
     getShareableLink?: () => string;
+    colorPalette?: ColorPalette;
+    onHighlightResidue?: (chain: string, resNo: number) => void;
 }
 
 
@@ -26,7 +28,9 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     isLightMode,
     proteinName = "Protein Structure",
     getSnapshot,
-    getShareableLink
+    getShareableLink,
+    colorPalette = 'standard',
+    onHighlightResidue
 }) => {
     const mapCanvasRef = useRef<HTMLCanvasElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -114,13 +118,75 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     const [showIntraChain, setShowIntraChain] = useState(true);
     const [showMobileSidebar, setShowMobileSidebar] = useState(false);
 
-    const [filters, setFilters] = useState({
+    const [filters, setFilters] = useState<{
+        all: boolean;
+        hydrophobic: boolean;
+        saltBridge: boolean;
+        piStacking: boolean;
+        disulfide: boolean;
+        chains: string[];
+        residues: string[];
+    }>({
         all: true,
         hydrophobic: false,
         saltBridge: false,
         piStacking: false,
-        disulfide: false
+        disulfide: false,
+        chains: [],
+        residues: []
     });
+
+    // Color Palettes (Approximation of D3 scales)
+    const getPaletteColor = (value: number, palette: ColorPalette) => {
+        // value is 0.0 to 1.0 (1.0 = closest/strongest contact)
+
+        if (palette === 'standard') {
+            // Original Blue->Red Heatmap
+            return `hsl(${value * 240}, 100%, 50%)`;
+        }
+
+        if (palette === 'viridis') {
+            // Viridis (Purple -> Blue -> Green -> Yellow)
+            // Approx interpolation
+            if (value < 0.25) return interpolate('#440154', '#3b528b', value * 4);
+            if (value < 0.5) return interpolate('#3b528b', '#21918c', (value - 0.25) * 4);
+            if (value < 0.75) return interpolate('#21918c', '#5ec962', (value - 0.5) * 4);
+            return interpolate('#5ec962', '#fde725', (value - 0.75) * 4);
+        }
+
+        if (palette === 'magma') {
+            // Magma (Black -> Purple -> Red -> Yellow)
+            if (value < 0.25) return interpolate('#000004', '#51127c', value * 4);
+            if (value < 0.5) return interpolate('#51127c', '#b73779', (value - 0.25) * 4);
+            if (value < 0.75) return interpolate('#b73779', '#fc8961', (value - 0.5) * 4);
+            return interpolate('#fc8961', '#fcfdbf', (value - 0.75) * 4);
+        }
+
+        if (palette === 'cividis') {
+            // Cividis (Blue -> Yellow) Optimized for CV Deficiencies
+            return interpolate('#002051', '#fdea45', value);
+        }
+
+        return `hsl(${value * 240}, 100%, 50%)`;
+    };
+
+    const interpolate = (color1: string, color2: string, factor: number) => {
+        const c1 = hexToRgb(color1);
+        const c2 = hexToRgb(color2);
+        const r = Math.round(c1.r + factor * (c2.r - c1.r));
+        const g = Math.round(c1.g + factor * (c2.g - c1.g));
+        const b = Math.round(c1.b + factor * (c2.b - c1.b));
+        return `rgb(${r},${g},${b})`;
+    };
+
+    const hexToRgb = (hex: string) => {
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? {
+            r: parseInt(result[1], 16),
+            g: parseInt(result[2], 16),
+            b: parseInt(result[3], 16)
+        } : { r: 0, g: 0, b: 0 };
+    };
 
     // Initial Data Calculation
     useEffect(() => {
@@ -463,47 +529,63 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
                 const dist = matrix[i][j];
 
-                // Filtering Logic
-                if (dist > proximalThreshold && filters.all) continue; // Skip if too far and showing all (optimization)
+                if (dist < proximalThreshold) {
+                    // Apply Filters
+                    const labelI = labels[i];
+                    const labelJ = labels[j];
 
-                if (!filters.all) {
-                    // Specific Filter Mode
-                    const typeData = getInteractionType(labels[i].label, labels[j].label, dist);
+                    // Filter by Chain
+                    if (filters.chains.length > 0) {
+                        if (!filters.chains.includes(labelI.chain) && !filters.chains.includes(labelJ.chain)) continue;
+                    }
+                    // Filter by Residue Type
+                    if (filters.residues.length > 0) {
+                        const resNameI = labelI.label.split(' ')[0]; // "ALA 123" -> "ALA"
+                        const resNameJ = labelJ.label.split(' ')[0];
+                        if (!filters.residues.includes(resNameI) && !filters.residues.includes(resNameJ)) continue;
+                    }
 
-                    if (!typeData) continue; // Not a recognized interaction type
+                    if (!filters.all) {
+                        // Specific Filter Mode
+                        const typeData = getInteractionType(labelI.label, labelJ.label, dist);
 
-                    // Check if this type corresponds to an active filter
-                    // Note: Mapping type strings to filter keys
-                    let match = false;
-                    let color = '#a3a3a3'; // Fallback
+                        if (!typeData) continue; // Not a recognized interaction type
 
-                    if (typeData.type === 'Salt Bridge' && filters.saltBridge) { match = true; color = '#ef4444'; } // red-500
-                    else if (typeData.type === 'Disulfide Bond' && filters.disulfide) { match = true; color = '#eab308'; } // yellow-500
-                    else if (typeData.type === 'Hydrophobic Contact' && filters.hydrophobic) { match = true; color = '#22c55e'; } // green-500
-                    else if ((typeData.type === 'Pi-Stacking' || typeData.type === 'Cation-Pi Interaction') && filters.piStacking) { match = true; color = '#a855f7'; } // purple-500
+                        // Check if this type corresponds to an active filter
+                        // Note: Mapping type strings to filter keys
+                        let match = false;
+                        let color = '#a3a3a3'; // Fallback
 
-                    if (!match) continue; // Skip if filter not active
+                        if (typeData.type === 'Salt Bridge' && filters.saltBridge) { match = true; color = '#ef4444'; } // red-500
+                        else if (typeData.type === 'Disulfide Bond' && filters.disulfide) { match = true; color = '#eab308'; } // yellow-500
+                        else if (typeData.type === 'Hydrophobic Contact' && filters.hydrophobic) { match = true; color = '#22c55e'; } // green-500
+                        else if ((typeData.type === 'Pi-Stacking' || typeData.type === 'Cation-Pi Interaction') && filters.piStacking) { match = true; color = '#a855f7'; } // purple-500
 
-                    // Draw with specific color for filtered mode
-                    ctx.fillStyle = color;
-                    ctx.fillRect(j * P, i * P, P, P);
+                        if (!match) continue; // Skip if filter not active
 
-                } else {
-                    // Default "Show All" Mode (Blue Heatmap)
-                    if (dist < proximalThreshold) {
+                        // Draw with specific color for filtered mode
+                        ctx.fillStyle = color;
+                        ctx.fillRect(j * P, i * P, P, P);
+
+                    } else {
+                        // Default "Show All" Mode (Blue Heatmap)
+                        // Normalize for intensity
+                        let intensity = 0;
                         if (dist < contactThreshold) {
-                            ctx.fillStyle = isLightMode ? '#1e3a8a' : '#60a5fa';
+                            intensity = 1.0 - (dist / contactThreshold) * 0.4; // 0.6 - 1.0
                         } else {
-                            ctx.fillStyle = isLightMode ? '#94a3b8' : '#475569';
+                            const range = proximalThreshold - contactThreshold;
+                            const val = dist - contactThreshold;
+                            intensity = 0.6 - (val / range) * 0.4; // 0.2 - 0.6
                         }
 
+                        ctx.fillStyle = getPaletteColor(intensity, colorPalette);
                         ctx.fillRect(j * P, i * P, P, P);
                     }
                 }
             }
         }
-
-    }, [distanceData, scale, isLightMode, contactThreshold, proximalThreshold, showGrid, showIntraChain, filters]);
+    }, [distanceData, scale, isLightMode, contactThreshold, proximalThreshold, showGrid, showIntraChain, filters, colorPalette]);
 
 
     // Modals
@@ -637,6 +719,12 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
         if (i >= 0 && i < distanceData.size && j >= 0 && j < distanceData.size) {
             setHoverPos({ i, j, x: e.clientX, y: e.clientY });
+
+            // Trigger Highlight
+            if (onHighlightResidue) {
+                const resA = distanceData.labels[i];
+                onHighlightResidue(resA.chain, resA.resNo);
+            }
         } else {
             setHoverPos(null);
         }

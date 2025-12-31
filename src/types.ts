@@ -48,3 +48,7 @@ export interface Annotation {
     text: string;
     position: { x: number; y: number; z: number };
 }
+
+export type RepresentationType = 'cartoon' | 'licorice' | 'backbone' | 'spacefill' | 'surface' | 'ribbon';
+export type ColoringType = 'chainid' | 'element' | 'residue' | 'secondary' | 'hydrophobicity' | 'structure' | 'bfactor' | 'charge';
+export type ColorPalette = 'standard' | 'viridis' | 'magma' | 'cividis' | 'plasma';

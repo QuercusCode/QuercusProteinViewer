@@ -9,8 +9,6 @@ declare global {
     }
 }
 
-export type RepresentationType = 'cartoon' | 'licorice' | 'backbone' | 'spacefill' | 'surface' | 'ribbon';
-export type ColoringType = 'chainid' | 'element' | 'residue' | 'secondary' | 'hydrophobicity' | 'structure' | 'bfactor' | 'charge';
 
 export interface MeasurementData {
     atom1: { chain: string, resNo: number, atomName: string, x: number, y: number, z: number, index?: number };
@@ -44,7 +42,6 @@ interface ProteinViewerProps {
     showLigands?: boolean;
     isSpinning?: boolean;
     isMeasurementMode?: boolean;
-    isCinematic?: boolean;
 }
 
 export interface ProteinViewerRef {
@@ -86,8 +83,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     showSurface = false,
     showLigands = false,
     isSpinning = false,
-    isMeasurementMode = false,
-    isCinematic = false
+    isMeasurementMode = false
 }: ProteinViewerProps, ref: React.Ref<ProteinViewerRef>) => {
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -885,31 +881,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             stageRef.current.setParameters({ backgroundColor });
         }
     }, [backgroundColor]);
-
-    // Handle Cinematic Mode
-    useEffect(() => {
-        if (stageRef.current) {
-            if (isCinematic) {
-                // High Quality "Studio" Settings
-                stageRef.current.setParameters({
-                    ambientOcclusion: true,
-                    ambientShadow: true,
-                    ambientIntensity: 1.0,
-                    lightIntensity: 0.8,
-                    sampleLevel: 3 // High quality sampling
-                });
-            } else {
-                // Standard Performance Settings
-                stageRef.current.setParameters({
-                    ambientOcclusion: false,
-                    ambientShadow: false, // Turn off for speed
-                    ambientIntensity: 0.2,
-                    lightIntensity: 1.0,
-                    sampleLevel: 0
-                });
-            }
-        }
-    }, [isCinematic]);
 
     useEffect(() => {
         isMounted.current = true;
