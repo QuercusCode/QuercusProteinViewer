@@ -587,6 +587,10 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         }
     }, [distanceData, scale, isLightMode, contactThreshold, proximalThreshold, showGrid, showIntraChain, filters, colorPalette]);
 
+    useEffect(() => {
+        console.log('ContactMap: colorPalette prop just changed to:', colorPalette);
+    }, [colorPalette]);
+
 
     // Modals
     const [showReportNameModal, setShowReportNameModal] = useState(false);

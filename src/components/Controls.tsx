@@ -436,7 +436,10 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <span className={`text-[10px] uppercase font-bold ${subtleText}`}>Color Palette</span>
                                 <select
                                     value={colorPalette}
-                                    onChange={(e) => setColorPalette(e.target.value as ColorPalette)}
+                                    onChange={(e) => {
+                                        console.log('Controls: Selected palette:', e.target.value);
+                                        setColorPalette(e.target.value as ColorPalette);
+                                    }}
                                     className={`w-32 border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
                                 >
                                     <option value="standard">Standard</option>

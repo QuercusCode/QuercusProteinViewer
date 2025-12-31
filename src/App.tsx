@@ -45,6 +45,7 @@ function App() {
   const [isCleanMode, setIsCleanMode] = useState(false);
   const [showContactMap, setShowContactMap] = useState(false);
   const [colorPalette, setColorPalette] = useState<ColorPalette>('standard');
+  console.log('App: Current colorPalette state:', colorPalette);
 
   // Custom Colors need to be initialized too
   const [customColors, setCustomColors] = useState<CustomColorRule[]>(initialUrlState.customColors || []);
