@@ -674,11 +674,11 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         if (i >= 0 && i < distanceData.size && j >= 0 && j < distanceData.size) {
             setHoverPos({ i, j, x: e.clientX, y: e.clientY });
 
-            // Trigger Highlight
-            if (onHighlightResidue) {
-                const resA = distanceData.labels[i];
-                onHighlightResidue(resA.chain, resA.resNo);
-            }
+            // Trigger Highlight - DISABLED per user request
+            // if (onHighlightResidue) {
+            //     const resA = distanceData.labels[i];
+            //     onHighlightResidue(resA.chain, resA.resNo);
+            // }
         } else {
             setHoverPos(null);
         }
