@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import type { CustomColorRule, ChainInfo } from '../types';
+import type { CustomColorRule, ChainInfo, ColorPalette } from '../types';
+import { getPaletteColor } from '../utils/colorUtils';
 
 declare global {
     interface Window {
@@ -17,8 +18,6 @@ export interface MeasurementData {
     shapeId: string;
 }
 
-
-
 interface ProteinViewerProps {
     pdbId?: string;
     file?: File;
@@ -26,6 +25,7 @@ interface ProteinViewerProps {
     representation?: string;
     coloring?: string;
     customColors?: CustomColorRule[];
+    colorPalette?: ColorPalette;
 
     className?: string;
     onStructureLoaded?: (info: { chains: ChainInfo[], ligands: string[] }) => void;
@@ -52,6 +52,7 @@ export interface ProteinViewerRef {
     getCameraOrientation: () => any;
     setCameraOrientation: (orientation: any) => void;
     getAtomCoordinates: () => Promise<{ x: number[], y: number[], z: number[], labels: string[], ss: string[] }[]>;
+    getTorsionData: () => Promise<{ phi: number | null, psi: number | null, chain: string, resNo: number, resName: string }[]>;
     getAtomPosition: (chain: string, resNo: number, atomName?: string) => { x: number, y: number, z: number } | null;
     getAtomPositionByIndex: (atomIndex: number) => { x: number, y: number, z: number } | null;
     addResidue: (chainName: string, resType: string) => Promise<Blob | null>;
@@ -60,9 +61,8 @@ export interface ProteinViewerRef {
     visualizeContact: (chainA: string, resA: number, chainB: string, resB: number) => void;
     getMeasurements: () => MeasurementData[];
     restoreMeasurements: (measurements: { atom1: any, atom2: any }[]) => void;
+    captureImage: () => Promise<void>;
 }
-
-
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     pdbId,
@@ -70,6 +70,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     representation = 'cartoon',
     coloring = 'chainid',
     customColors = [],
+    colorPalette = 'standard',
     className,
     onStructureLoaded,
     loading: externalLoading,
@@ -1387,7 +1388,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     useEffect(() => {
         updateRepresentation();
-    }, [representation, coloring, customColors, showSurface, showLigands]);
+    }, [representation, coloring, customColors, showSurface, showLigands, colorPalette]);
 
     useEffect(() => {
         if (stageRef.current && resetCamera) {
