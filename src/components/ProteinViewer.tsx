@@ -44,6 +44,7 @@ interface ProteinViewerProps {
     showLigands?: boolean;
     isSpinning?: boolean;
     isMeasurementMode?: boolean;
+    isCinematic?: boolean;
 }
 
 export interface ProteinViewerRef {
@@ -86,8 +87,9 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     showLigands = false,
     isSpinning = false,
     isMeasurementMode = false,
+    isCinematic = false
+}: ProteinViewerProps, ref: React.Ref<ProteinViewerRef>) => {
 
-}, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const stageRef = useRef<any>(null);
     const componentRef = useRef<any>(null);
@@ -883,6 +885,31 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             stageRef.current.setParameters({ backgroundColor });
         }
     }, [backgroundColor]);
+
+    // Handle Cinematic Mode
+    useEffect(() => {
+        if (stageRef.current) {
+            if (isCinematic) {
+                // High Quality "Studio" Settings
+                stageRef.current.setParameters({
+                    ambientOcclusion: true,
+                    ambientShadow: true,
+                    ambientIntensity: 1.0,
+                    lightIntensity: 0.8,
+                    sampleLevel: 3 // High quality sampling
+                });
+            } else {
+                // Standard Performance Settings
+                stageRef.current.setParameters({
+                    ambientOcclusion: false,
+                    ambientShadow: false, // Turn off for speed
+                    ambientIntensity: 0.2,
+                    lightIntensity: 1.0,
+                    sampleLevel: 0
+                });
+            }
+        }
+    }, [isCinematic]);
 
     useEffect(() => {
         isMounted.current = true;

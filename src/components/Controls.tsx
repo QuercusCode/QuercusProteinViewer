@@ -62,6 +62,8 @@ interface ControlsProps {
     onDeleteSnapshot: (id: string) => void;
     isSpinning: boolean;
     setIsSpinning: (spinning: boolean) => void;
+    isCinematic: boolean;
+    setIsCinematic: (cinematic: boolean) => void;
     isCleanMode: boolean;
     setIsCleanMode: (clean: boolean) => void;
     onSaveSession: () => void;
@@ -107,6 +109,8 @@ export const Controls: React.FC<ControlsProps> = ({
     onDeleteSnapshot,
     isSpinning,
     setIsSpinning,
+    isCinematic,
+    setIsCinematic,
     isCleanMode,
     setIsCleanMode,
     onSaveSession,
@@ -398,6 +402,14 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <RefreshCw className={`w-3 h-3 ${isSpinning ? 'animate-spin' : ''}`} />
                             </button>
                         </div>
+                        <button
+                            onClick={() => setIsCinematic(!isCinematic)}
+                            className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isCinematic ? 'bg-purple-500/10 border-purple-500 text-purple-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
+                        >
+                            <span className="text-xs font-medium">Cinematic</span>
+                            <div className={`w-2 h-2 rounded-full ${isCinematic ? 'bg-purple-500 animate-pulse' : 'bg-neutral-500'}`} />
+                        </button>
+
 
                         {/* Style & Color Dropdowns */}
                         <div className="space-y-1.5">

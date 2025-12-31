@@ -42,6 +42,7 @@ function App() {
 
   // Presentation State
   const [isSpinning, setIsSpinning] = useState(initialUrlState.isSpinning || false);
+  const [isCinematic, setIsCinematic] = useState(false);
   const [isCleanMode, setIsCleanMode] = useState(false);
   const [showContactMap, setShowContactMap] = useState(false);
 
@@ -462,6 +463,8 @@ function App() {
         onDeleteMovie={handleDeleteMovie}
         isSpinning={isSpinning}
         setIsSpinning={setIsSpinning}
+        isCinematic={isCinematic}
+        setIsCinematic={setIsCinematic}
         isCleanMode={isCleanMode}
         setIsCleanMode={setIsCleanMode}
         onSaveSession={handleSaveSession}
@@ -488,6 +491,7 @@ function App() {
         showSurface={showSurface}
         showLigands={showLigands}
         isSpinning={isSpinning}
+        isCinematic={isCinematic}
 
         className="w-full h-full"
       />
