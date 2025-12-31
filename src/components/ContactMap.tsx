@@ -31,7 +31,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     getSnapshot,
     getShareableLink,
     colorPalette = 'standard',
-    onHighlightResidue
+    // onHighlightResidue
 }) => {
     const mapCanvasRef = useRef<HTMLCanvasElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
