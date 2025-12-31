@@ -1326,7 +1326,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                 try {
                     const NGL = window.NGL;
-                    const id = NGL.ColormakerRegistry.addScheme(function (this: any) {
+                    NGL.ColormakerRegistry.addScheme(function (this: any) {
                         this.atomColor = (atom: any) => {
                             let value = 0;
                             if (currentColoring === 'bfactor') {
