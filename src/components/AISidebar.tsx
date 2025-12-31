@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, User, Sparkles, X, ChevronRight, LayoutList } from 'lucide-react';
+import { Send, Bot, User, Sparkles, X } from 'lucide-react';
 import clsx from 'clsx';
-import { ResidueInfo } from '../types';
+import type { ResidueInfo } from '../types';
 
 interface AISidebarProps {
     isOpen: boolean;
