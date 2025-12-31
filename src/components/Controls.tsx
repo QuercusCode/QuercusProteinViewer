@@ -241,7 +241,6 @@ export const Controls: React.FC<ControlsProps> = ({
                 onClick={() => setIsCleanMode(false)}
                 className={`absolute bottom-6 right-6 z-50 p-3 rounded-full shadow-lg transition-transform hover:scale-110 ${isLightMode ? 'bg-white text-neutral-800' : 'bg-neutral-800 text-white'}`}
                 title="Exit Presentation Mode"
-                aria-label="Exit Presentation Mode"
             >
                 <Minimize className="w-5 h-5" />
             </button>
@@ -253,7 +252,6 @@ export const Controls: React.FC<ControlsProps> = ({
             <button
                 onClick={() => setIsOpen(true)}
                 className={`absolute top-4 left-4 z-40 md:hidden p-2 rounded-lg backdrop-blur-md shadow-lg transition-opacity hover:opacity-80 border ${isLightMode ? 'bg-white/90 border-neutral-200 text-neutral-800' : 'bg-neutral-900/90 border-white/10 text-white'}`}
-                aria-label="Open Controls Menu"
             >
                 <Menu className="w-6 h-6" />
             </button>
@@ -273,7 +271,6 @@ export const Controls: React.FC<ControlsProps> = ({
                     <button
                         onClick={() => setIsOpen(false)}
                         className={`absolute top-4 right-4 p-1 md:hidden ${subtleText}`}
-                        aria-label="Close Controls Menu"
                     >
                         <X className="w-6 h-6" />
                     </button>
@@ -290,7 +287,6 @@ export const Controls: React.FC<ControlsProps> = ({
                             onClick={() => setIsLightMode(!isLightMode)}
                             className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-neutral-100 text-amber-500 hover:bg-neutral-200' : 'bg-neutral-800 text-blue-300 hover:bg-neutral-700'}`}
                             title="Toggle Theme"
-                            aria-label={isLightMode ? "Switch to Dark Mode" : "Switch to Light Mode"}
                         >
                             {isLightMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                         </button>
@@ -298,7 +294,6 @@ export const Controls: React.FC<ControlsProps> = ({
                             onClick={() => setIsDyslexicFont(!isDyslexicFont)}
                             className={`p-2 rounded-full transition-colors ${isDyslexicFont ? 'bg-blue-100 text-blue-600' : (isLightMode ? 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700')}`}
                             title="Toggle Dyslexic-Friendly Font"
-                            aria-label="Toggle Dyslexic-Friendly Font"
                         >
                             <span className="font-bold text-xs">Aa</span>
                         </button>
@@ -644,7 +639,7 @@ export const Controls: React.FC<ControlsProps> = ({
                         </button>
                         {/* Mini Gallery Trigger if snapshot exists */}
                         {snapshots.length > 0 && (
-                            <button onClick={() => setPreviewSnapshot(snapshots[snapshots.length - 1])} className="px-3 border rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800" aria-label="Open Snapshot Gallery">
+                            <button onClick={() => setPreviewSnapshot(snapshots[snapshots.length - 1])} className="px-3 border rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800">
                                 <ImageIcon className="w-4 h-4" />
                             </button>
                         )}
@@ -690,7 +685,6 @@ export const Controls: React.FC<ControlsProps> = ({
                                             onClick={(e) => { e.stopPropagation(); setPreviewSnapshot(snap); }}
                                             className="p-1.5 bg-neutral-600 hover:bg-neutral-500 text-white rounded-full transition-colors"
                                             title="Preview"
-                                            aria-label="Preview Snapshot"
                                         >
                                             <Eye className="w-3 h-3" />
                                         </button>
@@ -698,7 +692,6 @@ export const Controls: React.FC<ControlsProps> = ({
                                             onClick={(e) => { e.stopPropagation(); onDownloadSnapshot(snap.id); }}
                                             className="p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-full transition-colors"
                                             title="Download"
-                                            aria-label="Download Snapshot"
                                         >
                                             <Download className="w-3 h-3" />
                                         </button>
@@ -706,7 +699,6 @@ export const Controls: React.FC<ControlsProps> = ({
                                             onClick={(e) => { e.stopPropagation(); onDeleteSnapshot(snap.id); }}
                                             className="p-1.5 bg-red-600/80 hover:bg-red-500/80 text-white rounded-full transition-colors"
                                             title="Delete"
-                                            aria-label="Delete Snapshot"
                                         >
                                             <Trash2 className="w-3 h-3" />
                                         </button>
@@ -743,7 +735,6 @@ export const Controls: React.FC<ControlsProps> = ({
                                             onClick={(e) => { e.stopPropagation(); setPreviewMovie(movie); }}
                                             className="p-1.5 bg-neutral-600 hover:bg-neutral-500 text-white rounded transition-colors"
                                             title="Play"
-                                            aria-label="Play Movie"
                                         >
                                             <Video className="w-3 h-3" />
                                         </button>
@@ -751,7 +742,6 @@ export const Controls: React.FC<ControlsProps> = ({
                                             onClick={(e) => { e.stopPropagation(); onDownloadMovie(movie.id); }}
                                             className="p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors"
                                             title="Download"
-                                            aria-label="Download Movie"
                                         >
                                             <Download className="w-3 h-3" />
                                         </button>
@@ -759,7 +749,6 @@ export const Controls: React.FC<ControlsProps> = ({
                                             onClick={(e) => { e.stopPropagation(); onDeleteMovie(movie.id); }}
                                             className="p-1.5 bg-red-600/80 hover:bg-red-500/80 text-white rounded transition-colors"
                                             title="Delete"
-                                            aria-label="Delete Movie"
                                         >
                                             <Trash2 className="w-3 h-3" />
                                         </button>
@@ -780,7 +769,6 @@ export const Controls: React.FC<ControlsProps> = ({
                             <button
                                 onClick={() => setPreviewSnapshot(null)}
                                 className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
-                                aria-label="Close Preview"
                             >
                                 <X className="w-6 h-6" />
                             </button>
@@ -806,7 +794,6 @@ export const Controls: React.FC<ControlsProps> = ({
                             <button
                                 onClick={() => setPreviewMovie(null)}
                                 className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
-                                aria-label="Close Preview"
                             >
                                 <X className="w-6 h-6" />
                             </button>

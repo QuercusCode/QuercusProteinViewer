@@ -1430,13 +1430,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     useEffect(() => {
         if (stageRef.current) {
-            const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            if (isSpinning && prefersReducedMotion) {
-                console.log("Reduced motion preference detected: disabling auto-spin.");
-                stageRef.current.setSpin(false);
-            } else {
-                stageRef.current.setSpin(isSpinning);
-            }
+            stageRef.current.setSpin(isSpinning);
         }
     }, [isSpinning]);
 
@@ -1446,51 +1440,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         }
     }, [resetCamera]);
 
-    // Keyboard Navigation
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (!stageRef.current || !stageRef.current.viewerControls) return;
-        const controls = stageRef.current.viewerControls;
-        const step = 0.5; // Rotation step size
-
-        switch (e.key) {
-            case 'ArrowLeft':
-                controls.rotate({ x: 0, y: -step, z: 0 });
-                break;
-            case 'ArrowRight':
-                controls.rotate({ x: 0, y: step, z: 0 });
-                break;
-            case 'ArrowUp':
-                controls.rotate({ x: -step, y: 0, z: 0 });
-                break;
-            case 'ArrowDown':
-                controls.rotate({ x: step, y: 0, z: 0 });
-                break;
-            case '+':
-            case '=':
-                controls.zoom(-2); // Zoom in
-                break;
-            case '-':
-            case '_':
-                controls.zoom(2); // Zoom out
-                break;
-            case 'r':
-            case 'R':
-                stageRef.current.autoView();
-                break;
-            default:
-                return; // Allow default behavior for other keys
-        }
-        e.preventDefault(); // Prevent scroll if we handled the key
-    };
-
     return (
-        <div
-            className={clsx("relative w-full h-full focus:outline-none focus:ring-2 focus:ring-blue-500/50", className)}
-            tabIndex={0}
-            onKeyDown={handleKeyDown}
-            role="application"
-            aria-label="3D Protein Structure Viewer. Use Arrow keys to rotate, Plus/Minus to zoom, R to reset view."
-        >
+        <div className={clsx("relative w-full h-full", className)}>
             <div ref={containerRef} className="w-full h-full" />
             {loading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
