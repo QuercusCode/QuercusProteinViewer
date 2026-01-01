@@ -188,6 +188,11 @@ export const AISidebar: React.FC<AISidebarProps> = ({
                 return { text: "No active sites reported in UniProt for this protein." };
             }
         } else if (q.includes('function') || q.includes('biology') || q.includes('active site')) {
+            // Fallback: Check if we have a manual entry for this protein (e.g. 2B3P)
+            if (ctxPdb) {
+                const famousFact = FAMOUS_PROTEINS[ctxPdb.toUpperCase()];
+                if (famousFact) return { text: `**📚 Known Structure Detected**:\n\n${famousFact}\n\n(Note: Live UniProt data was not found, so this is a simplified summary.)` };
+            }
             return { text: "⚠️ I cannot provide biological function or active sites because **UniProt data was not found** for this PDB ID.\n\nIt might be a synthetic design or a new structure." };
         }
 
