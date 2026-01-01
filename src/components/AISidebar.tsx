@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Send, Bot, User, Sparkles, X } from 'lucide-react';
 import clsx from 'clsx';
 import type { ResidueInfo, ColoringType, RepresentationType } from '../types';
+import { calculateMW, calculateIsoelectricPoint, getAminoAcidComposition } from '../utils/chemistry';
 
 export type AIAction =
     | { type: 'SET_COLORING', value: ColoringType }
@@ -20,6 +21,7 @@ interface AISidebarProps {
         residueCount: number;
         ligandCount: number;
     };
+    chains?: { name: string; sequence: string }[];
     onAction: (action: AIAction) => void;
 }
 
@@ -30,7 +32,7 @@ interface Message {
     timestamp: Date;
 }
 
-// --- KNOWLEDGE BASE V3 (Expanded) ---
+// --- KNOWLEDGE BASE V5 ---
 
 const AMINO_ACID_DATA: Record<string, { full: string; type: string; desc: string; fact: string }> = {
     'ALA': { full: 'Alanine', type: 'Hydrophobic', desc: 'Small and non-polar.', fact: 'Often found in alpha-helices; it’s one of the most common residues.' },
@@ -89,7 +91,7 @@ const FAMOUS_PROTEINS: Record<string, string> = {
     '2B3P': "This is a designed protein structure (often used as a demo). Notice the secondary structure elements packing together."
 };
 
-// --- LOGIC ENGINE V3 (Actionable) ---
+// --- LOGIC ENGINE V5 (Actionable) ---
 
 export const AISidebar: React.FC<AISidebarProps> = ({
     isOpen,
@@ -98,6 +100,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
     proteinTitle,
     highlightedResidue,
     stats,
+    chains,
     onAction
 }) => {
     const [input, setInput] = useState('');
@@ -105,7 +108,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         {
             id: 'welcome',
             sender: 'ai',
-            text: "🤖 **Dr. AI (V3) Online**.\n\nI am now an **Active Agent**. I can not only explain, but also **control the viewer**.\n\nTry:\n- 'Color by hydrophobicity'\n- 'Show surface'\n- 'Reset view'",
+            text: "🤖 **Dr. AI (V5) Online**.\n\nI now feature **Chemical Intelligence**.\n\nTry:\n- 'Calculate molecular weight'\n- 'What is the pI?'\n- 'Analyze composition'",
             timestamp: new Date()
         }
     ]);
@@ -116,10 +119,48 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isOpen]);
 
-    const generateResponse = (query: string, ctxPdb: string | null, ctxTitle: string | null, ctxRes: ResidueInfo | null, ctxStats?: { chainCount: number, residueCount: number, ligandCount: number }): { text: string; action?: AIAction } => {
+    const generateResponse = (query: string, ctxPdb: string | null, ctxTitle: string | null, ctxRes: ResidueInfo | null, ctxStats?: { chainCount: number, residueCount: number, ligandCount: number }, ctxChains?: { name: string; sequence: string }[]): { text: string; action?: AIAction } => {
         const q = query.toLowerCase();
 
+        // --- V5: CHEMICAL INTELLIGENCE ---
+
+        // 1. Isoelectric Point (pI)
+        if (q.includes('isoelectric') || q.includes('pi ') || q.includes('charge')) {
+            if (ctxChains && ctxChains.length > 0) {
+                const chain = ctxChains[0]; // Analyze first chain for now
+                const pi = calculateIsoelectricPoint(chain.sequence);
+                return { text: `**🧪 Chemical Analysis (Chain ${chain.name})**:\n\nThe estimated **Isoelectric Point (pI)** is **${pi}**.\n(Calculated using EMBOSS pKa values).` };
+            }
+            return { text: "I need sequence data to calculate that. (No chains found)." };
+        }
+
+        // 2. Molecular Weight
+        if (q.includes('weight') || q.includes('mass') || q.includes('mw') || q.includes('dalton')) {
+            if (ctxChains && ctxChains.length > 0) {
+                let totalMw = 0;
+                let details = "";
+                ctxChains.forEach(c => {
+                    const mw = calculateMW(c.sequence);
+                    totalMw += mw;
+                    details += `- **Chain ${c.name}**: ${(mw / 1000).toFixed(1)} kDa\n`;
+                });
+                return { text: `**⚖️ Molecular Weight**:\n\nTotal Mass: **${(totalMw / 1000).toFixed(1)} kDa** (${Math.round(totalMw).toLocaleString()} Da).\n\n${details}` };
+            }
+        }
+
+        // 3. Composition / Hydrophobicity
+        if (q.includes('composition') || q.includes('hydrophobic') && q.includes('how many')) {
+            if (ctxChains && ctxChains.length > 0) {
+                const c = ctxChains[0];
+                const comp = getAminoAcidComposition(c.sequence);
+                const hydroPercent = ((comp.categories.hydrophobic / comp.length) * 100).toFixed(1);
+                return { text: `**🧬 Composition Analysis (Chain ${c.name})**:\n\n- **Length**: ${comp.length} residues\n- **Hydrophobic**: ${comp.categories.hydrophobic} (${hydroPercent}%)\n- **Polar**: ${comp.categories.polar}\n- **Charged**: ${comp.categories.charged_pos + comp.categories.charged_neg} (Pos: ${comp.categories.charged_pos}, Neg: ${comp.categories.charged_neg})\n\nThis protein is **${parseFloat(hydroPercent) > 40 ? 'highly hydrophobic' : 'soluble'}**.` };
+            }
+        }
+
         // --- ACTIVATION INTENTS (V3 & V4) ---
+        // ... (Keep existing logic)
+
 
         // V4: Expanded View Controls
         if (/ball.*stick|bonds/i.test(q)) {
@@ -283,7 +324,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         setIsTyping(true);
 
         setTimeout(() => {
-            const result = generateResponse(userMsg.text, pdbId, proteinTitle, highlightedResidue, stats);
+            const result = generateResponse(userMsg.text, pdbId, proteinTitle, highlightedResidue, stats, chains);
 
             // EXECUTE ACTION IF PRESENT
             if (result.action) {

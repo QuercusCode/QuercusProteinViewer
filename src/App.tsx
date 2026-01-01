@@ -489,6 +489,7 @@ function App() {
         proteinTitle={proteinTitle}
         highlightedResidue={highlightedResidue}
         stats={structureStats}
+        chains={chains}
         onAction={handleAIAction}
       />
       <Controls
