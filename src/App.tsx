@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ProteinViewer, type ProteinViewerRef } from './components/ProteinViewer';
 import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
-import { AISidebar } from './components/AISidebar';
+import { AISidebar, type AIAction } from './components/AISidebar';
 import { HelpGuide } from './components/HelpGuide';
 import { parseURLState, getShareableURL } from './utils/urlManager';
 import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Movie, ColorPalette, RepresentationType, ColoringType, ResidueInfo } from './types';
@@ -444,6 +444,25 @@ function App() {
 
 
 
+  // --- AI ACTION HANDLER (Dr. AI V3) ---
+  const handleAIAction = (action: AIAction) => {
+    switch (action.type) {
+      case 'SET_COLORING':
+        setColoring(action.value);
+        break;
+      case 'SET_REPRESENTATION':
+        setRepresentation(action.value);
+        break;
+      case 'TOGGLE_SURFACE':
+        setShowSurface(action.value);
+        break;
+      case 'RESET_VIEW':
+        setResetKey(prev => prev + 1);
+        if (viewerRef.current) viewerRef.current.resetCamera();
+        break;
+    }
+  };
+
   return (
     <main className={`w-full h-full relative overflow-hidden transition-colors duration-300 ${isLightMode ? 'bg-neutral-100 text-neutral-900' : 'bg-neutral-950 text-white'}`}>
       <AISidebar
@@ -452,6 +471,7 @@ function App() {
         pdbId={pdbId}
         proteinTitle={proteinTitle}
         highlightedResidue={highlightedResidue}
+        onAction={handleAIAction}
       />
       <Controls
         pdbId={pdbId}
