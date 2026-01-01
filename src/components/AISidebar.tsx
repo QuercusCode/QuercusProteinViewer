@@ -121,21 +121,30 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         {
             id: 'welcome',
             sender: 'ai',
-            text: "🤖 **Dr. AI (V6) Online**.\n\nI am connected to **UniProt**.\n\nTry:\n- 'What is the function of this protein?'\n- 'Show active sites'\n- 'Calculate molecular weight'",
+            text: "🤖 **Dr. AI (V6)**.\n\nI am analyzing this structure...",
             timestamp: new Date()
         }
     ]);
 
     // V6: Fetch UniProt Data
     useEffect(() => {
+        setUniprot(null); // Reset on PDB change
         if (pdbId) {
             fetchUniProtData(pdbId).then(data => {
                 if (data) {
                     setUniprot(data);
                     setMessages(prev => [...prev, {
-                        id: 'uniprot-found',
+                        id: `uniprot-found-${Date.now()}`,
                         sender: 'ai',
-                        text: `🧬 **UniProt Data Loaded**: ${data.proteinName} (${data.geneName}).\nI found definitions for **${data.features.length} features** (Active sites, domains, etc).`,
+                        text: `✅ **Connected to UniProt**.\n\nIdentified: **${data.proteinName}** (${data.geneName}).\nI have data for **${data.features.length} features** (active sites, etc).\n\nTry: 'What is the function?', 'Show active sites'.`,
+                        timestamp: new Date()
+                    }]);
+                } else {
+                    // No UniProt data found
+                    setMessages(prev => [...prev, {
+                        id: `uniprot-404-${Date.now()}`,
+                        sender: 'ai',
+                        text: `⚠️ **UniProt Data Not Found**.\n\nThis PDB (${pdbId}) might be a synthetic structure or not indexed yet. I will use chemical analysis instead.`,
                         timestamp: new Date()
                     }]);
                 }
@@ -178,6 +187,8 @@ export const AISidebar: React.FC<AISidebarProps> = ({
                 }
                 return { text: "No active sites reported in UniProt for this protein." };
             }
+        } else if (q.includes('function') || q.includes('biology') || q.includes('active site')) {
+            return { text: "⚠️ I cannot provide biological function or active sites because **UniProt data was not found** for this PDB ID.\n\nIt might be a synthetic design or a new structure." };
         }
 
         // ... (rest of function relies on ctxStats)
