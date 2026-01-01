@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { ProteinViewer, type ProteinViewerRef } from './components/ProteinViewer';
 import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
@@ -138,6 +138,23 @@ function App() {
   };
 
   // ... (fetchTitle logic) ... 
+
+  // --- DERIVED STATE (Dr. AI V4) ---
+  const structureStats = useMemo(() => {
+    const chainCount = chains.length;
+    const ligandCount = ligands.length;
+    let residueCount = 0;
+
+    chains.forEach(chain => {
+      if (chain.sequence) {
+        residueCount += chain.sequence.length;
+      } else if (chain.max && chain.min) {
+        residueCount += (chain.max - chain.min + 1);
+      }
+    });
+
+    return { chainCount, residueCount, ligandCount };
+  }, [chains, ligands]);
 
   // Need to insert logic into handleAtomClick
   const handleAtomClick = async (info: { chain: string; resNo: number; resName: string; atomIndex: number; position?: { x: number, y: number, z: number } } | null) => {
@@ -471,6 +488,7 @@ function App() {
         pdbId={pdbId}
         proteinTitle={proteinTitle}
         highlightedResidue={highlightedResidue}
+        stats={structureStats}
         onAction={handleAIAction}
       />
       <Controls

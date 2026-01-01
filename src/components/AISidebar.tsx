@@ -15,6 +15,11 @@ interface AISidebarProps {
     pdbId: string | null;
     proteinTitle: string | null;
     highlightedResidue: ResidueInfo | null;
+    stats?: {
+        chainCount: number;
+        residueCount: number;
+        ligandCount: number;
+    };
     onAction: (action: AIAction) => void;
 }
 
@@ -50,6 +55,30 @@ const AMINO_ACID_DATA: Record<string, { full: string; type: string; desc: string
     'VAL': { full: 'Valine', type: 'Hydrophobic', desc: 'Branched-chain (V-shaped).', fact: 'Assists in hydrophobic core packing.' }
 };
 
+const NUCLEOTIDE_DATA: Record<string, { full: string; type: string; desc: string; fact: string }> = {
+    'DA': { full: 'Deoxyadenosine (DNA)', type: 'Purine Base', desc: 'Pairs with Thymine (T).', fact: 'Forms 2 hydrogen bonds with T.' },
+    'DT': { full: 'Deoxythymidine (DNA)', type: 'Pyrimidine Base', desc: 'Pairs with Adenine (A).', fact: 'Unique to DNA (replaced by Uracil in RNA).' },
+    'DG': { full: 'Deoxyguanosine (DNA)', type: 'Purine Base', desc: 'Pairs with Cytosine (C).', fact: 'Forms 3 hydrogen bonds with C (stronger).' },
+    'DC': { full: 'Deoxycytidine (DNA)', type: 'Pyrimidine Base', desc: 'Pairs with Guanine (G).', fact: 'Susceptible to methylation (epigenetics).' },
+    'A': { full: 'Adenosine (RNA)', type: 'Purine Base', desc: 'Pairs with Uracil (U).', fact: 'Key component of ATP (energy).' },
+    'U': { full: 'Uridine (RNA)', type: 'Pyrimidine Base', desc: 'Pairs with Adenine (A).', fact: 'Replaces Thymine in RNA.' },
+    'G': { full: 'Guanosine (RNA)', type: 'Purine Base', desc: 'Pairs with Cytosine (C).', fact: 'Can form G-quadruplex structures.' },
+    'C': { full: 'Cytidine (RNA)', type: 'Pyrimidine Base', desc: 'Pairs with Guanine (G).', fact: 'Can undergo deamination.' }
+};
+
+const GLOSSARY_TERMS: Record<string, string> = {
+    'domain': "**Domain**: A distinct functional and/or structural unit in a protein. Usually, they are responsible for a particular function or interaction, contributing to the overall role of a protein.",
+    'loop': "**Loop**: A flexible region connecting secondary structures (alpha helices and beta sheets). Loops are often found at the protein surface and can be involved in binding or catalysis.",
+    'motif': "**Motif**: A supersecondary structure or fold which appears in a variety of molecules (e.g., Helix-Turn-Helix, Zinc Finger).",
+    'ligand': "**Ligand**: A substance that forms a complex with a biomolecule to serve a biological purpose. In protein viewers, this usually refers to small molecules bound to the protein.",
+    'active site': "**Active Site**: The specific region of an enzyme where substrate molecules bind and undergo a chemical reaction.",
+    'n-terminus': "**N-terminus**: The start of a protein or polypeptide chain (amino group end). Interaction often starts here!",
+    'c-terminus': "**C-terminus**: The end of an amino acid chain (carboxyl group end), terminated by a free carboxyl group.",
+    'dna': "**DNA**: Deoxyribonucleic acid. The molecule that carries genetic instructions. It's a double helix formed by base pairs (A-T, G-C).",
+    'rna': "**RNA**: Ribonucleic acid. Essential for coding, decoding, regulation and expression of genes. Usually single-stranded (A-U, G-C).",
+    'resolution': "**Resolution**: In structure (X-ray/Cryo-EM), it measures the detail of the image. Lower values (e.g., 1.5Å) mean higher detail!"
+};
+
 const FAMOUS_PROTEINS: Record<string, string> = {
     '4HHB': "This is **Hemoglobin**, the oxygen-transport protein. It's a tetramer (2 alpha, 2 beta chains). The Heme groups bind iron, which binds oxygen.",
     '1CRN': "This is **Crambin**, a small seed storage protein. It's famous for being extremely well-resolved in crystallography (atomic resolution)!",
@@ -68,6 +97,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
     pdbId,
     proteinTitle,
     highlightedResidue,
+    stats,
     onAction
 }) => {
     const [input, setInput] = useState('');
@@ -208,7 +238,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         setIsTyping(true);
 
         setTimeout(() => {
-            const result = generateResponse(userMsg.text, pdbId, proteinTitle, highlightedResidue);
+            const result = generateResponse(userMsg.text, pdbId, proteinTitle, highlightedResidue, stats);
 
             // EXECUTE ACTION IF PRESENT
             if (result.action) {
