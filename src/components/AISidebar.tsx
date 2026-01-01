@@ -91,32 +91,38 @@ export const AISidebar: React.FC<AISidebarProps> = ({
 
         // --- ACTIVATION INTENTS (V3) ---
 
+        // --- ACTIVATION INTENTS (V3) ---
+
         // Coloring
-        if (q.includes('color by') || q.includes('show me')) {
-            if (q.includes('hydrophobicity') || q.includes('hydrophobic')) {
-                return { text: "🎨 Coloring structure by **Hydrophobicity**. (Red = Hydrophobic, White = Hydrophilic)", action: { type: 'SET_COLORING', value: 'hydrophobicity' } };
-            }
-            if (q.includes('chain')) {
-                return { text: "🎨 Coloring structure by **Chain** ID.", action: { type: 'SET_COLORING', value: 'chainid' } };
-            }
-            if (q.includes('structure') || q.includes('secondary')) {
-                return { text: "🎨 Coloring by **Secondary Structure** (Helices vs Sheets).", action: { type: 'SET_COLORING', value: 'structure' } };
-            }
-            if (q.includes('b-factor') || q.includes('heat') || q.includes('flexibility')) {
-                return { text: "🎨 Coloring by **B-Factor** (Thermal Motion). Warmer colors = more flexible regions.", action: { type: 'SET_COLORING', value: 'bfactor' } };
-            }
+        if (/color.*hydrophob/i.test(q)) {
+            return { text: "🎨 Coloring structure by **Hydrophobicity**. (Red = Hydrophobic, White = Hydrophilic)", action: { type: 'SET_COLORING', value: 'hydrophobicity' } };
+        }
+        if (/color.*chain/i.test(q)) {
+            return { text: "🎨 Coloring structure by **Chain** ID.", action: { type: 'SET_COLORING', value: 'chainid' } };
+        }
+        if (/color.*(structure|secondary)/i.test(q)) {
+            return { text: "🎨 Coloring by **Secondary Structure** (Helices vs Sheets).", action: { type: 'SET_COLORING', value: 'structure' } };
+        }
+        if (/color.*(b-factor|flexibility|heat)/i.test(q)) {
+            return { text: "🎨 Coloring by **B-Factor** (Thermal Motion). Warmer colors = more flexible regions.", action: { type: 'SET_COLORING', value: 'bfactor' } };
         }
 
         // Representation
-        if ((q.includes('show') || q.includes('turn on') || q.includes('enable')) && q.includes('surface')) {
-            return { text: "✨ Enabling **Molecular Surface** representation.", action: { type: 'TOGGLE_SURFACE', value: true } };
-        }
-        if ((q.includes('hide') || q.includes('remove') || q.includes('turn off')) && q.includes('surface')) {
-            return { text: "👻 Hiding **Molecular Surface**.", action: { type: 'TOGGLE_SURFACE', value: false } };
+        if (/surface/i.test(q)) {
+            if (/color/.test(q)) {
+                // Fallthrough if they say "Color surface" (ambiguous, assume they meant show surface?)
+                // actually let's keep it specific
+            }
+            if (/(show|enable|on|add)/i.test(q)) {
+                return { text: "✨ Enabling **Molecular Surface** representation.", action: { type: 'TOGGLE_SURFACE', value: true } };
+            }
+            if (/(hide|disable|off|remove)/i.test(q)) {
+                return { text: "👻 Hiding **Molecular Surface**.", action: { type: 'TOGGLE_SURFACE', value: false } };
+            }
         }
 
         // View Control
-        if (q.includes('reset') || q.includes('center')) {
+        if (/reset|center/i.test(q)) {
             return { text: "🔄 **Resetting View** to default orientation.", action: { type: 'RESET_VIEW' } };
         }
 
