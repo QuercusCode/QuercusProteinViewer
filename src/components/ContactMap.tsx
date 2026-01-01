@@ -186,8 +186,8 @@ export const ContactMap: React.FC<ContactMapProps> = ({
 
                 // ... (N check) ...
                 const N = allResidues.length;
-                if (N > 3000) {
-                    alert("Protein too large for browser-based contact map.");
+                if (N > 6000) {
+                    alert(`Protein too large for browser-based contact map (${N} residues > 6000 limit). Computing this might freeze your device.`);
                     setLoading(false);
                     return;
                 }
