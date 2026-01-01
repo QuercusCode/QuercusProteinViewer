@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, User, Sparkles, X } from 'lucide-react';
+import { Send, Bot, User, Sparkles, X, Settings } from 'lucide-react';
 import clsx from 'clsx';
 import type { ResidueInfo, ColoringType, RepresentationType } from '../types';
 import { calculateMW, calculateIsoelectricPoint, getAminoAcidComposition } from '../utils/chemistry';
 import { fetchUniProtData, type UniProtData } from '../services/uniprot';
+import { generateAIResponse } from '../services/llm';
 
 export type AIAction =
     | { type: 'SET_COLORING', value: ColoringType }
@@ -113,7 +114,9 @@ export const AISidebar: React.FC<AISidebarProps> = ({
     onAction
 }) => {
     const [input, setInput] = useState('');
-    const [uniprot, setUniprot] = useState<UniProtData | null>(null); // V6 State
+    const [uniprot, setUniprot] = useState<UniProtData | null>(null);
+    const [apiKey, setApiKey] = useState<string>(localStorage.getItem('gemini_api_key') || ''); // V7
+    const [showSettings, setShowSettings] = useState(false); // V7
     const [messages, setMessages] = useState<Message[]>([
         {
             id: 'welcome',
@@ -364,7 +367,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         return { text: "Refine your query. You can ask me to:\n- **Control View**: 'Color by hydrophobicity', 'Reset view'\n- **Mutate**: Select a residue and ask 'Change to Arg'\n- **Analyze**: 'What is this helix?'" };
     };
 
-    const handleSend = () => {
+    const handleSend = async () => {
         if (!input.trim()) return;
 
         const userMsg: Message = {
@@ -377,23 +380,70 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         setInput('');
         setIsTyping(true);
 
-        setTimeout(() => {
-            const result = generateResponse(userMsg.text, pdbId, proteinTitle, highlightedResidue, stats, chains);
+        // V7: LLM Logic with V6 Fallback
+        if (apiKey) {
+            try {
+                // Construct History (Simple mapping)
+                const history = messages.slice(-10).map(m => ({
+                    role: (m.sender === 'user' ? 'user' : 'model') as "user" | "model",
+                    parts: m.text
+                }));
 
-            // EXECUTE ACTION IF PRESENT
-            if (result.action) {
-                onAction(result.action);
+                const context = {
+                    pdbId,
+                    title: proteinTitle,
+                    highlightedResidue,
+                    uniprot,
+                    chains,
+                    stats
+                };
+
+                const response = await generateAIResponse(apiKey, history, userMsg.text, context);
+
+                // Execute Actions
+                if (response.actions) {
+                    response.actions.forEach(action => {
+                        console.log("Dr. AI Action:", action);
+                        onAction(action);
+                    });
+                }
+
+                setIsTyping(false);
+                setMessages(prev => [...prev, {
+                    id: Date.now().toString(),
+                    sender: 'ai',
+                    text: response.text,
+                    timestamp: new Date()
+                }]);
+
+            } catch (e) {
+                console.error("LLM Error", e);
+                setIsTyping(false);
+                setMessages(prev => [...prev, {
+                    id: Date.now().toString(),
+                    sender: 'ai',
+                    text: "⚠️ **Connection Error**: I couldn't reach the AI brain. Please check your API Key or try again.",
+                    timestamp: new Date()
+                }]);
             }
+        } else {
+            // V6: Heuristic Fallback
+            setTimeout(() => {
+                const result = generateResponse(userMsg.text, pdbId, proteinTitle, highlightedResidue, stats, chains);
 
-            const aiMsg: Message = {
-                id: (Date.now() + 1).toString(),
-                sender: 'ai',
-                text: result.text,
-                timestamp: new Date()
-            };
-            setMessages(prev => [...prev, aiMsg]);
-            setIsTyping(false);
-        }, 500);
+                if (result.action) {
+                    onAction(result.action);
+                }
+
+                setMessages(prev => [...prev, {
+                    id: (Date.now() + 1).toString(),
+                    sender: 'ai',
+                    text: result.text,
+                    timestamp: new Date()
+                }]);
+                setIsTyping(false);
+            }, 500);
+        }
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -419,10 +469,57 @@ export const AISidebar: React.FC<AISidebarProps> = ({
                         <span className="text-xs text-purple-200">Active Agent V3.0</span>
                     </div>
                 </div>
-                <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white">
-                    <X size={20} />
-                </button>
+                <div className="flex items-center gap-1">
+                    <button
+                        onClick={() => setShowSettings(!showSettings)}
+                        className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white"
+                        title="AI Settings"
+                    >
+                        <Settings size={18} />
+                    </button>
+                    <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white">
+                        <X size={20} />
+                    </button>
+                </div>
             </div>
+
+            {/* Header */}
+
+            {/* Settings Overlay */}
+            {showSettings && (
+                <div className="absolute inset-0 top-[70px] bg-gray-900/95 z-20 p-6 backdrop-blur-md flex flex-col gap-4">
+                    <h3 className="text-white font-bold text-lg">🤖 Dr. AI Settings</h3>
+
+                    <div className="space-y-2">
+                        <label className="text-sm text-gray-400">Google Gemini API Key</label>
+                        <input
+                            type="password"
+                            value={apiKey}
+                            onChange={(e) => {
+                                setApiKey(e.target.value);
+                                localStorage.setItem('gemini_api_key', e.target.value);
+                            }}
+                            placeholder="AIzaSy..."
+                            className="w-full bg-black/40 border border-white/20 rounded-lg p-3 text-white focus:border-purple-500 focus:outline-none"
+                        />
+                        <p className="text-xs text-gray-500">
+                            Your key is stored locally in your browser.
+                            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-purple-400 hover:underline ml-1">
+                                Get a free key here.
+                            </a>
+                        </p>
+                    </div>
+
+                    <div className="mt-auto">
+                        <button
+                            onClick={() => setShowSettings(false)}
+                            className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium transition-colors"
+                        >
+                            Save & Close
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
