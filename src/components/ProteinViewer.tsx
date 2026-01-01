@@ -60,10 +60,8 @@ export interface ProteinViewerRef {
     resetCamera: () => void;
     clearMeasurements: () => void;
     getMeasurements: () => MeasurementData[];
-    restoreMeasurements: (measurements: MeasurementData[]) => void;
-    visualizeContact: (chainA: string, resA: number, chainB: string, resB: number) => void;
-    getMeasurements: () => MeasurementData[];
     restoreMeasurements: (measurements: { atom1: any, atom2: any }[]) => void;
+    visualizeContact: (chainA: string, resA: number, chainB: string, resB: number) => void;
     captureImage: () => Promise<void>;
 }
 
