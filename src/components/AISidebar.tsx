@@ -116,12 +116,32 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isOpen]);
 
-    const generateResponse = (query: string, ctxPdb: string | null, ctxTitle: string | null, ctxRes: ResidueInfo | null): { text: string; action?: AIAction } => {
+    const generateResponse = (query: string, ctxPdb: string | null, ctxTitle: string | null, ctxRes: ResidueInfo | null, ctxStats?: { chainCount: number, residueCount: number, ligandCount: number }): { text: string; action?: AIAction } => {
         const q = query.toLowerCase();
 
-        // --- ACTIVATION INTENTS (V3) ---
+        // --- ACTIVATION INTENTS (V3 & V4) ---
 
-        // --- ACTIVATION INTENTS (V3) ---
+        // V4: Expanded View Controls
+        if (/ball.*stick|bonds/i.test(q)) {
+            return { text: "🎨 Switching to **Ball & Stick** mode.", action: { type: 'SET_REPRESENTATION', value: 'ball+stick' } };
+        }
+        if (/wireframe|lines/i.test(q)) {
+            return { text: "🎨 Switching to **Wireframe** (lines) mode.", action: { type: 'SET_REPRESENTATION', value: 'line' } };
+        }
+        if (/backbone/i.test(q)) {
+            return { text: "🎨 Showing **Backbone** trace.", action: { type: 'SET_REPRESENTATION', value: 'backbone' } };
+        }
+        if (/cartoon|ribbon/i.test(q)) {
+            return { text: "🎨 Switching to **Cartoon** representation.", action: { type: 'SET_REPRESENTATION', value: 'cartoon' } };
+        }
+
+        // V4: Expanded Coloring
+        if (/color.*(element|atom|cpk)/i.test(q)) {
+            return { text: "🎨 Coloring by **Element** (CPK).", action: { type: 'SET_COLORING', value: 'element' } };
+        }
+        if (/color.*(rainbow|spectrum|residue)/i.test(q)) {
+            return { text: "🎨 Coloring by **Rainbow** (N-term to C-term).", action: { type: 'SET_COLORING', value: 'residueindex' } };
+        }
 
         // Coloring
         if (/color.*hydrophob/i.test(q)) {
@@ -140,8 +160,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         // Representation
         if (/surface/i.test(q)) {
             if (/color/.test(q)) {
-                // Fallthrough if they say "Color surface" (ambiguous, assume they meant show surface?)
-                // actually let's keep it specific
+                // Fallthrough
             }
             if (/(show|enable|on|add)/i.test(q)) {
                 return { text: "✨ Enabling **Molecular Surface** representation.", action: { type: 'TOGGLE_SURFACE', value: true } };
@@ -156,14 +175,33 @@ export const AISidebar: React.FC<AISidebarProps> = ({
             return { text: "🔄 **Resetting View** to default orientation.", action: { type: 'RESET_VIEW' } };
         }
 
+
+        // --- V4: STATS & HELP ---
+
+        if (/(how large|how big|size|count|stats)/i.test(q) && ctxStats) {
+            return { text: `**📊 Structure Statistics**:\n\n- **Chains**: ${ctxStats.chainCount}\n- **Residues**: ${ctxStats.residueCount}\n- **Ligands**: ${ctxStats.ligandCount}\n\nThis is a fairly detailed structure!` };
+        }
+
+        // UI Help
+        if (/(how.*(spin|rotate)|spinning)/i.test(q)) {
+            return { text: "🔄 **Spinning**: You can toggle auto-rotation by pressing the **'Spin'** button in the controls panel at the bottom right." };
+        }
+        if (/(how.*(picture|screenshot|image|save))/i.test(q)) {
+            return { text: "📸 **Snapshot**: Click the **Camera Icon** in the bottom panel to save a high-res image of the current view." };
+        }
+        if (/(how.*(export|download|file))/i.test(q)) {
+            return { text: "💾 **Export**: You can download the current PDB file or a PyMOL session relative to this view from the 'File' menu (if implemented) or use the 'Snapshot' feature." };
+        }
+
+
         // --- MUTATION ANALYSIS (V3) ---
         if (ctxRes && (q.includes('mutate') || q.includes('swap') || q.includes('replace') || q.includes('change to'))) {
             // Extract target amino acid
             const targetMatch = q.match(/(?:to|with)\s+([a-zA-Z]{3,})/i);
             if (targetMatch) {
                 const targetName = targetMatch[1].toUpperCase().substring(0, 3);
-                const sourceInfo = AMINO_ACID_DATA[ctxRes.resName];
-                const targetInfo = AMINO_ACID_DATA[targetName];
+                const sourceInfo = AMINO_ACID_DATA[ctxRes.resName] || NUCLEOTIDE_DATA[ctxRes.resName];
+                const targetInfo = AMINO_ACID_DATA[targetName]; // Can only mutate to AA for now
 
                 if (targetInfo && sourceInfo) {
                     let analysis = `**🧬 Mutation Simulation**: ${sourceInfo.full} (${ctxRes.resName}) ➝ ${targetInfo.full} (${targetName}).\n\n`;
@@ -184,11 +222,11 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         }
 
 
-        // --- KNOWLEDGE BASE (V2 Logic) ---
+        // --- KNOWLEDGE BASE (V2/V4 Logic) ---
 
         // 1. DIRECT RESIDUE QUERY (Explicit click)
         if (ctxRes && (q.includes('this') || q.includes('selected') || q.includes('residue') || q.includes('what is'))) {
-            const info = AMINO_ACID_DATA[ctxRes.resName] || { full: ctxRes.resName, type: 'Unknown', desc: '', fact: '' };
+            const info = AMINO_ACID_DATA[ctxRes.resName] || NUCLEOTIDE_DATA[ctxRes.resName] || { full: ctxRes.resName, type: 'Unknown', desc: '', fact: '' };
             return {
                 text: `**🔬 Identification**: You selected **${info.full} (${ctxRes.resName})**.\n` +
                     `**📍 Position**: Chain ${ctxRes.chain}, Residue ${ctxRes.resNo}.\n\n` +
@@ -197,7 +235,14 @@ export const AISidebar: React.FC<AISidebarProps> = ({
             };
         }
 
-        // 2. FAMOUS PROTEIN MATCH?
+        // 2. GLOSSARY LOOKUP (V4)
+        for (const [term, def] of Object.entries(GLOSSARY_TERMS)) {
+            if (q.toLowerCase().includes(term)) {
+                return { text: def };
+            }
+        }
+
+        // 3. FAMOUS PROTEIN MATCH?
         if (ctxPdb && (q.includes('protein') || q.includes('structure') || q.includes('what is this'))) {
             const famousFact = FAMOUS_PROTEINS[ctxPdb.toUpperCase()];
             if (famousFact) return { text: `**📚 Famous Structure Detected**:\n\n${famousFact}` };
@@ -216,7 +261,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         if (q.match(/disulfide|bridge/)) return { text: "**🔗 Disulfide Bond**: A covalent bond between the sulfur atoms of two Cysteine residues. It acts like a molecular 'staple' to stabilize the fold (common in secreted proteins)." };
 
         // 4. CHITCHAT
-        if (q.match(/hello|hi|hey/)) return { text: "Hello! I am Dr. AI V3. I can now **control the viewer**. Try 'Color by chain'!" };
+        if (q.match(/hello|hi|hey/)) return { text: "Hello! I am Dr. AI V4. I can now **control the viewer**. Try 'Color by hydrophobicity'!" };
         if (q.match(/joke|funny/)) return { text: "Why did the Biochemist cross the road? \n\nTo get to the other *site*! (Active site... get it? 🧪)" };
         if (q.match(/thank/)) return { text: "You are welcome. Science never sleeps! 🧬" };
 
