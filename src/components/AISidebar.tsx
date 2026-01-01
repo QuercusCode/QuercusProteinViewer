@@ -18,6 +18,43 @@ interface Message {
     timestamp: Date;
 }
 
+// --- KNOWLEDGE BASE V2 ---
+
+const AMINO_ACID_DATA: Record<string, { full: string; type: string; desc: string; fact: string }> = {
+    'ALA': { full: 'Alanine', type: 'Hydrophobic', desc: 'Small and non-polar.', fact: 'Often found in alpha-helices; it’s one of the most common residues.' },
+    'ARG': { full: 'Arginine', type: 'Positive Charge', desc: 'Large, basic, and polar.', fact: 'Its guanidinium group is often involved in salt bridges and binding nucleic acids.' },
+    'ASN': { full: 'Asparagine', type: 'Polar (Neutral)', desc: 'Carboxamide side chain.', fact: 'A common site for N-linked glycosylation.' },
+    'ASP': { full: 'Aspartic Acid', type: 'Negative Charge', desc: 'Acidic and polar.', fact: 'Often found in active sites; interacts with metal ions.' },
+    'CYS': { full: 'Cysteine', type: 'Polar / Special', desc: 'Contains a thiol (-SH) group.', fact: 'Can form **disulfide bridges** that stabilize the protein structure.' },
+    'GLN': { full: 'Glutamine', type: 'Polar (Neutral)', desc: 'Like Asparagine but longer.', fact: 'Often involved in hydrogen bonding networks.' },
+    'GLU': { full: 'Glutamic Acid', type: 'Negative Charge', desc: 'Acidic and polar.', fact: 'A major neurotransmitter precursor and common on protein surfaces.' },
+    'GLY': { full: 'Glycine', type: 'Special / Flexible', desc: 'The smallest residue (just H).', fact: 'Its flexibility allows distinct turns and tight packing.' },
+    'HIS': { full: 'Histidine', type: 'Positive (pH dependant)', desc: 'Contains an imidazole ring.', fact: 'Crucial for enzyme catalysis (acid-base buffering).' },
+    'ILE': { full: 'Isoleucine', type: 'Hydrophobic', desc: 'Branched-chain aliphatic.', fact: 'Prefers the buried core of proteins.' },
+    'LEU': { full: 'Leucine', type: 'Hydrophobic', desc: 'Branched-chain aliphatic.', fact: 'One of the strongest stabilizers of alpha-helices (Leucine Zippers).' },
+    'LYS': { full: 'Lysine', type: 'Positive Charge', desc: 'Long aliphatic chain with amine.', fact: 'Often found on the surface; target for ubiquitination.' },
+    'MET': { full: 'Methionine', type: 'Hydrophobic', desc: 'Contains sulfur (thioether).', fact: 'Usually the "start" residue (AUG codon).' },
+    'PHE': { full: 'Phenylalanine', type: 'Hydrophobic (Aromatic)', desc: 'Benzyl side chain.', fact: 'Plays a key role in stacking interactions.' },
+    'PRO': { full: 'Proline', type: 'Special / Rigid', desc: 'Cyclic imino acid.', fact: 'A "helix breaker" due to its rigid ring structure.' },
+    'SER': { full: 'Serine', type: 'Polar (Neutral)', desc: 'Hydroxyl (-OH) group.', fact: 'Common site for phosphorylation (regulation).' },
+    'THR': { full: 'Threonine', type: 'Polar (Neutral)', desc: 'Hydroxyl with methyl group.', fact: 'Also a phosphorylation site.' },
+    'TRP': { full: 'Tryptophan', type: 'Hydrophobic (Aromatic)', desc: 'Largest side chain (Indole).', fact: 'Fluorescent! Used to track protein folding experimentally.' },
+    'TYR': { full: 'Tyrosine', type: 'Polar (Aromatic)', desc: 'Phenol group.', fact: 'Can be phosphorylated; critical in signal transduction.' },
+    'VAL': { full: 'Valine', type: 'Hydrophobic', desc: 'Branched-chain (V-shaped).', fact: 'Assists in hydrophobic core packing.' }
+};
+
+const FAMOUS_PROTEINS: Record<string, string> = {
+    '4HHB': "This is **Hemoglobin**, the oxygen-transport protein. It's a tetramer (2 alpha, 2 beta chains). The Heme groups bind iron, which binds oxygen.",
+    '1CRN': "This is **Crambin**, a small seed storage protein. It's famous for being extremely well-resolved in crystallography (atomic resolution)!",
+    '1TIM': "This is **Triosephosphate Isomerase**, the classic example of the 'TIM Barrel' fold (8-stranded beta barrel surrounded by alpha helices).",
+    '1GFL': "This is **Green Fluorescent Protein (GFP)**. The beta-barrel protects the central chromophore, which glows green under UV light!",
+    '6VXX': "This looks like a **SARS-CoV-2 Spike Protein** structure. It's the key target for vaccines.",
+    '1UBQ': "This is **Ubiquitin**, a small regulatory protein found in almost all tissues (ubiquitous!). It tags other proteins for degradation.",
+    '2B3P': "This is a designed protein structure (often used as a demo). Notice the secondary structure elements packing together."
+};
+
+// --- LOGIC ENGINE ---
+
 export const AISidebar: React.FC<AISidebarProps> = ({
     isOpen,
     onClose,
@@ -30,68 +67,52 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         {
             id: 'welcome',
             sender: 'ai',
-            text: "Hello! I'm Dr. AI. I can help you analyze this structure. Ask me about the protein, or click a residue and ask 'What is this?'",
+            text: "🎓 **Dr. AI (V2)** here. My heuristics have been upgraded.\n\nI now have deep knowledge of amino acid chemistry and famous structures. Click a residue or ask away!",
             timestamp: new Date()
         }
     ]);
     const [isTyping, setIsTyping] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
-
     useEffect(() => {
-        scrollToBottom();
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isOpen]);
 
-    // Context-Aware Response Logic (Simulated AI)
     const generateResponse = (query: string, ctxPdb: string | null, ctxTitle: string | null, ctxRes: ResidueInfo | null): string => {
         const q = query.toLowerCase();
 
-        // 1. Selection Context
-        if (q.includes('this') || q.includes('selected') || q.includes('residue')) {
-            if (!ctxRes) return "You haven't selected anything yet! Click on an atom in the viewer first.";
-
-            const resNameMap: Record<string, string> = {
-                'ALA': 'Alanine (Hydrophobic)', 'ARG': 'Arginine (Positive)', 'ASN': 'Asparagine (Polar)',
-                'ASP': 'Aspartic Acid (Negative)', 'CYS': 'Cysteine (Can form disulfides)', 'GLN': 'Glutamine (Polar)',
-                'GLU': 'Glutamic Acid (Negative)', 'GLY': 'Glycine (Flexible)', 'HIS': 'Histidine (Positive/Neutral)',
-                'ILE': 'Isoleucine (Hydrophobic)', 'LEU': 'Leucine (Hydrophobic)', 'LYS': 'Lysine (Positive)',
-                'MET': 'Methionine (Start/Hydrophobic)', 'PHE': 'Phenylalanine (Aromatic)', 'PRO': 'Proline (Rigid)',
-                'SER': 'Serine (Polar)', 'THR': 'Threonine (Polar)', 'TRP': 'Tryptophan (Aromatic)',
-                'TYR': 'Tyrosine (Aromatic)', 'VAL': 'Valine (Hydrophobic)'
-            };
-
-            const desc = resNameMap[ctxRes.resName] || ctxRes.resName;
-            return `You have selected **${desc}** at position ${ctxRes.resNo} on Chain ${ctxRes.chain}. \n\n${getEvolutionaryContext(ctxRes.resName)}`;
+        // 1. DIRECT RESIDUE QUERY (Explicit click)
+        if (ctxRes && (q.includes('this') || q.includes('selected') || q.includes('residue') || q.includes('what is'))) {
+            const info = AMINO_ACID_DATA[ctxRes.resName] || { full: ctxRes.resName, type: 'Unknown', desc: '', fact: '' };
+            return `**🔬 Identification**: You selected **${info.full} (${ctxRes.resName})**.\n` +
+                `**📍 Position**: Chain ${ctxRes.chain}, Residue ${ctxRes.resNo}.\n\n` +
+                `**🧪 Chemistry**: ${info.type}. ${info.desc}\n` +
+                `**💡 Insight**: ${info.fact}`;
         }
 
-        // 2. Protein Context
-        if (q.includes('what is') || q.includes('function') || q.includes('summary')) {
-            if (!ctxPdb) return "No protein is currently loaded. Load a PDB first!";
-            if (ctxPdb.toLowerCase() === '4hhb') {
-                return "This is **Hemoglobin**, the iron-containing oxygen-transport metalloprotein in red blood cells. It consists of four subunits (2 alpha, 2 beta).";
-            }
-            if (ctxTitle) {
-                return `This structure is titled: **"${ctxTitle}"**. \n\nI can analyze its sequence properties if you ask about specific regions!`;
-            }
-            return `You are looking at PDB entry **${ctxPdb.toUpperCase()}**. I don't have a pre-trained summary for this specific entry in my demo database, but I can analyze its geometry!`;
+        // 2. FAMOUS PROTEIN MATCH?
+        if (ctxPdb && (q.includes('protein') || q.includes('structure') || q.includes('what is this'))) {
+            const famousFact = FAMOUS_PROTEINS[ctxPdb.toUpperCase()];
+            if (famousFact) return `**📚 Famous Structure Detected**:\n\n${famousFact}`;
+
+            // Fallback for unknown protein
+            return `This is **${ctxPdb.toUpperCase()}**: "${ctxTitle || 'Unknown Title'}".\n\n` +
+                `I don't have a specific dossier on this one, but I can analyze its components. Try selecting a residue!`;
         }
 
-        // 3. General Biology
-        if (q.includes('alpha') || q.includes('helix')) return "Alpha helices are right-handed coiled secondary structures, stabilized by hydrogen bonds between the backbone N-H and C=O groups.";
-        if (q.includes('beta') || q.includes('sheet')) return "Beta sheets consist of beta strands connected laterally by at least two or three backbone hydrogen bonds, forming a generally twisted, pleated sheet.";
+        // 3. GENERAL KNOWLEDGE (Regex Match)
+        if (q.match(/alpha|helix/)) return "**🧬 Alpha Helix**: A right-handed coil where the backbone N-H hydrogen bonds to the C=O of the amino acid 4 residues (i+4) earlier. It's the most common secondary structure.";
+        if (q.match(/beta|sheet|strand/)) return "**🧬 Beta Sheet**: Consists of beta strands connected laterally by at least two or three backbone hydrogen bonds, forming a twisted, pleated sheet.";
+        if (q.match(/hydropho/)) return "**💧 Hydrophobic Effect**: The tendency of non-polar substances to aggregate in aqueous solution and exclude water molecules. It is the main driving force of protein folding!";
+        if (q.match(/disulfide|bridge/)) return "**🔗 Disulfide Bond**: A covalent bond between the sulfur atoms of two Cysteine residues. It acts like a molecular 'staple' to stabilize the fold (common in secreted proteins).";
 
-        // 4. Default
-        return "I'm not sure about that yet. Try selecting a residue and asking 'What is this?', or ask 'What is this protein?'";
-    };
+        // 4. CHITCHAT
+        if (q.match(/hello|hi|hey/)) return "Hello! I am ready to analyze. Load a PDB or click an atom.";
+        if (q.match(/joke|funny/)) return "Why did the Biochemist cross the road? \n\nTo get to the other *site*! (Active site... get it? 🧪)";
+        if (q.match(/thank/)) return "You are welcome. Science never sleeps! 🧬";
 
-    const getEvolutionaryContext = (resName: string) => {
-        if (['GLY', 'PRO'].includes(resName)) return "💡 **Analyst Note**: This residue often breaks helices or introduces distinct turns in the structure.";
-        if (['CYS'].includes(resName)) return "💡 **Analyst Note**: Look for other Cysteines nearby; they might form a stabilizing disulfide bridge.";
-        if (['TRP', 'TYR', 'PHE'].includes(resName)) return "💡 **Analyst Note**: These aromatic rings are often found in the hydrophobic core, stabilizing the fold.";
-        return "";
+        // 5. DEFAULT
+        return "Refine your query. You can ask about:\n- The **selected residue**\n- The **protein function**\n- Structural concepts (helices, sheets)\n- Or load a famous PDB like **1CRN** or **4HHB**.";
     };
 
     const handleSend = () => {
@@ -107,7 +128,6 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         setInput('');
         setIsTyping(true);
 
-        // Simulate network delay
         setTimeout(() => {
             const responseText = generateResponse(userMsg.text, pdbId, proteinTitle, highlightedResidue);
             const aiMsg: Message = {
@@ -118,7 +138,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
             };
             setMessages(prev => [...prev, aiMsg]);
             setIsTyping(false);
-        }, 800 + Math.random() * 500);
+        }, 600 + Math.random() * 400); // Faster response for V2
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -134,14 +154,14 @@ export const AISidebar: React.FC<AISidebarProps> = ({
             isOpen ? "translate-x-0" : "translate-x-full"
         )}>
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-white/10 bg-gradient-to-r from-blue-900/50 to-purple-900/50">
+            <div className="flex items-center justify-between p-4 border-b border-white/10 bg-gradient-to-r from-emerald-900/50 to-blue-900/50"> {/* Changed Color for V2 */}
                 <div className="flex items-center gap-2">
-                    <div className="p-1.5 bg-blue-500 rounded-lg shadow-lg shadow-blue-500/20">
+                    <div className="p-1.5 bg-emerald-500 rounded-lg shadow-lg shadow-emerald-500/20">
                         <Bot size={20} className="text-white" />
                     </div>
                     <div>
                         <h2 className="font-bold text-white text-lg leading-none">Dr. AI Analyst</h2>
-                        <span className="text-xs text-blue-200">HoloLanguage v1.0</span>
+                        <span className="text-xs text-emerald-200">Heuristics V2.0 (Active)</span>
                     </div>
                 </div>
                 <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white">
@@ -154,7 +174,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
                 {messages.map(msg => (
                     <div key={msg.id} className={clsx("flex gap-3", msg.sender === 'user' ? "justify-end" : "justify-start")}>
                         {msg.sender === 'ai' && (
-                            <div className="w-8 h-8 rounded-full bg-blue-600/80 flex items-center justify-center shrink-0 border border-white/10">
+                            <div className="w-8 h-8 rounded-full bg-emerald-600/80 flex items-center justify-center shrink-0 border border-white/10">
                                 <Sparkles size={14} className="text-white" />
                             </div>
                         )}
@@ -178,7 +198,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
                 ))}
                 {isTyping && (
                     <div className="flex gap-3 justify-start animate-pulse">
-                        <div className="w-8 h-8 rounded-full bg-blue-600/50 shrink-0" />
+                        <div className="w-8 h-8 rounded-full bg-emerald-600/50 shrink-0" />
                         <div className="bg-white/5 rounded-2xl px-4 py-3 border border-white/5 flex items-center gap-1">
                             <div className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce" />
                             <div className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce [animation-delay:0.2s]" />
@@ -189,26 +209,6 @@ export const AISidebar: React.FC<AISidebarProps> = ({
                 <div ref={messagesEndRef} />
             </div>
 
-            {/* Suggested Questions (Quick Actions) */}
-            <div className="p-3 border-t border-white/5 bg-black/20 overflow-x-auto whitespace-nowrap scrollbar-none">
-                <div className="flex gap-2">
-                    {[
-                        "What is this protein?",
-                        "Analyze selection",
-                        "Explain helix",
-                        "Show active site"
-                    ].map(q => (
-                        <button
-                            key={q}
-                            onClick={() => { setInput(q); handleSend(); }}
-                            className="px-3 py-1.5 bg-white/5 hover:bg-white/15 border border-white/10 rounded-full text-xs text-blue-200 transition-colors"
-                        >
-                            {q}
-                        </button>
-                    ))}
-                </div>
-            </div>
-
             {/* Input Area */}
             <div className="p-4 border-t border-white/10 bg-gray-900">
                 <div className="relative flex items-center gap-2">
@@ -217,19 +217,16 @@ export const AISidebar: React.FC<AISidebarProps> = ({
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="Ask Dr. AI..."
-                        className="w-full bg-black/40 border border-white/20 rounded-xl pl-4 pr-12 py-3 text-sm text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 placeholder-white/20"
+                        placeholder="Ask expert question..."
+                        className="w-full bg-black/40 border border-white/20 rounded-xl pl-4 pr-12 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 placeholder-white/20"
                     />
                     <button
                         onClick={handleSend}
                         disabled={!input.trim()}
-                        className="absolute right-2 p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="absolute right-2 p-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <Send size={16} />
                     </button>
-                </div>
-                <div className="text-center mt-2">
-                    <span className="text-[10px] text-white/30">AI can hallucinate. Check important facts.</span>
                 </div>
             </div>
         </div>
