@@ -151,33 +151,37 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isOpen]);
 
-    const generateResponse = (query: string, ctxPdb: string | null, ctxTitle: string | null, ctxRes: ResidueInfo | null, ctxStats?: { chainCount: number, residueCount: number, ligandCount: number }, ctxChains?: { name: string; sequence: string }[]): { text: string; action?: AIAction } => {
-        const q = query.toLowerCase();
+    const generateResponse = (
+        q: string,
+        ctxPdb: string | null,
+        ctxTitle: string | null,
+        ctxRes: ResidueInfo | null,
+        ctxStats: any,
+        ctxChains?: { name: string, sequence: string }[],
+        uniprot?: UniProtData | null
+    ): { text: string, action?: AIAction } => {
+        q = q.toLowerCase();
 
-        // --- V6: BIOLOGICAL INTELLIGENCE (UniProt) ---
-
+        // 0. UNIPROT INTELLIGENCE (Priority)
         if (uniprot) {
-            // 1. Function Query
             if (q.includes('function') || q.includes('what does this do') || q.includes('biology')) {
                 return { text: `**🧬 Biological Function (${uniprot.geneName})**:\n\n${uniprot.function}\n\n(Source: UniProt ${uniprot.id})` };
             }
-
-            // 2. Feature Visualization (Active Sites)
             if (q.includes('active site') || q.includes('binding') || q.includes('show features')) {
                 const sites = uniprot.features.filter(f => f.type === 'ACT_SITE' || f.type === 'BINDING' || f.type === 'SITE');
                 if (sites.length > 0) {
-                    // Construct NGL selection string: "10-15 or 20 or 30-35"
-                    // UniProt ranges are usually "10..15" or "10".
                     const ranges = sites.map(s => s.begin === s.end ? s.begin : `${s.begin}-${s.end}`).join(' or ');
-
                     return {
                         text: `**🎯 Active/Binding Sites Found**:\n\nI have highlighted **${sites.length} regions** corresponding to functional sites.\n\n${sites.map(s => `- ${s.type}: Residues ${s.begin}-${s.end} (${s.description})`).join('\n')}`,
                         action: { type: 'HIGHLIGHT_REGION', selection: ranges, label: 'Active Sites' }
                     };
                 }
-                return { text: "No active sites or binding regions reported in UniProt for this protein." };
+                return { text: "No active sites reported in UniProt for this protein." };
             }
         }
+
+        // ... (rest of function relies on ctxStats)
+
 
         // --- V5: CHEMICAL INTELLIGENCE ---
 
@@ -429,7 +433,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         } else {
             // V6: Heuristic Fallback
             setTimeout(() => {
-                const result = generateResponse(userMsg.text, pdbId, proteinTitle, highlightedResidue, stats, chains);
+                const result = generateResponse(userMsg.text, pdbId, proteinTitle, highlightedResidue, stats, chains, uniprot);
 
                 if (result.action) {
                     onAction(result.action);
