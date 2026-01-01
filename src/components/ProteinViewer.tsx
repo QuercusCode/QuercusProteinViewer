@@ -63,6 +63,7 @@ export interface ProteinViewerRef {
     restoreMeasurements: (measurements: { atom1: any, atom2: any }[]) => void;
     visualizeContact: (chainA: string, resA: number, chainB: string, resB: number) => void;
     captureImage: () => Promise<void>;
+    highlightRegion: (selection: string, label?: string) => void;
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
@@ -97,6 +98,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     const measurementsRef = useRef<MeasurementData[]>([]);
     const measurementRepsRef = useRef<any[]>([]); // Track NGL Representations for cleanup
     const contactLineRepRef = useRef<any>(null); // Track single contact line representation
+    const regionHighlightRepRef = useRef<any>(null); // V6: Track region highlight
     const selectedAtomsRef = useRef<any[]>([]);
 
     // Helper to find atom
@@ -270,6 +272,36 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     };
 
     useImperativeHandle(ref, () => ({
+        highlightRegion: (selection: string, _label?: string) => {
+            if (!componentRef.current) return;
+            const component = componentRef.current;
+
+            // 1. Remove Previous Highlight
+            if (regionHighlightRepRef.current) {
+                try {
+                    component.removeRepresentation(regionHighlightRepRef.current);
+                    regionHighlightRepRef.current = null;
+                } catch (e) { }
+            }
+
+            if (!selection) return;
+
+            // 2. Add New Highlight (Ball & Stick)
+            try {
+                const rep = component.addRepresentation('ball+stick', {
+                    sele: selection,
+                    color: 'magenta',
+                    radius: 0.3,
+                    name: 'region-highlight'
+                });
+                regionHighlightRepRef.current = rep;
+
+                // 3. Focus View
+                component.autoView(selection, 1000);
+            } catch (e) {
+                console.warn("Failed to highlight region:", selection, e);
+            }
+        },
         getSnapshotBlob: async () => {
             if (!stageRef.current) return null;
             try {

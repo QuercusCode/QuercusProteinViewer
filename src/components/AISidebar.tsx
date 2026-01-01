@@ -3,12 +3,14 @@ import { Send, Bot, User, Sparkles, X } from 'lucide-react';
 import clsx from 'clsx';
 import type { ResidueInfo, ColoringType, RepresentationType } from '../types';
 import { calculateMW, calculateIsoelectricPoint, getAminoAcidComposition } from '../utils/chemistry';
+import { fetchUniProtData, type UniProtData } from '../services/uniprot';
 
 export type AIAction =
     | { type: 'SET_COLORING', value: ColoringType }
     | { type: 'SET_REPRESENTATION', value: RepresentationType }
     | { type: 'TOGGLE_SURFACE', value: boolean }
-    | { type: 'RESET_VIEW' };
+    | { type: 'RESET_VIEW' }
+    | { type: 'HIGHLIGHT_REGION', selection: string, label: string }; // New Action
 
 interface AISidebarProps {
     isOpen: boolean;
@@ -24,6 +26,13 @@ interface AISidebarProps {
     chains?: { name: string; sequence: string }[];
     onAction: (action: AIAction) => void;
 }
+
+// ... (KEEP CONSTANTS - abbreviated for Replace)
+// I cannot easily replace the middle without touching constants if I use start/end lines crossing them.
+// Strategy: Insert the LOGIC inside the component using a targeted replacement of the component body.
+
+// Let's replace the Start of the component to add state.
+
 
 interface Message {
     id: string;
@@ -104,15 +113,35 @@ export const AISidebar: React.FC<AISidebarProps> = ({
     onAction
 }) => {
     const [input, setInput] = useState('');
+    const [uniprot, setUniprot] = useState<UniProtData | null>(null); // V6 State
     const [messages, setMessages] = useState<Message[]>([
         {
             id: 'welcome',
             sender: 'ai',
-            text: "🤖 **Dr. AI (V5) Online**.\n\nI now feature **Chemical Intelligence**.\n\nTry:\n- 'Calculate molecular weight'\n- 'What is the pI?'\n- 'Analyze composition'",
+            text: "🤖 **Dr. AI (V6) Online**.\n\nI am connected to **UniProt**.\n\nTry:\n- 'What is the function of this protein?'\n- 'Show active sites'\n- 'Calculate molecular weight'",
             timestamp: new Date()
         }
     ]);
-    const [isTyping, setIsTyping] = useState(false);
+
+    // V6: Fetch UniProt Data
+    useEffect(() => {
+        if (pdbId) {
+            fetchUniProtData(pdbId).then(data => {
+                if (data) {
+                    setUniprot(data);
+                    setMessages(prev => [...prev, {
+                        id: 'uniprot-found',
+                        sender: 'ai',
+                        text: `🧬 **UniProt Data Loaded**: ${data.proteinName} (${data.geneName}).\nI found definitions for **${data.features.length} features** (Active sites, domains, etc).`,
+                        timestamp: new Date()
+                    }]);
+                }
+            });
+        }
+    }, [pdbId]);
+
+    const [isTyping, setIsTyping] = useState(false); // Restored
+
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -121,6 +150,31 @@ export const AISidebar: React.FC<AISidebarProps> = ({
 
     const generateResponse = (query: string, ctxPdb: string | null, ctxTitle: string | null, ctxRes: ResidueInfo | null, ctxStats?: { chainCount: number, residueCount: number, ligandCount: number }, ctxChains?: { name: string; sequence: string }[]): { text: string; action?: AIAction } => {
         const q = query.toLowerCase();
+
+        // --- V6: BIOLOGICAL INTELLIGENCE (UniProt) ---
+
+        if (uniprot) {
+            // 1. Function Query
+            if (q.includes('function') || q.includes('what does this do') || q.includes('biology')) {
+                return { text: `**🧬 Biological Function (${uniprot.geneName})**:\n\n${uniprot.function}\n\n(Source: UniProt ${uniprot.id})` };
+            }
+
+            // 2. Feature Visualization (Active Sites)
+            if (q.includes('active site') || q.includes('binding') || q.includes('show features')) {
+                const sites = uniprot.features.filter(f => f.type === 'ACT_SITE' || f.type === 'BINDING' || f.type === 'SITE');
+                if (sites.length > 0) {
+                    // Construct NGL selection string: "10-15 or 20 or 30-35"
+                    // UniProt ranges are usually "10..15" or "10".
+                    const ranges = sites.map(s => s.begin === s.end ? s.begin : `${s.begin}-${s.end}`).join(' or ');
+
+                    return {
+                        text: `**🎯 Active/Binding Sites Found**:\n\nI have highlighted **${sites.length} regions** corresponding to functional sites.\n\n${sites.map(s => `- ${s.type}: Residues ${s.begin}-${s.end} (${s.description})`).join('\n')}`,
+                        action: { type: 'HIGHLIGHT_REGION', selection: ranges, label: 'Active Sites' }
+                    };
+                }
+                return { text: "No active sites or binding regions reported in UniProt for this protein." };
+            }
+        }
 
         // --- V5: CHEMICAL INTELLIGENCE ---
 

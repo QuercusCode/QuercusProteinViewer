@@ -477,6 +477,11 @@ function App() {
         setResetKey(prev => prev + 1);
         if (viewerRef.current) viewerRef.current.resetCamera();
         break;
+      case 'HIGHLIGHT_REGION':
+        if (viewerRef.current) {
+          viewerRef.current.highlightRegion(action.selection, action.label);
+        }
+        break;
     }
   };
 
