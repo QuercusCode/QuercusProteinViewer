@@ -352,7 +352,34 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
     { id: '1QO1', title: 'Hep B Capsid', category: 'Viral', description: 'Icosahedral shell.', details: 'The core particle of Hepatitis B. It assembles from dimers into a T=4 icosahedral shell to protect the viral genome.' },
     { id: '1SLQ', title: 'Guanylate Cyclase', category: 'Signaling', description: 'NO sensor.', details: 'The receptor for Nitric Oxide (NO). When NO binds to its heme, it produces cGMP to relax smooth muscle.' },
     { id: '1MOX', title: 'Myeloperoxidase', category: 'Immune', description: 'Green enzyme.', details: 'Found in neutrophils (pus). It produces hypochlorous acid (bleach) to kill bacteria. Its green color comes from a unique heme group.' },
-    { id: '1DLH', title: 'Delta-Opioid', category: 'Signaling', description: 'Pain receptor.', details: 'A G-protein coupled receptor involved in pain relief (analgesia). It is a target for enkephalins and painkiller drugs.' }
+    { id: '1DLH', title: 'Delta-Opioid', category: 'Signaling', description: 'Pain receptor.', details: 'A G-protein coupled receptor involved in pain relief (analgesia). It is a target for enkephalins and painkiller drugs.' },
+
+    // --- BATCH 5 ADDITIONS (25 VERIFIED) ---
+    { id: '3WU2', title: 'Photosystem II', category: 'Energy', description: 'Oxygen engine.', details: 'The enzyme that changed the world. It uses light to split water, releasing the oxygen we breathe. This specific structure shows the oxygen-evolving complex.' },
+    { id: '1XPW', title: 'LHCII', category: 'Energy', description: 'Light harvesting.', details: 'The most abundant membrane protein on Earth. It acts as a solar panel, capturing photons and funneling the energy to Photosystems.' },
+    { id: '1PKN', title: 'Pyruvate Kinase', category: 'Enzymes', description: 'Glycolysis finale.', details: 'The final step of glycolysis. It generates ATP from PEP. This enzyme is regulated to control the metabolic flux of the cell.' },
+    { id: '1I10', title: 'Lactate Dehydrogenase', category: 'Enzymes', description: 'Muscle fatigue.', details: 'Converts pyruvate to lactate during intense exercise, allowing glycolysis to continue without oxygen (fermentation).' },
+    { id: '1ADC', title: 'Alcohol Dehydrogenase', category: 'Enzymes', description: 'Alcohol breakdown.', details: 'The liver enzyme that detoxifies ethanol. It converts alcohol into acetaldehyde, which is then further broken down.' },
+    { id: '1CA2', title: 'Carbonic Anhydrase', category: 'Enzymes', description: 'pH regulator.', details: 'One of the fastest enzymes known. It converts CO2 to bicarbonate to transport it in blood and regulate pH.' },
+    { id: '5PEP', title: 'Pepsin', category: 'Enzymes', description: 'Stomach digestion.', details: 'A potent protease active in the acidic environment of the stomach (pH 2). It cuts food proteins into peptides.' },
+    { id: '2REN', title: 'Renin', category: 'Enzymes', description: 'Blood pressure.', details: 'The starting point of the blood pressure regulation system (RAS). Inhibitors of renin are used to treat hypertension.' },
+    { id: '1HYS', title: 'HIV Reverse Transcriptase', category: 'Viral', description: 'Viral replication.', details: 'The target of AZT. This enzyme copies the viral RNA genome into DNA, which then integrates into the host cell\'s genome.' },
+    { id: '2PLV', title: 'Polio Virus', category: 'Viral', description: 'Picornavirus.', details: 'A historic structure. This small RNA virus causes poliomyelitis. Salk and Sabin developed vaccines targeting this capsid.' },
+    { id: '4RHV', title: 'Human Rhinovirus', category: 'Viral', description: 'Common cold.', details: 'The primary cause of the common cold. It has a canyon on its surface that hides the receptor-binding site from antibodies.' },
+    { id: '5JQ3', title: 'Ebola Glycoprotein', category: 'Viral', description: 'Ebola surface.', details: 'The trimeric spike protein on the surface of Ebola. It mediates fusion with host cells and is the target of antibody therapies.' },
+    { id: '1K4R', title: 'Dengue Envelope', category: 'Viral', description: 'Viral fusion.', details: 'The envelope protein of Dengue virus. It changes shape in the acidic endosome to fuse the viral membrane with the cell.' },
+    { id: '1XI4', title: 'Clathrin', category: 'Structural', description: 'Vesicle coat.', details: 'The terminal domain of the clathrin triskelion. These self-assemble into diverse cage shapes to bud vesicles from membranes.' },
+    { id: '3SNH', title: 'Dynamin', category: 'Structural', description: 'Membrane pincher.', details: 'A molecular noose. Dynamin forms a spiral around the neck of a budding vesicle and constricts (using GTP) to pinch it off.' },
+    { id: '1SFC', title: 'SNARE Complex', category: 'Signaling', description: 'Membrane fusion.', details: 'The machine that fuses synaptic vesicles. Four helices zip together with incredible force to pull two membranes into one.' },
+    { id: '1NCC', title: 'N-Cadherin', category: 'Structural', description: 'Cell adhesion.', details: 'Calcium-dependent adhesion molecules that zip cells together like Velcro to form solid tissues.' },
+    { id: '1ESL', title: 'E-Selectin', category: 'Immune', description: 'Inflammation.', details: 'A receptor on blood vessel walls. It grabs passing white blood cells, causing them to roll and stop at sites of infection.' },
+    { id: '3FXI', title: 'TLR3', category: 'Immune', description: 'Pathogen sensor.', details: 'Toll-Like Receptor 3. It recognizes double-stranded RNA (a sign of viral infection) and triggers the innate immune system.' },
+    { id: '4TLL', title: 'NMDA Receptor', category: 'Signaling', description: 'Memory formation.', details: 'A glutamate receptor critical for synaptic plasticity and memory. It requires both glutamate and glycine to open.' },
+    { id: '4COF', title: 'GABA-A Receptor', category: 'Signaling', description: 'Sedation target.', details: 'The brain\'s main inhibitory channel. It is the target of benzodiazepines (Valium) and anesthetics.' },
+    { id: '1AP8', title: 'Apoptosis Inducing', category: 'Enzymes', description: 'Cell death.', details: 'AIF (Apoptosis Inducing Factor). It travels from the mitochondria to the nucleus to trigger DNA fragmentation and cell death.' },
+    { id: '1QLS', title: 'Hsp70', category: 'Chaperone', description: 'Heat shock.', details: 'The workhorse chaperone. It clamps onto exposed hydrophobic patches of unfolded proteins to prevent aggregation.' },
+    { id: '1TUH', title: 'Tubulin-Colchicine', category: 'Structural', description: 'Drug binding.', details: 'Shows how the drug Colchicine binds to tubulin to prevent microtubule polymerization, used to treat gout.' },
+    { id: '1MBN', title: 'Sperm Whale Myoglobin', category: 'Transport', description: 'The first structure.', details: 'A re-refined version of the first protein structure ever solved. A historic milestone in biology.' }
 ];
 
 // Deduplicate IDs just in case
