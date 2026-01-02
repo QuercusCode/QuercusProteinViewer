@@ -379,7 +379,32 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
     { id: '1AP8', title: 'Apoptosis Inducing', category: 'Enzymes', description: 'Cell death.', details: 'AIF (Apoptosis Inducing Factor). It travels from the mitochondria to the nucleus to trigger DNA fragmentation and cell death.' },
     { id: '1QLS', title: 'Hsp70', category: 'Chaperone', description: 'Heat shock.', details: 'The workhorse chaperone. It clamps onto exposed hydrophobic patches of unfolded proteins to prevent aggregation.' },
     { id: '1TUH', title: 'Tubulin-Colchicine', category: 'Structural', description: 'Drug binding.', details: 'Shows how the drug Colchicine binds to tubulin to prevent microtubule polymerization, used to treat gout.' },
-    { id: '1MBN', title: 'Sperm Whale Myoglobin', category: 'Transport', description: 'The first structure.', details: 'A re-refined version of the first protein structure ever solved. A historic milestone in biology.' }
+    // --- BATCH 6 ADDITIONS (25 MORE) ---
+    { id: '1OQ5', title: 'Abl Kinase', category: 'Enzymes', description: 'Leukemia cure.', details: 'The tyrosine kinase targeted by Gleevec (Imatinib). It was the first "rational drug design" success, turning a fatal leukemia into a manageable condition.' },
+    { id: '1CX2', title: 'Cyclooxygenase-2', category: 'Enzymes', description: 'Pain & Inflammation.', details: 'The target of NSAIDs like Celebrex. It produces prostaglandins that cause pain and inflammation. Selective COX-2 inhibitors spare the stomach.' },
+    { id: '1UDT', title: 'PDE5', category: 'Enzymes', description: 'Viagra target.', details: 'Phosphodiesterase type 5. Sildenafil (Viagra) binds here to inhibit cGMP breakdown, prolonging vasodilation signal processing.' },
+    { id: '2HYY', title: 'HER2', category: 'Signaling', description: 'Breast cancer target.', details: 'The growth factor receptor overexpressed in many breast cancers. The monoclonal antibody Herceptin binds here to stop tumor growth.' },
+    { id: '5I6X', title: 'PCSK9', category: 'Enzymes', description: 'Cholesterol regulator.', details: 'A protein that destroys LDL receptors. Blocking PCSK9 allows the liver to clear more bad cholesterol from the blood.' },
+    { id: '6W41', title: 'SARS-CoV-2 Mpro', category: 'Viral', description: 'Main Protease.', details: 'The viral enzyme that cuts polyproteins. It is the target of Paxlovid (Nirmatrelvir), preventing the virus from replicating.' },
+    { id: '3J7L', title: 'TRPA1', category: 'Transport', description: 'Wasabi receptor.', details: 'The chemical sensor for noxious irritants like mustard oil and wasabi. It triggers pain and inflammation signals.' },
+    { id: '5O3L', title: 'Telomerase', category: 'Enzymes', description: 'Immortality enzyme.', details: 'The enzyme that rebuilds chromosome ends (telomeres). It allows cancer cells to divide indefinitely.' },
+    { id: '1S03', title: 'Topoisomerase II', category: 'Enzymes', description: 'DNA untangler.', details: 'A molecular machine that cuts both strands of DNA, passes another helix through the gap, and reseals it to remove tangles.' },
+    { id: '6M0J', title: 'ACE2 Receptor', category: 'Structural', description: 'COVID entry door.', details: 'The human cell surface receptor that SARS-CoV-2 binds to. Paradoxically, its normal role is to lower blood pressure.' },
+    { id: '1SI8', title: 'Anthrax LF', category: 'Toxins', description: 'Lethal Factor.', details: 'One part of the Anthrax toxin trio. It shears MAPKK enzymes inside the cell, silencing survival signals.' },
+    { id: '3N4V', title: 'P-Glycoprotein', category: 'Transport', description: 'Drug pump.', details: 'The bane of chemotherapy. This pump actively ejects drugs from cancer cells, causing multi-drug resistance.' },
+    { id: '1FVO', title: 'Fatty Acid Synthase', category: 'Enzymes', description: 'Molecular factory.', details: 'A massive multi-enzyme complex that builds fatty acid chains from scratch, passing the growing chain between active sites.' },
+    { id: '3B7E', title: 'Nav1.7 Channel', category: 'Transport', description: 'Pain threshold.', details: 'A voltage-gated sodium channel essential for sensing pain. Mutations here can cause insensitivity to pain or chronic pain syndromes.' },
+    { id: '6V1X', title: '20S Proteasome', category: 'Enzymes', description: 'Recycling center.', details: 'The core particle of the cellular trash can. It is a hollow cylinder where tagged proteins are shredded.' },
+    { id: '1DAN', title: 'Factor Xa', category: 'Enzymes', description: 'Coagulation.', details: 'A critical clotting factor. Drugs like Eliquis (Apixaban) bind here to prevent stroke without requiring dietary monitoring.' },
+    { id: '1FIN', title: 'CDK2-Cyclin A', category: 'Enzymes', description: 'Cell cycle switch.', details: 'The complex that drives the cell into DNA replication (S-phase). A classic model of kinase activation.' },
+    { id: '2SRC', title: 'Src Kinase', category: 'Signaling', description: 'First oncogene.', details: 'The first cancer-causing gene discovered. It is typically kept folded and inactive, but mutations can unleash its growth signals.' },
+    { id: '1LQS', title: 'Lipoxygenase', category: 'Enzymes', description: 'Inflammation.', details: 'Converts fatty acids into signaling molecules (leukotrienes). It uses a non-heme iron to perform oxidation.' },
+    { id: '3LZT', title: 'LeuT', category: 'Transport', description: 'Neurotransmitter carrier.', details: 'A bacterial homolog of serotonin/dopamine transporters. It revealed the "rocking bundle" mechanism of transport.' },
+    { id: '1OMG', title: 'Gramicidin A', category: 'Transport', description: 'Antibiotic pore.', details: 'A peptide antibiotic that forms a perfect hole in bacterial membranes, letting ions leak out and killing the cell.' },
+    { id: '2WDQ', title: 'Leghemoglobin', category: 'Transport', description: 'Plant blood.', details: 'Found in nitrogen-fixing root nodules. It scavenges oxygen to protect the nitrogenase enzyme, turning the roots pink.' },
+    { id: '3CNA', title: 'Concanavalin A', category: 'Structural', description: 'Lectin.', details: 'A carbohydrate-binding protein from Jack Bean. It binds specifically to sugars on cell surfaces.' },
+    { id: '1K42', title: 'Tissue Factor', category: 'Signaling', description: 'Clot starter.', details: 'The receptor that initiates the extrinsic clotting pathway when blood vessels are damaged.' },
+    { id: '1POK', title: 'Pokeweed Protein', category: 'Toxins', description: 'Ribosome inactivator.', details: 'A plant toxin that removes a specific base from ribosomal RNA, shutting down protein synthesis.' }
 ];
 
 // Deduplicate IDs just in case
