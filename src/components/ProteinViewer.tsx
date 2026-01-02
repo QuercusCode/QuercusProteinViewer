@@ -1288,20 +1288,18 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             // 1. CHARGE COLORING (Atomic Scheme)
             // Re-implemented as a pure atomic callback to ensure it hits every atom.
             if (currentColoring === 'charge') {
-                const schemeId = 'charge-scheme-robust';
-
-                // Register scheme globally (safe to overwrite)
-                NGL.ColormakerRegistry.addScheme(function (this: any) {
-                    this.atomColor = (atom: any) => {
+                // Use the ID returned by NGL to be safe
+                const chargeSchemeId = NGL.ColormakerRegistry.addScheme(function (this: any) {
+                    this.atomColor = function (atom: any) {
                         const r = atom.resname;
                         if (r === 'ARG' || r === 'LYS' || r === 'HIS') return 0x0000FF; // Blue
                         if (r === 'ASP' || r === 'GLU') return 0xFF0000; // Red
                         return 0xCCCCCC; // Grey
                     };
-                }, schemeId);
+                });
 
                 if (baseSelection !== "not ()") {
-                    component.addRepresentation(repType, { color: schemeId, sele: baseSelection });
+                    component.addRepresentation(repType, { color: chargeSchemeId, sele: baseSelection });
                 }
             }
 
@@ -1310,12 +1308,11 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 (currentColoring === 'hydrophobicity' || currentColoring === 'bfactor') &&
                 colorPalette !== 'standard'
             ) {
-                const schemeId = `custom-scheme-${Date.now()}`;
                 const activeMode = currentColoring;
 
                 try {
-                    NGL.ColormakerRegistry.addScheme(function (this: any) {
-                        this.atomColor = (atom: any) => {
+                    const customSchemeId = NGL.ColormakerRegistry.addScheme(function (this: any) {
+                        this.atomColor = function (atom: any) {
                             let value = 0;
                             if (activeMode === 'bfactor') {
                                 const b = atom.bfactor;
@@ -1335,10 +1332,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             const cssColor = getPaletteColor(value, colorPalette);
                             return new NGL.Color(cssColor).getHex();
                         };
-                    }, schemeId);
+                    });
 
                     if (baseSelection !== "not ()") {
-                        component.addRepresentation(repType, { color: schemeId, sele: baseSelection });
+                        component.addRepresentation(repType, { color: customSchemeId, sele: baseSelection });
                     }
 
                 } catch (e) {
