@@ -23,7 +23,8 @@ import {
     Loader2,
     ImageIcon,
     Grid3X3,
-    Bot
+    Bot,
+    BookOpen
 } from 'lucide-react';
 import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette } from '../types';
 
@@ -50,6 +51,7 @@ interface ControlsProps {
     onResidueClick: (chain: string, resNo: number, resName?: string) => void;
     onToggleAISidebar: () => void;
     isAISidebarOpen: boolean;
+    onToggleLibrary: () => void;
     showSurface: boolean;
     setShowSurface: (show: boolean) => void;
     showLigands: boolean;
@@ -126,7 +128,8 @@ export const Controls: React.FC<ControlsProps> = ({
     isDyslexicFont,
     setIsDyslexicFont,
     onToggleAISidebar,
-    isAISidebarOpen
+    isAISidebarOpen,
+    onToggleLibrary
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const sessionInputRef = useRef<HTMLInputElement>(null);
@@ -290,6 +293,13 @@ export const Controls: React.FC<ControlsProps> = ({
 
                         <div className="flex items-center gap-2">
                             <button
+                                onClick={onToggleLibrary}
+                                className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700'}`}
+                                title="Open Offline Library"
+                            >
+                                <BookOpen className="w-4 h-4" />
+                            </button>
+                            <button
                                 onClick={onToggleAISidebar}
                                 className={`p-2 rounded-full transition-colors ${isAISidebarOpen ? 'bg-blue-500 text-white shadow-md shadow-blue-500/20' : (isLightMode ? 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700')}`}
                                 title="Ask Dr. AI"
@@ -342,16 +352,25 @@ export const Controls: React.FC<ControlsProps> = ({
                                 Load
                             </button>
                         </form>
-                        <div className="relative">
-                            <input type="file" accept=".pdb,.cif,.ent,.mmcif" className="hidden" ref={fileInputRef} onChange={(e) => {
-                                if (e.target.files?.[0]) onUpload(e.target.files[0]);
-                            }} />
+                        <div className="grid grid-cols-2 gap-2">
+                            <div className="relative">
+                                <input type="file" accept=".pdb,.cif,.ent,.mmcif" className="hidden" ref={fileInputRef} onChange={(e) => {
+                                    if (e.target.files?.[0]) onUpload(e.target.files[0]);
+                                }} />
+                                <button
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all group ${cardBg} hover:opacity-80`}
+                                >
+                                    <Upload className="w-4 h-4 group-hover:text-blue-500 transition-colors" />
+                                    <span className="text-xs font-medium">Upload File</span>
+                                </button>
+                            </div>
                             <button
-                                onClick={() => fileInputRef.current?.click()}
+                                onClick={onToggleLibrary}
                                 className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all group ${cardBg} hover:opacity-80`}
                             >
-                                <Upload className="w-4 h-4 group-hover:text-blue-500 transition-colors" />
-                                <span className="text-xs font-medium">Upload File</span>
+                                <BookOpen className="w-4 h-4 group-hover:text-purple-500 transition-colors" />
+                                <span className="text-xs font-medium">Library</span>
                             </button>
                         </div>
                     </div>

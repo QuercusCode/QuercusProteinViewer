@@ -3,6 +3,7 @@ import { Send, Bot, User, Sparkles, X } from 'lucide-react';
 import clsx from 'clsx';
 import type { ResidueInfo, ColoringType, RepresentationType } from '../types';
 import { calculateMW, calculateIsoelectricPoint, getAminoAcidComposition } from '../utils/chemistry';
+import { OFFLINE_LIBRARY } from '../data/library';
 // import { fetchUniProtData, type UniProtData } from '../services/uniprot'; // Usage Removed
 
 export type AIAction =
@@ -110,7 +111,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         {
             id: 'welcome',
             sender: 'ai',
-            text: "🤖 **Dr. AI (Offline)**.\n\nI am analyzing this structure using chemical rules and geometry.\n\nAsk me to 'Color by hydrophobicity' or 'Show active sites' (if known).",
+            text: "🤖 **Dr. AI (Offline)**.\n\nI have access to the **Offline Biological Library**.\n\nAsk me 'What is this protein?' or 'Color by hydrophobicity'.",
             timestamp: new Date()
         }
     ]);
@@ -309,9 +310,15 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         }
 
         // 3. FAMOUS PROTEIN MATCH?
-        if (ctxPdb && (q.includes('protein') || q.includes('structure') || q.includes('what is this'))) {
+        if (ctxPdb && (q.includes('protein') || q.includes('structure') || q.includes('what is this') || q.includes('tell me about'))) {
+            // Check Offline Library first
+            const libraryEntry = OFFLINE_LIBRARY.find(e => e.id.toUpperCase() === ctxPdb.toUpperCase());
+            if (libraryEntry) {
+                return { text: `**📚 Offline Library Structure**:\n\n**${libraryEntry.title}**\n*Category: ${libraryEntry.category}*\n\n${libraryEntry.description}\n\n**Deep Dive**: ${libraryEntry.details}` };
+            }
+
             const famousFact = FAMOUS_PROTEINS[ctxPdb.toUpperCase()];
-            if (famousFact) return { text: `**📚 Famous Structure Detected**:\n\n${famousFact}` };
+            if (famousFact) return { text: `**📚 Known Structure Detected**:\n\n${famousFact}` };
 
             // Fallback for unknown protein
             return {

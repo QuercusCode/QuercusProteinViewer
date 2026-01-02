@@ -7,6 +7,8 @@ import { HelpGuide } from './components/HelpGuide';
 import { parseURLState, getShareableURL } from './utils/urlManager';
 import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Movie, ColorPalette, RepresentationType, ColoringType, ResidueInfo } from './types';
 
+import LibraryModal from './components/LibraryModal';
+
 function App() {
   // Parse Global URL State Once
   const initialUrlState = parseURLState();
@@ -46,6 +48,7 @@ function App() {
   const [isCleanMode, setIsCleanMode] = useState(false);
   const [showContactMap, setShowContactMap] = useState(false);
   const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
+  const [isLibraryOpen, setIsLibraryOpen] = useState(false);
   const [colorPalette, setColorPalette] = useState<ColorPalette>('standard');
 
   // Accessibility: Dyslexic Font
@@ -487,6 +490,38 @@ function App() {
 
   return (
     <main className={`w-full h-full relative overflow-hidden transition-colors duration-300 ${isLightMode ? 'bg-neutral-100 text-neutral-900' : 'bg-neutral-950 text-white'}`}>
+
+      <LibraryModal
+        isOpen={isLibraryOpen}
+        onClose={() => setIsLibraryOpen(false)}
+        onSelect={(url) => {
+          // Extract ID
+          const idMatch = url.match(/\/models\/([a-zA-Z0-9]+)\.pdb/);
+          const id = idMatch ? idMatch[1] : 'Unknown';
+
+          setIsLibraryOpen(false);
+          setPdbId(id);
+          setProteinTitle(`Loading ${id}...`);
+
+          // Fetch and Load
+          fetch(url)
+            .then(res => {
+              if (!res.ok) throw new Error("Failed to load local file");
+              return res.blob();
+            })
+            .then(blob => {
+              const file = new File([blob], `${id}.pdb`, { type: 'chemical/x-pdb' });
+              handleUpload(file);
+              // We set title manually since fetchTitle might fail for local files if no internet
+              setProteinTitle(`Offline: ${id}`);
+            })
+            .catch(err => {
+              console.error("Library load failed", err);
+              alert("Failed to load local protein file. Ensure 'npm run download' was executed.");
+            });
+        }}
+      />
+
       <AISidebar
         isOpen={isAISidebarOpen}
         onClose={() => setIsAISidebarOpen(false)}
@@ -545,6 +580,7 @@ function App() {
         setIsDyslexicFont={setIsDyslexicFont}
         onToggleAISidebar={() => setIsAISidebarOpen(prev => !prev)}
         isAISidebarOpen={isAISidebarOpen}
+        onToggleLibrary={() => setIsLibraryOpen(true)}
       />
 
       <ProteinViewer
