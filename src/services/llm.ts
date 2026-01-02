@@ -24,11 +24,9 @@ export const generateAIResponse = async (
 ): Promise<LLMResponse> => {
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
-        // Use flash for speed, or pro for better reasoning
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         // Construct System Context
-        let systemPrompt = `You are Dr. AI, an expert structural biologist assistant inside a 3D Protein Viewer.
+        const systemPrompt = `You are Dr. AI, an expert structural biologist assistant inside a 3D Protein Viewer.
         
 CURRENT MOLECULE:
 - PDB ID: ${context.pdbId || "None"}
@@ -55,21 +53,14 @@ INSTRUCTIONS:
 - Be concise but helpful.
 `;
 
-        // We append system prompt as the first part of the conversation or handle it via system instruction (not fully exposed in simple API yet, so we prepend).
-        // Actually, gemini-1.5 supports systemInstruction. Let's try to use it if creating chat, or just unshift history.
+        // Use flash for speed, or pro for better reasoning
+        const model = genAI.getGenerativeModel({
+            model: "gemini-1.5-flash",
+            systemInstruction: systemPrompt
+        });
 
         const chat = model.startChat({
-            history: [
-                {
-                    role: "user",
-                    parts: [{ text: "SYSTEM INSTRUCTION:\n" + systemPrompt }]
-                },
-                {
-                    role: "model",
-                    parts: [{ text: "Understood. I am Dr. AI. I recall the context and tools." }]
-                },
-                ...history.map(h => ({ role: h.role, parts: [{ text: h.parts }] }))
-            ],
+            history: history.map(h => ({ role: h.role, parts: [{ text: h.parts }] })),
             generationConfig: {
                 maxOutputTokens: 500,
             }
@@ -104,8 +95,16 @@ INSTRUCTIONS:
             actions
         };
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Gemini API Error:", error);
-        return { text: "⚠️ Error connecting to Gemini. Please check your API Key.", actions: [] };
+        let errorMsg = "⚠️ Error connecting to Gemini.";
+
+        if (error.message) {
+            if (error.message.includes("403")) errorMsg += " (403 Forbidden: Invalid API Key or Location not supported).";
+            else if (error.message.includes("404")) errorMsg += " (404 Not Found: Model may be unavailable).";
+            else errorMsg += ` (${error.message})`;
+        }
+
+        return { text: errorMsg, actions: [] };
     }
 };
