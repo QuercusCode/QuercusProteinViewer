@@ -256,7 +256,24 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
     { id: '2W5N', title: 'Wnt8', category: 'Signaling', description: 'Development.', details: 'A specialized signaling protein that directs embryogenesis and tissue regeneration. "Wnt" stands for Wingless/Int-1.' },
     { id: '2X6O', title: 'Xanthine Oxidase', category: 'Enzymes', description: 'Purine degradation.', details: 'Produces uric acid. Overactivity causes Gout (crystals in joints). Inhibited by the drug Allopurinol.' },
     { id: '2Y7P', title: 'Yeast RNA Pol II', category: 'Enzymes', description: 'Transcription complex.', details: 'The core machinery for reading genes in eukaryotes. This large complex allows for nuanced regulation of gene expression.' },
-    { id: '2Z8Q', title: 'Leucine Zipper', category: 'Structural', description: 'Dimerization motif.', details: 'A classic "coiled coil" of two alpha helices. Leucine residues line up like a zipper to hold the two strands together.' }
+    { id: '2Z8Q', title: 'Leucine Zipper', category: 'Structural', description: 'Dimerization motif.', details: 'A classic "coiled coil" of two alpha helices. Leucine residues line up like a zipper to hold the two strands together.' },
+
+    // --- BATCH 2 ADDITIONS ---
+    { id: '1BMF', title: 'F1-ATPase', category: 'Energy', description: 'ATP Synthase motor.', details: 'The rotary motor part of ATP Synthase. It spins at thousands of RPM to mash ADP and Phosphate together into ATP. Use the "Spin" feature to visualize its function!' },
+    { id: '1J59', title: 'Aquaporin', category: 'Transport', description: 'Water channel.', details: 'The plumbing of the cell. Aquaporins conduct billions of water molecules per second while strictly filtering out protons and other ions.' },
+    { id: '1E6E', title: 'Acetylcholinesterase', category: 'Enzymes', description: 'Neurotransmitter breakdown.', details: 'One of nature\'s fastest enzymes. It cleans up acetylcholine at the synapse to stop nerve signaling. Nerve agents like Sarin work by irreversibly blocking this enzyme.' },
+    { id: '3PBL', title: 'Beta-Lactamase', category: 'Enzymes', description: 'Antibiotic resistance.', details: 'The enzyme responsible for penicillin resistance. It breaks the beta-lactam ring of antibiotics, rendering them useless. Investigating this structure helps design better drugs.' },
+    { id: '1CX8', title: 'Prion Protein (Human)', category: 'Structural', description: 'Normal human prion.', details: 'Structure of the normal, healthy PrP protein. In disease (Creutzfeldt-Jakob), this alpha-helical structure refolds into toxic beta-sheets.' },
+    { id: '1T2K', title: 'Titin Fragment', category: 'Structural', description: 'World\'s biggest protein.', details: 'A small fragment (Ig domains) of Titin, the largest known protein. Titin acts as a molecular spring in muscle, preventing overstretching.' },
+    { id: '3V03', title: 'GPCR-G Protein Complex', category: 'Signaling', description: 'Beta2AR complex.', details: 'A landmark structure showing a GPCR (Beta-2 Adrenergic Receptor) caught in the act of activating its G-protein partner. This won Kobilka and Lefkowitz the Nobel Prize.' },
+    { id: '1SVB', title: 'Tobacco Necrosis Virus', category: 'Viral', description: 'Tiny virus capsid.', details: 'One of the smallest known viruses. Its capsid is composed of 60 identical subunits arranged in T=1 icosahedral symmetry.' },
+    { id: '4DAJ', title: 'DHFR', category: 'Enzymes', description: 'Chemo target.', details: 'Dihydrofolate Reductase is essential for DNA synthesis. The cancer drug Methotrexate binds here to starve rapidly dividing cells of thymine.' },
+    { id: '1PRE', title: 'Progesterone Receptor', category: 'Signaling', description: 'Hormone receptor.', details: 'The nuclear receptor that binds progesterone. It regulates genes involved in pregnancy and the menstrual cycle.' },
+    { id: '1MOL', title: 'Nitrogenase', category: 'Enzymes', description: 'Nitrogen fixation.', details: 'The enzyme that feeds the world. It breaks the incredibly strong triple bond of atmospheric nitrogen (N2) to create ammonia (NH3) for plants to use.' },
+    { id: '2POR', title: 'Porin', category: 'Transport', description: 'Bacterial outer membrane.', details: 'A classic beta-barrel channel found in the outer membrane of gram-negative bacteria. It acts as a molecular sieve.' },
+    { id: '2REB', title: 'RecA', category: 'DNA/RNA', description: 'DNA repair.', details: 'The master of recombination. RecA forms a filament on single-stranded DNA and searches for homologous sequences to repair breaks.' },
+    { id: '1TGH', title: 'TATA-Binding Protein', category: 'DNA/RNA', description: 'Gene start signal.', details: 'The molecular "saddle" that sits on DNA. It recognizes the "TATA box" sequence to mark the starting line for transcription.' },
+    { id: '3NIR', title: 'Nitrite Reductase', category: 'Energy', description: 'Copper enzyme.', details: 'An enzyme that converts nitrite to nitric oxide. It contains beautiful blue copper centers that transfer electrons.' }
 ];
 
 // Deduplicate IDs just in case
