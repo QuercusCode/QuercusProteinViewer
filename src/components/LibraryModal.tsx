@@ -39,12 +39,18 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
 
     // Filter items
     const filteredItems = useMemo(() => {
+        const lowerTerm = searchTerm.toLowerCase().trim();
         return OFFLINE_LIBRARY.filter(item => {
-            const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.description.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
-            return matchesSearch && matchesCategory;
+            // Category Filter
+            if (selectedCategory !== 'All' && item.category !== selectedCategory) {
+                return false;
+            }
+
+            // Search Filter
+            if (!lowerTerm) return true;
+
+            const searchableText = `${item.title} ${item.id} ${item.description} ${item.details || ''}`.toLowerCase();
+            return searchableText.includes(lowerTerm);
         });
     }, [searchTerm, selectedCategory]);
 
