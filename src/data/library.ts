@@ -195,7 +195,7 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
     // MORE ENZYMES
     { id: '1AKE', title: 'Adenylate Kinase', category: 'Enzymes', description: 'Energy regulation.', details: 'A textbook example of "induced fit." The enzyme acts like a clamp, closing massive "lid" domains over ATP and AMP to transfer a phosphate group and maintain cellular energy balance.' },
     { id: '6Q40', title: 'Parkin', category: 'Enzymes', description: 'Associated with Parkinsons.', details: 'Parkin is an E3 ubiquitin ligase that tags damaged mitochondria for destruction. Mutations in this gene disrupt cellular quality control and are a cause of familial Parkinson\'s disease.' },
-    { id: '4V60', title: 'Ribosome (70S)', category: 'DNA/RNA', description: 'Protein synthesis factory.', details: 'The cellular machine that translates genetic code into life. This massive complex coordinates tRNAs and mRNA to synthesize proteins. It is the target of many antibiotics.' }, // Careful with size!
+    { id: '1J5E', title: 'Ribosome (30S)', category: 'DNA/RNA', description: 'Small subunit.', details: 'The small subunit of the bacterial ribosome. It decodes the mRNA to ensure the correct amino acids are added to the chain. A target for aminoglycoside antibiotics.' },
 
     // ... Filling out structure diversity
     { id: '1YRF', title: 'P53 DNA Binding Domain', category: 'Signaling', description: 'Tumor suppressor.', details: 'P53 is often called the "Guardian of the Genome." It binds to DNA to trigger repair or cell death (apoptosis) when damage is detected. Over 50% of human cancers involve a mutation here.' },
@@ -249,9 +249,9 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
     { id: '2P8G', title: 'Papain', category: 'Enzymes', description: 'Papaya enzyme.', details: 'A cysteine protease found in papaya. It is tough enough to be used as effective meat tenderizer.' },
     { id: '2Q9H', title: 'Q-beta Virus Capsid', category: 'Viral', description: 'Viral shell.', details: 'The outer shell of an RNA bacteriophage. It spontaneously self-assembles from protein subunits, forming a perfect icosahedron.' },
     { id: '2R0I', title: 'Ribonuclease A', category: 'Enzymes', description: 'RNA cutter.', details: 'Christian Anfinsen used this enzyme to prove that "sequence determines structure" (Nobel Prize). It can refold spontaneously after denaturation.' },
-    { id: '2S1J', title: 'Streptavidin', category: 'Structural', description: 'Biotin binder.', details: 'Binds to the vitamin Biotin with one of the strongest non-covalent interactions in nature. Used extensively in biotech detection systems.' },
-    { id: '2T2K', title: 'Tubulin', category: 'Structural', description: 'Microtubule subunit.', details: 'The building block of microtubules (the cell\'s highways). It is the target of Taxol, a chemotherapy drug that freezes cell division.' },
-    { id: '2U3L', title: 'Urease', category: 'Enzymes', description: 'Urea breakdown.', details: 'The first enzyme ever crystallized (by James Sumner, 1926), proving that enzymes are proteins. It converts urea into ammonia.' },
+    { id: '1STP', title: 'Streptavidin', category: 'Structural', description: 'Biotin binder.', details: 'Binds to the vitamin Biotin with one of the strongest non-covalent interactions in nature. Used extensively in biotech detection systems.' },
+    { id: '1JFF', title: 'Tubulin', category: 'Structural', description: 'Microtubule subunit.', details: 'The building block of microtubules (the cell\'s highways). It is the target of Taxol, a chemotherapy drug that freezes cell division.' },
+    { id: '3LA4', title: 'Urease', category: 'Enzymes', description: 'Urea breakdown.', details: 'The first enzyme ever crystallized (by James Sumner, 1926), proving that enzymes are proteins. It converts urea into ammonia.' },
     { id: '2V4M', title: 'Vitamin D Receptor', category: 'Signaling', description: 'Nuclear receptor.', details: 'Binds the active form of Vitamin D (calcitriol) to regulate genes involved in calcium absorption and bone health.' },
     { id: '2W5N', title: 'Wnt8', category: 'Signaling', description: 'Development.', details: 'A specialized signaling protein that directs embryogenesis and tissue regeneration. "Wnt" stands for Wingless/Int-1.' },
     { id: '2X6O', title: 'Xanthine Oxidase', category: 'Enzymes', description: 'Purine degradation.', details: 'Produces uric acid. Overactivity causes Gout (crystals in joints). Inhibited by the drug Allopurinol.' },
@@ -323,9 +323,9 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
     { id: '2P1H', title: 'Phosphofructokinase', category: 'Enzymes', description: 'Glycolysis valve.', details: 'The "pacemaker" of glycolysis. It is allosterically inhibited by ATP, slowing consumption when energy is high.' },
     { id: '2Q66', title: 'Quinone Reductase', category: 'Enzymes', description: 'Cancer protection.', details: 'Protects cells from quinone toxicity. Levels are induced by broccoli and other cruciferous vegetables.' },
     { id: '2R7G', title: 'Rhodopsin Kinase', category: 'Signaling', description: 'Vision reset.', details: 'Phosphorylates light-activated rhodopsin to turn off the visual signal.' },
-    { id: '2S0B', title: 'Serum Albumin', category: 'Transport', description: 'Blood carrier.', details: 'The most abundant protein in blood plasma. It carries fatty acids, hormones, and drugs.' },
-    { id: '2T61', title: 'Thrombin', category: 'Enzymes', description: 'Blood clotting.', details: 'The serine protease that converts fibrinogen to fibrin, forming the mesh of a blood clot.' },
-    { id: '2U51', title: 'Urokinase', category: 'Enzymes', description: 'Clot buster.', details: 'Activates plasmin to dissolve blood clots. Used clinically for heart attacks and strokes.' },
+    { id: '1AO6', title: 'Serum Albumin', category: 'Transport', description: 'Blood carrier.', details: 'The most abundant protein in blood plasma. It carries fatty acids, hormones, and drugs.' },
+    { id: '1PPB', title: 'Thrombin', category: 'Enzymes', description: 'Blood clotting.', details: 'The serine protease that converts fibrinogen to fibrin, forming the mesh of a blood clot.' },
+    { id: '1LME', title: 'Urokinase', category: 'Enzymes', description: 'Clot buster.', details: 'Activates plasmin to dissolve blood clots. Used clinically for heart attacks and strokes.' },
 
     // --- BATCH 4 ADDITIONS (25 VERIFIED) ---
     { id: '1PRC', title: 'Reaction Center', category: 'Energy', description: 'Photosynthesis Nobel.', details: 'The first membrane protein structure ever solved (Nobel 1988). It captures light energy to create an electric voltage across the membrane.' },
@@ -452,10 +452,10 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
     { id: '5N5E', title: 'Cas13', category: 'Enzymes', description: 'RNA shredder.', details: 'A CRISPR enzyme that targets RNA instead of DNA. It is used for viral diagnostics (SHERLOCK) and RNA editing.' },
     { id: '1GFL', title: 'Green Fluorescent Protein', category: 'Structural', description: 'Bioluminescence.', details: 'The famous glowing protein from jellyfish. Fused to other proteins, it allows scientists to watch biology happen in real-time.' },
     { id: '1BNA', title: 'B-DNA Helix', category: 'DNA/RNA', description: 'The double helix.', details: 'The classic structure of DNA. This crystal structure confirmed the Watson-Crick model at atomic resolution.' },
-    { id: '7K00', title: 'LSD Receptor', category: 'Signaling', description: 'Hallucinogen.', details: 'The serotonin receptor bound to LSD. It reveals how the drug gets "trapped" in the receptor, explaining its long-lasting effects.' },
+    { id: '6WGT', title: 'LSD Receptor', category: 'Signaling', description: 'Hallucinogen.', details: 'The serotonin receptor bound to LSD. It reveals how the drug gets "trapped" in the receptor, explaining its long-lasting effects.' },
     { id: '6A5J', title: 'Psilocybin Receptor', category: 'Signaling', description: 'Magic mushroom.', details: 'The 5-HT2A receptor bound to psilocin, the active metabolite of magic mushrooms, showing the structural basis of psychedelics.' },
     { id: '6X18', title: 'Caffeine Receptor', category: 'Signaling', description: 'Wakefulness.', details: 'The Adenosine A2A receptor bound to caffeine. Caffeine blocks the "sleepiness" signal of adenosine.' },
-    { id: '5U1K', title: 'Opioid Receptor', category: 'Signaling', description: 'Pain relief.', details: 'The Kappa-opioid receptor. Understanding these structures is key to designing non-addictive pain relievers.' },
+    { id: '4DJH', title: 'Opioid Receptor', category: 'Signaling', description: 'Pain relief.', details: 'The Kappa-opioid receptor. Understanding these structures is key to designing non-addictive pain relievers.' },
     { id: '3PBL', title: 'Penicillin Binding Protein', category: 'Enzymes', description: 'Antibiotic target.', details: 'The bacterial enzyme that builds cell walls. Penicillin binds here irreversibly, causing the bacteria to burst.' },
     // --- BATCH 9 ADDITIONS (20 BALANCING) ---
     // Synthetic / Designed

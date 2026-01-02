@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "download": "node scripts/download_models.js"
   },
   "dependencies": {
     "@types/qrcode": "^1.5.6",
