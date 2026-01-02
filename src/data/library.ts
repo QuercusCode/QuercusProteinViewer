@@ -169,10 +169,10 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
     // --- SYNTHETIC / EXOTIC ---
     {
         id: '2B3P',
-        title: 'Top7',
+        title: 'Superfolder GFP',
         category: 'Synthetic',
-        description: 'First completely designed protein.',
-        details: 'Top7 is an artificial protein designed by Brian Kuhlman and David Baker. It was the first globular protein with a fold not found in nature to be designed from scratch.'
+        description: 'Robust GFP variant.',
+        details: 'Superfolder GFP (sfGFP) is a resilient form of GFP evolved to fold well even when fused to poorly folding proteins. It maintains the classic beta-barrel structure.'
     },
 
     // --- MORE CLASSICS TO REACH 100+ (Abbreviated List) ---
@@ -221,7 +221,7 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
     { id: '1N2C', title: 'Nucleosome', category: 'DNA/RNA', description: 'DNA packaging.', details: 'The fundamental unit of DNA packaging. 147 base pairs of DNA are wrapped around a core of 8 histone proteins, like thread on a spool.' },
     { id: '1OAA', title: 'Oxy-Hemoglobin', category: 'Transport', description: 'Oxygen bound form.', details: 'This structure captures hemoglobin in the "R-state" (Relaxed), fully loaded with oxygen. Notice how the subunits have rotated compared to the deoxy form.' },
     { id: '1PGB', title: 'Protein G', category: 'Structural', description: 'Ig binding domain.', details: 'A bacterial protein that binds to the constant region of antibodies. Scientists use it as a tool to purify antibodies from serum.' },
-    { id: '1QYS', title: 'Topoisomerase I', category: 'Enzymes', description: 'DNA supercoiling.', details: 'This enzyme relieves the tension in DNA strands. It cuts one strand, lets it spin around the other, and reseals it—essential for replication.' },
+    { id: '1QYS', title: 'Top7', category: 'Synthetic', description: 'Designed protein.', details: 'Top7 is an artificial protein designed by Brian Kuhlman and David Baker. It was the first globular protein with a fold not found in nature to be designed from scratch.' },
     { id: '1R0R', title: 'RNA Polymerase', category: 'Enzymes', description: 'Transcription.', details: 'The enzyme that transcribes DNA into RNA. It unwinds the DNA helix and builds a matching RNA strand base by base.' },
     { id: '1S5L', title: 'Superoxide Dismutase', category: 'Enzymes', description: 'Antioxidant.', details: 'An extremely fast enzyme that protects cells from oxidative damage. It instantly converts dangerous superoxide radicals into oxygen and hydrogen peroxide.' },
     { id: '1TUP', title: 'P53 Core Domain', category: 'Signaling', description: 'Tumor suppressor.', details: 'The central DNA-binding unit of p53. This specific structure shows how p53 recognizes its target DNA sequence to control cell fate.' },
