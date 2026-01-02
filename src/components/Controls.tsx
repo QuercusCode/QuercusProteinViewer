@@ -386,7 +386,7 @@ export const Controls: React.FC<ControlsProps> = ({
                             {proteinTitle && typeof proteinTitle === 'string' && (
                                 <div className={`p-3 rounded-lg border ${cardBg} mb-1 shadow-sm`}>
                                     <h3 className={`text-[10px] font-bold uppercase tracking-wider mb-1 ${subtleText}`}>Title</h3>
-                                    <p className={`text-xs font-medium leading-relaxed ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>
+                                    <p className={`text-xs font-medium leading-relaxed break-words ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>
                                         {proteinTitle}
                                     </p>
                                 </div>
