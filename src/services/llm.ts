@@ -55,15 +55,25 @@ INSTRUCTIONS:
 `;
 
         // Use selected model
+        // Note: We avoid 'systemInstruction' property to ensure compatibility with all regions/models (some throw 404).
         const model = genAI.getGenerativeModel({
-            model: modelName,
-            systemInstruction: systemPrompt
+            model: modelName
         });
 
         const chat = model.startChat({
-            history: history.map(h => ({ role: h.role, parts: [{ text: h.parts }] })),
+            history: [
+                {
+                    role: "user",
+                    parts: [{ text: "SYSTEM_INSTRUCTION:\n" + systemPrompt }]
+                },
+                {
+                    role: "model",
+                    parts: [{ text: "Understood. I am Dr. AI structure analyst. I am ready." }]
+                },
+                ...history.map(h => ({ role: h.role, parts: [{ text: h.parts }] }))
+            ],
             generationConfig: {
-                maxOutputTokens: 500,
+                maxOutputTokens: 1000,
             }
         });
 
