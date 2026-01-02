@@ -1294,7 +1294,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 const schemeId = `custom-scheme-${Date.now()}`;
 
                 try {
-                    const NGL = window.NGL;
+                    // Use outer NGL definition
                     NGL.ColormakerRegistry.addScheme(function (this: any) {
                         this.atomColor = (atom: any) => {
                             // A. Custom Overrides (First priority)
