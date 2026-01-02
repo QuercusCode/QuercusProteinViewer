@@ -404,7 +404,28 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
     { id: '2WDQ', title: 'Leghemoglobin', category: 'Transport', description: 'Plant blood.', details: 'Found in nitrogen-fixing root nodules. It scavenges oxygen to protect the nitrogenase enzyme, turning the roots pink.' },
     { id: '3CNA', title: 'Concanavalin A', category: 'Structural', description: 'Lectin.', details: 'A carbohydrate-binding protein from Jack Bean. It binds specifically to sugars on cell surfaces.' },
     { id: '1K42', title: 'Tissue Factor', category: 'Signaling', description: 'Clot starter.', details: 'The receptor that initiates the extrinsic clotting pathway when blood vessels are damaged.' },
-    { id: '1POK', title: 'Pokeweed Protein', category: 'Toxins', description: 'Ribosome inactivator.', details: 'A plant toxin that removes a specific base from ribosomal RNA, shutting down protein synthesis.' }
+    { id: '1POK', title: 'Pokeweed Protein', category: 'Toxins', description: 'Ribosome inactivator.', details: 'A plant toxin that removes a specific base from ribosomal RNA, shutting down protein synthesis.' },
+    // --- BATCH 7 ADDITIONS (20 VIRAL PROTEINS) ---
+    { id: '1RUZ', title: 'Influenza Hemagglutinin', category: 'Viral', description: 'Flu surface spike.', details: 'The key protein on the surface of the flu virus that binds to sialic acid receptors on host cells, enabling viral entry.' },
+    { id: '2HTY', title: 'Influenza Neuraminidase', category: 'Viral', description: 'Tamiflu target.', details: 'The enzyme that cleaves sialic acid to release new viral particles. Inhibited by drugs like Oseltamivir (Tamiflu).' },
+    { id: '5JQ3', title: 'Ebola Glycoprotein', category: 'Viral', description: 'Deadly viral key.', details: 'The sole surface protein of Ebola virus, responsible for attachment and fusion. It is the primary target for neutralizing antibodies.' },
+    { id: '5IRE', title: 'Zika Virus', category: 'Viral', description: 'Mature particle.', details: 'The cryo-EM structure of the mature Zika virus. Similar to Dengue, it caused a major global health emergency linked to birth defects.' },
+    { id: '1K4R', title: 'Dengue Virus E', category: 'Viral', description: 'Breakbone fever.', details: 'The envelope protein of Dengue virus. It changes shape in the acidic environment of the endosome to drive membrane fusion.' },
+    { id: '1POV', title: 'Poliovirus', category: 'Viral', description: 'The entire capsid.', details: 'A historic structure of the complete Poliovirus capsid. Its solution helped understand how non-enveloped viruses assemble.' },
+    { id: '3M5L', title: 'HCV Protease', category: 'Viral', description: 'Hepatitis C cure.', details: 'The NS3/4A protease of Hepatitis C. Direct-acting antivirals targeting this enzyme have effectively cured HCV infection.' },
+    { id: '1QGT', title: 'Hepatitis B Capsid', category: 'Viral', description: 'Viral core.', details: 'The icosahedral core shell of HBV. It packages the viral pre-genomic RNA and reverse transcriptase.' },
+    { id: '1DZL', title: 'HPV Capsid (L1)', category: 'Viral', description: 'Papillomavirus.', details: 'The major capsid protein L1 of Human Papillomavirus. These virus-like particles are the basis of the Gardasil vaccine.' },
+    { id: '1KNB', title: 'Adenovirus Knob', category: 'Viral', description: 'Common cold vector.', details: 'The fiber knob domain that allows Adenovirus to bind to cells. Modified versions are used as vectors for gene therapy and vaccines.' },
+    { id: '2ZB6', title: 'Measles Hemagglutinin', category: 'Viral', description: 'Highly contagious.', details: 'The attachment protein of Measles. It binds to CD46 or SLAM receptors, making it one of the most infectious viruses known.' },
+    { id: '2I69', title: 'West Nile Envelope', category: 'Viral', description: 'Mosquito-borne.', details: 'The envelope protein of West Nile Virus, structurally related to Dengue and Zika, revealing the conservation in flaviviruses.' },
+    { id: '6EPK', title: 'Yellow Fever E', category: 'Viral', description: 'Historic virus.', details: 'The envelope protein of the virus that caused historical epidemics. The 17D vaccine strain is one of the most effective vaccines ever created.' },
+    { id: '2C36', title: 'HSV-1 Glycoprotein D', category: 'Viral', description: 'Herpes entry.', details: 'A receptor-binding protein from Herpes Simplex Virus 1. It triggers the fusion machinery to allow the virus to enter nerve cells.' },
+    { id: '5UDJ', title: 'RSV Fusion Protein', category: 'Viral', description: 'Respiratory virus.', details: 'The prefusion form of the RSV F protein. Stabilizing this shape was the breakthrough that led to the first approved RSV vaccines.' },
+    { id: '3KZ4', title: 'Rotavirus VP4', category: 'Viral', description: 'Stomach flu.', details: 'The spike protein of Rotavirus, a leading cause of severe diarrhea in children. It must be cleaved by trypsin to become infectious.' },
+    { id: '1IHM', title: 'Norovirus Capsid', category: 'Viral', description: 'Winter vomiting.', details: 'The shell of the highly contagious Norovirus. Its robust structure allows it to survive on surfaces and withstand stomach acid.' },
+    { id: '4RHV', title: 'Rhinovirus 14', category: 'Viral', description: 'Common cold.', details: 'One of the first animal virus structures solved. It reveals the "canyon" where the cellular receptor binds, hidden from antibodies.' },
+    { id: '2TMV', title: 'Tobacco Mosaic Virus', category: 'Viral', description: 'First virus.', details: 'The coat protein of TMV. This was the first virus ever discovered and the first to be crystallized, launching the field of structural virology.' },
+    { id: '2MS2', title: 'MS2 Bacteriophage', category: 'Viral', description: 'RNA shell.', details: 'A simple RNA virus that infects bacteria. It is widely used as a model system for understanding viral assembly and RNA interactions.' }
 ];
 
 // Deduplicate IDs just in case
