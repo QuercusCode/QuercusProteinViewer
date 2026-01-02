@@ -525,8 +525,8 @@ function App() {
               }
             })
             .catch(err => {
-              console.error("Library load failed", err);
-              alert("Failed to load local protein file. Ensure 'npm run download' was executed.");
+              console.warn("Local library load failed, falling back to RCSB.", err);
+              // Fallback is automatic via setPdbId(id) above
             });
         }}
       />
