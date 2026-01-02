@@ -3,7 +3,7 @@ import { Send, Bot, User, Sparkles, X } from 'lucide-react';
 import clsx from 'clsx';
 import type { ResidueInfo, ColoringType, RepresentationType } from '../types';
 import { calculateMW, calculateIsoelectricPoint, getAminoAcidComposition } from '../utils/chemistry';
-import { fetchUniProtData, type UniProtData } from '../services/uniprot';
+// import { fetchUniProtData, type UniProtData } from '../services/uniprot'; // Usage Removed
 
 export type AIAction =
     | { type: 'SET_COLORING', value: ColoringType }
@@ -105,41 +105,17 @@ export const AISidebar: React.FC<AISidebarProps> = ({
     onAction
 }) => {
     const [input, setInput] = useState('');
-    const [uniprot, setUniprot] = useState<UniProtData | null>(null);
+    // const [uniprot, setUniprot] = useState<UniProtData | null>(null); // Removed per user request
     const [messages, setMessages] = useState<Message[]>([
         {
             id: 'welcome',
             sender: 'ai',
-            text: "🤖 **Dr. AI (V6)**.\n\nI am analyzing this structure...",
+            text: "🤖 **Dr. AI (Offline)**.\n\nI am analyzing this structure using chemical rules and geometry.\n\nAsk me to 'Color by hydrophobicity' or 'Show active sites' (if known).",
             timestamp: new Date()
         }
     ]);
 
-    // V6: Fetch UniProt Data
-    useEffect(() => {
-        setUniprot(null); // Reset on PDB change
-        if (pdbId) {
-            fetchUniProtData(pdbId).then(data => {
-                if (data) {
-                    setUniprot(data);
-                    setMessages(prev => [...prev, {
-                        id: `uniprot-found-${Date.now()}`,
-                        sender: 'ai',
-                        text: `✅ **Connected to UniProt**.\n\nIdentified: **${data.proteinName}** (${data.geneName}).\nI have data for **${data.features.length} features** (active sites, etc).\n\nTry: 'What is the function?', 'Show active sites'.`,
-                        timestamp: new Date()
-                    }]);
-                } else {
-                    // No UniProt data found
-                    setMessages(prev => [...prev, {
-                        id: `uniprot-404-${Date.now()}`,
-                        sender: 'ai',
-                        text: `⚠️ **UniProt Data Not Found**.\n\nThis PDB (${pdbId}) might be a synthetic structure or not indexed yet. I will use chemical analysis instead.`,
-                        timestamp: new Date()
-                    }]);
-                }
-            });
-        }
-    }, [pdbId]);
+    // UniProt Fetching Removed
 
     const [isTyping, setIsTyping] = useState(false); // Restored
 
@@ -155,34 +131,17 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         ctxTitle: string | null,
         ctxRes: ResidueInfo | null,
         ctxStats: any,
-        ctxChains?: { name: string, sequence: string }[],
-        uniprot?: UniProtData | null
+        ctxChains?: { name: string, sequence: string }[]
     ): { text: string, action?: AIAction } => {
         q = q.toLowerCase();
 
-        // 0. UNIPROT INTELLIGENCE (Priority)
-        if (uniprot) {
-            if (q.includes('function') || q.includes('what does this do') || q.includes('biology')) {
-                return { text: `**🧬 Biological Function (${uniprot.geneName})**:\n\n${uniprot.function}\n\n(Source: UniProt ${uniprot.id})` };
-            }
-            if (q.includes('active site') || q.includes('binding') || q.includes('show features')) {
-                const sites = uniprot.features.filter(f => f.type === 'ACT_SITE' || f.type === 'BINDING' || f.type === 'SITE');
-                if (sites.length > 0) {
-                    const ranges = sites.map(s => s.begin === s.end ? s.begin : `${s.begin}-${s.end}`).join(' or ');
-                    return {
-                        text: `**🎯 Active/Binding Sites Found**:\n\nI have highlighted **${sites.length} regions** corresponding to functional sites.\n\n${sites.map(s => `- ${s.type}: Residues ${s.begin}-${s.end} (${s.description})`).join('\n')}`,
-                        action: { type: 'HIGHLIGHT_REGION', selection: ranges, label: 'Active Sites' }
-                    };
-                }
-                return { text: "No active sites reported in UniProt for this protein." };
-            }
-        } else if (q.includes('function') || q.includes('biology') || q.includes('active site')) {
-            // Fallback: Check if we have a manual entry for this protein (e.g. 2B3P)
+        // 0. BIOLOGICAL INTELLIGENCE (Offline Fallback)
+        if (q.includes('function') || q.includes('biology') || q.includes('active site')) {
             if (ctxPdb) {
                 const famousFact = FAMOUS_PROTEINS[ctxPdb.toUpperCase()];
-                if (famousFact) return { text: `**📚 Known Structure Detected**:\n\n${famousFact}\n\n(Note: Live UniProt data was not found, so this is a simplified summary.)` };
+                if (famousFact) return { text: `**📚 Known Structure Detected**:\n\n${famousFact}` };
             }
-            return { text: "⚠️ I cannot provide biological function or active sites because **UniProt data was not found** for this PDB ID.\n\nIt might be a synthetic design or a new structure." };
+            return { text: "⚠️ I am in **Offline Mode**. I don't have access to live biological databases (UniProt), but I can analyze the *chemistry* and *structure* of this protein.\n\nTry asking about:\n- Hydrophobicity\n- Isoelectric Point\n- Surface Area" };
         }
 
         // ... (rest of function relies on ctxStats)
@@ -391,9 +350,9 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         setInput('');
         setIsTyping(true);
 
-        // V6: Heuristic / UniProt Logic Only (Stable)
+        // V6: Heuristic Logic Only (Offline/Stable)
         setTimeout(() => {
-            const result = generateResponse(userMsg.text, pdbId, proteinTitle, highlightedResidue, stats, chains, uniprot);
+            const result = generateResponse(userMsg.text, pdbId, proteinTitle, highlightedResidue, stats, chains);
 
             if (result.action) {
                 onAction(result.action);
@@ -429,7 +388,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
                     </div>
                     <div>
                         <h2 className="font-bold text-white text-lg leading-none">Dr. AI Analyst</h2>
-                        <span className="text-xs text-blue-200">Active Agent V6.0 (UniProt)</span>
+                        <span className="text-xs text-blue-200">Active Agent V6.0 (Offline)</span>
                     </div>
                 </div>
                 <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white">
