@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Bot, User, Sparkles, X, Settings } from 'lucide-react';
+import { Send, Bot, User, Sparkles, X } from 'lucide-react';
 import clsx from 'clsx';
 import type { ResidueInfo, ColoringType, RepresentationType } from '../types';
 import { calculateMW, calculateIsoelectricPoint, getAminoAcidComposition } from '../utils/chemistry';
 import { fetchUniProtData, type UniProtData } from '../services/uniprot';
-import { generateAIResponse } from '../services/llm';
 
 export type AIAction =
     | { type: 'SET_COLORING', value: ColoringType }
@@ -27,14 +26,6 @@ interface AISidebarProps {
     chains?: { name: string; sequence: string }[];
     onAction: (action: AIAction) => void;
 }
-
-// ... (KEEP CONSTANTS - abbreviated for Replace)
-// I cannot easily replace the middle without touching constants if I use start/end lines crossing them.
-// Strategy: Insert the LOGIC inside the component using a targeted replacement of the component body.
-
-// Let's replace the Start of the component to add state.
-
-
 interface Message {
     id: string;
     sender: 'user' | 'ai';
@@ -101,7 +92,7 @@ const FAMOUS_PROTEINS: Record<string, string> = {
     '2B3P': "This is a designed protein structure (often used as a demo). Notice the secondary structure elements packing together."
 };
 
-// --- LOGIC ENGINE V5 (Actionable) ---
+
 
 export const AISidebar: React.FC<AISidebarProps> = ({
     isOpen,
@@ -115,14 +106,11 @@ export const AISidebar: React.FC<AISidebarProps> = ({
 }) => {
     const [input, setInput] = useState('');
     const [uniprot, setUniprot] = useState<UniProtData | null>(null);
-    const [apiKey, setApiKey] = useState<string>(localStorage.getItem('gemini_api_key') || ''); // V7
-    const [modelName, setModelName] = useState<string>(localStorage.getItem('gemini_model') || 'gemini-1.5-flash'); // V7 Model Selector
-    const [showSettings, setShowSettings] = useState(false); // V7
     const [messages, setMessages] = useState<Message[]>([
         {
             id: 'welcome',
             sender: 'ai',
-            text: "🤖 **Dr. AI (V7.0)**.\n\nI am analyzing this structure...",
+            text: "🤖 **Dr. AI (V6)**.\n\nI am analyzing this structure...",
             timestamp: new Date()
         }
     ]);
@@ -388,6 +376,8 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         return { text: "Refine your query. You can ask me to:\n- **Control View**: 'Color by hydrophobicity', 'Reset view'\n- **Mutate**: Select a residue and ask 'Change to Arg'\n- **Analyze**: 'What is this helix?'" };
     };
 
+    // --- UI EVENTS ---
+
     const handleSend = async () => {
         if (!input.trim()) return;
 
@@ -401,76 +391,22 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         setInput('');
         setIsTyping(true);
 
-        // V7: LLM Logic with V6 Fallback
-        if (apiKey) {
-            try {
-                // Construct History (Corrected for Gemini: Must start with User)
-                let recentMessages = messages.slice(-10);
-                // Remove leading AI messages until we find a user message
-                while (recentMessages.length > 0 && recentMessages[0].sender === 'ai') {
-                    recentMessages.shift();
-                }
+        // V6: Heuristic / UniProt Logic Only (Stable)
+        setTimeout(() => {
+            const result = generateResponse(userMsg.text, pdbId, proteinTitle, highlightedResidue, stats, chains, uniprot);
 
-                const history = recentMessages.map(m => ({
-                    role: (m.sender === 'user' ? 'user' : 'model') as "user" | "model",
-                    parts: m.text
-                }));
-
-                const context = {
-                    pdbId,
-                    title: proteinTitle,
-                    highlightedResidue,
-                    uniprot,
-                    chains,
-                    stats
-                };
-
-                const response = await generateAIResponse(apiKey, history, userMsg.text, context, modelName);
-
-                // Execute Actions
-                if (response.actions) {
-                    response.actions.forEach(action => {
-                        console.log("Dr. AI Action:", action);
-                        onAction(action);
-                    });
-                }
-
-                setIsTyping(false);
-                setMessages(prev => [...prev, {
-                    id: Date.now().toString(),
-                    sender: 'ai',
-                    text: response.text,
-                    timestamp: new Date()
-                }]);
-
-            } catch (e) {
-                console.error("LLM Error", e);
-                setIsTyping(false);
-                setMessages(prev => [...prev, {
-                    id: Date.now().toString(),
-                    sender: 'ai',
-                    text: "⚠️ **Connection Error**: I couldn't reach the AI brain. Please check your API Key or try again.",
-                    timestamp: new Date()
-                }]);
+            if (result.action) {
+                onAction(result.action);
             }
-        } else {
-            // V6: Heuristic Fallback
-            setTimeout(() => {
-                const result = generateResponse(userMsg.text, pdbId, proteinTitle, highlightedResidue, stats, chains, uniprot);
 
-                if (result.action) {
-                    onAction(result.action);
-                }
-
-                setMessages(prev => [...prev, {
-                    id: (Date.now() + 1).toString(),
-                    sender: 'ai',
-                    text: result.text,
-                    timestamp: new Date()
-                }]);
-                setIsTyping(false);
-            }, 500);
-        }
+            setMessages(prev => [...prev, {
+                id: (Date.now() + 1).toString(),
+                sender: 'ai',
+                text: result.text,
+                timestamp: new Date()
+            }]);
+            setIsTyping(false);
+        }, 600);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -486,86 +422,20 @@ export const AISidebar: React.FC<AISidebarProps> = ({
             isOpen ? "translate-x-0" : "translate-x-full"
         )}>
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-white/10 bg-gradient-to-r from-purple-900/50 to-blue-900/50"> {/* Changed Color for V3 */}
+            <div className="flex items-center justify-between p-4 border-b border-white/10 bg-gradient-to-r from-purple-900/50 to-blue-900/50">
                 <div className="flex items-center gap-2">
                     <div className="p-1.5 bg-purple-500 rounded-lg shadow-lg shadow-purple-500/20">
                         <Bot size={20} className="text-white" />
                     </div>
                     <div>
                         <h2 className="font-bold text-white text-lg leading-none">Dr. AI Analyst</h2>
-                        <span className="text-xs text-purple-200">Active Agent V7.0 (Gemini)</span>
+                        <span className="text-xs text-blue-200">Active Agent V6.0 (UniProt)</span>
                     </div>
                 </div>
-                <div className="flex items-center gap-1">
-                    <button
-                        onClick={() => setShowSettings(!showSettings)}
-                        className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white"
-                        title="AI Settings"
-                    >
-                        <Settings size={18} />
-                    </button>
-                    <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white">
-                        <X size={20} />
-                    </button>
-                </div>
+                <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors text-white/70 hover:text-white">
+                    <X size={20} />
+                </button>
             </div>
-
-            {/* Header */}
-
-            {/* Settings Overlay */}
-            {showSettings && (
-                <div className="absolute inset-0 top-[70px] bg-gray-900/95 z-20 p-6 backdrop-blur-md flex flex-col gap-4">
-                    <h3 className="text-white font-bold text-lg">🤖 Dr. AI Settings</h3>
-
-                    <div className="space-y-2">
-                        <label className="text-sm text-gray-400">Google Gemini API Key</label>
-                        <input
-                            type="password"
-                            value={apiKey}
-                            onChange={(e) => {
-                                setApiKey(e.target.value);
-                                localStorage.setItem('gemini_api_key', e.target.value);
-                            }}
-                            placeholder="AIzaSy..."
-                            className="w-full bg-black/40 border border-white/20 rounded-lg p-3 text-white focus:border-purple-500 focus:outline-none"
-                        />
-                        <p className="text-xs text-gray-500">
-                            Your key is stored locally in your browser.
-                            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-purple-400 hover:underline ml-1">
-                                Get a free key here.
-                            </a>
-                        </p>
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="text-sm text-gray-400">AI Model</label>
-                        <select
-                            value={modelName}
-                            onChange={(e) => {
-                                setModelName(e.target.value);
-                                localStorage.setItem('gemini_model', e.target.value);
-                            }}
-                            className="w-full bg-black/40 border border-white/20 rounded-lg p-3 text-white focus:border-purple-500 focus:outline-none"
-                        >
-                            <option value="gemini-1.5-flash">Gemini 1.5 Flash (Fastest)</option>
-                            <option value="gemini-1.5-pro">Gemini 1.5 Pro (Smarter)</option>
-                            <option value="gemini-pro">Gemini 1.0 Pro (Legacy)</option>
-                        </select>
-                        <p className="text-xs text-gray-500">
-                            Try "Pro" if "Flash" gives 404 errors.
-                        </p>
-                    </div>
-
-                    <div className="mt-auto">
-                        <button
-                            onClick={() => setShowSettings(false)}
-                            className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-lg font-medium transition-colors"
-                        >
-                            Save & Close
-                        </button>
-                    </div>
-                </div>
-            )}
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent">
