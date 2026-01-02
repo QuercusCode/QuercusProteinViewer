@@ -456,7 +456,35 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
     { id: '6A5J', title: 'Psilocybin Receptor', category: 'Signaling', description: 'Magic mushroom.', details: 'The 5-HT2A receptor bound to psilocin, the active metabolite of magic mushrooms, showing the structural basis of psychedelics.' },
     { id: '6X18', title: 'Caffeine Receptor', category: 'Signaling', description: 'Wakefulness.', details: 'The Adenosine A2A receptor bound to caffeine. Caffeine blocks the "sleepiness" signal of adenosine.' },
     { id: '5U1K', title: 'Opioid Receptor', category: 'Signaling', description: 'Pain relief.', details: 'The Kappa-opioid receptor. Understanding these structures is key to designing non-addictive pain relievers.' },
-    { id: '3PBL', title: 'Penicillin Binding Protein', category: 'Enzymes', description: 'Antibiotic target.', details: 'The bacterial enzyme that builds cell walls. Penicillin binds here irreversibly, causing the bacteria to burst.' }
+    { id: '3PBL', title: 'Penicillin Binding Protein', category: 'Enzymes', description: 'Antibiotic target.', details: 'The bacterial enzyme that builds cell walls. Penicillin binds here irreversibly, causing the bacteria to burst.' },
+    // --- BATCH 9 ADDITIONS (20 BALANCING) ---
+    // Synthetic / Designed
+    { id: '2L6Q', title: 'Octarellin', category: 'Synthetic', description: 'Artificial barrel.', details: 'A completely de novo designed protein mimicking the TIM barrel fold. It proves we can design complex folds from scratch.' },
+    { id: '6E5C', title: 'Designed Cage', category: 'Synthetic', description: 'Protein origami.', details: 'A computationally designed icosahedral protein cage. These can be used as nanocontainers for drug delivery.' },
+    { id: '1Q1G', title: 'Three-Helix Bundle', category: 'Synthetic', description: 'De novo design.', details: 'One of the earliest successes in computational protein design, creating a stable chemical building block not found in nature.' },
+    { id: '2KZD', title: 'Designed Zinc Finger', category: 'Synthetic', description: 'DNA binder.', details: 'A computationally optimized zinc finger motif designed to bind a specific DNA sequence with high affinity.' },
+    { id: '1PSV', title: 'Miniprotein', category: 'Synthetic', description: 'Foldamer.', details: 'A tiny designed peptide that folds into a stable structure despite its small size, blurring the line between peptide and protein.' },
+
+    // Chaperones (Folding helpers)
+    { id: '1DKZ', title: 'DnaK', category: 'Chaperone', description: 'Hsp70 homolog.', details: 'The bacterial version of Hsp70. It binds to extended hydrophobic chains of newly synthesized proteins to prevent them from tangling.' },
+    { id: '1FXK', title: 'Prefoldin', category: 'Chaperone', description: 'Jellyfish shape.', details: 'A hexameric chaperone that captures unfolded actin and tubulin like a jellyfish and delivers them to the Chaperonin.' },
+    { id: '3J01', title: 'Trigger Factor', category: 'Chaperone', description: 'Ribosome associated.', details: 'The first chaperone a bacterium protein meets. It sits at the exit tunnel of the ribosome to cradle the emerging polypeptide chain.' },
+    { id: '1SS8', title: 'SecB', category: 'Chaperone', description: 'Export chaperone.', details: 'It keeps proteins unfolded so they can be threaded through the membrane for secretin out of the cell.' },
+    { id: '1GCI', title: 'Subtilisin Propeptide', category: 'Chaperone', description: 'Intramolecular.', details: 'A chaperone that is part of the protein itself. It catalyzes the folding of the main protease domain and is then cleaved off.' },
+
+    // Energy (Photosynthesis / Redox)
+    { id: '1A70', title: 'Ferredoxin', category: 'Energy', description: 'Electron carrier.', details: 'A small iron-sulfur protein that acts as a wire, shuttling electrons in photosynthesis and nitrogen fixation.' },
+    { id: '3BKB', title: 'Cytochrome bc1', category: 'Energy', description: 'Proton pump.', details: 'A massive complex in the electron transport chain. It pumps protons across the inner mitochondrial membrane to charge the cellular battery.' },
+    { id: '2MHR', title: 'Hydrogenase', category: 'Energy', description: 'Hydrogen fuel.', details: 'An ancient enzyme that can split hydrogen gas into protons and electrons. It is studied for potential bio-hydrogen fuel production.' },
+    { id: '1CCR', title: 'Cytochrome c550', category: 'Energy', description: 'Redox switch.', details: 'A classic variation of the cytochrome fold, used by bacteria to manage energy flow under different environmental conditions.' },
+    { id: '1FEH', title: 'Iron-Sulfur Cluster', category: 'Energy', description: 'Ancient battery.', details: 'A primordial protein containing Fe4S4 clusters. It represents some of the earliest biological chemistries on Earth.' },
+
+    // Immune (Defense)
+    { id: '1DLH', title: 'MHC Class II', category: 'Immune', description: 'Antigen presentation.', details: 'Unlike Class I, this molecule presents antigens from outside the cell (like bacterial fragments) to helper T-cells to coordinate an antibody response.' },
+    { id: '1HZH', title: 'Whole IgG1', category: 'Immune', description: 'Full antibody.', details: 'A complete crystal structure of an intact antibody molecule, showing the flexibility of the hinge region connecting the arms.' },
+    { id: '1AY7', title: 'Fab Fragment', category: 'Immune', description: 'Binding arm.', details: 'The "Fragment Antigen Binding" arm of an antibody. This is the part that actually grabs the intruder.' },
+    { id: '1KNL', title: 'TLR4', category: 'Immune', description: 'Bacteria sensor.', details: 'Toll-like Receptor 4. It detects lipopolysaccharide (LPS) from bacterial cell walls and triggers immediate inflammation (septic shock warning).' },
+    { id: '1HPM', title: 'C-Reactive Protein', category: 'Immune', description: 'Inflammation marker.', details: 'A pentameric ring protein that rises sharply in the blood during inflammation. It binds to dying cells to activate the complement system.' }
 ];
 
 // Deduplicate IDs just in case
