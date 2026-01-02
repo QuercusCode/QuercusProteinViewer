@@ -46,34 +46,99 @@ const drawMapToDataURL = (
     ctx.fillStyle = isLightMode ? '#ffffff' : '#171717';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // 2. Axes Lines
+    // 2. Grid & Axes
     const axisColor = isLightMode ? '#000000' : '#ffffff';
+    const gridColor = isLightMode ? '#e5e5e5' : '#404040';
+
+    // Draw Grid Lines (Every 50 residues)
+    ctx.strokeStyle = gridColor;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let i = 0; i <= size; i += 50) {
+        const pos = (i * P);
+        // Horizontal
+        ctx.moveTo(padding, pos);
+        ctx.lineTo(padding + (size * P), pos);
+        // Vertical
+        ctx.moveTo(padding + pos, 0);
+        ctx.lineTo(padding + pos, size * P);
+    }
+    ctx.stroke();
+
+    // 3. Chain Bars & Labels
+    const chainRanges: { chain: string, start: number, end: number }[] = [];
+    if (data.labels.length > 0) {
+        let currentChain = data.labels[0].chain;
+        let startIndex = 0;
+        for (let i = 1; i < data.labels.length; i++) {
+            if (data.labels[i].chain !== currentChain) {
+                chainRanges.push({ chain: currentChain, start: startIndex, end: i });
+                currentChain = data.labels[i].chain;
+                startIndex = i;
+            }
+        }
+        chainRanges.push({ chain: currentChain, start: startIndex, end: data.labels.length });
+    }
+
+    // Draw Chain Bars
+    const barSize = 10;
+    const colors = ['#f59e0b', '#ec4899', '#8b5cf6', '#3b82f6', '#10b981', '#ef4444']; // Visual palette
+
+    chainRanges.forEach((c, idx) => {
+        const color = colors[idx % colors.length];
+        const startPx = c.start * P;
+        const lengthPx = (c.end - c.start) * P;
+
+        // X-Axis Bar (Top) - mirroring UI (or Bottom?) - Let's put it top for X
+        // Actually PDF has axes at Left (Y) and Bottom (X).
+        // Let's put bars just outside the map.
+
+        ctx.fillStyle = color;
+
+        // Y-Axis Bar (Left)
+        ctx.fillRect(padding - 15, startPx, barSize, lengthPx);
+
+        // X-Axis Bar (Bottom)
+        ctx.fillRect(padding + startPx, (size * P) + 5, lengthPx, barSize);
+
+        // Label (Midpoint)
+        ctx.fillStyle = axisColor;
+        ctx.font = 'bold 10px Helvetica';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+
+        // Y-Label
+        ctx.fillText(c.chain, padding - 20, startPx + (lengthPx / 2));
+
+        // X-Label
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText(c.chain, padding + startPx + (lengthPx / 2), (size * P) + 12);
+    });
+
+    // Draw Main Axes Lines
     ctx.strokeStyle = axisColor;
     ctx.lineWidth = 2;
     ctx.beginPath();
-    // Y Axis
-    ctx.moveTo(padding - 5, 0);
-    ctx.lineTo(padding - 5, size * P);
-    // X Axis
-    ctx.moveTo(padding, size * P + 5);
-    ctx.lineTo(canvas.width, size * P + 5);
+    ctx.moveTo(padding, 0);
+    ctx.lineTo(padding, size * P);
+    ctx.lineTo(padding + (size * P), size * P);
     ctx.stroke();
 
-    // 3. Axes Labels
+    // Numeric Ticks (Simplied)
     ctx.fillStyle = axisColor;
-    ctx.font = '14px Arial'; // Smaller font for cleaner look
+    ctx.font = '10px Helvetica';
     ctx.textAlign = 'right';
-    ctx.textBaseline = 'middle';
 
-    // Y Labels
-    for (let i = 0; i < size; i += 50) {
-        ctx.fillText(i.toString(), padding - 10, (i * P));
-    }
-    // X Labels
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    for (let i = 0; i < size; i += 50) {
-        ctx.fillText(i.toString(), padding + (i * P), (size * P) + 10);
+    for (let i = 0; i <= size; i += 100) {
+        if (i === 0) continue;
+        const pos = i * P;
+        // Y 
+        ctx.fillText(i.toString(), padding - 35, pos); // Further out
+        // X
+        ctx.textAlign = 'center';
+        ctx.fillText(i.toString(), padding + pos, (size * P) + 25);
+        ctx.textAlign = 'right';
     }
 
 
