@@ -392,6 +392,28 @@ export const Controls: React.FC<ControlsProps> = ({
                                 </div>
                             )}
 
+                            {/* Stats Row */}
+                            {chains.length > 0 && (
+                                <div className={`grid grid-cols-2 gap-2 mb-1`}>
+                                    <div className={`p-2 rounded-lg border ${cardBg} shadow-sm overflow-hidden`}>
+                                        <span className={`block text-[10px] font-bold uppercase tracking-wider mb-0.5 ${subtleText}`}>Residues</span>
+                                        <div className={`text-sm font-bold truncate ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>
+                                            {chains.reduce((acc, chain) => {
+                                                if (chain.sequence) return acc + chain.sequence.length;
+                                                if (chain.max !== undefined && chain.min !== undefined) return acc + (chain.max - chain.min + 1);
+                                                return acc;
+                                            }, 0).toLocaleString()}
+                                        </div>
+                                    </div>
+                                    <div className={`p-2 rounded-lg border ${cardBg} shadow-sm overflow-hidden`}>
+                                        <span className={`block text-[10px] font-bold uppercase tracking-wider mb-0.5 ${subtleText}`}>Chains</span>
+                                        <div className={`text-sm font-bold truncate ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>
+                                            {chains.length}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
                             {/* Ligands */}
                             {ligands.length > 0 && (
                                 <div className={`p-3 rounded-lg border ${cardBg} shadow-sm`}>

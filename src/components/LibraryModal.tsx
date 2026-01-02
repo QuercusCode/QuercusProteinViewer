@@ -92,7 +92,7 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
                         </div>
                         <div>
                             <h2 className="text-2xl font-bold text-white">Known Structure Library</h2>
-                            <p className="text-gray-400 text-sm">Curated collection of {OFFLINE_LIBRARY.length} famous proteins, available offline.</p>
+                            <p className="text-gray-400 text-sm">Curated collection of {OFFLINE_LIBRARY.length} famous proteins.</p>
                         </div>
                     </div>
 
