@@ -203,9 +203,6 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         }
 
         // V4: Expanded Coloring
-        if (/color.*(element|atom|cpk)/i.test(q)) {
-            return { text: "🎨 Coloring by **Element** (CPK).", action: { type: 'SET_COLORING', value: 'element' } };
-        }
         if (/color.*(rainbow|spectrum|residue)/i.test(q)) {
             return { text: "🎨 Coloring by **Rainbow** (N-term to C-term).", action: { type: 'SET_COLORING', value: 'residueindex' } };
         }
