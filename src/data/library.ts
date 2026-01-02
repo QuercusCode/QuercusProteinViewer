@@ -325,7 +325,34 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
     { id: '2R7G', title: 'Rhodopsin Kinase', category: 'Signaling', description: 'Vision reset.', details: 'Phosphorylates light-activated rhodopsin to turn off the visual signal.' },
     { id: '2S0B', title: 'Serum Albumin', category: 'Transport', description: 'Blood carrier.', details: 'The most abundant protein in blood plasma. It carries fatty acids, hormones, and drugs.' },
     { id: '2T61', title: 'Thrombin', category: 'Enzymes', description: 'Blood clotting.', details: 'The serine protease that converts fibrinogen to fibrin, forming the mesh of a blood clot.' },
-    { id: '2U51', title: 'Urokinase', category: 'Enzymes', description: 'Clot buster.', details: 'Activates plasmin to dissolve blood clots. Used clinically for heart attacks and strokes.' }
+    { id: '2U51', title: 'Urokinase', category: 'Enzymes', description: 'Clot buster.', details: 'Activates plasmin to dissolve blood clots. Used clinically for heart attacks and strokes.' },
+
+    // --- BATCH 4 ADDITIONS (25 VERIFIED) ---
+    { id: '1PRC', title: 'Reaction Center', category: 'Energy', description: 'Photosynthesis Nobel.', details: 'The first membrane protein structure ever solved (Nobel 1988). It captures light energy to create an electric voltage across the membrane.' },
+    { id: '6P6W', title: 'Piezo1', category: 'Transport', description: 'Touch receptor.', details: 'The massive "propeller" channel that senses mechanical force (touch). It won the 2021 Nobel Prize in Physiology.' },
+    { id: '5Z62', title: 'TRPV1', category: 'Transport', description: 'Capsaicin receptor.', details: 'The receptor that makes chili peppers feel hot. It senses heat and pain molecules like capsaicin. (Nobel 2021).' },
+    { id: '5KXI', title: 'Zika Virus', category: 'Viral', description: 'Viral Envelope.', details: 'The cryo-EM structure of the mature Zika virus. It reveals how the virus protects its genetic material and infects cells.' },
+    { id: '4IAR', title: 'CFTR', category: 'Transport', description: 'Cystic Fibrosis.', details: 'The chloride channel that is mutated in Cystic Fibrosis. Understanding this structure helps develop drugs like Trikafta.' },
+    { id: '1B3T', title: 'HIV Capsid', category: 'Viral', description: 'Viral core.', details: 'A pentameric building block of the HIV capsid cone. It protects the viral RNA as it travels to the nucleus.' },
+    { id: '1MKT', title: 'Citrate Synthase', category: 'Enzymes', description: 'Krebs Cycle.', details: 'The first enzyme of the Krebs (Citric Acid) Cycle. It fuses Acetyl-CoA and Oxaloacetate to produce Citrate.' },
+    { id: '3H5B', title: 'Neuraminidase', category: 'Viral', description: 'Tamiflu target.', details: 'The "N" in H1N1. This influenza enzyme helps the virus detach from cells. It is the target of the drug Tamiflu (Oseltamivir).' },
+    { id: '2K2C', title: 'Amyloid Beta', category: 'Structural', description: 'Alzheimer\'s fibril.', details: 'A solid-state NMR structure of the amyloid fibril found in Alzheimer\'s plaques. It shows the cross-beta sheet architecture.' },
+    { id: '1G3P', title: 'G6PD', category: 'Enzymes', description: 'Metabolic enzyme.', details: 'Glucose-6-Phosphate Dehydrogenase protects red blood cells from oxidative stress. Deficiency is the most common enzyme defect in humans.' },
+    { id: '1YCR', title: 'MDM2-p53', category: 'Signaling', description: 'Cancer interaction.', details: 'A key protein-protein interface. MDM2 binds to p53 to inhibit it. Many cancer drugs try to break this interaction to reactivate p53.' },
+    { id: '1CTF', title: 'L7/L12 Ribosomal', category: 'DNA/RNA', description: 'Ribosome stalk.', details: 'A classic NMR structure of the flexible stalk of the ribosome, which recruits translation factors.' },
+    { id: '2O60', title: 'Gap Junction', category: 'Transport', description: 'Cell communication.', details: 'Connexin-26 forms channels that connect neighboring cells, allowing ions and small molecules to flow directly between them.' },
+    { id: '1LMB', title: 'Lambda Repressor', category: 'DNA/RNA', description: 'Gene regulation.', details: 'A textbook example of a helix-turn-helix motif binding to DNA. It controls the switch between lysogenic and lytic viral growth.' },
+    { id: '1D4B', title: 'DNA Pol Beta', category: 'DNA/RNA', description: 'DNA repair.', details: 'The smallest eukaryotic DNA polymerase. It performs "base excision repair" to fix damaged DNA bases.' },
+    { id: '1TOS', title: 'Streptokinase', category: 'Enzymes', description: 'Clot activator.', details: 'A bacterial protein that activates human plasminogen. It is used medically to dissolve blood clots in heart attacks.' },
+    { id: '1KDM', title: 'Collagenase', category: 'Enzymes', description: 'Tissue remodeling.', details: 'Matrix Metalloproteinase 1 (MMP-1). It is one of the few enzymes capable of cutting the tough triple helix of collagen.' },
+    { id: '1H1F', title: 'Histone H1', category: 'DNA/RNA', description: 'Linker histone.', details: 'Unlike core histones, H1 sits on the outside of the nucleosome to seal the DNA wrap, helping condense chromatin into chromosomes.' },
+    { id: '1DXT', title: 'Diphtheria Toxin', category: 'Toxins', description: 'Deadly inhibitor.', details: 'A potent toxin that shuts down protein synthesis in host cells by modifying Elongation Factor 2.' },
+    { id: '1JIJ', title: 'Luciferase', category: 'Enzymes', description: 'Bioluminescence.', details: 'The enzyme from fireflies that converts chemical energy (ATP) into visible light. Used as a reporter in biological assays.' },
+    { id: '5N2E', title: 'Cas13a', category: 'Enzymes', description: 'RNA targeting.', details: 'A CRISPR enzyme that targets RNA instead of DNA. It is used for precise RNA editing and diagnostic detection.' },
+    { id: '1QO1', title: 'Hep B Capsid', category: 'Viral', description: 'Icosahedral shell.', details: 'The core particle of Hepatitis B. It assembles from dimers into a T=4 icosahedral shell to protect the viral genome.' },
+    { id: '1SLQ', title: 'Guanylate Cyclase', category: 'Signaling', description: 'NO sensor.', details: 'The receptor for Nitric Oxide (NO). When NO binds to its heme, it produces cGMP to relax smooth muscle.' },
+    { id: '1MOX', title: 'Myeloperoxidase', category: 'Immune', description: 'Green enzyme.', details: 'Found in neutrophils (pus). It produces hypochlorous acid (bleach) to kill bacteria. Its green color comes from a unique heme group.' },
+    { id: '1DLH', title: 'Delta-Opioid', category: 'Signaling', description: 'Pain receptor.', details: 'A G-protein coupled receptor involved in pain relief (analgesia). It is a target for enkephalins and painkiller drugs.' }
 ];
 
 // Deduplicate IDs just in case
