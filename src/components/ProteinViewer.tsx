@@ -1274,6 +1274,14 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             let repType = representation || 'cartoon';
             let currentColoring = coloring;
 
+            // --- SMART REPRESENTATION ---
+            // "By Element" looks useless on Cartoon (all grey C-alpha). 
+            // Automatically switch to Licorice to show atoms if the user hasn't chosen a detail-oriented view.
+            if (currentColoring === 'element' && ['cartoon', 'ribbon', 'backbone'].includes(repType)) {
+                console.log("Auto-switching to Licorice for Element coloring");
+                repType = 'licorice';
+            }
+
             // Handle special 1crn case
             if (coloring === 'chainid' && pdbId && pdbId.toLowerCase().includes('1crn')) {
                 currentColoring = 'element';
@@ -1306,20 +1314,24 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 ((currentColoring === 'hydrophobicity' || currentColoring === 'bfactor') && colorPalette !== 'standard')
             ) {
                 const schemeId = `custom-scheme-${Date.now()}`;
+                // CRITICAL FIX: Capture the INTENT of the coloring mode in a const, 
+                // because 'currentColoring' variable gets overwritten with the schemeId below!
+                const activeColoringMode = currentColoring;
+
                 try {
                     NGL.ColormakerRegistry.addScheme(function (this: any) {
                         this.atomColor = (atom: any) => {
                             // A. Charge
-                            if (currentColoring === 'charge') {
+                            if (activeColoringMode === 'charge') {
                                 return getChargeColor(atom.resname);
                             }
 
                             // B. Quantitative (with Custom Palette)
                             let value = 0;
-                            if (currentColoring === 'bfactor') {
+                            if (activeColoringMode === 'bfactor') {
                                 const b = atom.bfactor;
                                 value = Math.max(0, Math.min(1, b / 100.0)); // Adjusted range 0-100
-                            } else if (currentColoring === 'hydrophobicity') {
+                            } else if (activeColoringMode === 'hydrophobicity') {
                                 const res = atom.resname;
                                 const scale: Record<string, number> = {
                                     ILE: 4.5, VAL: 4.2, LEU: 3.8, PHE: 2.8, CYS: 2.5,
@@ -1340,7 +1352,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 } catch (e) {
                     console.warn("Custom scheme creation failed, using fallback.", e);
                     // Fallback to native if custom fails
-                    if (currentColoring === 'charge') currentColoring = 'chainid';
+                    if (activeColoringMode === 'charge') currentColoring = 'chainid';
                 }
             }
 
