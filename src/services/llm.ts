@@ -20,7 +20,8 @@ export const generateAIResponse = async (
     apiKey: string,
     history: { role: "user" | "model", parts: string }[],
     query: string,
-    context: AIContext
+    context: AIContext,
+    modelName: string = "gemini-1.5-flash"
 ): Promise<LLMResponse> => {
     try {
         const genAI = new GoogleGenerativeAI(apiKey);
@@ -53,9 +54,9 @@ INSTRUCTIONS:
 - Be concise but helpful.
 `;
 
-        // Use flash for speed, or pro for better reasoning
+        // Use selected model
         const model = genAI.getGenerativeModel({
-            model: "gemini-1.5-flash",
+            model: modelName,
             systemInstruction: systemPrompt
         });
 

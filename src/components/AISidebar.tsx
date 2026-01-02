@@ -116,6 +116,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
     const [input, setInput] = useState('');
     const [uniprot, setUniprot] = useState<UniProtData | null>(null);
     const [apiKey, setApiKey] = useState<string>(localStorage.getItem('gemini_api_key') || ''); // V7
+    const [modelName, setModelName] = useState<string>(localStorage.getItem('gemini_model') || 'gemini-1.5-flash'); // V7 Model Selector
     const [showSettings, setShowSettings] = useState(false); // V7
     const [messages, setMessages] = useState<Message[]>([
         {
@@ -424,7 +425,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
                     stats
                 };
 
-                const response = await generateAIResponse(apiKey, history, userMsg.text, context);
+                const response = await generateAIResponse(apiKey, history, userMsg.text, context, modelName);
 
                 // Execute Actions
                 if (response.actions) {
@@ -533,6 +534,25 @@ export const AISidebar: React.FC<AISidebarProps> = ({
                             <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-purple-400 hover:underline ml-1">
                                 Get a free key here.
                             </a>
+                        </p>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-sm text-gray-400">AI Model</label>
+                        <select
+                            value={modelName}
+                            onChange={(e) => {
+                                setModelName(e.target.value);
+                                localStorage.setItem('gemini_model', e.target.value);
+                            }}
+                            className="w-full bg-black/40 border border-white/20 rounded-lg p-3 text-white focus:border-purple-500 focus:outline-none"
+                        >
+                            <option value="gemini-1.5-flash">Gemini 1.5 Flash (Fastest)</option>
+                            <option value="gemini-1.5-pro">Gemini 1.5 Pro (Smarter)</option>
+                            <option value="gemini-pro">Gemini 1.0 Pro (Legacy)</option>
+                        </select>
+                        <p className="text-xs text-gray-500">
+                            Try "Pro" if "Flash" gives 404 errors.
                         </p>
                     </div>
 
