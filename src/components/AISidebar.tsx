@@ -121,7 +121,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         {
             id: 'welcome',
             sender: 'ai',
-            text: "🤖 **Dr. AI (V6)**.\n\nI am analyzing this structure...",
+            text: "🤖 **Dr. AI (V7.0)**.\n\nI am analyzing this structure...",
             timestamp: new Date()
         }
     ]);
@@ -486,7 +486,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
                     </div>
                     <div>
                         <h2 className="font-bold text-white text-lg leading-none">Dr. AI Analyst</h2>
-                        <span className="text-xs text-purple-200">Active Agent V3.0</span>
+                        <span className="text-xs text-purple-200">Active Agent V7.0 (Gemini)</span>
                     </div>
                 </div>
                 <div className="flex items-center gap-1">
