@@ -24,8 +24,25 @@ expectedIds.forEach(id => {
         missing.push(id);
     } else {
         const stats = fs.statSync(filePath);
-        if (stats.size < 100) { // arbitrary small size for failed/empty file
-            empty.push(id);
+        if (stats.size < 500) { // Increased threshold
+            empty.push(`${id} (Tail: ${stats.size}b)`);
+        } else {
+            // Content Check
+            const buffer = Buffer.alloc(100);
+            const fd = fs.openSync(filePath, 'r');
+            fs.readSync(fd, buffer, 0, 100, 0);
+            fs.closeSync(fd);
+
+            const header = buffer.toString();
+            if (header.includes('<!DOCTYPE') || header.includes('<html') || header.includes('404 Not Found')) {
+                empty.push(`${id} (Invalid Content: HTML/404)`);
+            } else {
+                // Deep Check: Does it have atoms?
+                const fullContent = fs.readFileSync(filePath, 'utf-8');
+                if (!fullContent.includes('ATOM') && !fullContent.includes('HETATM')) {
+                    empty.push(`${id} (No ATOM records)`);
+                }
+            }
         }
     }
 });
