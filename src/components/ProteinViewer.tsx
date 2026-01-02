@@ -1346,10 +1346,36 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 }
             }
 
-            // 3. STANDARD COLORING (Chain, Structure, Native Hydro/B-Factor)
-            else {
-                if (currentColoring === 'charge') currentColoring = 'chainid';
+            // 3. HIGH CONTRAST CHAIN COLORING
+            else if (currentColoring === 'chainid') {
+                const chainSchemeId = NGL.ColormakerRegistry.addScheme(function (this: any) {
+                    this.atomColor = function (atom: any) {
+                        // High contrast palette (D3 Category10) for maximum distinctness
+                        const colors = [
+                            0x1f77b4, // Blue
+                            0xff7f0e, // Orange
+                            0x2ca02c, // Green
+                            0xd62728, // Red
+                            0x9467bd, // Purple
+                            0x8c564b, // Brown
+                            0xe377c2, // Pink
+                            0x7f7f7f, // Grey
+                            0xbcbd22, // Olive
+                            0x17becf  // Cyan
+                        ];
+                        // Cycle through colors based on chain index
+                        return colors[atom.chainIndex % colors.length];
+                    };
+                });
 
+                if (baseSelection !== "not ()") {
+                    component.addRepresentation(repType, { color: chainSchemeId, sele: baseSelection });
+                }
+            }
+
+            // 4. STANDARD COLORING (Structure, Native Hydro/B-Factor)
+            // Fallback for everything else
+            else {
                 if (baseSelection !== "not ()") {
                     component.addRepresentation(repType, { color: currentColoring, sele: baseSelection });
                 }
