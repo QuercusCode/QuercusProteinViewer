@@ -1258,14 +1258,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         const component = specificComponent || componentRef.current;
         if (!component || !component.structure) return;
 
-        const NGL = window.NGL; // Define once at top of function
-
-        // Custom Charge Coloring Logic (Residue based)
-        const getChargeColor = (resName: string) => {
-            if (['ARG', 'LYS', 'HIS'].includes(resName)) return 0x0000FF; // Positive: Blue
-            if (['ASP', 'GLU'].includes(resName)) return 0xFF0000; // Negative: Red
-            return 0xCCCCCC; // Neutral: Grey
-        };
+        const NGL = window.NGL;
 
         try {
             component.removeAllRepresentations();
@@ -1274,64 +1267,60 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             let repType = representation || 'cartoon';
             let currentColoring = coloring;
 
-            // --- SMART REPRESENTATION ---
-            // "By Element" looks useless on Cartoon (all grey C-alpha). 
-            // Automatically switch to Licorice to show atoms if the user hasn't chosen a detail-oriented view.
-            if (currentColoring === 'element' && ['cartoon', 'ribbon', 'backbone'].includes(repType)) {
-                console.log("Auto-switching to Licorice for Element coloring");
-                repType = 'licorice';
-            }
-
             // Handle special 1crn case
             if (coloring === 'chainid' && pdbId && pdbId.toLowerCase().includes('1crn')) {
-                currentColoring = 'element';
+                // Legacy: Since we removed element, fallback to chainid or residue
+                currentColoring = 'residue';
                 repType = 'licorice';
             }
 
-            // Map 'structure' to NGL's 'sstruc'
             if (currentColoring === 'structure') currentColoring = 'sstruc';
 
             // --- STRATEGY: Native vs Custom ---
 
-            // 1. Element Coloring: ALWAYS Use Native (CPK)
-            // It's the standard. Re-implementing it is error-prone.
-            if (currentColoring === 'element') {
-                currentColoring = 'element'; // Ensure string is correct
+            // Define Base Selection (Exclude Custom Overrides)
+            let baseSelection = "*";
+            if (customColors?.length > 0) {
+                const exclusionList = customColors.filter(c => c.target).map(c => `(${c.target})`).join(" or ");
+                if (exclusionList) baseSelection = `not (${exclusionList})`;
             }
 
-            // 2. Quantitative Coloring (Hydrophobicity / B-Factor)
-            // If palette is 'standard', use NGL's built-in robust schemes.
-            // Only use custom logic if the user requested a special palette (Viridis, etc.)
-            else if ((currentColoring === 'hydrophobicity' || currentColoring === 'bfactor') && colorPalette === 'standard') {
-                // Use native strings. NGL has 'bfactor' and 'hydrophobicity' built-in.
-                // No change needed to currentColoring string.
+            // 1. CHARGE COLORING (Atomic Scheme)
+            // Re-implemented as a pure atomic callback to ensure it hits every atom.
+            if (currentColoring === 'charge') {
+                const schemeId = 'charge-scheme-robust';
+
+                // Register scheme globally (safe to overwrite)
+                NGL.ColormakerRegistry.addScheme(function (this: any) {
+                    this.atomColor = (atom: any) => {
+                        const r = atom.resname;
+                        if (r === 'ARG' || r === 'LYS' || r === 'HIS') return 0x0000FF; // Blue
+                        if (r === 'ASP' || r === 'GLU') return 0xFF0000; // Red
+                        return 0xCCCCCC; // Grey
+                    };
+                }, schemeId);
+
+                if (baseSelection !== "not ()") {
+                    component.addRepresentation(repType, { color: schemeId, sele: baseSelection });
+                }
             }
 
-            // 3. Custom Palette / Charge logic
-            // Use custom scheme ONLY if we really need it.
+            // 2. QUANTITATIVE COLORING (Custom Schemes for Hydro/B-Factor)
             else if (
-                currentColoring === 'charge' ||
-                ((currentColoring === 'hydrophobicity' || currentColoring === 'bfactor') && colorPalette !== 'standard')
+                (currentColoring === 'hydrophobicity' || currentColoring === 'bfactor') &&
+                colorPalette !== 'standard'
             ) {
                 const schemeId = `custom-scheme-${Date.now()}`;
-                // CRITICAL FIX: Capture the INTENT of the coloring mode in a const, 
-                // because 'currentColoring' variable gets overwritten with the schemeId below!
-                const activeColoringMode = currentColoring;
+                const activeMode = currentColoring;
 
                 try {
                     NGL.ColormakerRegistry.addScheme(function (this: any) {
                         this.atomColor = (atom: any) => {
-                            // A. Charge
-                            if (activeColoringMode === 'charge') {
-                                return getChargeColor(atom.resname);
-                            }
-
-                            // B. Quantitative (with Custom Palette)
                             let value = 0;
-                            if (activeColoringMode === 'bfactor') {
+                            if (activeMode === 'bfactor') {
                                 const b = atom.bfactor;
-                                value = Math.max(0, Math.min(1, b / 100.0)); // Adjusted range 0-100
-                            } else if (activeColoringMode === 'hydrophobicity') {
+                                value = Math.max(0, Math.min(1, b / 100.0));
+                            } else if (activeMode === 'hydrophobicity') {
                                 const res = atom.resname;
                                 const scale: Record<string, number> = {
                                     ILE: 4.5, VAL: 4.2, LEU: 3.8, PHE: 2.8, CYS: 2.5,
@@ -1348,28 +1337,28 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         };
                     }, schemeId);
 
-                    currentColoring = schemeId; // Override the string to use our new ID
+                    if (baseSelection !== "not ()") {
+                        component.addRepresentation(repType, { color: schemeId, sele: baseSelection });
+                    }
+
                 } catch (e) {
-                    console.warn("Custom scheme creation failed, using fallback.", e);
-                    // Fallback to native if custom fails
-                    if (activeColoringMode === 'charge') currentColoring = 'chainid';
+                    console.warn("Custom scheme failed", e);
+                    if (baseSelection !== "not ()") {
+                        component.addRepresentation(repType, { color: activeMode, sele: baseSelection });
+                    }
                 }
             }
 
-            // --- APPLY REPRESENTATION ---
+            // 3. STANDARD COLORING (Chain, Structure, Native Hydro/B-Factor)
+            else {
+                if (currentColoring === 'charge') currentColoring = 'chainid';
 
-            // 1. Base Layer
-            let baseSelection = "*";
-            if (customColors?.length > 0) {
-                const exclusionList = customColors.filter(c => c.target).map(c => `(${c.target})`).join(" or ");
-                if (exclusionList) baseSelection = `not (${exclusionList})`;
+                if (baseSelection !== "not ()") {
+                    component.addRepresentation(repType, { color: currentColoring, sele: baseSelection });
+                }
             }
 
-            if (baseSelection !== "not ()") {
-                component.addRepresentation(repType, { color: currentColoring, sele: baseSelection });
-            }
-
-            // 2. Custom Color Overrides (Top Layer)
+            // 4. Custom Color Overrides (Top Layer)
             if (customColors?.length > 0) {
                 customColors.forEach(rule => {
                     if (rule.color && rule.target) {
@@ -1385,13 +1374,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 try { component.addRepresentation(r, { color: c, sele: sele, ...params }); } catch (e) { }
             };
 
-            if (showSurface) {
-                tryApply('surface', 'white', "*", { opacity: 0.4, depthWrite: false, side: 'front' });
-            }
-
-            if (showLigands) {
-                tryApply('ball+stick', 'element', 'ligand and not (water or ion)', { scale: 2.0 });
-            }
+            if (showSurface) tryApply('surface', 'white', "*", { opacity: 0.4, depthWrite: false, side: 'front' });
+            if (showLigands) tryApply('ball+stick', 'element', 'ligand and not (water or ion)', { scale: 2.0 });
 
             if (stageRef.current?.viewer) {
                 stageRef.current.viewer.requestRender();

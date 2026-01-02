@@ -472,7 +472,6 @@ export const Controls: React.FC<ControlsProps> = ({
                                     className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
                                 >
                                     <option value="chainid">By Chain</option>
-                                    <option value="element">By Element</option>
                                     <option value="resname">By Residue</option>
                                     <option value="structure">Secondary Structure</option>
                                     <option value="hydrophobicity">Hydrophobicity</option>
