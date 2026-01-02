@@ -496,7 +496,7 @@ function App() {
         onClose={() => setIsLibraryOpen(false)}
         onSelect={(url) => {
           // Extract ID
-          const idMatch = url.match(/\/models\/([a-zA-Z0-9]+)\.pdb/);
+          const idMatch = url.match(/models\/([a-zA-Z0-9]+)\.pdb/);
           const id = idMatch ? idMatch[1] : 'Unknown';
 
           setIsLibraryOpen(false);

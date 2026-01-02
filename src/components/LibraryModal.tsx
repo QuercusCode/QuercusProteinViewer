@@ -114,7 +114,7 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
                             {filteredItems.map(item => (
                                 <button
                                     key={item.id}
-                                    onClick={() => onSelect(`${window.location.origin}/models/${item.id}.pdb`)}
+                                    onClick={() => onSelect(`models/${item.id}.pdb`)}
                                     className="group flex flex-col items-start text-left bg-gray-800/50 hover:bg-gray-800 border border-white/5 hover:border-blue-500/50 rounded-xl p-4 transition-all hover:shadow-lg hover:shadow-blue-500/10 active:scale-[0.98]"
                                 >
                                     <div className="flex items-center justify-between w-full mb-3">
