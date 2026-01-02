@@ -403,8 +403,14 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         // V7: LLM Logic with V6 Fallback
         if (apiKey) {
             try {
-                // Construct History (Simple mapping)
-                const history = messages.slice(-10).map(m => ({
+                // Construct History (Corrected for Gemini: Must start with User)
+                let recentMessages = messages.slice(-10);
+                // Remove leading AI messages until we find a user message
+                while (recentMessages.length > 0 && recentMessages[0].sender === 'ai') {
+                    recentMessages.shift();
+                }
+
+                const history = recentMessages.map(m => ({
                     role: (m.sender === 'user' ? 'user' : 'model') as "user" | "model",
                     parts: m.text
                 }));
