@@ -22,12 +22,22 @@ const drawMapToDataURL = (
     isLightMode: boolean
 ): string => {
     const canvas = document.createElement('canvas');
-    const P = 2; // Pixel scale for high res
     const size = data.size;
-    const padding = 50; // Space for axes
 
-    canvas.width = (size * P) + padding;
-    canvas.height = (size * P) + padding;
+    // Dynamic Scale for Performance
+    // Cap max dimension at 3000px to prevent memory crashes during toDataURL or jsPDF addImage
+    // For 3000 residues, P would be 1. For 6000, P would be 0.5.
+    // We want high res (P=2) only if size is small (<1500).
+    const MAX_DIMENSION = 3000;
+    const padding = 50;
+    let P = 2;
+
+    if ((data.size * P) > MAX_DIMENSION) {
+        P = MAX_DIMENSION / data.size;
+    }
+
+    canvas.width = (data.size * P) + padding;
+    canvas.height = (data.size * P) + padding;
     const ctx = canvas.getContext('2d', { alpha: false });
 
     if (!ctx) return ''; // Should never happen
