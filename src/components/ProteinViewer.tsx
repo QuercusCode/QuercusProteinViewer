@@ -1258,24 +1258,16 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         const component = specificComponent || componentRef.current;
         if (!component || !component.structure) return;
 
-        const NGL = window.NGL;
 
-        // Stable Color Palettes
-        const CHAIN_COLORS = [
-            0x1f77b4, 0xff7f0e, 0x2ca02c, 0xd62728, 0x9467bd,
-            0x8c564b, 0xe377c2, 0x7f7f7f, 0xbcbd22, 0x17becf,
-            0xFA8072, 0x00FF7F, 0xFFD700, 0x4B0082, 0xFF1493,
-            0x008080, 0xCD5C5C, 0x000080, 0xDAA520, 0x32CD32
-        ];
 
-        const ELEMENT_COLORS: { [key: string]: number } = {
-            'C': 0x909090,
-            'O': 0xFF0D0D,
-            'N': 0x3050F8,
-            'S': 0xFFFF30,
-            'P': 0xFFA500,
-            'H': 0xFFFFFF,
-            'DEFAULT': 0xCCCCCC
+        // Custom Charge Coloring Logic (Residue based)
+        const getChargeColor = (resName: string) => {
+            // Positive: Blue
+            if (['ARG', 'LYS', 'HIS'].includes(resName)) return 0x0000FF;
+            // Negative: Red
+            if (['ASP', 'GLU'].includes(resName)) return 0xFF0000;
+            // Neutral: White/Grey
+            return 0xCCCCCC;
         };
 
         try {
@@ -1296,81 +1288,30 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 currentColoring = 'sstruc';
             }
 
-            // Strategy: Unified Custom Scheme
-            // For simple coloring modes (chainid, element), we use a purely manual scheme
-            // This ensures that "base" colors are identical whether a custom rule exists or not.
-
-            if (currentColoring === 'chainid' || currentColoring === 'element' || currentColoring === 'charge') {
-                const schemeId = `unified-scheme-${Date.now()}`;
-
-                // Pre-calculate custom colors for fast lookup
-                const customColorMap = new Map<number, number>();
-                if (customColors?.length > 0) {
-                    customColors.forEach(rule => {
-                        if (!rule.color || !rule.target) return;
-                        try {
-                            const colorHex = new NGL.Color(rule.color).getHex();
-                            const selection = new NGL.Selection(rule.target);
-                            component.structure.eachAtom((atom: any) => {
-                                customColorMap.set(atom.index, colorHex);
-                            }, selection);
-                        } catch (e) { }
-                    });
-                }
-
-                try {
-                    const registeredSchemeId = NGL.ColormakerRegistry.addScheme(function (this: any) {
-                        this.atomColor = (atom: any) => {
-                            // 1. Custom Override (Highest Priority)
-                            if (customColorMap.has(atom.index)) {
-                                return customColorMap.get(atom.index);
-                            }
-
-                            // 2. Charge Coloring
-                            if (currentColoring === 'charge') {
-                                const resName = atom.resname;
-                                // Positive: Blue
-                                if (['ARG', 'LYS', 'HIS'].includes(resName)) return 0x0000FF;
-                                // Negative: Red
-                                if (['ASP', 'GLU'].includes(resName)) return 0xFF0000;
-                                // Neutral: White/Grey
-                                return 0xCCCCCC;
-                            }
-
-
-
-                            // 3. Base Coloring (Stable)
-                            if (currentColoring === 'element') {
-                                return ELEMENT_COLORS[atom.element] || ELEMENT_COLORS['DEFAULT'];
-                            }
-
-                            // Default: Chain ID
-                            return CHAIN_COLORS[(atom.chainIndex || 0) % CHAIN_COLORS.length];
-                        };
-                    }, schemeId);
-
-                    console.log(`Applying Unified Scheme: ${repType}, ID: ${registeredSchemeId}`);
-                    component.addRepresentation(repType, { color: registeredSchemeId, sele: "*" });
-
-                } catch (e) {
-                    console.warn("Unified Scheme failed, falling back to standard", e);
-                    component.addRepresentation(repType, { color: currentColoring, sele: "*" });
-                }
-
-            } else if (currentColoring === 'hydrophobicity' || currentColoring === 'bfactor') {
-                // Custom Scheme for Quantitative Data (Hydrophobicity / B-Factor)
-                const schemeId = `quant-scheme-${Date.now()}`;
+            // 1. COMPLEX/QUANTITATIVE SCENARIOS (Hydrophobicity, B-Factor, Charge)
+            // These require custom schemes to support our palettes or custom logic.
+            if (currentColoring === 'hydrophobicity' || currentColoring === 'bfactor' || currentColoring === 'charge') {
+                const schemeId = `custom-scheme-${Date.now()}`;
 
                 try {
                     const NGL = window.NGL;
                     NGL.ColormakerRegistry.addScheme(function (this: any) {
                         this.atomColor = (atom: any) => {
+                            // A. Custom Overrides (First priority)
+                            // Note: We use a Layered Approach for custom colors instead of checking them per-atom here.
+                            // This improves performance significantly.
+
+                            // B. Base Logic
+                            if (currentColoring === 'charge') {
+                                return getChargeColor(atom.resname);
+                            }
+
                             let value = 0;
                             if (currentColoring === 'bfactor') {
                                 // Simple normalization for B-factor (approx 0-80 range)
                                 const b = atom.bfactor;
                                 value = Math.max(0, Math.min(1, b / 80.0));
-                            } else {
+                            } else if (currentColoring === 'hydrophobicity') {
                                 // Hydrophobicity (Kyte-Doolittle)
                                 const res = atom.resname;
                                 const scale: Record<string, number> = {
@@ -1390,64 +1331,65 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         };
                     }, schemeId);
 
-                    component.addRepresentation(repType, { color: schemeId, sele: "*" });
+                    // Apply Base Layer with Custom Scheme
+                    // We exclude custom targets to allow layering
+                    let baseSelection = "*";
+                    if (customColors?.length > 0) {
+                        const exclusionList = customColors.filter(c => c.target).map(c => `(${c.target})`).join(" or ");
+                        if (exclusionList) baseSelection = `not (${exclusionList})`;
+                    }
+
+                    if (baseSelection !== "not ()") {
+                        component.addRepresentation(repType, { color: schemeId, sele: baseSelection });
+                    }
+
                 } catch (e) {
+                    console.warn("Custom scheme failed, fallback to native", e);
                     component.addRepresentation(repType, { color: currentColoring, sele: "*" });
                 }
 
             } else {
-                // FALLBACK: Layered Strategy for complex types (structure, hydrophobicity, etc.)
-                // These are harder to replicate manually, so we accept minor shifts or use the layered approach.
-                // We'll stick to the "Base + Custom Layers" approach from Attempt 1 for these edge cases.
+                // 2. STANDARD SCENARIOS (Chain, Element, Secondary Structure, Residue)
+                // Use Native NGL schemes for maximum robustness.
 
-                // 1. Define Base Selection
+                // A. Base Layer
                 let baseSelection = "*";
                 if (customColors?.length > 0) {
-                    const exclusionList = customColors
-                        .filter(c => c.target)
-                        .map(c => `(${c.target})`)
-                        .join(" or ");
+                    const exclusionList = customColors.filter(c => c.target).map(c => `(${c.target})`).join(" or ");
                     if (exclusionList) baseSelection = `not (${exclusionList})`;
                 }
 
-                // 2. Apply Base
-                try {
-                    if (baseSelection !== "not ()") { // Only if something remains
-                        component.addRepresentation(repType, { color: currentColoring, sele: baseSelection });
-                    }
-                } catch (e) { }
-
-                // 3. Apply Custom Layers
-                if (customColors?.length > 0) {
-                    customColors.forEach(rule => {
-                        if (rule.color && rule.target) {
-                            try {
-                                component.addRepresentation(repType, { color: rule.color, sele: rule.target });
-                            } catch (e) { }
-                        }
-                    });
+                if (baseSelection !== "not ()") {
+                    component.addRepresentation(repType, { color: currentColoring, sele: baseSelection });
                 }
             }
 
+            // 3. COMMON: Apply Custom Colors Layer (Top Priority)
+            if (customColors?.length > 0) {
+                customColors.forEach(rule => {
+                    if (rule.color && rule.target) {
+                        try {
+                            component.addRepresentation(repType, { color: rule.color, sele: rule.target });
+                        } catch (e) { }
+                    }
+                });
+            }
+
+
+            // --- Visualization Overlays ---
             const tryApply = (r: string, c: string, sele: string, params: any = {}) => {
                 try {
                     component.addRepresentation(r, { color: c, sele: sele, ...params });
                 } catch (e) { }
             };
 
-            // --- Visualization Overlays ---
-
             // Surface Overlay
             if (showSurface) {
-                console.log("Adding Surface Overlay...");
                 tryApply('surface', 'white', "*", { opacity: 0.4, depthWrite: false, side: 'front' });
             }
 
             // Ligand Highlight
             if (showLigands) {
-                console.log("Adding Ligand Highlight...");
-                // "ligand" keyword in NGL (non-polymer)
-                // Filter out Water/Ions if wanted: ligand and not (water or ion)
                 tryApply('ball+stick', 'element', 'ligand and not (water or ion)', { scale: 2.0 });
             }
 
