@@ -500,7 +500,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                         chainid: "Colors each protein chain differently.",
                                         element: "Standard CPK coloring (C=Grey, O=Red, N=Blue, S=Yellow).",
                                         resname: "Distinct color for each amino acid type.",
-                                        structure: "Helix (Pink), Sheet (Yellow), Loop (Green).",
+                                        structure: "Helix (Magenta), Sheet (Yellow), Turn (Blue), Coil (White).",
                                         hydrophobicity: "Red = Hydrophobic core, White = Hydrophilic surface.",
                                         bfactor: "Red = Flexible/Mobile, Blue = Rigid/Stable.",
                                         charge: "Blue = Positive (Basic), Red = Negative (Acidic)."
