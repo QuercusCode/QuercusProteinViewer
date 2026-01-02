@@ -206,7 +206,6 @@ function App() {
 
   useEffect(() => {
     if (!pdbId || pdbId.length < 4) {
-      setProteinTitle(null);
       return;
     }
 
