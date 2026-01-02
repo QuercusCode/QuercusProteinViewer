@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import { Search, X, BookOpen, Database, FlaskConical, Dna, Activity, Zap, Shield, Grid, Archive, AlignJustify } from 'lucide-react';
+import { Search, X, BookOpen, Database, FlaskConical, Dna, Activity, Zap, Shield, Grid, Archive } from 'lucide-react';
 import clsx from 'clsx';
-import { OFFLINE_LIBRARY, LibraryEntry } from '../data/library';
+import { OFFLINE_LIBRARY } from '../data/library';
 
 // --- TYPES ---
 
