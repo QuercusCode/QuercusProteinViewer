@@ -484,7 +484,11 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
     { id: '1HZH', title: 'Whole IgG1', category: 'Immune', description: 'Full antibody.', details: 'A complete crystal structure of an intact antibody molecule, showing the flexibility of the hinge region connecting the arms.' },
     { id: '1AY7', title: 'Fab Fragment', category: 'Immune', description: 'Binding arm.', details: 'The "Fragment Antigen Binding" arm of an antibody. This is the part that actually grabs the intruder.' },
     { id: '1KNL', title: 'TLR4', category: 'Immune', description: 'Bacteria sensor.', details: 'Toll-like Receptor 4. It detects lipopolysaccharide (LPS) from bacterial cell walls and triggers immediate inflammation (septic shock warning).' },
-    { id: '1HPM', title: 'C-Reactive Protein', category: 'Immune', description: 'Inflammation marker.', details: 'A pentameric ring protein that rises sharply in the blood during inflammation. It binds to dying cells to activate the complement system.' }
+    { id: '1HPM', title: 'C-Reactive Protein', category: 'Immune', description: 'Inflammation marker.', details: 'A pentameric ring protein that rises sharply in the blood during inflammation. It binds to dying cells to activate the complement system.' },
+
+    // --- BATCH 10 ADDITIONS (FINAL 2 to reach 300) ---
+    { id: '3POW', title: 'Calreticulin', category: 'Chaperone', description: 'ER Chaperone.', details: 'A key chaperone in the Endoplasmic Reticulum that binds calcium. It ensures proper folding of glycoproteins and is part of the immune system\'s "eat me" signal.' },
+    { id: '1SG5', title: 'Skp Chaperone', category: 'Chaperone', description: 'Jellyfish shape.', details: 'A trimeric periplasmic chaperone that looks like a jellyfish ("Seventeen Kilodalton Protein"). It helps outer membrane proteins cross the periplasm safely.' }
 ];
 
 // Deduplicate IDs just in case
