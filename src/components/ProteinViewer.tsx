@@ -1258,7 +1258,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         const component = specificComponent || componentRef.current;
         if (!component || !component.structure) return;
 
-
+        const NGL = window.NGL;
 
         // Custom Charge Coloring Logic (Residue based)
         const getChargeColor = (resName: string) => {

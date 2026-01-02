@@ -49,12 +49,15 @@ export const getPaletteColor = (value: number, palette: ColorPalette) => {
         return interpolate('#f89540', '#f0f921', (value - 0.75) * 4);
     }
 
+    if (isNaN(value)) return '#cccccc'; // Fallback for invalid values
     return hslToRgb(value * 240 / 360, 1.0, 0.5);
 };
 
 
 // Helper to convert HSL to Hex/RGB string for NGL compatibility
 function hslToRgb(h: number, s: number, l: number): string {
+    if (isNaN(h) || isNaN(s) || isNaN(l)) return '#cccccc';
+
     let r, g, b;
 
     if (s === 0) {
