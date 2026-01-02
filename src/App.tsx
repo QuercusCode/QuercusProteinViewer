@@ -8,6 +8,7 @@ import { parseURLState, getShareableURL } from './utils/urlManager';
 import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Movie, ColorPalette, RepresentationType, ColoringType, ResidueInfo } from './types';
 
 import LibraryModal from './components/LibraryModal';
+import { OFFLINE_LIBRARY } from './data/library';
 
 function App() {
   // Parse Global URL State Once
@@ -138,6 +139,8 @@ function App() {
     setCustomColors([]);
 
     setHighlightedResidue(null);
+    // Auto-set title from filename (removing extension)
+    setProteinTitle(uploadedFile.name.replace(/\.[^/.]+$/, ""));
   };
 
   // ... (fetchTitle logic) ... 
@@ -227,7 +230,8 @@ function App() {
         }
       } catch (error) {
         console.error("Failed to fetch protein title:", error);
-        setProteinTitle(null);
+        // Fallback to ID if fetch fails
+        setProteinTitle(pdbId.toUpperCase());
       }
     };
 
@@ -512,8 +516,14 @@ function App() {
             .then(blob => {
               const file = new File([blob], `${id}.pdb`, { type: 'chemical/x-pdb' });
               handleUpload(file);
-              // We set title manually since fetchTitle might fail for local files if no internet
-              setProteinTitle(`Offline: ${id}`);
+
+              // Smart Title Lookup
+              const libEntry = OFFLINE_LIBRARY.find(e => e.id.toLowerCase() === id.toLowerCase());
+              if (libEntry) {
+                setProteinTitle(libEntry.title);
+              } else {
+                setProteinTitle(`Offline: ${id}`);
+              }
             })
             .catch(err => {
               console.error("Library load failed", err);
