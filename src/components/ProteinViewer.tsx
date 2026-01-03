@@ -1276,95 +1276,121 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             if (currentColoring === 'structure') currentColoring = 'sstruc';
 
-            // --- STRATEGY: UNIFIED SELECTION SCHEME ---
-            // Instead of splitting representations (which causes gaps), we use NGL's SelectionScheme
-            // to apply different colors to different parts of the SAME representation.
+            // --- STRATEGY: Native vs Custom ---
 
-            // 1. Define the BASE Scheme ID
-            let baseSchemeId = currentColoring;
+            // Define Base Selection (Exclude Custom Overrides)
+            let baseSelection = "*";
+            if (customColors?.length > 0) {
+                const exclusionList = customColors.filter(c => c.target).map(c => `(${c.target})`).join(" or ");
+                if (exclusionList) baseSelection = `not (${exclusionList})`;
+            }
 
-            // If base coloring is custom (Charge, Hydro, B-Factor), register it first
+            // 1. CHARGE COLORING (Atomic Scheme)
+            // Re-implemented as a pure atomic callback to ensure it hits every atom.
             if (currentColoring === 'charge') {
-                baseSchemeId = "charge_scheme_" + Date.now();
-                NGL.ColormakerRegistry.addScheme(function (this: any) {
+                // Use the ID returned by NGL to be safe
+                const chargeSchemeId = NGL.ColormakerRegistry.addScheme(function (this: any) {
                     this.atomColor = function (atom: any) {
                         const r = atom.resname;
                         if (r === 'ARG' || r === 'LYS' || r === 'HIS') return 0x0000FF; // Blue
                         if (r === 'ASP' || r === 'GLU') return 0xFF0000; // Red
                         return 0xCCCCCC; // Grey
                     };
-                }, baseSchemeId);
+                });
+
+                if (baseSelection !== "not ()") {
+                    component.addRepresentation(repType, { color: chargeSchemeId, sele: baseSelection });
+                }
             }
+
+            // 2. QUANTITATIVE COLORING (Custom Schemes for Hydro/B-Factor)
             else if (
                 (currentColoring === 'hydrophobicity' || currentColoring === 'bfactor') &&
                 colorPalette !== 'standard'
             ) {
                 const activeMode = currentColoring;
-                baseSchemeId = `custom_${activeMode}_${Date.now()}`;
 
-                NGL.ColormakerRegistry.addScheme(function (this: any) {
-                    this.atomColor = function (atom: any) {
-                        let value = 0;
-                        if (activeMode === 'bfactor') {
-                            const b = atom.bfactor;
-                            value = Math.max(0, Math.min(1, b / 100.0));
-                        } else if (activeMode === 'hydrophobicity') {
-                            const res = atom.resname;
-                            const scale: Record<string, number> = {
-                                ILE: 4.5, VAL: 4.2, LEU: 3.8, PHE: 2.8, CYS: 2.5,
-                                MET: 1.9, ALA: 1.8, GLY: -0.4, THR: -0.7, SER: -0.8,
-                                TRP: -0.9, TYR: -1.3, PRO: -1.6, HIS: -3.2, GLU: -3.5,
-                                GLN: -3.5, ASP: -3.5, ASN: -3.5, LYS: -3.9, ARG: -4.5
-                            };
-                            const h = scale[res] || 0;
-                            value = (h + 4.5) / 9.0;
-                        }
+                try {
+                    const customSchemeId = NGL.ColormakerRegistry.addScheme(function (this: any) {
+                        this.atomColor = function (atom: any) {
+                            let value = 0;
+                            if (activeMode === 'bfactor') {
+                                const b = atom.bfactor;
+                                value = Math.max(0, Math.min(1, b / 100.0));
+                            } else if (activeMode === 'hydrophobicity') {
+                                const res = atom.resname;
+                                const scale: Record<string, number> = {
+                                    ILE: 4.5, VAL: 4.2, LEU: 3.8, PHE: 2.8, CYS: 2.5,
+                                    MET: 1.9, ALA: 1.8, GLY: -0.4, THR: -0.7, SER: -0.8,
+                                    TRP: -0.9, TYR: -1.3, PRO: -1.6, HIS: -3.2, GLU: -3.5,
+                                    GLN: -3.5, ASP: -3.5, ASN: -3.5, LYS: -3.9, ARG: -4.5
+                                };
+                                const h = scale[res] || 0;
+                                value = (h + 4.5) / 9.0;
+                            }
 
-                        const cssColor = getPaletteColor(value, colorPalette);
-                        return new NGL.Color(cssColor).getHex();
-                    };
-                }, baseSchemeId);
+                            const cssColor = getPaletteColor(value, colorPalette);
+                            return new NGL.Color(cssColor).getHex();
+                        };
+                    });
+
+                    if (baseSelection !== "not ()") {
+                        component.addRepresentation(repType, { color: customSchemeId, sele: baseSelection });
+                    }
+
+                } catch (e) {
+                    console.warn("Custom scheme failed", e);
+                    if (baseSelection !== "not ()") {
+                        component.addRepresentation(repType, { color: activeMode, sele: baseSelection });
+                    }
+                }
             }
+
+            // 3. HIGH CONTRAST CHAIN COLORING
             else if (currentColoring === 'chainid') {
-                // High contrast palette
-                baseSchemeId = "chainid_scheme_" + Date.now();
-                NGL.ColormakerRegistry.addScheme(function (this: any) {
+                const chainSchemeId = NGL.ColormakerRegistry.addScheme(function (this: any) {
                     this.atomColor = function (atom: any) {
+                        // High contrast palette (D3 Category10) for maximum distinctness
                         const colors = [
-                            0x1f77b4, 0xff7f0e, 0x2ca02c, 0xd62728, 0x9467bd,
-                            0x8c564b, 0xe377c2, 0x7f7f7f, 0xbcbd22, 0x17becf
+                            0x1f77b4, // Blue
+                            0xff7f0e, // Orange
+                            0x2ca02c, // Green
+                            0xd62728, // Red
+                            0x9467bd, // Purple
+                            0x8c564b, // Brown
+                            0xe377c2, // Pink
+                            0x7f7f7f, // Grey
+                            0xbcbd22, // Olive
+                            0x17becf  // Cyan
                         ];
+                        // Cycle through colors based on chain index
                         return colors[atom.chainIndex % colors.length];
                     };
-                }, baseSchemeId);
+                });
+
+                if (baseSelection !== "not ()") {
+                    component.addRepresentation(repType, { color: chainSchemeId, sele: baseSelection });
+                }
             }
 
-            // 2. Construct the Selection List
-            // Format: [ [color, selection], [color, selection], ... ]
-            // Order matters: First match wins (usually, usually top to bottom priority in NGL?)
-            // Actually NGL SelectionScheme iterates and checks. 
-            // We want Custom Rules to take precedence.
+            // 4. STANDARD COLORING (Structure, Native Hydro/B-Factor)
+            // Fallback for everything else
+            else {
+                if (baseSelection !== "not ()") {
+                    component.addRepresentation(repType, { color: currentColoring, sele: baseSelection });
+                }
+            }
 
-            const selectionList: any[] = [];
-
+            // 4. Custom Color Overrides (Top Layer)
             if (customColors?.length > 0) {
                 customColors.forEach(rule => {
                     if (rule.color && rule.target) {
-                        selectionList.push([rule.color, rule.target]);
+                        try {
+                            component.addRepresentation(repType, { color: rule.color, sele: rule.target });
+                        } catch (e) { }
                     }
                 });
             }
-
-            // Add Base Scheme as catch-all
-            selectionList.push([baseSchemeId, "*"]);
-
-            // 3. Register the Combined Scheme
-            const finalSchemeId = "combined_" + Date.now();
-            NGL.ColormakerRegistry.addSelectionScheme(selectionList, finalSchemeId);
-
-            // 4. Apply Single Representation
-            component.addRepresentation(repType, { color: finalSchemeId, sele: "*" });
-
 
             // --- OVERLAYS ---
             const tryApply = (r: string, c: string, sele: string, params: any = {}) => {
