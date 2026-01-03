@@ -1325,8 +1325,24 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     };
                 }, chargeSchemeId);
 
+                // 1. Base Layer: ALL ATOMS -> White (Neutral)
                 component.addRepresentation(repType, {
-                    color: chargeSchemeId
+                    color: 0xFFFFFF, // White
+                    name: "charge_base_neu"
+                });
+
+                // 2. Overlay: Positive -> Blue
+                component.addRepresentation(repType, {
+                    color: 0x0000FF, // Blue
+                    sele: "ARG or LYS or HIS",
+                    name: "charge_pos_overlay"
+                });
+
+                // 3. Overlay: Negative -> Red
+                component.addRepresentation(repType, {
+                    color: 0xFF0000, // Red
+                    sele: "ASP or GLU",
+                    name: "charge_neg_overlay"
                 });
 
             } else {
