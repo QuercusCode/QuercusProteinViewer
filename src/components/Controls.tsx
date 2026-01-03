@@ -286,7 +286,7 @@ export const Controls: React.FC<ControlsProps> = ({
                     <div className="flex items-center justify-between pt-8 md:pt-0">
                         <div>
                             <h1 className="text-xl font-bold bg-gradient-to-r from-blue-500 to-teal-500 bg-clip-text text-transparent mb-1">
-                                Protein Viewer
+                                Quercus Viewer
                             </h1>
                             <p className={`text-xs ${subtleText}`}>Visualize 3D structures</p>
                         </div>
@@ -299,6 +299,7 @@ export const Controls: React.FC<ControlsProps> = ({
                             >
                                 <BookOpen className="w-4 h-4" />
                             </button>
+                            {/* Dr. AI Disabled
                             <button
                                 onClick={onToggleAISidebar}
                                 className={`p-2 rounded-full transition-colors ${isAISidebarOpen ? 'bg-blue-500 text-white shadow-md shadow-blue-500/20' : (isLightMode ? 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700')}`}
@@ -312,6 +313,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                     <Bot className="w-4 h-4" />
                                 </div>
                             </button>
+                            */}
                             <button
                                 onClick={() => setIsLightMode(!isLightMode)}
                                 className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-neutral-100 text-amber-500 hover:bg-neutral-200' : 'bg-neutral-800 text-blue-300 hover:bg-neutral-700'}`}
