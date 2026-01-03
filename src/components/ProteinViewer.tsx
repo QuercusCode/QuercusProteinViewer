@@ -1287,68 +1287,90 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             }
             else {
                 // 2. IF CUSTOM RULES EXIST: Use Unified Custom Scheme.
-                // KEY FIX: DELEGATE base coloring to NGL's own standard scheme instances.
-                console.log("Applying Unified Coloring via Delegation");
+                // REVERT TO MANUAL CALCULATION (Delegation was too fragile)
+                console.log("Applying Unified Coloring (Manual Strategy)");
 
-                try {
-                    const atomColormap = new Map<number, number>(); // Index -> Hex
+                const atomColormap = new Map<number, number>(); // Index -> Hex
 
-                    // Instantiate the Base Scheme (e.g. 'chainid', 'sstruc')
-                    let BaseSchemeClass;
-                    try {
-                        BaseSchemeClass = NGL.ColormakerRegistry.getScheme(currentColoring);
-                    } catch (e) {
-                        // Fallback if scheme name is weird
-                        BaseSchemeClass = NGL.ColormakerRegistry.getScheme('chainid');
+                // Color Palette for Chain ID hashing (Standard NGL-like colors)
+                const chainColors = [
+                    0x1f77b4, 0xff7f0e, 0x2ca02c, 0xd62728, 0x9467bd,
+                    0x8c564b, 0xe377c2, 0x7f7f7f, 0xbcbd22, 0x17becf
+                ];
+
+                // A. Base Colors for ALL atoms (Manual Logic)
+                component.structure.eachAtom((atom: any) => {
+                    let color = 0xCCCCCC; // Default Grey
+
+                    // Debug first atom to see what we are working with
+                    if (atom.index === 0) {
+                        console.log("Atom Debug:", {
+                            index: atom.index, chainname: atom.chainname,
+                            chainIndex: atom.chainIndex, resname: atom.resname,
+                            sstruc: atom.sstruc, element: atom.element
+                        });
                     }
 
-                    // Initialize it with the component's structure statistics
-                    const baseScheme = new BaseSchemeClass({
-                        structure: component.structure,
-                        scheme: currentColoring,
-                        params: {
-                            // Pass palette params just in case functionality depends on it
-                            scale: currentColoring === 'bfactor' ? 'rwb' : undefined
+                    if (currentColoring === 'chainid') {
+                        // ROBUST: Use chainname directly.
+                        const name = atom.chainname || 'A';
+                        let code = 0;
+                        for (let i = 0; i < name.length; i++) {
+                            code += name.charCodeAt(i);
                         }
-                    });
+                        color = chainColors[code % chainColors.length];
+                    }
+                    else if (currentColoring === 'sstruc') {
+                        const s = atom.sstruc;
+                        if (s === 'h') color = 0xFF0080; // Magenta
+                        else if (s === 's') color = 0xFFC800; // Orange
+                        else if (s === 't') color = 0x6080FF; // Blue
+                        else color = 0xFFFFFF; // White
+                    }
+                    else if (currentColoring === 'element') {
+                        const e = atom.element;
+                        if (e === 'C') color = 0x909090;
+                        else if (e === 'O') color = 0xFF0000;
+                        else if (e === 'N') color = 0x0000FF;
+                        else if (e === 'S') color = 0xFFFF00;
+                        else color = 0xDDDDDD;
+                    }
+                    else if (currentColoring === 'resname' || currentColoring === 'residue') {
+                        const safeRes = atom.resname || 'UNK';
+                        let hash = 0;
+                        for (let i = 0; i < safeRes.length; i++) hash = safeRes.charCodeAt(i) + ((hash << 5) - hash);
+                        const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
+                        color = parseInt("00000".substring(0, 6 - c.length) + c, 16);
+                    }
+                    // Add other modes as needed, or fallback to grey
 
-                    // A. Base Colors for ALL atoms (via NGL)
-                    component.structure.eachAtom((atom: any) => {
-                        let color = 0xCCCCCC;
+                    atomColormap.set(atom.index, color);
+                });
+
+                // B. Apply Custom Overrides
+                customColors.forEach(rule => {
+                    if (rule.color && rule.target) {
                         try {
-                            color = baseScheme.atomColor(atom);
-                        } catch (e) { }
-                        atomColormap.set(atom.index, color);
-                    });
-
-                    // B. Apply Custom Overrides
-                    customColors.forEach(rule => {
-                        if (rule.color && rule.target) {
-                            try {
-                                const sel = new NGL.Selection(rule.target);
-                                const colorHex = new NGL.Color(rule.color).getHex();
-                                component.structure.eachAtom((atom: any) => {
-                                    atomColormap.set(atom.index, colorHex);
-                                }, sel);
-                            } catch (e) { }
+                            const sel = new NGL.Selection(rule.target);
+                            const colorHex = new NGL.Color(rule.color).getHex();
+                            component.structure.eachAtom((atom: any) => {
+                                atomColormap.set(atom.index, colorHex);
+                            }, sel);
+                        } catch (e) {
+                            console.warn("Selection failed:", rule.target);
                         }
-                    });
+                    }
+                });
 
-                    // C. Register & Apply
-                    const unifiedSchemeId = `unified_${Date.now()}_${Math.random()}`;
-                    NGL.ColormakerRegistry.addScheme(function (this: any) {
-                        this.atomColor = function (atom: any) {
-                            return atomColormap.get(atom.index) || 0xCCCCCC;
-                        };
-                    }, unifiedSchemeId);
+                // C. Register & Apply
+                const unifiedSchemeId = `unified_${Date.now()}_${Math.random()}`;
+                NGL.ColormakerRegistry.addScheme(function (this: any) {
+                    this.atomColor = function (atom: any) {
+                        return atomColormap.get(atom.index) || 0xCCCCCC;
+                    };
+                }, unifiedSchemeId);
 
-                    component.addRepresentation(repType, { color: unifiedSchemeId });
-
-                } catch (delegationError) {
-                    console.error("Custom Scheme Failed, reverting to standard:", delegationError);
-                    // FALLBACK: If custom scheme crashes, just show standard structure so it doesn't vanish
-                    component.addRepresentation(repType, { color: currentColoring });
-                }
+                component.addRepresentation(repType, { color: unifiedSchemeId });
             }
 
             // --- OVERLAYS ---
