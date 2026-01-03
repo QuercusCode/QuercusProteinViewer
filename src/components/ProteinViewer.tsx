@@ -1311,29 +1311,22 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 });
 
             } else if (currentColoring === 'charge') {
-                // IMPROVEMENT: MANUAL CHARGE COLORING
-                // Use robust 'resname' syntax for lists
+                // IMPROVEMENT: MANUAL CHARGE COLORING (CUSTOM SCHEME STRATEGY)
+                // Selections proved to be fragile with "not" logic.
+                // We use a custom scheme to check resname directly in JS.
+                const chargeSchemeId = `charge_manual_${Date.now()}`;
 
-                // 1. Positive (Basic) -> Blue
-                component.addRepresentation(repType, {
-                    color: 0x0000FF, // Blue
-                    sele: "resname ARG LYS HIS",
-                    name: "charge_pos"
-                });
+                NGL.ColormakerRegistry.addScheme(function (this: any) {
+                    this.atomColor = function (atom: any) {
+                        const r = atom.resname;
+                        if (r === 'ARG' || r === 'LYS' || r === 'HIS') return 0x0000FF; // Blue
+                        if (r === 'ASP' || r === 'GLU') return 0xFF0000; // Red
+                        return 0xFFFFFF; // White
+                    };
+                }, chargeSchemeId);
 
-                // 2. Negative (Acidic) -> Red
                 component.addRepresentation(repType, {
-                    color: 0xFF0000, // Red
-                    sele: "resname ASP GLU",
-                    name: "charge_neg"
-                });
-
-                // 3. Neutral -> White (base)
-                // Use 'not resname ...' to handle the inverse safely
-                component.addRepresentation(repType, {
-                    color: 0xFFFFFF, // White
-                    sele: "not resname ARG LYS HIS ASP GLU",
-                    name: "charge_neu"
+                    color: chargeSchemeId
                 });
 
             } else {
