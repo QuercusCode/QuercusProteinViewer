@@ -650,8 +650,8 @@ export const Controls: React.FC<ControlsProps> = ({
                             <div className={`h-24 p-1 overflow-y-auto scrollbar-thin ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-800'} rounded`} ref={sequenceContainerRef}>
                                 {chains.length === 0 ? <p className={`italic text-[10px] ${subtleText}`}>No sequence data</p> : (
                                     chains.filter(c => viewSequenceChain ? c.name === viewSequenceChain : true).map(c => (
-                                        <div key={c.name} className="mb-2">
-                                            <div className={`text-[9px] font-bold uppercase tracking-wider mb-1 opacity-70 sticky top-0 ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-800'}`}>
+                                        <div key={c.name} className="mb-3 relative">
+                                            <div className={`sticky top-0 z-10 py-1 px-1 mb-1 text-[10px] font-extrabold uppercase tracking-widest border-b shadow-sm ${isLightMode ? 'bg-neutral-100 border-neutral-200 text-neutral-800' : 'bg-neutral-800 border-neutral-700 text-white'}`}>
                                                 Chain {c.name}
                                             </div>
                                             <div className="flex flex-wrap text-[10px] font-mono leading-none break-all">
