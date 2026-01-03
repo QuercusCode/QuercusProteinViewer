@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
 import type { CustomColorRule, ChainInfo, ColorPalette } from '../types';
-import { getPaletteColor } from '../utils/colorUtils';
+
 
 declare global {
     interface Window {
