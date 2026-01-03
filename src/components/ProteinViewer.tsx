@@ -1316,7 +1316,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 // Define the color scheme
                 NGL.ColormakerRegistry.addScheme(function (this: any) {
                     this.atomColor = (atom: any) => {
-                        const resname = atom.resname;
+                        const resname = atom.residue?.resname || atom.resname;
                         if (resname === 'ARG' || resname === 'LYS' || resname === 'HIS') {
                             return 0x0000FF; // Blue for positive
                         } else if (resname === 'ASP' || resname === 'GLU') {
