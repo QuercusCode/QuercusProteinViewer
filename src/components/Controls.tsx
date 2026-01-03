@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import {
     Camera,
-    Crosshair,
+
     Download,
     Eye,
     Hexagon,
@@ -24,7 +24,10 @@ import {
     ImageIcon,
     Grid3X3,
     // Bot,
-    BookOpen
+    BookOpen,
+    ChevronDown,
+    Activity,
+    Wrench
 } from 'lucide-react';
 import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette } from '../types';
 
@@ -147,6 +150,25 @@ export const Controls: React.FC<ControlsProps> = ({
     const [residueRange, setResidueRange] = useState('');
     const [selectedColor, setSelectedColor] = useState('#ff0000');
 
+    // Styles
+    const cardBg = isLightMode ? 'bg-white' : 'bg-neutral-900';
+    const subtleText = isLightMode ? 'text-neutral-500' : 'text-neutral-400';
+    const inputBg = isLightMode ? 'bg-white border-neutral-300 text-neutral-900 focus:ring-blue-500' : 'bg-neutral-800 border-neutral-700 text-white focus:ring-blue-500';
+
+    // Accordion State
+    const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+        'appearance': true,
+        'analysis': false,
+        'tools': false
+    });
+
+    const toggleSection = (section: string) => {
+        setOpenSections(prev => ({
+            ...prev,
+            [section]: !prev[section]
+        }));
+    };
+
     // Mobile Sidebar State
     const [isOpen, setIsOpen] = useState(false);
 
@@ -201,8 +223,6 @@ export const Controls: React.FC<ControlsProps> = ({
         setPdbId(localPdbId);
     };
 
-
-
     const addCustomRule = (e: React.FormEvent) => {
         e.preventDefault();
         let target = '';
@@ -231,16 +251,7 @@ export const Controls: React.FC<ControlsProps> = ({
         setCustomColors(customColors.filter(r => r.id !== id));
     };
 
-    const getSelectedChainRange = () => {
-        if (!selectedChain) return null;
-        const chain = chains.find(c => c.name === selectedChain);
-        return chain ? `${chain.min} - ${chain.max}` : null;
-    };
 
-    // Styles
-    const cardBg = isLightMode ? 'bg-white' : 'bg-neutral-900';
-    const subtleText = isLightMode ? 'text-neutral-500' : 'text-neutral-400';
-    const inputBg = isLightMode ? 'bg-white border-neutral-300 text-neutral-900 focus:ring-blue-500' : 'bg-neutral-800 border-neutral-700 text-white focus:ring-blue-500';
 
     // Clean Mode: Return only the exit button
     if (isCleanMode) {
@@ -254,6 +265,28 @@ export const Controls: React.FC<ControlsProps> = ({
             </button>
         );
     }
+
+    const SidebarSection = ({ title, id, icon: Icon, children }: { title: string, id: string, icon: any, children: React.ReactNode }) => (
+        <div className="border border-white/10 rounded-xl overflow-hidden bg-black/20">
+            <button
+                onClick={() => toggleSection(id)}
+                className={`w-full flex items-center justify-between p-3 text-xs font-bold uppercase tracking-wider transition-colors ${openSections[id] ? 'bg-white/5 text-blue-400' : 'hover:bg-white/5 text-neutral-400'}`}
+            >
+                <div className="flex items-center gap-2">
+                    <Icon className="w-4 h-4" />
+                    {title}
+                </div>
+                <div className={`transition-transform duration-200 ${openSections[id] ? 'rotate-180' : ''}`}>
+                    <ChevronDown className="w-3 h-3" />
+                </div>
+            </button>
+            {openSections[id] && (
+                <div className="p-3 space-y-3 border-t border-white/5">
+                    {children}
+                </div>
+            )}
+        </div>
+    );
 
     return (
         <>
@@ -272,7 +305,7 @@ export const Controls: React.FC<ControlsProps> = ({
                 flex flex-col
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
                 md:translate-x-0 md:top-4 md:left-4 md:h-[calc(100vh-2rem)] md:rounded-xl md:shadow-2xl md:z-10
-                ${isLightMode ? 'bg-white/90 border-neutral-200' : 'bg-neutral-900/95 border-white/10'}
+                ${isLightMode ? 'bg-white/80 border-neutral-200' : 'bg-neutral-900/80 border-white/10'}
             `}>
                 {/* Header - Fixed */}
                 <div className="flex-none p-4 pb-2 relative">
@@ -294,51 +327,27 @@ export const Controls: React.FC<ControlsProps> = ({
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={onToggleLibrary}
-                                className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700'}`}
+                                className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-neutral-100/80 text-neutral-500 hover:bg-neutral-200' : 'bg-neutral-800/80 text-neutral-400 hover:bg-neutral-700'}`}
                                 title="Open Offline Library"
                             >
                                 <BookOpen className="w-4 h-4" />
                             </button>
-                            {/* Dr. AI Disabled
-                            <button
-                                onClick={onToggleAISidebar}
-                                className={`p-2 rounded-full transition-colors ${isAISidebarOpen ? 'bg-blue-500 text-white shadow-md shadow-blue-500/20' : (isLightMode ? 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700')}`}
-                                title="Ask Dr. AI"
-                            >
-                                <div className="relative">
-                                    <span className="absolute -top-0.5 -right-0.5 flex h-2 w-2">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-                                    </span>
-                                    <Bot className="w-4 h-4" />
-                                </div>
-                            </button>
-                            */}
                             <button
                                 onClick={() => setIsLightMode(!isLightMode)}
-                                className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-neutral-100 text-amber-500 hover:bg-neutral-200' : 'bg-neutral-800 text-blue-300 hover:bg-neutral-700'}`}
+                                className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-neutral-100/80 text-amber-500 hover:bg-neutral-200' : 'bg-neutral-800/80 text-blue-300 hover:bg-neutral-700'}`}
                                 title="Toggle Theme"
                             >
                                 {isLightMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                             </button>
-                            <button
-                                onClick={() => setIsDyslexicFont(!isDyslexicFont)}
-                                className={`p-2 rounded-full transition-colors ${isDyslexicFont ? 'bg-blue-100 text-blue-600' : (isLightMode ? 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700')}`}
-                                title="Toggle Dyslexic-Friendly Font"
-                            >
-                                <span className="font-bold text-xs">Aa</span>
-                            </button>
                         </div>
                     </div>
-                    <div className={`h-px mt-4 ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
                 </div>
 
                 {/* Scrollable Content */}
-                <div className={`flex-1 overflow-y-auto scrollbar-thin p-4 space-y-6 ${isLightMode ? 'scrollbar-thumb-neutral-300' : 'scrollbar-thumb-neutral-700'}`}>
+                <div className={`flex-1 overflow-y-auto scrollbar-thin p-3 space-y-3 ${isLightMode ? 'scrollbar-thumb-neutral-300' : 'scrollbar-thumb-neutral-700'}`}>
 
-                    {/* 1. INPUT SECTION */}
-                    <div className="space-y-3">
-                        <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Load Structure</label>
+                    {/* 1. CORE INPUT (Always Visible) */}
+                    <div className="space-y-3 mb-2">
                         <form onSubmit={handleSubmit} className="flex gap-2">
                             <div className="relative flex-1">
                                 <Search className={`absolute left-2.5 top-2.5 w-4 h-4 ${subtleText}`} />
@@ -346,7 +355,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                     type="text"
                                     value={localPdbId}
                                     onChange={(e) => setLocalPdbId(e.target.value)}
-                                    placeholder="PDB ID (e.g. 4hhb)"
+                                    placeholder="Search PDB ID..."
                                     className={`w-full rounded-lg pl-9 pr-3 py-2 border outline-none transition-all ${inputBg}`}
                                 />
                             </div>
@@ -354,107 +363,62 @@ export const Controls: React.FC<ControlsProps> = ({
                                 Load
                             </button>
                         </form>
+
                         <div className="grid grid-cols-2 gap-2">
-                            <div className="relative">
-                                <input type="file" accept=".pdb,.cif,.ent,.mmcif" className="hidden" ref={fileInputRef} onChange={(e) => {
-                                    if (e.target.files?.[0]) onUpload(e.target.files[0]);
-                                }} />
-                                <button
-                                    onClick={() => fileInputRef.current?.click()}
-                                    className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all group ${cardBg} hover:opacity-80`}
-                                >
-                                    <Upload className="w-4 h-4 group-hover:text-blue-500 transition-colors" />
-                                    <span className="text-xs font-medium">Upload File</span>
-                                </button>
-                            </div>
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all group ${cardBg} hover:opacity-80`}
+                            >
+                                <Upload className="w-3.5 h-3.5 group-hover:text-blue-500 transition-colors" />
+                                <span className="text-xs font-medium">Upload File</span>
+                            </button>
+                            <input type="file" accept=".pdb,.cif,.ent,.mmcif" className="hidden" ref={fileInputRef} onChange={(e) => {
+                                if (e.target.files?.[0]) onUpload(e.target.files[0]);
+                            }} />
+
                             <button
                                 onClick={onToggleLibrary}
                                 className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all group ${cardBg} hover:opacity-80`}
                             >
-                                <BookOpen className="w-4 h-4 group-hover:text-purple-500 transition-colors" />
+                                <BookOpen className="w-3.5 h-3.5 group-hover:text-purple-500 transition-colors" />
                                 <span className="text-xs font-medium">Library</span>
                             </button>
                         </div>
                     </div>
 
-                    <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
-
-                    {/* 2. STRUCTURE INFO (Title & Ligands) */}
-                    {(proteinTitle || ligands.length > 0) && (
-                        <div className="space-y-3">
-                            <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Structure Info</label>
-
-                            {/* Title */}
-                            {proteinTitle && typeof proteinTitle === 'string' && (
-                                <div className={`p-3 rounded-lg border ${cardBg} mb-1 shadow-sm`}>
-                                    <h3 className={`text-[10px] font-bold uppercase tracking-wider mb-1 ${subtleText}`}>Title</h3>
-                                    <p className={`text-xs font-medium leading-relaxed break-words ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>
-                                        {proteinTitle}
-                                    </p>
+                    {/* 2. STRUCTURE INFO (Always Visible if loaded) */}
+                    {(proteinTitle || chains.length > 0) && (
+                        <div className={`p-3 rounded-xl border ${cardBg} shadow-sm`}>
+                            {proteinTitle && (
+                                <div className="mb-2">
+                                    <h3 className={`text-[10px] font-bold uppercase tracking-wider mb-0.5 ${subtleText}`}>Structure</h3>
+                                    <p className={`text-xs font-bold leading-snug ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>{proteinTitle}</p>
                                 </div>
                             )}
 
-                            {/* Stats Row */}
-                            {chains.length > 0 && (
-                                <div className={`grid grid-cols-2 gap-2 mb-1`}>
-                                    <div className={`p-2 rounded-lg border ${cardBg} shadow-sm overflow-hidden`}>
-                                        <span className={`block text-[10px] font-bold uppercase tracking-wider mb-0.5 ${subtleText}`}>Residues</span>
-                                        <div className={`text-sm font-bold truncate ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>
-                                            {chains.reduce((acc, chain) => {
-                                                if (chain.sequence) return acc + chain.sequence.length;
-                                                if (chain.max !== undefined && chain.min !== undefined) return acc + (chain.max - chain.min + 1);
-                                                return acc;
-                                            }, 0).toLocaleString()}
-                                        </div>
-                                    </div>
-                                    <div className={`p-2 rounded-lg border ${cardBg} shadow-sm overflow-hidden`}>
-                                        <span className={`block text-[10px] font-bold uppercase tracking-wider mb-0.5 ${subtleText}`}>Chains</span>
-                                        <div className={`text-sm font-bold truncate ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>
-                                            {chains.length}
-                                        </div>
-                                    </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className="flex flex-col">
+                                    <span className={`text-[9px] font-bold uppercase tracking-wider ${subtleText}`}>Residues</span>
+                                    <span className={`text-sm font-mono font-bold ${isLightMode ? 'text-neutral-700' : 'text-neutral-300'}`}>
+                                        {chains.reduce((acc, chain) => {
+                                            if (chain.sequence) return acc + chain.sequence.length;
+                                            if (chain.max !== undefined && chain.min !== undefined) return acc + (chain.max - chain.min + 1);
+                                            return acc;
+                                        }, 0).toLocaleString()}
+                                    </span>
                                 </div>
-                            )}
-
-                            {/* Ligands */}
-                            {ligands.length > 0 && (
-                                <div className={`p-3 rounded-lg border ${cardBg} shadow-sm`}>
-                                    <div className="flex items-center justify-between mb-2">
-                                        <div className="flex items-center gap-2">
-                                            <Hexagon className="w-3.5 h-3.5 text-blue-500" />
-                                            <span className={`text-xs font-semibold ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>Ligands</span>
-                                        </div>
-                                        <div className="flex gap-1">
-                                            <button
-                                                onClick={() => setShowLigands(!showLigands)}
-                                                className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${showLigands ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-transparent text-neutral-500 hover:bg-neutral-50'}`}
-                                            >
-                                                {showLigands ? 'Hide' : 'Show'}
-                                            </button>
-                                            <button
-                                                onClick={onFocusLigands}
-                                                className="text-[10px] px-2 py-0.5 rounded bg-blue-600 text-white hover:bg-blue-500 transition-colors flex items-center gap-1"
-                                            >
-                                                <Crosshair className="w-3 h-3" /> Focus
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <div className="flex flex-wrap gap-1">
-                                        {ligands.map(lig => (
-                                            <span key={lig} className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600">
-                                                {lig}
-                                            </span>
-                                        ))}
-                                    </div>
+                                <div className="flex flex-col border-l pl-3 border-neutral-200 dark:border-neutral-700">
+                                    <span className={`text-[9px] font-bold uppercase tracking-wider ${subtleText}`}>Chains</span>
+                                    <span className={`text-sm font-mono font-bold ${isLightMode ? 'text-neutral-700' : 'text-neutral-300'}`}>
+                                        {chains.length}
+                                    </span>
                                 </div>
-                            )}
+                            </div>
                         </div>
                     )}
 
-                    {/* 3. VISUALIZATION (Style, Color, Surface) */}
-                    <div className="space-y-3">
-                        <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Visualization</label>
-
+                    {/* ACCORDION 1: APPEARANCE */}
+                    <SidebarSection title="Appearance" id="appearance" icon={Eye}>
                         {/* Quick Toggles */}
                         <div className="grid grid-cols-2 gap-2">
                             <button
@@ -462,23 +426,33 @@ export const Controls: React.FC<ControlsProps> = ({
                                 className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${showSurface ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
                             >
                                 <div className="flex items-center gap-2">
-                                    <Layers className="w-4 h-4" />
+                                    <Layers className="w-3.5 h-3.5" />
                                     <span className="text-xs font-medium">Surface</span>
                                 </div>
-                                <div className={`w-2 h-2 rounded-full ${showSurface ? 'bg-blue-500' : 'bg-neutral-500'}`} />
+                                <div className={`w-1.5 h-1.5 rounded-full ${showSurface ? 'bg-blue-500' : 'bg-neutral-500'}`} />
                             </button>
                             <button
                                 onClick={() => setIsSpinning(!isSpinning)}
                                 className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isSpinning ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
                             >
-                                <span className="text-xs font-medium">Auto-Spin</span>
-                                <RefreshCw className={`w-3 h-3 ${isSpinning ? 'animate-spin' : ''}`} />
+                                <div className="flex items-center gap-2">
+                                    <RefreshCw className={`w-3.5 h-3.5 ${isSpinning ? 'animate-spin' : ''}`} />
+                                    <span className="text-xs font-medium">Spin</span>
+                                </div>
+                                <div className={`w-1.5 h-1.5 rounded-full ${isSpinning ? 'bg-blue-500' : 'bg-neutral-500'}`} />
+                            </button>
+                            <button
+                                onClick={() => setIsDyslexicFont(!isDyslexicFont)}
+                                className={`col-span-2 flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isDyslexicFont ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
+                            >
+                                <span className="text-xs font-medium">Dyslexic Font</span>
+                                <div className={`w-1.5 h-1.5 rounded-full ${isDyslexicFont ? 'bg-blue-500' : 'bg-neutral-500'}`} />
                             </button>
                         </div>
-                        {/* Style & Color Dropdowns */}
-                        <div className="space-y-1.5">
-                            <span className={`text-[10px] uppercase font-bold ${subtleText}`}>Representation & Color</span>
-                            <div className="grid grid-cols-2 gap-2">
+
+                        <div className="space-y-2">
+                            <div>
+                                <label className={`text-[10px] font-bold uppercase tracking-wider mb-1 block ${subtleText}`}>Style</label>
                                 <select
                                     value={representation}
                                     onChange={(e) => setRepresentation(e.target.value as RepresentationType)}
@@ -490,121 +464,149 @@ export const Controls: React.FC<ControlsProps> = ({
                                     <option value="surface">Surface</option>
                                     <option value="ribbon">Ribbon</option>
                                 </select>
-                                <select
-                                    value={coloring}
-                                    onChange={(e) => setColoring(e.target.value as ColoringType)}
-                                    className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
-                                >
-                                    <option value="chainid">By Chain</option>
-                                    <option value="resname">By Residue</option>
-                                    <option value="structure">Secondary Structure</option>
-                                    <option value="hydrophobicity">Hydrophobicity</option>
-                                    <option value="bfactor">B-Factor</option>
-                                    <option value="charge">Charge</option>
-                                </select>
                             </div>
 
-                            {/* Accessibility Palette Selector */}
-                            <div className="flex items-center justify-between pt-1">
-                                <span className={`text-[10px] uppercase font-bold ${subtleText}`}>Color Palette</span>
-                                <select
-                                    value={colorPalette}
-                                    onChange={(e) => setColorPalette(e.target.value as ColorPalette)}
-                                    className={`w-32 border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
-                                >
-                                    <option value="standard">Standard</option>
-                                    <option value="viridis">Viridis (Deuteranopia)</option>
-                                    <option value="magma">Magma (Contrast)</option>
-                                    <option value="cividis">Cividis (Optimized)</option>
-                                </select>
-                            </div>
-                            <div className={`p-2 rounded border text-[10px] leading-snug ${isLightMode ? 'bg-neutral-50/50 border-neutral-100 text-neutral-600' : 'bg-neutral-800/50 border-neutral-700/50 text-neutral-400'}`}>
-                                {(() => {
-                                    const descriptions: Record<string, string> = {
-                                        chainid: "Colors each protein chain differently.",
-                                        element: "Standard CPK coloring (C=Grey, O=Red, N=Blue, S=Yellow).",
-                                        resname: "Distinct color for each amino acid type.",
-                                        structure: "Helix (Magenta), Sheet (Yellow), Turn (Blue), Coil (White).",
-                                        hydrophobicity: "Red = Hydrophobic core, White = Hydrophilic surface.",
-                                        bfactor: "Red = Flexible/Mobile, Blue = Rigid/Stable.",
-                                        charge: "Blue = Positive (Basic), Red = Negative (Acidic)."
-                                    };
-
-                                    return descriptions[coloring] || "Select a coloring mode";
-                                })()}
-                            </div>
-                        </div>
-
-                        {/* Custom Colors */}
-                        <div className="space-y-1.5 pt-1">
-                            <div className="flex items-center justify-between">
-                                <span className={`text-[10px] uppercase font-bold ${subtleText}`}>Custom Rules</span>
+                            <div>
+                                <label className={`text-[10px] font-bold uppercase tracking-wider mb-1 block ${subtleText}`}>Colors</label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <select
+                                        value={coloring}
+                                        onChange={(e) => setColoring(e.target.value as ColoringType)}
+                                        className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
+                                    >
+                                        <option value="chainid">By Chain</option>
+                                        <option value="resname">By Residue</option>
+                                        <option value="structure">Secondary Structure</option>
+                                        <option value="hydrophobicity">Hydrophobicity</option>
+                                        <option value="bfactor">B-Factor</option>
+                                        <option value="charge">Charge</option>
+                                    </select>
+                                    <select
+                                        value={colorPalette}
+                                        onChange={(e) => setColorPalette(e.target.value as ColorPalette)}
+                                        className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
+                                    >
+                                        <option value="standard">Standard</option>
+                                        <option value="viridis">Viridis</option>
+                                        <option value="magma">Magma</option>
+                                        <option value="cividis">Cividis</option>
+                                    </select>
+                                </div>
                             </div>
 
-                            <form onSubmit={addCustomRule} className={`space-y-2 p-2 rounded-lg border ${cardBg}`}>
-                                <div className="flex gap-2 items-start">
-                                    <div className="flex-1 flex flex-col gap-1 min-w-0">
-                                        <div className="flex gap-2">
-                                            <select
-                                                value={targetType}
-                                                onChange={(e) => setTargetType(e.target.value as any)}
-                                                className={`w-18 border rounded px-1 py-1.5 text-xs outline-none ${inputBg}`}
-                                            >
-                                                <option value="chain">Chain</option>
-                                                <option value="residue">Res</option>
-                                            </select>
-                                            {/* Dynamic Input based on Type */}
-                                            {targetType === 'chain' ? (
-                                                <select
-                                                    value={selectedChain}
-                                                    onChange={(e) => setSelectedChain(e.target.value)}
-                                                    disabled={chains.length === 0}
-                                                    className={`flex-1 border rounded px-1 py-1.5 text-xs outline-none min-w-0 ${inputBg}`}
-                                                >
-                                                    {chains.map(c => <option key={c.name} value={c.name}>{c.name}</option>)}
-                                                </select>
-                                            ) : (
-                                                <input
-                                                    type="text"
-                                                    placeholder="e.g. 10-20"
-                                                    value={residueRange}
-                                                    onChange={(e) => setResidueRange(e.target.value)}
-                                                    className={`flex-1 border rounded px-2 py-1.5 text-xs outline-none min-w-0 ${inputBg}`}
-                                                />
-                                            )}
-                                        </div>
-                                        {targetType === 'residue' && selectedChain && getSelectedChainRange() && (
-                                            <div className={`text-[10px] px-1 truncate ${subtleText}`}>Valid: {getSelectedChainRange()}</div>
-                                        )}
+                            {/* Custom Rules */}
+                            <div className="pt-2 border-t border-white/5">
+                                <label className={`text-[10px] font-bold uppercase tracking-wider mb-2 block ${subtleText}`}>Custom Rules</label>
+                                <form onSubmit={addCustomRule} className="space-y-2">
+                                    <div className="flex gap-1 bg-black/20 p-1 rounded-lg">
+                                        <button
+                                            type="button"
+                                            onClick={() => setTargetType('chain')}
+                                            className={`flex-1 text-[10px] py-1 rounded-md transition-all ${targetType === 'chain' ? 'bg-blue-600 text-white shadow-sm' : 'text-neutral-400 hover:text-white'}`}
+                                        >
+                                            Chain
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setTargetType('residue')}
+                                            className={`flex-1 text-[10px] py-1 rounded-md transition-all ${targetType === 'residue' ? 'bg-blue-600 text-white shadow-sm' : 'text-neutral-400 hover:text-white'}`}
+                                        >
+                                            Residue
+                                        </button>
                                     </div>
-                                    <div className="shrink-0">
+
+                                    <div className="flex gap-2">
+                                        {targetType === 'chain' ? (
+                                            <select
+                                                value={selectedChain}
+                                                onChange={(e) => setSelectedChain(e.target.value)}
+                                                className={`flex-1 min-w-0 bg-transparent border-b ${isLightMode ? 'border-neutral-300' : 'border-neutral-700'} text-xs px-1 py-1 outline-none`}
+                                            >
+                                                {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
+                                            </select>
+                                        ) : (
+                                            <input
+                                                type="text"
+                                                value={residueRange}
+                                                onChange={(e) => setResidueRange(e.target.value)}
+                                                placeholder="e.g. 10-20"
+                                                className={`flex-1 min-w-0 bg-transparent border-b ${isLightMode ? 'border-neutral-300' : 'border-neutral-700'} text-xs px-1 py-1 outline-none`}
+                                            />
+                                        )}
                                         <input
                                             type="color"
                                             value={selectedColor}
                                             onChange={(e) => setSelectedColor(e.target.value)}
-                                            className="w-8 h-8 rounded cursor-pointer border-none p-0 overflow-hidden shadow-sm"
+                                            className="w-6 h-6 rounded cursor-pointer bg-transparent border-none p-0"
                                         />
+                                        <button
+                                            type="submit"
+                                            className="p-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors"
+                                            disabled={targetType === 'residue' && !residueRange}
+                                        >
+                                            <Plus className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                </form>
+
+                                {customColors.length > 0 && (
+                                    <div className="space-y-1 mt-2">
+                                        {customColors.map(rule => (
+                                            <div key={rule.id} className={`flex justify-between items-center text-[10px] px-2 py-1 rounded border ${isLightMode ? 'bg-white border-neutral-200' : 'bg-black/20 border-white/5'}`}>
+                                                <div className="flex items-center gap-2">
+                                                    <span className={`px-1 py-0.5 rounded text-[9px] uppercase font-bold ${isLightMode ? 'bg-neutral-100' : 'bg-white/10'}`}>{rule.type}</span>
+                                                    <span className="font-mono">{rule.target}</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-3 h-3 rounded-full border border-white/10" style={{ background: rule.color }} />
+                                                    <button onClick={() => removeRule(rule.id)} className="text-neutral-500 hover:text-red-500 transition-colors">
+                                                        <Trash2 className="w-3 h-3" />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                    </SidebarSection>
+
+                    {/* ACCORDION 2: ANALYSIS */}
+                    <SidebarSection title="Analysis" id="analysis" icon={Activity}>
+
+                        {/* Ligands */}
+                        {ligands.length > 0 && (
+                            <div className={`p-2 rounded-lg border ${cardBg}`}>
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center gap-2">
+                                        <Hexagon className="w-3.5 h-3.5 text-blue-500" />
+                                        <span className={`text-xs font-bold ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>Ligands ({ligands.length})</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={onFocusLigands}
+                                            className={`text-[10px] px-2 py-0.5 rounded border transition-colors bg-transparent text-neutral-500 hover:bg-neutral-50`}
+                                        >
+                                            Focus
+                                        </button>
+                                        <button
+                                            onClick={() => setShowLigands(!showLigands)}
+                                            className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${showLigands ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-transparent text-neutral-500 hover:bg-neutral-50'}`}
+                                        >
+                                            {showLigands ? 'Hide' : 'Show'}
+                                        </button>
                                     </div>
                                 </div>
-                                <button type="submit" className="w-full flex items-center justify-center gap-1 bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600 text-xs py-1.5 rounded transition-colors font-medium">
-                                    <Plus className="w-3 h-3" /> Add Rule
-                                </button>
-                            </form>
-                            {/* Rule List */}
-                            {customColors.map(rule => (
-                                <div key={rule.id} className={`flex items-center justify-between text-xs px-2 py-1 rounded border-l-4 ${cardBg}`} style={{ borderLeftColor: rule.color }}>
-                                    <span className="font-mono">{rule.type === 'chain' ? `Chain ${rule.target.replace(':', '')}` : `Res ${rule.target}`}</span>
-                                    <button onClick={() => removeRule(rule.id)} className={`${subtleText} hover:text-red-500`}><Trash2 className="w-3 h-3" /></button>
+                                <div className="flex flex-wrap gap-1">
+                                    {ligands.map(lig => (
+                                        <span key={lig} className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600">
+                                            {lig}
+                                        </span>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
-
-                    {/* 4. ANALYSIS SECTION (Sequence, Measurements, etc) */}
-                    <div className="space-y-3">
-                        <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText}`}>Analysis</label>
+                            </div>
+                        )}
 
                         <div className="grid grid-cols-2 gap-2">
                             <button
@@ -621,205 +623,166 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <span className="text-xs font-medium">Contact Map</span>
                                 <Grid3X3 className="w-3.5 h-3.5" />
                             </button>
-                        </div>
-                        {isMeasurementMode && (
-                            <button
-                                onClick={onClearMeasurements}
-                                className={`w-full flex items-center justify-center gap-2 border py-1.5 rounded-lg text-xs font-medium transition-colors ${isLightMode ? 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100' : 'bg-red-900/30 text-red-400 border-red-900/50 hover:bg-red-900/50'}`}
-                            >
-                                <Trash2 className="w-3 h-3" /> Clear Measurements
-                            </button>
-                        )}
-                    </div>
-
-                    {/* Sequence Viewer */}
-                    <div className="rounded-lg border overflow-hidden flex flex-col ${cardBg}">
-                        <div className={`px-3 py-2 flex items-center justify-between ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-800'}`}>
-                            <span className={`text-xs font-bold ${subtleText}`}>Sequence Viewer</span>
-                            <select
-                                value={viewSequenceChain}
-                                onChange={(e) => setViewSequenceChain(e.target.value)}
-                                className={`bg-transparent border-none text-[10px] outline-none cursor-pointer text-right ${subtleText}`}
-                            >
-                                <option value="">All Chains</option>
-                                {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
-                            </select>
-                        </div>
-                        <div className={`h-32 p-2 overflow-y-auto scrollbar-thin ${cardBg}`} ref={sequenceContainerRef}>
-                            {chains.length === 0 ? <p className={`italic text-[10px] ${subtleText}`}>No sequence data</p> : (
-                                chains.filter(c => viewSequenceChain ? c.name === viewSequenceChain : true).map(c => (
-                                    <div key={c.name} className="mb-2">
-                                        <div className={`text-[10px] font-bold text-blue-500 mb-0.5 sticky top-0 z-10 w-full py-1 ${cardBg} opacity-95 backdrop-blur-sm`}>Chain {c.name}</div>
-                                        <div className="flex flex-wrap text-[10px] font-mono leading-none">
-                                            {c.sequence.split('').map((char, idx) => {
-                                                const resNo = c.min + idx;
-                                                const isHighlighted = highlightedResidue?.chain === c.name && highlightedResidue.resNo === resNo;
-                                                return (
-                                                    <span
-                                                        key={idx}
-                                                        ref={(el) => { if (el) residueRefs.current.set(`${c.name}-${resNo}`, el); }}
-                                                        onClick={() => onResidueClick(c.name, resNo, char)}
-                                                        className={`w-5 h-5 flex items-center justify-center cursor-pointer rounded-sm transition-colors ${isHighlighted ? 'bg-blue-600 text-white font-bold' : 'hover:bg-neutral-200 dark:hover:bg-neutral-700'}`}
-                                                        title={`${char}${resNo}`}
-                                                    >
-                                                        {char}
-                                                    </span>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                ))
+                            {isMeasurementMode && (
+                                <button
+                                    onClick={onClearMeasurements}
+                                    className={`col-span-2 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border transition-all ${cardBg} hover:text-red-500 hover:border-red-500`}
+                                >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                    <span className="text-xs font-medium">Clear Measurements</span>
+                                </button>
                             )}
                         </div>
-                    </div>
-                </div>
 
-
-                {/* 5. FOOTER (Sessions & Exports) - Fixed at bottom */}
-                <div className={`flex-none p-4 border-t space-y-3 ${isLightMode ? 'border-neutral-200 bg-white/50' : 'border-neutral-800 bg-neutral-900/50'}`}>
-
-                    {/* Session Controls */}
-                    <div className="flex gap-2">
-                        <button onClick={onSaveSession} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
-                            <Download className="w-3.5 h-3.5" /> Save Session
-                        </button>
-                        <button onClick={() => sessionInputRef.current?.click()} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
-                            <Upload className="w-3.5 h-3.5" /> Load
-                        </button>
-                        <input type="file" accept=".json" className="hidden" ref={sessionInputRef} onChange={(e) => e.target.files?.[0] && onLoadSession(e.target.files[0])} />
-                    </div>
-
-                    <div className={`h-px ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`} />
-
-                    {/* ACTIONS ROW 1: Reset & Snapshot */}
-                    <div className="flex gap-2">
-                        <button onClick={onResetView} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}>
-                            <RotateCcw className="w-4 h-4" /> Reset
-                        </button>
-                        <button onClick={onSnapshot} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:text-blue-500 hover:border-blue-500/50`}>
-                            <Camera className="w-4 h-4" /> Snapshot
-                        </button>
-                        {/* Mini Gallery Trigger if snapshot exists */}
-                        {snapshots.length > 0 && (
-                            <button onClick={() => setPreviewSnapshot(snapshots[snapshots.length - 1])} className="px-3 border rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800">
-                                <ImageIcon className="w-4 h-4" />
-                            </button>
-                        )}
-                    </div>
-
-                    {/* ACTIONS ROW 2: Recording */}
-                    <div className="flex items-center gap-2">
-                        <div className={`flex items-center gap-2 pl-2 pr-1 py-1 border rounded-lg ${cardBg}`}>
-                            <span className={`text-[10px] font-bold ${subtleText}`}>SEC</span>
-                            <input
-                                type="number"
-                                min="1"
-                                max="60"
-                                value={recordDuration / 1000}
-                                onChange={(e) => setRecordDuration(Math.max(1, Number(e.target.value)) * 1000)}
-                                disabled={isRecording}
-                                className={`w-8 bg-transparent text-center text-xs outline-none font-mono ${isRecording ? 'opacity-50' : ''}`}
-                            />
-                        </div>
-                        <button
-                            onClick={() => onRecordMovie(recordDuration)}
-                            disabled={isRecording}
-                            className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all text-xs font-medium ${isRecording ? 'bg-red-500 text-white border-red-500' : `${cardBg} hover:text-red-500 hover:border-red-500/50`}`}
-                        >
-                            {isRecording ? <Loader2 className="w-4 h-4 animate-spin" /> : <Video className="w-4 h-4" />}
-                            {isRecording ? 'Recording...' : 'Record Movie'}
-                        </button>
-                    </div>
-                </div>
-
-                {/* Snapshot Gallery - Full View */}
-                {snapshots.length > 0 && (
-                    <div className={`space-y-2 pt-2 border-t ${isLightMode ? 'border-neutral-200' : 'bg-neutral-800'}`}>
-                        <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText} flex items-center gap-2`}>
-                            <ImageIcon className="w-3.5 h-3.5" /> Gallery ({snapshots.length})
-                        </label>
-                        <div className="grid grid-cols-2 gap-2">
-                            {snapshots.map(snap => (
-                                <div key={snap.id} className="group relative aspect-video rounded-lg overflow-hidden border border-neutral-700/50 bg-neutral-900 cursor-pointer" onClick={() => setPreviewSnapshot(snap)}>
-                                    <img src={snap.url} alt="Snapshot" className="w-full h-full object-cover" />
-                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); setPreviewSnapshot(snap); }}
-                                            className="p-1.5 bg-neutral-600 hover:bg-neutral-500 text-white rounded-full transition-colors"
-                                            title="Preview"
-                                        >
-                                            <Eye className="w-3 h-3" />
-                                        </button>
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); onDownloadSnapshot(snap.id); }}
-                                            className="p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-full transition-colors"
-                                            title="Download"
-                                        >
-                                            <Download className="w-3 h-3" />
-                                        </button>
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); onDeleteSnapshot(snap.id); }}
-                                            className="p-1.5 bg-red-600/80 hover:bg-red-500/80 text-white rounded-full transition-colors"
-                                            title="Delete"
-                                        >
-                                            <Trash2 className="w-3 h-3" />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-
-                {/* Movie Gallery - Full View */}
-                {movies.length > 0 && (
-                    <div className={`space-y-2 pt-2 border-t ${isLightMode ? 'border-neutral-200' : 'bg-neutral-800'}`}>
-                        <label className={`text-xs font-semibold uppercase tracking-wider ${subtleText} flex items-center gap-2`}>
-                            <Video className="w-3.5 h-3.5" /> Movies ({movies.length})
-                        </label>
-                        <div className="grid grid-cols-1 gap-2">
-                            {movies.map(movie => (
-                                <div key={movie.id} className="group relative rounded-lg overflow-hidden border border-neutral-700/50 bg-neutral-900 flex items-center p-2 gap-2 cursor-pointer" onClick={() => setPreviewMovie(movie)}>
-                                    <div className="w-16 h-10 bg-black rounded flex items-center justify-center relative overflow-hidden">
-                                        <video src={movie.url} className="w-full h-full object-cover" muted />
-                                        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                                            <div className="w-4 h-4 rounded-full bg-white/80 flex items-center justify-center pl-0.5">
-                                                <div className="w-0 h-0 border-t-[3px] border-t-transparent border-l-[5px] border-l-black border-b-[3px] border-b-transparent" />
+                        {/* Sequence Viewer Component */}
+                        <div className={`p-2 rounded-lg border flex flex-col ${cardBg}`}>
+                            <div className="flex items-center justify-between mb-2">
+                                <span className={`text-xs font-bold ${subtleText}`}>Sequence</span>
+                                <select
+                                    value={viewSequenceChain}
+                                    onChange={(e) => setViewSequenceChain(e.target.value)}
+                                    className={`bg-transparent border-none text-[10px] outline-none cursor-pointer text-right ${subtleText}`}
+                                >
+                                    <option value="">All Chains</option>
+                                    {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
+                                </select>
+                            </div>
+                            <div className={`h-24 p-1 overflow-y-auto scrollbar-thin ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-800'} rounded`} ref={sequenceContainerRef}>
+                                {chains.length === 0 ? <p className={`italic text-[10px] ${subtleText}`}>No sequence data</p> : (
+                                    chains.filter(c => viewSequenceChain ? c.name === viewSequenceChain : true).map(c => (
+                                        <div key={c.name} className="mb-2">
+                                            <div className="flex flex-wrap text-[10px] font-mono leading-none break-all">
+                                                {c.sequence.split('').map((char, idx) => {
+                                                    const resNo = c.min + idx;
+                                                    const isHighlighted = highlightedResidue?.chain === c.name && highlightedResidue.resNo === resNo;
+                                                    return (
+                                                        <span
+                                                            key={idx}
+                                                            ref={(el) => { if (el) residueRefs.current.set(`${c.name}-${resNo}`, el); }}
+                                                            onClick={() => onResidueClick(c.name, resNo, char)}
+                                                            className={`w-4 h-4 flex items-center justify-center cursor-pointer rounded-sm transition-colors ${isHighlighted ? 'bg-blue-600 text-white font-bold' : 'hover:bg-neutral-200 dark:hover:bg-neutral-600'}`}
+                                                            title={`${char}${resNo}`}
+                                                        >
+                                                            {char}
+                                                        </span>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="text-[10px] font-medium text-white truncate">Movie {movie.id.slice(0, 4)}</div>
-                                        <div className="text-[9px] text-neutral-400">{Math.round(movie.duration)}s • {movie.format}</div>
-                                    </div>
-                                    <div className="flex gap-1">
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); setPreviewMovie(movie); }}
-                                            className="p-1.5 bg-neutral-600 hover:bg-neutral-500 text-white rounded transition-colors"
-                                            title="Play"
-                                        >
-                                            <Video className="w-3 h-3" />
+                                    ))
+                                )}
+                            </div>
+                        </div>
+                    </SidebarSection>
+
+                    {/* ACCORDION 3: TOOLS */}
+                    <SidebarSection title="Tools" id="tools" icon={Wrench}>
+                        <div className="space-y-3">
+                            {/* Session Controls */}
+                            <div>
+                                <label className={`text-[10px] font-bold uppercase tracking-wider block mb-2 ${subtleText}`}>Session</label>
+                                <div className="flex gap-2">
+                                    <button onClick={onSaveSession} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
+                                        <Download className="w-3.5 h-3.5" /> Save
+                                    </button>
+                                    <button onClick={() => sessionInputRef.current?.click()} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
+                                        <Upload className="w-3.5 h-3.5" /> Load
+                                    </button>
+                                    <input type="file" accept=".json" className="hidden" ref={sessionInputRef} onChange={(e) => e.target.files?.[0] && onLoadSession(e.target.files[0])} />
+                                </div>
+                            </div>
+
+                            {/* Actions & Recording */}
+                            <div>
+                                <label className={`text-[10px] font-bold uppercase tracking-wider block mb-2 ${subtleText}`}>Actions & Recording</label>
+                                <div className="space-y-2">
+                                    <div className="flex gap-2">
+                                        <button onClick={onResetView} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}>
+                                            <RotateCcw className="w-3.5 h-3.5" /> <span className="text-xs">Reset</span>
                                         </button>
-                                        <button
-                                            onClick={(e) => { e.stopPropagation(); onDownloadMovie(movie.id); }}
-                                            className="p-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors"
-                                            title="Download"
-                                        >
-                                            <Download className="w-3 h-3" />
+                                        <button onClick={onSnapshot} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:text-blue-500 hover:border-blue-500/50`}>
+                                            <Camera className="w-3.5 h-3.5" /> <span className="text-xs">Snapshot</span>
                                         </button>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                        <div className={`flex items-center gap-2 pl-2 pr-1 py-1.5 border rounded-lg ${cardBg}`}>
+                                            <span className={`text-[9px] font-bold ${subtleText}`}>SEC</span>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                max="60"
+                                                value={recordDuration / 1000}
+                                                onChange={(e) => setRecordDuration(Math.max(1, Number(e.target.value)) * 1000)}
+                                                disabled={isRecording}
+                                                className={`w-8 bg-transparent text-center text-xs outline-none font-mono ${isRecording ? 'opacity-50' : ''}`}
+                                            />
+                                        </div>
                                         <button
-                                            onClick={(e) => { e.stopPropagation(); onDeleteMovie(movie.id); }}
-                                            className="p-1.5 bg-red-600/80 hover:bg-red-500/80 text-white rounded transition-colors"
-                                            title="Delete"
+                                            onClick={() => onRecordMovie(recordDuration)}
+                                            disabled={isRecording}
+                                            className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${isRecording ? 'bg-red-500 text-white border-red-500' : `${cardBg} hover:text-red-500 hover:border-red-500/50`}`}
                                         >
-                                            <Trash2 className="w-3 h-3" />
+                                            {isRecording ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Video className="w-3.5 h-3.5" />}
+                                            {isRecording ? 'Recording...' : 'Record'}
                                         </button>
                                     </div>
                                 </div>
-                            ))}
+                            </div>
+
+                            {/* Galleries */}
+                            {(snapshots.length > 0 || movies.length > 0) && (
+                                <div className="pt-2 border-t border-white/5 space-y-3">
+                                    {snapshots.length > 0 && (
+                                        <div className="space-y-2">
+                                            <label className={`text-[9px] font-bold uppercase tracking-wider ${subtleText} flex items-center gap-2`}>
+                                                <ImageIcon className="w-3 h-3" /> Snapshots ({snapshots.length})
+                                            </label>
+                                            <div className="grid grid-cols-2 gap-2">
+                                                {snapshots.map(snap => (
+                                                    <div key={snap.id} className="group relative aspect-video rounded border border-neutral-700/50 bg-neutral-900 cursor-pointer overflow-hidden" onClick={() => setPreviewSnapshot(snap)}>
+                                                        <img src={snap.url} alt="Snapshot" className="w-full h-full object-cover" />
+                                                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                                                            <button onClick={(e) => { e.stopPropagation(); setPreviewSnapshot(snap); }} className="p-1 bg-neutral-600 hover:bg-neutral-500 text-white rounded-full"><Eye className="w-2.5 h-2.5" /></button>
+                                                            <button onClick={(e) => { e.stopPropagation(); onDownloadSnapshot(snap.id); }} className="p-1 bg-blue-600 hover:bg-blue-500 text-white rounded-full"><Download className="w-2.5 h-2.5" /></button>
+                                                            <button onClick={(e) => { e.stopPropagation(); onDeleteSnapshot(snap.id); }} className="p-1 bg-red-600/80 hover:bg-red-500/80 text-white rounded-full"><Trash2 className="w-2.5 h-2.5" /></button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {movies.length > 0 && (
+                                        <div className="space-y-2">
+                                            <label className={`text-[9px] font-bold uppercase tracking-wider ${subtleText} flex items-center gap-2`}>
+                                                <Video className="w-3 h-3" /> Movies ({movies.length})
+                                            </label>
+                                            <div className="space-y-2">
+                                                {movies.map(movie => (
+                                                    <div key={movie.id} className="group relative rounded border border-neutral-700/50 bg-neutral-900 flex items-center p-1.5 gap-2 cursor-pointer" onClick={() => setPreviewMovie(movie)}>
+                                                        <div className="w-8 h-8 bg-black rounded flex items-center justify-center relative overflow-hidden flex-none">
+                                                            <div className="w-0 h-0 border-t-[3px] border-t-transparent border-l-[5px] border-l-white border-b-[3px] border-b-transparent" />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="text-[9px] font-medium text-white truncate">Movie {movie.id.slice(0, 4)}</div>
+                                                            <div className="text-[8px] text-neutral-400">{Math.round(movie.duration)}s</div>
+                                                        </div>
+                                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            <button onClick={(e) => { e.stopPropagation(); onDownloadMovie(movie.id); }} className="p-1 bg-blue-600 hover:bg-blue-500 text-white rounded"><Download className="w-2.5 h-2.5" /></button>
+                                                            <button onClick={(e) => { e.stopPropagation(); onDeleteMovie(movie.id); }} className="p-1 bg-red-600/80 hover:bg-red-500/80 text-white rounded"><Trash2 className="w-2.5 h-2.5" /></button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
                         </div>
-                    </div>
-                )}
+                    </SidebarSection>
+                </div >
             </div >
 
 
