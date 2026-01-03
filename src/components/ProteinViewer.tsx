@@ -1290,58 +1290,65 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 // KEY FIX: DELEGATE base coloring to NGL's own standard scheme instances.
                 console.log("Applying Unified Coloring via Delegation");
 
-                const atomColormap = new Map<number, number>(); // Index -> Hex
-
-                // Instantiate the Base Scheme (e.g. 'chainid', 'sstruc')
-                let BaseSchemeClass;
                 try {
-                    BaseSchemeClass = NGL.ColormakerRegistry.getScheme(currentColoring);
-                } catch (e) {
-                    // Fallback if scheme name is weird
-                    BaseSchemeClass = NGL.ColormakerRegistry.getScheme('chainid');
-                }
+                    const atomColormap = new Map<number, number>(); // Index -> Hex
 
-                // Initialize it with the component's structure statistics (important for bfactor/hydrophobicity scales)
-                const baseScheme = new BaseSchemeClass({
-                    structure: component.structure,
-                    scheme: currentColoring,
-                    // Pass palette if needed (custom handling might be needed for 'hydrophobicity' props, 
-                    // but standard 'chainid'/'sstruc' work out of box)
-                });
-
-                // A. Base Colors for ALL atoms (via NGL)
-                component.structure.eachAtom((atom: any) => {
-                    let color = 0xCCCCCC;
+                    // Instantiate the Base Scheme (e.g. 'chainid', 'sstruc')
+                    let BaseSchemeClass;
                     try {
-                        color = baseScheme.atomColor(atom);
+                        BaseSchemeClass = NGL.ColormakerRegistry.getScheme(currentColoring);
                     } catch (e) {
-                        // fallback
+                        // Fallback if scheme name is weird
+                        BaseSchemeClass = NGL.ColormakerRegistry.getScheme('chainid');
                     }
-                    atomColormap.set(atom.index, color);
-                });
 
-                // B. Apply Custom Overrides
-                customColors.forEach(rule => {
-                    if (rule.color && rule.target) {
+                    // Initialize it with the component's structure statistics
+                    const baseScheme = new BaseSchemeClass({
+                        structure: component.structure,
+                        scheme: currentColoring,
+                        params: {
+                            // Pass palette params just in case functionality depends on it
+                            scale: currentColoring === 'bfactor' ? 'rwb' : undefined
+                        }
+                    });
+
+                    // A. Base Colors for ALL atoms (via NGL)
+                    component.structure.eachAtom((atom: any) => {
+                        let color = 0xCCCCCC;
                         try {
-                            const sel = new NGL.Selection(rule.target);
-                            const colorHex = new NGL.Color(rule.color).getHex();
-                            component.structure.eachAtom((atom: any) => {
-                                atomColormap.set(atom.index, colorHex);
-                            }, sel);
+                            color = baseScheme.atomColor(atom);
                         } catch (e) { }
-                    }
-                });
+                        atomColormap.set(atom.index, color);
+                    });
 
-                // C. Register & Apply
-                const unifiedSchemeId = `unified_${Date.now()}_${Math.random()}`;
-                NGL.ColormakerRegistry.addScheme(function (this: any) {
-                    this.atomColor = function (atom: any) {
-                        return atomColormap.get(atom.index) || 0xCCCCCC;
-                    };
-                }, unifiedSchemeId);
+                    // B. Apply Custom Overrides
+                    customColors.forEach(rule => {
+                        if (rule.color && rule.target) {
+                            try {
+                                const sel = new NGL.Selection(rule.target);
+                                const colorHex = new NGL.Color(rule.color).getHex();
+                                component.structure.eachAtom((atom: any) => {
+                                    atomColormap.set(atom.index, colorHex);
+                                }, sel);
+                            } catch (e) { }
+                        }
+                    });
 
-                component.addRepresentation(repType, { color: unifiedSchemeId });
+                    // C. Register & Apply
+                    const unifiedSchemeId = `unified_${Date.now()}_${Math.random()}`;
+                    NGL.ColormakerRegistry.addScheme(function (this: any) {
+                        this.atomColor = function (atom: any) {
+                            return atomColormap.get(atom.index) || 0xCCCCCC;
+                        };
+                    }, unifiedSchemeId);
+
+                    component.addRepresentation(repType, { color: unifiedSchemeId });
+
+                } catch (delegationError) {
+                    console.error("Custom Scheme Failed, reverting to standard:", delegationError);
+                    // FALLBACK: If custom scheme crashes, just show standard structure so it doesn't vanish
+                    component.addRepresentation(repType, { color: currentColoring });
+                }
             }
 
             // --- OVERLAYS ---
