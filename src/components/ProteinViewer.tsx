@@ -1265,24 +1265,29 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             highlightComponentRef.current = null;
 
             let repType = representation || 'cartoon';
-            let currentColoring = coloring;
+            let currentColoring = coloring || 'chainid'; // SAFETY DEFAULT
 
             // Handle special 1crn case
-            if (coloring === 'chainid' && pdbId && pdbId.toLowerCase().includes('1crn')) {
+            if (currentColoring === 'chainid' && pdbId && pdbId.toLowerCase().includes('1crn')) {
                 currentColoring = 'residue';
                 repType = 'licorice';
             }
 
             if (currentColoring === 'structure') currentColoring = 'sstruc';
 
+            // Check for VALID custom rules only
+            const hasValidCustomRules = customColors && customColors.length > 0 && customColors.some(r => r.target && r.color);
+
+            console.log("Coloring Debug:", { currentColoring, repType, hasValidCustomRules, rules: customColors });
+
             // --- STRATEGY: HYBRID ---
-            // 1. IF NO CUSTOM RULES: Use native NGL coloring (Performance + Reliability)
-            if (!customColors || customColors.length === 0) {
+            // 1. IF NO VALID CUSTOM RULES: Use native NGL coloring (Performance + Reliability)
+            if (!hasValidCustomRules) {
                 component.addRepresentation(repType, { color: currentColoring });
             }
             else {
-                // 2. IF CUSTOM RULES EXIST: Use Unified Custom Scheme (To prevent gaps)
-                console.log("Applying Unified Coloring (Custom Rules Active)", customColors.length);
+                // 2. IF CUSTOM RULES EXIST: Use Unified Custom Scheme
+                console.log("Applying Unified Coloring (Custom Rules Active)");
 
                 const atomColormap = new Map<number, number>(); // Index -> Hex
 
