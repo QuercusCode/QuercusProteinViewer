@@ -1304,7 +1304,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             // We use a unique ID each time to force NGL to refresh
             const unifiedSchemeId = `unified_${Date.now()}_${Math.random()}`;
 
-            NGL.ColormakerRegistry.addScheme(function (this: any, params: any) {
+            NGL.ColormakerRegistry.addScheme(function (this: any) {
                 this.atomColor = function (atom: any) {
                     // A. PRIORITY: Custom Overrides (Map Lookup O(1))
                     if (atomColorMap.has(atom.index)) {
