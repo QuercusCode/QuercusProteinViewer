@@ -1325,10 +1325,18 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     };
                 }, chargeSchemeId);
 
-                // IMPROVEMENT: MANUAL CHARGE COLORING (SINGLE REP + CUSTOM SCHEME)
-                // We use a single representation with a custom scheme to ensure continuous backbone.
+                // IMPROVEMENT: MANUAL CHARGE COLORING (NATIVE SELECTION SCHEME)
+                // Single Representation + Selection Scheme = Continuous Backbone + Correct Colors.
+                const chargeSchemeId_Active = `charge_fixed_${Date.now()}`;
+
+                NGL.ColormakerRegistry.addSelectionScheme(chargeSchemeId_Active, [
+                    ["blue", "resname ARG LYS HIS"],
+                    ["red", "resname ASP GLU"],
+                    ["white", "*"]
+                ]);
+
                 component.addRepresentation(repType, {
-                    color: chargeSchemeId
+                    color: chargeSchemeId_Active
                 });
 
             } else {
