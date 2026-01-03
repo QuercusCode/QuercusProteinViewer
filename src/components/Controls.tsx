@@ -438,7 +438,7 @@ export const Controls: React.FC<ControlsProps> = ({
                             {/* Visual Style */}
                             <div className="space-y-2">
                                 <label className={`text-[10px] font-bold uppercase tracking-wider block ${subtleText}`}>Visualization</label>
-                                <div className="space-y-2">
+                                <div className="grid grid-cols-2 gap-2">
                                     <button
                                         onClick={() => setShowSurface(!showSurface)}
                                         className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${showSurface ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
