@@ -1310,28 +1310,23 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     chainIdx++;
                 });
             } else if (currentColoring === 'charge') {
-                // CHARGE COLORING: Use unique timestamped ID to avoid conflicts
-                const chargeSchemeId = `charge_${Date.now()}`;
-
-                // Define the color scheme using proper NGL ColorMaker structure
-                NGL.ColormakerRegistry.addScheme(function (this: any) {
-                    this.atomColor = function (atom: any) {
-                        const resname = atom.resname;
-                        // Positive residues - Blue
-                        if (resname === 'ARG' || resname === 'LYS' || resname === 'HIS') {
-                            return 0x0000FF;
-                        }
-                        // Negative residues - Red
-                        if (resname === 'ASP' || resname === 'GLU') {
-                            return 0xFF0000;
-                        }
-                        // Neutral residues - White
-                        return 0xFFFFFF;
-                    };
-                }, chargeSchemeId);
-
+                // CHARGE COLORING: Selection-based approach (most reliable)
+                // Positive residues - Blue
                 component.addRepresentation(repType, {
-                    colorScheme: chargeSchemeId
+                    color: 0x0000FF,
+                    sele: "ARG or LYS or HIS"
+                });
+
+                // Negative residues - Red
+                component.addRepresentation(repType, {
+                    color: 0xFF0000,
+                    sele: "ASP or GLU"
+                });
+
+                // Neutral residues - White
+                component.addRepresentation(repType, {
+                    color: 0xFFFFFF,
+                    sele: "not (ARG or LYS or HIS or ASP or GLU)"
                 });
             } else {
                 // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL
