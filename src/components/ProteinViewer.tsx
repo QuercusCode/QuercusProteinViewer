@@ -1310,20 +1310,18 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     chainIdx++;
                 });
             } else if (currentColoring === 'charge') {
-                // IMPROVEMENT: MANUAL CHARGE COLORING (CUSTOM FUNCTION SCHEME)
-                // This uses a robust JS function for per-residue coloring.
-                // Works universally across Cartoon, Ribbon, Surface, etc.
-                const chargeSchemeId = "charge_custom_v3";
+                // IMPROVEMENT: MANUAL CHARGE COLORING (SAFE SELECTION SCHEME)
+                // Rules are processed in order. First match wins.
+                // 1. Blue (Pos)
+                // 2. Red (Neg)
+                // 3. White (Base/Catch-all)
+                const chargeSchemeId = "charge_coloring_fixed";
 
-                // Overwrite/Register the scheme safely
-                NGL.ColormakerRegistry.addScheme(function (this: any) {
-                    this.atomColor = function (atom: any) {
-                        const r = atom.resname;
-                        if (r === 'ARG' || r === 'LYS' || r === 'HIS') return 0x0000FF; // Blue
-                        if (r === 'ASP' || r === 'GLU') return 0xFF0000; // Red
-                        return 0xFFFFFF; // White
-                    };
-                }, chargeSchemeId);
+                NGL.ColormakerRegistry.addSelectionScheme(chargeSchemeId, [
+                    ["blue", "ARG or LYS or HIS"],
+                    ["red", "ASP or GLU"],
+                    ["white", "*"]
+                ]);
 
                 component.addRepresentation(repType, {
                     color: chargeSchemeId
