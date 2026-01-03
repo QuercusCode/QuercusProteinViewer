@@ -1280,78 +1280,43 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             console.log("Coloring Debug:", { currentColoring, repType, hasValidCustomRules, rules: customColors });
 
-            // --- STRATEGY: HYBRID ---
-            // 1. IF NO VALID CUSTOM RULES: Use native NGL coloring (Performance + Reliability)
+            // --- STRATEGY: HYBRID VIA DELEGATION ---
+            // 1. IF NO CUSTOM RULES: Use native NGL coloring.
             if (!hasValidCustomRules) {
                 component.addRepresentation(repType, { color: currentColoring });
             }
             else {
-                // 2. IF CUSTOM RULES EXIST: Use Unified Custom Scheme
-                console.log("Applying Unified Coloring (Custom Rules Active)");
+                // 2. IF CUSTOM RULES EXIST: Use Unified Custom Scheme.
+                // KEY FIX: DELEGATE base coloring to NGL's own standard scheme instances.
+                console.log("Applying Unified Coloring via Delegation");
 
                 const atomColormap = new Map<number, number>(); // Index -> Hex
 
-                // A. Base Colors for ALL atoms (Pre-calculation)
+                // Instantiate the Base Scheme (e.g. 'chainid', 'sstruc')
+                let BaseSchemeClass;
+                try {
+                    BaseSchemeClass = NGL.ColormakerRegistry.getScheme(currentColoring);
+                } catch (e) {
+                    // Fallback if scheme name is weird
+                    BaseSchemeClass = NGL.ColormakerRegistry.getScheme('chainid');
+                }
+
+                // Initialize it with the component's structure statistics (important for bfactor/hydrophobicity scales)
+                const baseScheme = new BaseSchemeClass({
+                    structure: component.structure,
+                    scheme: currentColoring,
+                    // Pass palette if needed (custom handling might be needed for 'hydrophobicity' props, 
+                    // but standard 'chainid'/'sstruc' work out of box)
+                });
+
+                // A. Base Colors for ALL atoms (via NGL)
                 component.structure.eachAtom((atom: any) => {
                     let color = 0xCCCCCC;
-
-                    if (currentColoring === 'chainid') {
-                        const chainIdx = typeof atom.chainIndex === 'number' ? atom.chainIndex : 0;
-                        const colors = [
-                            0x1f77b4, 0xff7f0e, 0x2ca02c, 0xd62728, 0x9467bd,
-                            0x8c564b, 0xe377c2, 0x7f7f7f, 0xbcbd22, 0x17becf
-                        ];
-                        if (chainIdx >= 0) {
-                            color = colors[chainIdx % colors.length];
-                        } else {
-                            const name = atom.chainname || 'A';
-                            const code = name.charCodeAt(0);
-                            color = colors[code % colors.length];
-                        }
+                    try {
+                        color = baseScheme.atomColor(atom);
+                    } catch (e) {
+                        // fallback
                     }
-                    else if (currentColoring === 'sstruc') {
-                        const s = atom.sstruc;
-                        if (s === 'h') color = 0xFF0080;
-                        else if (s === 's') color = 0xFFC800;
-                        else if (s === 't') color = 0x6080FF;
-                        else color = 0xFFFFFF;
-                    }
-                    else if (currentColoring === 'charge') {
-                        const r = atom.resname;
-                        if (['ARG', 'LYS', 'HIS'].includes(r)) color = 0x0000FF;
-                        else if (['ASP', 'GLU'].includes(r)) color = 0xFF0000;
-                        else color = 0xCCCCCC;
-                    }
-                    else if (currentColoring === 'hydrophobicity') {
-                        const scale: Record<string, number> = {
-                            ILE: 4.5, VAL: 4.2, LEU: 3.8, PHE: 2.8, CYS: 2.5,
-                            MET: 1.9, ALA: 1.8, GLY: -0.4, THR: -0.7, SER: -0.8,
-                            TRP: -0.9, TYR: -1.3, PRO: -1.6, HIS: -3.2, GLU: -3.5,
-                            GLN: -3.5, ASP: -3.5, ASN: -3.5, LYS: -3.9, ARG: -4.5
-                        };
-                        const val = (scale[atom.resname] || 0) + 4.5;
-                        const norm = Math.max(0, Math.min(1, val / 9.0));
-                        color = new NGL.Color(getPaletteColor(norm, colorPalette)).getHex();
-                    }
-                    else if (currentColoring === 'bfactor') {
-                        color = new NGL.Color(getPaletteColor(Math.min(1, atom.bfactor / 100), colorPalette)).getHex();
-                    }
-                    else if (currentColoring === 'element') {
-                        const e = atom.element;
-                        if (e === 'C') color = 0x909090;
-                        else if (e === 'O') color = 0xFF0000;
-                        else if (e === 'N') color = 0x0000FF;
-                        else if (e === 'S') color = 0xFFFF00;
-                        else color = 0xDDDDDD;
-                    }
-                    else if (currentColoring === 'resname' || currentColoring === 'residue') {
-                        const safeRes = atom.resname || 'UNK';
-                        let hash = 0;
-                        for (let i = 0; i < safeRes.length; i++) hash = safeRes.charCodeAt(i) + ((hash << 5) - hash);
-                        const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
-                        color = parseInt("00000".substring(0, 6 - c.length) + c, 16);
-                    }
-
                     atomColormap.set(atom.index, color);
                 });
 
@@ -1368,13 +1333,11 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     }
                 });
 
-                // C. Register & Apply Scheme
+                // C. Register & Apply
                 const unifiedSchemeId = `unified_${Date.now()}_${Math.random()}`;
                 NGL.ColormakerRegistry.addScheme(function (this: any) {
                     this.atomColor = function (atom: any) {
-                        const c = atomColormap.get(atom.index);
-                        // Fix 0x000000 bug: Check undefined
-                        return c !== undefined ? c : 0xCCCCCC;
+                        return atomColormap.get(atom.index) || 0xCCCCCC;
                     };
                 }, unifiedSchemeId);
 
