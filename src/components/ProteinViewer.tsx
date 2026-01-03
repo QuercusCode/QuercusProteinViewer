@@ -1311,27 +1311,20 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 });
 
             } else if (currentColoring === 'charge') {
-                // IMPROVEMENT: MANUAL CHARGE COLORING (BASE + SCALED OVERLAY STRATEGY)
-                // 1. Base Layer: ALL ATOMS -> White (Neutral) - Ensures continuous backbone
-                component.addRepresentation(repType, {
-                    color: 0xFFFFFF,
-                    name: "charge_base_neu"
-                });
+            } else if (currentColoring === 'charge') {
+                // IMPROVEMENT: MANUAL CHARGE COLORING (NATIVE SELECTION SCHEME)
+                // This works for ALL styles (Cartoon, Ribbon, Licorice, etc.)
+                // effectively solving Z-fighting (Overlays) and Gaps (Partitions).
+                const chargeSchemeId = `charge_fixed_universal_${Date.now()}`;
 
-                // 2. Overlay: Positive -> Blue (Scaled up to prevent occlusion/z-fighting)
-                component.addRepresentation(repType, {
-                    color: 0x0000FF,
-                    sele: "ARG or LYS or HIS",
-                    name: "charge_pos",
-                    scale: 1.05
-                });
+                NGL.ColormakerRegistry.addSelectionScheme(chargeSchemeId, [
+                    ["blue", "resname ARG LYS HIS"],
+                    ["red", "resname ASP GLU"],
+                    ["white", "*"]
+                ]);
 
-                // 3. Overlay: Negative -> Red (Scaled up)
                 component.addRepresentation(repType, {
-                    color: 0xFF0000,
-                    sele: "ASP or GLU",
-                    name: "charge_neg",
-                    scale: 1.05
+                    color: chargeSchemeId
                 });
             } else {
                 // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL
