@@ -1280,14 +1280,12 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             console.log("Coloring Debug:", { currentColoring, repType, hasValidCustomRules, rules: customColors });
 
-            // --- STRATEGY: MULTI-REPRESENTATION OVERLAY (RESTORED RESTORED) ---
-            // The "Unified Scheme" was too fragile. We revert to the robust standard NGL approach.
+            // --- STRATEGY: MULTI-REPRESENTATION OVERLAY (RESTORED & IMPROVED) ---
+            // NGL Custom Schemes proved fragile for this user.
+            // We implementation "High Contrast Chain Coloring" by EXPLICITLY adding a representation for each chain.
+            // This relies only on basic NGL primitives (addRepresentation with selection), which is 100% robust.
 
-            let finalColoring = currentColoring;
-
-            // 1. IMPROVEMENT: HIGH CONTRAST CHAIN COLORING
             if (currentColoring === 'chainid') {
-                const uniqueId = `high_contrast_chain_${Date.now()}`;
                 const highContrastColors = [
                     0xFF0000, // Red
                     0x0000FF, // Blue
@@ -1301,30 +1299,22 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     0x7FFF00, // Chartreuse
                 ];
 
-                NGL.ColormakerRegistry.addScheme(function (this: any) {
-                    this.atomColor = function (atom: any) {
-                        // ROBUST: Use chainname hashing instead of index
-                        // (Indices proved unreliable for this user's PDBs)
-                        const name = atom.chainname || 'A';
-                        let code = 0;
-                        for (let i = 0; i < name.length; i++) {
-                            code += name.charCodeAt(i);
-                        }
-                        return highContrastColors[code % highContrastColors.length];
-                    };
-                }, uniqueId);
-
-                finalColoring = uniqueId;
+                let chainIdx = 0;
+                component.structure.eachChain((chain: any) => {
+                    const color = highContrastColors[chainIdx % highContrastColors.length];
+                    component.addRepresentation(repType, {
+                        color: color,
+                        sele: `:${chain.chainname}`,
+                        name: `chain_base_${chain.chainname}`
+                    });
+                    chainIdx++;
+                });
+            } else {
+                // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL
+                component.addRepresentation(repType, {
+                    color: currentColoring
+                });
             }
-
-            // 1. Add Base Representation
-            component.addRepresentation(repType, {
-                color: finalColoring,
-                // To minimize Z-fighting, we could try to subtract custom selections, but 
-                // for robust "it just works" behavior, we just add the base.
-                // If the user wants to hide the base, they can set base opacity maybe? 
-                // For now, this mimics the original working state.
-            });
 
             // 2. Add Custom Representations (Overlay)
             if (hasValidCustomRules) {
