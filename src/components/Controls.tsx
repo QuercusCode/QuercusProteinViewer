@@ -31,6 +31,29 @@ import {
 } from 'lucide-react';
 import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette } from '../types';
 
+// Reusable Sidebar Section Component - Defined outside to prevent re-renders losing focus
+const SidebarSection = ({ title, id, icon: Icon, children, isOpen, onToggle }: { title: string, id: string, icon: any, children: React.ReactNode, isOpen: boolean, onToggle: () => void }) => (
+    <div className="border border-white/10 rounded-xl overflow-hidden bg-black/20">
+        <button
+            onClick={onToggle}
+            className={`w-full flex items-center justify-between p-3 text-xs font-bold uppercase tracking-wider transition-colors ${isOpen ? 'bg-white/5 text-blue-400' : 'hover:bg-white/5 text-neutral-400'}`}
+        >
+            <div className="flex items-center gap-2">
+                <Icon className="w-4 h-4" />
+                {title}
+            </div>
+            <div className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+                <ChevronDown className="w-3 h-3" />
+            </div>
+        </button>
+        {isOpen && (
+            <div className="p-3 space-y-3 border-t border-white/5">
+                {children}
+            </div>
+        )}
+    </div>
+);
+
 interface ControlsProps {
     pdbId: string;
     setPdbId: (id: string) => void;
@@ -150,6 +173,13 @@ export const Controls: React.FC<ControlsProps> = ({
     const [residueRange, setResidueRange] = useState('');
     const [selectedColor, setSelectedColor] = useState('#ff0000');
 
+    // Helper to get range of residues for selected chain
+    const getSelectedChainRange = () => {
+        if (!selectedChain) return null;
+        const chain = chains.find(c => c.name === selectedChain);
+        return chain ? `${chain.min} - ${chain.max}` : null;
+    };
+
     // Styles
     const cardBg = isLightMode ? 'bg-white' : 'bg-neutral-900';
     const subtleText = isLightMode ? 'text-neutral-500' : 'text-neutral-400';
@@ -266,27 +296,7 @@ export const Controls: React.FC<ControlsProps> = ({
         );
     }
 
-    const SidebarSection = ({ title, id, icon: Icon, children }: { title: string, id: string, icon: any, children: React.ReactNode }) => (
-        <div className="border border-white/10 rounded-xl overflow-hidden bg-black/20">
-            <button
-                onClick={() => toggleSection(id)}
-                className={`w-full flex items-center justify-between p-3 text-xs font-bold uppercase tracking-wider transition-colors ${openSections[id] ? 'bg-white/5 text-blue-400' : 'hover:bg-white/5 text-neutral-400'}`}
-            >
-                <div className="flex items-center gap-2">
-                    <Icon className="w-4 h-4" />
-                    {title}
-                </div>
-                <div className={`transition-transform duration-200 ${openSections[id] ? 'rotate-180' : ''}`}>
-                    <ChevronDown className="w-3 h-3" />
-                </div>
-            </button>
-            {openSections[id] && (
-                <div className="p-3 space-y-3 border-t border-white/5">
-                    {children}
-                </div>
-            )}
-        </div>
-    );
+
 
     return (
         <>
@@ -418,445 +428,473 @@ export const Controls: React.FC<ControlsProps> = ({
                     )}
 
                     {/* ACCORDION 1: APPEARANCE */}
-                    <SidebarSection title="Appearance" id="appearance" icon={Eye}>
-                        {/* Quick Toggles */}
-                        <div className="grid grid-cols-2 gap-2">
-                            <button
-                                onClick={() => setShowSurface(!showSurface)}
-                                className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${showSurface ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
-                            >
-                                <div className="flex items-center gap-2">
-                                    <Layers className="w-3.5 h-3.5" />
-                                    <span className="text-xs font-medium">Surface</span>
-                                </div>
-                                <div className={`w-1.5 h-1.5 rounded-full ${showSurface ? 'bg-blue-500' : 'bg-neutral-500'}`} />
-                            </button>
-                            <button
-                                onClick={() => setIsSpinning(!isSpinning)}
-                                className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isSpinning ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
-                            >
-                                <div className="flex items-center gap-2">
-                                    <RefreshCw className={`w-3.5 h-3.5 ${isSpinning ? 'animate-spin' : ''}`} />
-                                    <span className="text-xs font-medium">Spin</span>
-                                </div>
-                                <div className={`w-1.5 h-1.5 rounded-full ${isSpinning ? 'bg-blue-500' : 'bg-neutral-500'}`} />
-                            </button>
-                            <button
-                                onClick={() => setIsDyslexicFont(!isDyslexicFont)}
-                                className={`col-span-2 flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isDyslexicFont ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
-                            >
-                                <span className="text-xs font-medium">Dyslexic Font</span>
-                                <div className={`w-1.5 h-1.5 rounded-full ${isDyslexicFont ? 'bg-blue-500' : 'bg-neutral-500'}`} />
-                            </button>
-                        </div>
-
-                        <div className="space-y-2">
-                            <div>
-                                <label className={`text-[10px] font-bold uppercase tracking-wider mb-1 block ${subtleText}`}>Style</label>
-                                <select
-                                    value={representation}
-                                    onChange={(e) => setRepresentation(e.target.value as RepresentationType)}
-                                    className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
-                                >
-                                    <option value="cartoon">Cartoon</option>
-                                    <option value="ball+stick">Ball & Stick</option>
-                                    <option value="spacefill">Spacefill</option>
-                                    <option value="surface">Surface</option>
-                                    <option value="ribbon">Ribbon</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label className={`text-[10px] font-bold uppercase tracking-wider mb-1 block ${subtleText}`}>Colors</label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    <select
-                                        value={coloring}
-                                        onChange={(e) => setColoring(e.target.value as ColoringType)}
-                                        className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
-                                    >
-                                        <option value="chainid">By Chain</option>
-                                        <option value="resname">By Residue</option>
-                                        <option value="structure">Secondary Structure</option>
-                                        <option value="hydrophobicity">Hydrophobicity</option>
-                                        <option value="bfactor">B-Factor</option>
-                                        <option value="charge">Charge</option>
-                                    </select>
-                                    <select
-                                        value={colorPalette}
-                                        onChange={(e) => setColorPalette(e.target.value as ColorPalette)}
-                                        className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
-                                    >
-                                        <option value="standard">Standard</option>
-                                        <option value="viridis">Viridis</option>
-                                        <option value="magma">Magma</option>
-                                        <option value="cividis">Cividis</option>
-                                    </select>
-                                </div>
-                                <p className={`text-[9px] mt-1.5 opacity-70 leading-relaxed ${subtleText}`}>
-                                    {({
-                                        chainid: "Distinct colors for each chain.",
-                                        resname: "Standard amino acid colors (RasMol).",
-                                        residue: "Standard amino acid colors.",
-                                        structure: "Helices (Magenta), Sheets (Yellow), Loops (White).",
-                                        hydrophobicity: "Blue (Hydrophilic) → Red (Hydrophobic).",
-                                        bfactor: "Blue (Stable) → Red (Flexible/Mobile).",
-                                        charge: "Blue (Positive) → Red (Negative).",
-                                        secondary: "Secondary structure delineation.",
-                                        residueindex: "Rainbow gradient by residue position."
-                                    } as Record<string, string>)[coloring]}
-                                </p>
-                            </div>
-
-                            {/* Custom Rules */}
-                            <div className="pt-2 border-t border-white/5">
-                                <label className={`text-[10px] font-bold uppercase tracking-wider mb-2 block ${subtleText}`}>Custom Rules</label>
-                                <form onSubmit={addCustomRule} className="space-y-2">
-                                    <div className="flex gap-1 bg-black/20 p-1 rounded-lg">
-                                        <button
-                                            type="button"
-                                            onClick={() => setTargetType('chain')}
-                                            className={`flex-1 text-[10px] py-1 rounded-md transition-all ${targetType === 'chain' ? 'bg-blue-600 text-white shadow-sm' : 'text-neutral-400 hover:text-white'}`}
-                                        >
-                                            Chain
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setTargetType('residue')}
-                                            className={`flex-1 text-[10px] py-1 rounded-md transition-all ${targetType === 'residue' ? 'bg-blue-600 text-white shadow-sm' : 'text-neutral-400 hover:text-white'}`}
-                                        >
-                                            Residue
-                                        </button>
-                                    </div>
-
-                                    <div className="flex gap-2">
-                                        {targetType === 'chain' ? (
-                                            <select
-                                                value={selectedChain}
-                                                onChange={(e) => setSelectedChain(e.target.value)}
-                                                className={`flex-1 min-w-0 bg-transparent border-b ${isLightMode ? 'border-neutral-300' : 'border-neutral-700'} text-xs px-1 py-1 outline-none`}
-                                            >
-                                                {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
-                                            </select>
-                                        ) : (
-                                            <input
-                                                type="text"
-                                                value={residueRange}
-                                                onChange={(e) => {
-                                                    const val = e.target.value;
-                                                    // Allow numbers, hyphens, and commas only
-                                                    if (/^[0-9,\-]*$/.test(val)) {
-                                                        setResidueRange(val);
-                                                    }
-                                                }}
-                                                placeholder="e.g. 10-20"
-                                                className={`flex-1 min-w-0 bg-transparent border-b ${isLightMode ? 'border-neutral-300' : 'border-neutral-700'} text-xs px-1 py-1 outline-none`}
-                                            />
-                                        )}
-                                        <input
-                                            type="color"
-                                            value={selectedColor}
-                                            onChange={(e) => setSelectedColor(e.target.value)}
-                                            className="w-6 h-6 rounded cursor-pointer bg-transparent border-none p-0"
-                                        />
-                                        <button
-                                            type="submit"
-                                            className="p-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors"
-                                            disabled={targetType === 'residue' && !residueRange}
-                                        >
-                                            <Plus className="w-3.5 h-3.5" />
-                                        </button>
-                                    </div>
-                                </form>
-
-                                {customColors.length > 0 && (
-                                    <div className="space-y-1 mt-2">
-                                        {customColors.map(rule => (
-                                            <div key={rule.id} className={`flex justify-between items-center text-[10px] px-2 py-1 rounded border ${isLightMode ? 'bg-white border-neutral-200' : 'bg-black/20 border-white/5'}`}>
-                                                <div className="flex items-center gap-2">
-                                                    <span className={`px-1 py-0.5 rounded text-[9px] uppercase font-bold ${isLightMode ? 'bg-neutral-100' : 'bg-white/10'}`}>{rule.type}</span>
-                                                    <span className="font-mono">{rule.target}</span>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-3 h-3 rounded-full border border-white/10" style={{ background: rule.color }} />
-                                                    <button onClick={() => removeRule(rule.id)} className="text-neutral-500 hover:text-red-500 transition-colors">
-                                                        <Trash2 className="w-3 h-3" />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                    </SidebarSection>
-
-                    {/* ACCORDION 2: ANALYSIS */}
-                    <SidebarSection title="Analysis" id="analysis" icon={Activity}>
-
-                        {/* Ligands */}
-                        {ligands.length > 0 && (
-                            <div className={`p-2 rounded-lg border ${cardBg}`}>
-                                <div className="flex items-center justify-between mb-2">
-                                    <div className="flex items-center gap-2">
-                                        <Hexagon className="w-3.5 h-3.5 text-blue-500" />
-                                        <span className={`text-xs font-bold ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>Ligands ({ligands.length})</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={onFocusLigands}
-                                            className={`text-[10px] px-2 py-0.5 rounded border transition-colors bg-transparent text-neutral-500 hover:bg-neutral-50`}
-                                        >
-                                            Focus
-                                        </button>
-                                        <button
-                                            onClick={() => setShowLigands(!showLigands)}
-                                            className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${showLigands ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-transparent text-neutral-500 hover:bg-neutral-50'}`}
-                                        >
-                                            {showLigands ? 'Hide' : 'Show'}
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="flex flex-wrap gap-1">
-                                    {ligands.map(lig => (
-                                        <span key={lig} className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600">
-                                            {lig}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="grid grid-cols-2 gap-2">
-                            <button
-                                onClick={() => setIsMeasurementMode(!isMeasurementMode)}
-                                className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isMeasurementMode ? 'bg-amber-500/10 border-amber-500 text-amber-500' : `${cardBg} hover:opacity-80`}`}
-                            >
-                                <span className="text-xs font-medium">Measure</span>
-                                <Ruler className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                                onClick={onToggleContactMap}
-                                className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
-                            >
-                                <span className="text-xs font-medium">Contact Map</span>
-                                <Grid3X3 className="w-3.5 h-3.5" />
-                            </button>
-                            {isMeasurementMode && (
-                                <button
-                                    onClick={onClearMeasurements}
-                                    className={`col-span-2 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border transition-all ${cardBg} hover:text-red-500 hover:border-red-500`}
-                                >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                    <span className="text-xs font-medium">Clear Measurements</span>
-                                </button>
-                            )}
-                        </div>
-
-                        {/* Sequence Viewer Component */}
-                        <div className={`p-2 rounded-lg border flex flex-col ${cardBg}`}>
-                            <div className="flex items-center justify-between mb-2">
-                                <span className={`text-xs font-bold ${subtleText}`}>Sequence</span>
-                                <select
-                                    value={viewSequenceChain}
-                                    onChange={(e) => setViewSequenceChain(e.target.value)}
-                                    className={`bg-transparent border-none text-[10px] outline-none cursor-pointer text-right ${subtleText}`}
-                                >
-                                    <option value="">All Chains</option>
-                                    {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
-                                </select>
-                            </div>
-                            <div className={`h-24 p-1 overflow-y-auto scrollbar-thin ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-800'} rounded`} ref={sequenceContainerRef}>
-                                {chains.length === 0 ? <p className={`italic text-[10px] ${subtleText}`}>No sequence data</p> : (
-                                    chains.filter(c => viewSequenceChain ? c.name === viewSequenceChain : true).map(c => (
-                                        <div key={c.name} className="mb-3 relative">
-                                            <div className={`sticky top-0 z-10 py-1 px-1 mb-1 text-[10px] font-extrabold uppercase tracking-widest border-b shadow-sm ${isLightMode ? 'bg-neutral-100 border-neutral-200 text-neutral-800' : 'bg-neutral-800 border-neutral-700 text-white'}`}>
-                                                Chain {c.name}
-                                            </div>
-                                            <div className="flex flex-wrap text-[10px] font-mono leading-none break-all">
-                                                {c.sequence.split('').map((char, idx) => {
-                                                    const resNo = c.min + idx;
-                                                    const isHighlighted = highlightedResidue?.chain === c.name && highlightedResidue.resNo === resNo;
-                                                    return (
-                                                        <span
-                                                            key={idx}
-                                                            ref={(el) => { if (el) residueRefs.current.set(`${c.name}-${resNo}`, el); }}
-                                                            onClick={() => onResidueClick(c.name, resNo, char)}
-                                                            className={`w-4 h-4 flex items-center justify-center cursor-pointer rounded-sm transition-colors ${isHighlighted ? 'bg-blue-600 text-white font-bold' : 'hover:bg-neutral-200 dark:hover:bg-neutral-600'}`}
-                                                            title={`${char}${resNo}`}
-                                                        >
-                                                            {char}
-                                                        </span>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        </div>
-                    </SidebarSection>
-
-                    {/* ACCORDION 3: TOOLS */}
-                    <SidebarSection title="Tools" id="tools" icon={Wrench}>
+                    <SidebarSection
+                        title="Appearance"
+                        id="appearance"
+                        icon={Eye}
+                        isOpen={openSections['appearance']}
+                        onToggle={() => toggleSection('appearance')}
+                    >
                         <div className="space-y-3">
-                            {/* Session Controls */}
-                            <div>
-                                <label className={`text-[10px] font-bold uppercase tracking-wider block mb-2 ${subtleText}`}>Session</label>
-                                <div className="flex gap-2">
-                                    <button onClick={onSaveSession} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
-                                        <Download className="w-3.5 h-3.5" /> Save
-                                    </button>
-                                    <button onClick={() => sessionInputRef.current?.click()} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
-                                        <Upload className="w-3.5 h-3.5" /> Load
-                                    </button>
-                                    <input type="file" accept=".json" className="hidden" ref={sessionInputRef} onChange={(e) => e.target.files?.[0] && onLoadSession(e.target.files[0])} />
-                                </div>
-                            </div>
-
-                            {/* Actions & Recording */}
-                            <div>
-                                <label className={`text-[10px] font-bold uppercase tracking-wider block mb-2 ${subtleText}`}>Actions & Recording</label>
+                            {/* Visual Style */}
+                            <div className="space-y-2">
+                                <label className={`text-[10px] font-bold uppercase tracking-wider block ${subtleText}`}>Visualization</label>
                                 <div className="space-y-2">
-                                    <div className="flex gap-2">
-                                        <button onClick={onResetView} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}>
-                                            <RotateCcw className="w-3.5 h-3.5" /> <span className="text-xs">Reset</span>
-                                        </button>
-                                        <button onClick={onSnapshot} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:text-blue-500 hover:border-blue-500/50`}>
-                                            <Camera className="w-3.5 h-3.5" /> <span className="text-xs">Snapshot</span>
-                                        </button>
-                                    </div>
-
-                                    <div className="flex items-center gap-2">
-                                        <div className={`flex items-center gap-2 pl-2 pr-1 py-1.5 border rounded-lg ${cardBg}`}>
-                                            <span className={`text-[9px] font-bold ${subtleText}`}>SEC</span>
-                                            <input
-                                                type="number"
-                                                min="1"
-                                                max="60"
-                                                value={recordDuration / 1000}
-                                                onChange={(e) => setRecordDuration(Math.max(1, Number(e.target.value)) * 1000)}
-                                                disabled={isRecording}
-                                                className={`w-8 bg-transparent text-center text-xs outline-none font-mono ${isRecording ? 'opacity-50' : ''}`}
-                                            />
+                                    <button
+                                        onClick={() => setShowSurface(!showSurface)}
+                                        className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${showSurface ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <Layers className="w-3.5 h-3.5" />
+                                            <span className="text-xs font-medium">Surface</span>
                                         </div>
-                                        <button
-                                            onClick={() => onRecordMovie(recordDuration)}
-                                            disabled={isRecording}
-                                            className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${isRecording ? 'bg-red-500 text-white border-red-500' : `${cardBg} hover:text-red-500 hover:border-red-500/50`}`}
+                                        <div className={`w-1.5 h-1.5 rounded-full ${showSurface ? 'bg-blue-500' : 'bg-neutral-500'}`} />
+                                    </button>
+                                    <button
+                                        onClick={() => setIsSpinning(!isSpinning)}
+                                        className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isSpinning ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <RefreshCw className={`w-3.5 h-3.5 ${isSpinning ? 'animate-spin' : ''}`} />
+                                            <span className="text-xs font-medium">Spin</span>
+                                        </div>
+                                        <div className={`w-1.5 h-1.5 rounded-full ${isSpinning ? 'bg-blue-500' : 'bg-neutral-500'}`} />
+                                    </button>
+                                    <button
+                                        onClick={() => setIsDyslexicFont(!isDyslexicFont)}
+                                        className={`col-span-2 flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isDyslexicFont ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
+                                    >
+                                        <span className="text-xs font-medium">Dyslexic Font</span>
+                                        <div className={`w-1.5 h-1.5 rounded-full ${isDyslexicFont ? 'bg-blue-500' : 'bg-neutral-500'}`} />
+                                    </button>
+                                </div>
+
+                                <div className="space-y-2">
+                                    <div>
+                                        <label className={`text-[10px] font-bold uppercase tracking-wider mb-1 block ${subtleText}`}>Style</label>
+                                        <select
+                                            value={representation}
+                                            onChange={(e) => setRepresentation(e.target.value as RepresentationType)}
+                                            className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
                                         >
-                                            {isRecording ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Video className="w-3.5 h-3.5" />}
-                                            {isRecording ? 'Recording...' : 'Record'}
-                                        </button>
+                                            <option value="cartoon">Cartoon</option>
+                                            <option value="ball+stick">Ball & Stick</option>
+                                            <option value="spacefill">Spacefill</option>
+                                            <option value="surface">Surface</option>
+                                            <option value="ribbon">Ribbon</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className={`text-[10px] font-bold uppercase tracking-wider mb-1 block ${subtleText}`}>Colors</label>
+                                        <div className="grid grid-cols-2 gap-2">
+                                            <select
+                                                value={coloring}
+                                                onChange={(e) => setColoring(e.target.value as ColoringType)}
+                                                className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
+                                            >
+                                                <option value="chainid">By Chain</option>
+                                                <option value="resname">By Residue</option>
+                                                <option value="structure">Secondary Structure</option>
+                                                <option value="hydrophobicity">Hydrophobicity</option>
+                                                <option value="bfactor">B-Factor</option>
+                                                <option value="charge">Charge</option>
+                                            </select>
+                                            <select
+                                                value={colorPalette}
+                                                onChange={(e) => setColorPalette(e.target.value as ColorPalette)}
+                                                className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
+                                            >
+                                                <option value="standard">Standard</option>
+                                                <option value="viridis">Viridis</option>
+                                                <option value="magma">Magma</option>
+                                                <option value="cividis">Cividis</option>
+                                            </select>
+                                        </div>
+                                        <p className={`text-[9px] mt-1.5 opacity-70 leading-relaxed ${subtleText}`}>
+                                            {({
+                                                chainid: "Distinct colors for each chain.",
+                                                resname: "Standard amino acid colors (RasMol).",
+                                                residue: "Standard amino acid colors.",
+                                                structure: "Helices (Magenta), Sheets (Yellow), Loops (White).",
+                                                hydrophobicity: "Blue (Hydrophilic) → Red (Hydrophobic).",
+                                                bfactor: "Blue (Stable) → Red (Flexible/Mobile).",
+                                                charge: "Blue (Positive) → Red (Negative).",
+                                                secondary: "Secondary structure delineation.",
+                                                residueindex: "Rainbow gradient by residue position."
+                                            } as Record<string, string>)[coloring]}
+                                        </p>
+                                    </div>
+
+                                    {/* Custom Rules */}
+                                    <div className="pt-2 border-t border-white/5">
+                                        <label className={`text-[10px] font-bold uppercase tracking-wider mb-2 block ${subtleText}`}>Custom Rules</label>
+                                        <form onSubmit={addCustomRule} className="space-y-2">
+                                            <div className="flex gap-1 bg-black/20 p-1 rounded-lg">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setTargetType('chain')}
+                                                    className={`flex-1 text-[10px] py-1 rounded-md transition-all ${targetType === 'chain' ? 'bg-blue-600 text-white shadow-sm' : 'text-neutral-400 hover:text-white'}`}
+                                                >
+                                                    Chain
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setTargetType('residue')}
+                                                    className={`flex-1 text-[10px] py-1 rounded-md transition-all ${targetType === 'residue' ? 'bg-blue-600 text-white shadow-sm' : 'text-neutral-400 hover:text-white'}`}
+                                                >
+                                                    Residue
+                                                </button>
+                                            </div>
+
+                                            <div className="flex gap-2">
+                                                {targetType === 'chain' ? (
+                                                    <select
+                                                        value={selectedChain}
+                                                        onChange={(e) => setSelectedChain(e.target.value)}
+                                                        className={`flex-1 min-w-0 bg-transparent border-b ${isLightMode ? 'border-neutral-300' : 'border-neutral-700'} text-xs px-1 py-1 outline-none`}
+                                                    >
+                                                        {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
+                                                    </select>
+                                                ) : (
+                                                    <div className="flex-1 min-w-0">
+                                                        <input
+                                                            type="text"
+                                                            value={residueRange}
+                                                            onChange={(e) => {
+                                                                const val = e.target.value;
+                                                                // Allow numbers, hyphens, and commas only
+                                                                if (/^[0-9,\-]*$/.test(val)) {
+                                                                    setResidueRange(val);
+                                                                }
+                                                            }}
+                                                            placeholder="e.g. 10-20"
+                                                            className={`w-full bg-transparent border-b ${isLightMode ? 'border-neutral-300' : 'border-neutral-700'} text-xs px-1 py-1 outline-none`}
+                                                        />
+                                                        {getSelectedChainRange() && (
+                                                            <div className={`text-[9px] mt-0.5 ${subtleText} opacity-80`}>
+                                                                Range: {getSelectedChainRange()}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                                <input
+                                                    type="color"
+                                                    value={selectedColor}
+                                                    onChange={(e) => setSelectedColor(e.target.value)}
+                                                    className="w-6 h-6 rounded cursor-pointer bg-transparent border-none p-0"
+                                                />
+                                                <button
+                                                    type="submit"
+                                                    className="p-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors"
+                                                    disabled={targetType === 'residue' && !residueRange}
+                                                >
+                                                    <Plus className="w-3.5 h-3.5" />
+                                                </button>
+                                            </div>
+                                        </form>
+
+                                        {customColors.length > 0 && (
+                                            <div className="space-y-1 mt-2">
+                                                {customColors.map(rule => (
+                                                    <div key={rule.id} className={`flex justify-between items-center text-[10px] px-2 py-1 rounded border ${isLightMode ? 'bg-white border-neutral-200' : 'bg-black/20 border-white/5'}`}>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className={`px-1 py-0.5 rounded text-[9px] uppercase font-bold ${isLightMode ? 'bg-neutral-100' : 'bg-white/10'}`}>{rule.type}</span>
+                                                            <span className="font-mono">{rule.target}</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-3 h-3 rounded-full border border-white/10" style={{ background: rule.color }} />
+                                                            <button onClick={() => removeRule(rule.id)} className="text-neutral-500 hover:text-red-500 transition-colors">
+                                                                <Trash2 className="w-3 h-3" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Galleries */}
-                            {(snapshots.length > 0 || movies.length > 0) && (
-                                <div className="pt-2 border-t border-white/5 space-y-3">
-                                    {snapshots.length > 0 && (
-                                        <div className="space-y-2">
-                                            <label className={`text-[9px] font-bold uppercase tracking-wider ${subtleText} flex items-center gap-2`}>
-                                                <ImageIcon className="w-3 h-3" /> Snapshots ({snapshots.length})
-                                            </label>
-                                            <div className="grid grid-cols-2 gap-2">
-                                                {snapshots.map(snap => (
-                                                    <div key={snap.id} className="group relative aspect-video rounded border border-neutral-700/50 bg-neutral-900 cursor-pointer overflow-hidden" onClick={() => setPreviewSnapshot(snap)}>
-                                                        <img src={snap.url} alt="Snapshot" className="w-full h-full object-cover" />
-                                                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                                                            <button onClick={(e) => { e.stopPropagation(); setPreviewSnapshot(snap); }} className="p-1 bg-neutral-600 hover:bg-neutral-500 text-white rounded-full"><Eye className="w-2.5 h-2.5" /></button>
-                                                            <button onClick={(e) => { e.stopPropagation(); onDownloadSnapshot(snap.id); }} className="p-1 bg-blue-600 hover:bg-blue-500 text-white rounded-full"><Download className="w-2.5 h-2.5" /></button>
-                                                            <button onClick={(e) => { e.stopPropagation(); onDeleteSnapshot(snap.id); }} className="p-1 bg-red-600/80 hover:bg-red-500/80 text-white rounded-full"><Trash2 className="w-2.5 h-2.5" /></button>
-                                                        </div>
-                                                    </div>
-                                                ))}
+                            </SidebarSection>
+
+                            {/* ACCORDION 2: ANALYSIS */}
+                            <SidebarSection
+                                title="Analysis"
+                                id="analysis"
+                                icon={Activity}
+                                isOpen={openSections['analysis']}
+                                onToggle={() => toggleSection('analysis')}
+                            >
+
+                                {/* Ligands */}
+                                {ligands.length > 0 && (
+                                    <div className={`p-2 rounded-lg border ${cardBg}`}>
+                                        <div className="flex items-center justify-between mb-2">
+                                            <div className="flex items-center gap-2">
+                                                <Hexagon className="w-3.5 h-3.5 text-blue-500" />
+                                                <span className={`text-xs font-bold ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>Ligands ({ligands.length})</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={onFocusLigands}
+                                                    className={`text-[10px] px-2 py-0.5 rounded border transition-colors bg-transparent text-neutral-500 hover:bg-neutral-50`}
+                                                >
+                                                    Focus
+                                                </button>
+                                                <button
+                                                    onClick={() => setShowLigands(!showLigands)}
+                                                    className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${showLigands ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-transparent text-neutral-500 hover:bg-neutral-50'}`}
+                                                >
+                                                    {showLigands ? 'Hide' : 'Show'}
+                                                </button>
                                             </div>
                                         </div>
-                                    )}
-
-                                    {movies.length > 0 && (
-                                        <div className="space-y-2">
-                                            <label className={`text-[9px] font-bold uppercase tracking-wider ${subtleText} flex items-center gap-2`}>
-                                                <Video className="w-3 h-3" /> Movies ({movies.length})
-                                            </label>
-                                            <div className="space-y-2">
-                                                {movies.map(movie => (
-                                                    <div key={movie.id} className="group relative rounded border border-neutral-700/50 bg-neutral-900 flex items-center p-1.5 gap-2 cursor-pointer" onClick={() => setPreviewMovie(movie)}>
-                                                        <div className="w-8 h-8 bg-black rounded flex items-center justify-center relative overflow-hidden flex-none">
-                                                            <div className="w-0 h-0 border-t-[3px] border-t-transparent border-l-[5px] border-l-white border-b-[3px] border-b-transparent" />
-                                                        </div>
-                                                        <div className="flex-1 min-w-0">
-                                                            <div className="text-[9px] font-medium text-white truncate">Movie {movie.id.slice(0, 4)}</div>
-                                                            <div className="text-[8px] text-neutral-400">{Math.round(movie.duration)}s</div>
-                                                        </div>
-                                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                            <button onClick={(e) => { e.stopPropagation(); onDownloadMovie(movie.id); }} className="p-1 bg-blue-600 hover:bg-blue-500 text-white rounded"><Download className="w-2.5 h-2.5" /></button>
-                                                            <button onClick={(e) => { e.stopPropagation(); onDeleteMovie(movie.id); }} className="p-1 bg-red-600/80 hover:bg-red-500/80 text-white rounded"><Trash2 className="w-2.5 h-2.5" /></button>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
+                                        <div className="flex flex-wrap gap-1">
+                                            {ligands.map(lig => (
+                                                <span key={lig} className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600">
+                                                    {lig}
+                                                </span>
+                                            ))}
                                         </div>
+                                    </div>
+                                )}
+
+                                <div className="grid grid-cols-2 gap-2">
+                                    <button
+                                        onClick={() => setIsMeasurementMode(!isMeasurementMode)}
+                                        className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isMeasurementMode ? 'bg-amber-500/10 border-amber-500 text-amber-500' : `${cardBg} hover:opacity-80`}`}
+                                    >
+                                        <span className="text-xs font-medium">Measure</span>
+                                        <Ruler className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                        onClick={onToggleContactMap}
+                                        className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
+                                    >
+                                        <span className="text-xs font-medium">Contact Map</span>
+                                        <Grid3X3 className="w-3.5 h-3.5" />
+                                    </button>
+                                    {isMeasurementMode && (
+                                        <button
+                                            onClick={onClearMeasurements}
+                                            className={`col-span-2 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border transition-all ${cardBg} hover:text-red-500 hover:border-red-500`}
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5" />
+                                            <span className="text-xs font-medium">Clear Measurements</span>
+                                        </button>
                                     )}
                                 </div>
-                            )}
 
-                        </div>
-                    </SidebarSection>
+                                {/* Sequence Viewer Component */}
+                                <div className={`p-2 rounded-lg border flex flex-col ${cardBg}`}>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <span className={`text-xs font-bold ${subtleText}`}>Sequence</span>
+                                        <select
+                                            value={viewSequenceChain}
+                                            onChange={(e) => setViewSequenceChain(e.target.value)}
+                                            className={`bg-transparent border-none text-[10px] outline-none cursor-pointer text-right ${subtleText}`}
+                                        >
+                                            <option value="">All Chains</option>
+                                            {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
+                                        </select>
+                                    </div>
+                                    <div className={`h-24 p-1 overflow-y-auto scrollbar-thin ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-800'} rounded`} ref={sequenceContainerRef}>
+                                        {chains.length === 0 ? <p className={`italic text-[10px] ${subtleText}`}>No sequence data</p> : (
+                                            chains.filter(c => viewSequenceChain ? c.name === viewSequenceChain : true).map(c => (
+                                                <div key={c.name} className="mb-3 relative">
+                                                    <div className={`sticky top-0 z-10 py-1 px-1 mb-1 text-[10px] font-extrabold uppercase tracking-widest border-b shadow-sm ${isLightMode ? 'bg-neutral-100 border-neutral-200 text-neutral-800' : 'bg-neutral-800 border-neutral-700 text-white'}`}>
+                                                        Chain {c.name}
+                                                    </div>
+                                                    <div className="flex flex-wrap text-[10px] font-mono leading-none break-all">
+                                                        {c.sequence.split('').map((char, idx) => {
+                                                            const resNo = c.min + idx;
+                                                            const isHighlighted = highlightedResidue?.chain === c.name && highlightedResidue.resNo === resNo;
+                                                            return (
+                                                                <span
+                                                                    key={idx}
+                                                                    ref={(el) => { if (el) residueRefs.current.set(`${c.name}-${resNo}`, el); }}
+                                                                    onClick={() => onResidueClick(c.name, resNo, char)}
+                                                                    className={`w-4 h-4 flex items-center justify-center cursor-pointer rounded-sm transition-colors ${isHighlighted ? 'bg-blue-600 text-white font-bold' : 'hover:bg-neutral-200 dark:hover:bg-neutral-600'}`}
+                                                                    title={`${char}${resNo}`}
+                                                                >
+                                                                    {char}
+                                                                </span>
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+                            </SidebarSection>
+
+                            {/* ACCORDION 3: TOOLS */}
+                            <SidebarSection
+                                title="Tools"
+                                id="tools"
+                                icon={Wrench}
+                                isOpen={openSections['tools']}
+                                onToggle={() => toggleSection('tools')}
+                            >
+                                <div className="space-y-3">
+                                    {/* Session Controls */}
+                                    <div>
+                                        <label className={`text-[10px] font-bold uppercase tracking-wider block mb-2 ${subtleText}`}>Session</label>
+                                        <div className="flex gap-2">
+                                            <button onClick={onSaveSession} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
+                                                <Download className="w-3.5 h-3.5" /> Save
+                                            </button>
+                                            <button onClick={() => sessionInputRef.current?.click()} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
+                                                <Upload className="w-3.5 h-3.5" /> Load
+                                            </button>
+                                            <input type="file" accept=".json" className="hidden" ref={sessionInputRef} onChange={(e) => e.target.files?.[0] && onLoadSession(e.target.files[0])} />
+                                        </div>
+                                    </div>
+
+                                    {/* Actions & Recording */}
+                                    <div>
+                                        <label className={`text-[10px] font-bold uppercase tracking-wider block mb-2 ${subtleText}`}>Actions & Recording</label>
+                                        <div className="space-y-2">
+                                            <div className="flex gap-2">
+                                                <button onClick={onResetView} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}>
+                                                    <RotateCcw className="w-3.5 h-3.5" /> <span className="text-xs">Reset</span>
+                                                </button>
+                                                <button onClick={onSnapshot} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:text-blue-500 hover:border-blue-500/50`}>
+                                                    <Camera className="w-3.5 h-3.5" /> <span className="text-xs">Snapshot</span>
+                                                </button>
+                                            </div>
+
+                                            <div className="flex items-center gap-2">
+                                                <div className={`flex items-center gap-2 pl-2 pr-1 py-1.5 border rounded-lg ${cardBg}`}>
+                                                    <span className={`text-[9px] font-bold ${subtleText}`}>SEC</span>
+                                                    <input
+                                                        type="number"
+                                                        min="1"
+                                                        max="60"
+                                                        value={recordDuration / 1000}
+                                                        onChange={(e) => setRecordDuration(Math.max(1, Number(e.target.value)) * 1000)}
+                                                        disabled={isRecording}
+                                                        className={`w-8 bg-transparent text-center text-xs outline-none font-mono ${isRecording ? 'opacity-50' : ''}`}
+                                                    />
+                                                </div>
+                                                <button
+                                                    onClick={() => onRecordMovie(recordDuration)}
+                                                    disabled={isRecording}
+                                                    className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${isRecording ? 'bg-red-500 text-white border-red-500' : `${cardBg} hover:text-red-500 hover:border-red-500/50`}`}
+                                                >
+                                                    {isRecording ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Video className="w-3.5 h-3.5" />}
+                                                    {isRecording ? 'Recording...' : 'Record'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Galleries */}
+                                    {(snapshots.length > 0 || movies.length > 0) && (
+                                        <div className="pt-2 border-t border-white/5 space-y-3">
+                                            {snapshots.length > 0 && (
+                                                <div className="space-y-2">
+                                                    <label className={`text-[9px] font-bold uppercase tracking-wider ${subtleText} flex items-center gap-2`}>
+                                                        <ImageIcon className="w-3 h-3" /> Snapshots ({snapshots.length})
+                                                    </label>
+                                                    <div className="grid grid-cols-2 gap-2">
+                                                        {snapshots.map(snap => (
+                                                            <div key={snap.id} className="group relative aspect-video rounded border border-neutral-700/50 bg-neutral-900 cursor-pointer overflow-hidden" onClick={() => setPreviewSnapshot(snap)}>
+                                                                <img src={snap.url} alt="Snapshot" className="w-full h-full object-cover" />
+                                                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                                                                    <button onClick={(e) => { e.stopPropagation(); setPreviewSnapshot(snap); }} className="p-1 bg-neutral-600 hover:bg-neutral-500 text-white rounded-full"><Eye className="w-2.5 h-2.5" /></button>
+                                                                    <button onClick={(e) => { e.stopPropagation(); onDownloadSnapshot(snap.id); }} className="p-1 bg-blue-600 hover:bg-blue-500 text-white rounded-full"><Download className="w-2.5 h-2.5" /></button>
+                                                                    <button onClick={(e) => { e.stopPropagation(); onDeleteSnapshot(snap.id); }} className="p-1 bg-red-600/80 hover:bg-red-500/80 text-white rounded-full"><Trash2 className="w-2.5 h-2.5" /></button>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {movies.length > 0 && (
+                                                <div className="space-y-2">
+                                                    <label className={`text-[9px] font-bold uppercase tracking-wider ${subtleText} flex items-center gap-2`}>
+                                                        <Video className="w-3 h-3" /> Movies ({movies.length})
+                                                    </label>
+                                                    <div className="space-y-2">
+                                                        {movies.map(movie => (
+                                                            <div key={movie.id} className="group relative rounded border border-neutral-700/50 bg-neutral-900 flex items-center p-1.5 gap-2 cursor-pointer" onClick={() => setPreviewMovie(movie)}>
+                                                                <div className="w-8 h-8 bg-black rounded flex items-center justify-center relative overflow-hidden flex-none">
+                                                                    <div className="w-0 h-0 border-t-[3px] border-t-transparent border-l-[5px] border-l-white border-b-[3px] border-b-transparent" />
+                                                                </div>
+                                                                <div className="flex-1 min-w-0">
+                                                                    <div className="text-[9px] font-medium text-white truncate">Movie {movie.id.slice(0, 4)}</div>
+                                                                    <div className="text-[8px] text-neutral-400">{Math.round(movie.duration)}s</div>
+                                                                </div>
+                                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                                    <button onClick={(e) => { e.stopPropagation(); onDownloadMovie(movie.id); }} className="p-1 bg-blue-600 hover:bg-blue-500 text-white rounded"><Download className="w-2.5 h-2.5" /></button>
+                                                                    <button onClick={(e) => { e.stopPropagation(); onDeleteMovie(movie.id); }} className="p-1 bg-red-600/80 hover:bg-red-500/80 text-white rounded"><Trash2 className="w-2.5 h-2.5" /></button>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+
+                                </div>
+                            </SidebarSection>
+                        </div >
                 </div >
-            </div >
 
 
-            {/* Snapshot Preview Modal */}
-            {
-                previewSnapshot && (
-                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setPreviewSnapshot(null)}>
-                        <div className="relative max-w-4xl max-h-[90vh] w-full rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
-                            <button
-                                onClick={() => setPreviewSnapshot(null)}
-                                className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
-                            >
-                                <X className="w-6 h-6" />
-                            </button>
-                            <img src={previewSnapshot.url} alt="Preview" className="w-full h-full object-contain bg-neutral-900" />
-                            <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-center gap-4">
+                {/* Snapshot Preview Modal */}
+                {
+                    previewSnapshot && (
+                        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setPreviewSnapshot(null)}>
+                            <div className="relative max-w-4xl max-h-[90vh] w-full rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
                                 <button
-                                    onClick={() => onDownloadSnapshot(previewSnapshot.id)}
-                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
+                                    onClick={() => setPreviewSnapshot(null)}
+                                    className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
                                 >
-                                    <Download className="w-4 h-4" /> Download
+                                    <X className="w-6 h-6" />
                                 </button>
+                                <img src={previewSnapshot.url} alt="Preview" className="w-full h-full object-contain bg-neutral-900" />
+                                <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-center gap-4">
+                                    <button
+                                        onClick={() => onDownloadSnapshot(previewSnapshot.id)}
+                                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
+                                    >
+                                        <Download className="w-4 h-4" /> Download
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )
-            }
+                    )
+                }
 
-            {/* Movie Preview Modal */}
-            {
-                previewMovie && (
-                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setPreviewMovie(null)}>
-                        <div className="relative max-w-4xl max-h-[90vh] w-full rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 bg-black" onClick={e => e.stopPropagation()}>
-                            <button
-                                onClick={() => setPreviewMovie(null)}
-                                className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
-                            >
-                                <X className="w-6 h-6" />
-                            </button>
-                            <video src={previewMovie.url} controls autoPlay className="w-full h-full object-contain bg-neutral-900 max-h-[80vh]" />
-                            <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-center gap-4">
+                {/* Movie Preview Modal */}
+                {
+                    previewMovie && (
+                        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setPreviewMovie(null)}>
+                            <div className="relative max-w-4xl max-h-[90vh] w-full rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 bg-black" onClick={e => e.stopPropagation()}>
                                 <button
-                                    onClick={() => onDownloadMovie(previewMovie.id)}
-                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
+                                    onClick={() => setPreviewMovie(null)}
+                                    className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
                                 >
-                                    <Download className="w-4 h-4" /> Download
+                                    <X className="w-6 h-6" />
                                 </button>
+                                <video src={previewMovie.url} controls autoPlay className="w-full h-full object-contain bg-neutral-900 max-h-[80vh]" />
+                                <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-center gap-4">
+                                    <button
+                                        onClick={() => onDownloadMovie(previewMovie.id)}
+                                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
+                                    >
+                                        <Download className="w-4 h-4" /> Download
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )
-            }
-        </>
-    );
+                    )
+                }
+            </>
+            );
 };
