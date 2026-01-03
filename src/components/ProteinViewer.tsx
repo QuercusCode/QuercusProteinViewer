@@ -1310,29 +1310,26 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     chainIdx++;
                 });
             } else if (currentColoring === 'charge') {
-                // CHARGE COLORING: Custom scheme with residue-level support for Cartoon/Ribbon
-                const chargeSchemeId = `charge_${Date.now()}`;
-
-                NGL.ColormakerRegistry.addScheme(function (this: any) {
-                    // Atom-level coloring
-                    this.atomColor = function (atom: any) {
-                        const resname = atom.resname;
-                        if (resname === 'ARG' || resname === 'LYS' || resname === 'HIS') return 0x0000FF;
-                        if (resname === 'ASP' || resname === 'GLU') return 0xFF0000;
-                        return 0xFFFFFF;
-                    };
-
-                    // Residue-level coloring (critical for Cartoon/Ribbon)
-                    this.residueColor = function (residue: any) {
-                        const resname = residue.resname;
-                        if (resname === 'ARG' || resname === 'LYS' || resname === 'HIS') return 0x0000FF;
-                        if (resname === 'ASP' || resname === 'GLU') return 0xFF0000;
-                        return 0xFFFFFF;
-                    };
-                }, chargeSchemeId);
-
+                // CHARGE COLORING: Using same proven pattern as chain coloring
+                // Positive residues - Blue
                 component.addRepresentation(repType, {
-                    colorScheme: chargeSchemeId
+                    color: 0x0000FF,
+                    sele: 'ARG or LYS or HIS',
+                    name: 'charge_positive'
+                });
+
+                // Negative residues - Red  
+                component.addRepresentation(repType, {
+                    color: 0xFF0000,
+                    sele: 'ASP or GLU',
+                    name: 'charge_negative'
+                });
+
+                // Neutral residues - White
+                component.addRepresentation(repType, {
+                    color: 0xFFFFFF,
+                    sele: 'not (ARG or LYS or HIS or ASP or GLU)',
+                    name: 'charge_neutral'
                 });
             } else {
                 // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL
