@@ -1275,84 +1275,82 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             if (currentColoring === 'structure') currentColoring = 'sstruc';
 
-            console.log("Applying Unified Coloring:", { currentColoring, repType, customColorsCount: customColors.length });
+            // --- STRATEGY: HYBRID ---
+            // 1. IF NO CUSTOM RULES: Use native NGL coloring (Performance + Reliability)
+            if (!customColors || customColors.length === 0) {
+                component.addRepresentation(repType, { color: currentColoring });
+            }
+            else {
+                // 2. IF CUSTOM RULES EXIST: Use Unified Custom Scheme (To prevent gaps)
+                console.log("Applying Unified Coloring (Custom Rules Active)", customColors.length);
 
-            // --- STRATEGY: UNIFIED COLOR MAP (PRE-CALCULATED) ---
-            // To ensure 100% robustness, we calculate the color for EVERY atom upfront and store it.
-            // This avoids any 'this' context issues or scope issues inside NGL's tight render loop.
+                const atomColormap = new Map<number, number>(); // Index -> Hex
 
-            const atomColormap = new Map<number, number>(); // Index -> Hex
+                // A. Base Colors for ALL atoms (Pre-calculation)
+                component.structure.eachAtom((atom: any) => {
+                    let color = 0xCCCCCC;
 
-            // 1. Calculate Base Colors for ALL atoms
-            component.structure.eachAtom((atom: any) => {
-                let color = 0xCCCCCC; // Default Grey
-
-                if (currentColoring === 'chainid') {
-                    // Robust chain cycling
-                    const chainIdx = typeof atom.chainIndex === 'number' ? atom.chainIndex : 0;
-                    const colors = [
-                        0x1f77b4, 0xff7f0e, 0x2ca02c, 0xd62728, 0x9467bd,
-                        0x8c564b, 0xe377c2, 0x7f7f7f, 0xbcbd22, 0x17becf
-                    ];
-                    // Fallback to hashing if chainIndex seems broken (e.g. all 0s for some files)
-                    // But usually chainIndex is reliable. Let's trust it but fallback if needed.
-                    if (chainIdx >= 0) {
-                        color = colors[chainIdx % colors.length];
-                    } else {
-                        // Name hash fallback
-                        const name = atom.chainname || 'A';
-                        const code = name.charCodeAt(0);
-                        color = colors[code % colors.length];
+                    if (currentColoring === 'chainid') {
+                        const chainIdx = typeof atom.chainIndex === 'number' ? atom.chainIndex : 0;
+                        const colors = [
+                            0x1f77b4, 0xff7f0e, 0x2ca02c, 0xd62728, 0x9467bd,
+                            0x8c564b, 0xe377c2, 0x7f7f7f, 0xbcbd22, 0x17becf
+                        ];
+                        if (chainIdx >= 0) {
+                            color = colors[chainIdx % colors.length];
+                        } else {
+                            const name = atom.chainname || 'A';
+                            const code = name.charCodeAt(0);
+                            color = colors[code % colors.length];
+                        }
                     }
-                }
-                else if (currentColoring === 'sstruc') {
-                    const s = atom.sstruc;
-                    if (s === 'h') color = 0xFF0080; // Magenta
-                    else if (s === 's') color = 0xFFC800; // Orange
-                    else if (s === 't') color = 0x6080FF; // Blue
-                    else color = 0xFFFFFF; // White
-                }
-                else if (currentColoring === 'charge') {
-                    const r = atom.resname;
-                    if (['ARG', 'LYS', 'HIS'].includes(r)) color = 0x0000FF;
-                    else if (['ASP', 'GLU'].includes(r)) color = 0xFF0000;
-                    else color = 0xCCCCCC;
-                }
-                else if (currentColoring === 'hydrophobicity') {
-                    const scale: Record<string, number> = {
-                        ILE: 4.5, VAL: 4.2, LEU: 3.8, PHE: 2.8, CYS: 2.5,
-                        MET: 1.9, ALA: 1.8, GLY: -0.4, THR: -0.7, SER: -0.8,
-                        TRP: -0.9, TYR: -1.3, PRO: -1.6, HIS: -3.2, GLU: -3.5,
-                        GLN: -3.5, ASP: -3.5, ASN: -3.5, LYS: -3.9, ARG: -4.5
-                    };
-                    const val = (scale[atom.resname] || 0) + 4.5;
-                    const norm = Math.max(0, Math.min(1, val / 9.0));
-                    color = new NGL.Color(getPaletteColor(norm, colorPalette)).getHex();
-                }
-                else if (currentColoring === 'bfactor') {
-                    color = new NGL.Color(getPaletteColor(Math.min(1, atom.bfactor / 100), colorPalette)).getHex();
-                }
-                else if (currentColoring === 'element') {
-                    const e = atom.element;
-                    if (e === 'C') color = 0x909090;
-                    else if (e === 'O') color = 0xFF0000;
-                    else if (e === 'N') color = 0x0000FF;
-                    else if (e === 'S') color = 0xFFFF00;
-                    else color = 0xDDDDDD;
-                }
-                else if (currentColoring === 'resname' || currentColoring === 'residue') {
-                    const safeRes = atom.resname || 'UNK';
-                    let hash = 0;
-                    for (let i = 0; i < safeRes.length; i++) hash = safeRes.charCodeAt(i) + ((hash << 5) - hash);
-                    const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
-                    color = parseInt("00000".substring(0, 6 - c.length) + c, 16);
-                }
+                    else if (currentColoring === 'sstruc') {
+                        const s = atom.sstruc;
+                        if (s === 'h') color = 0xFF0080;
+                        else if (s === 's') color = 0xFFC800;
+                        else if (s === 't') color = 0x6080FF;
+                        else color = 0xFFFFFF;
+                    }
+                    else if (currentColoring === 'charge') {
+                        const r = atom.resname;
+                        if (['ARG', 'LYS', 'HIS'].includes(r)) color = 0x0000FF;
+                        else if (['ASP', 'GLU'].includes(r)) color = 0xFF0000;
+                        else color = 0xCCCCCC;
+                    }
+                    else if (currentColoring === 'hydrophobicity') {
+                        const scale: Record<string, number> = {
+                            ILE: 4.5, VAL: 4.2, LEU: 3.8, PHE: 2.8, CYS: 2.5,
+                            MET: 1.9, ALA: 1.8, GLY: -0.4, THR: -0.7, SER: -0.8,
+                            TRP: -0.9, TYR: -1.3, PRO: -1.6, HIS: -3.2, GLU: -3.5,
+                            GLN: -3.5, ASP: -3.5, ASN: -3.5, LYS: -3.9, ARG: -4.5
+                        };
+                        const val = (scale[atom.resname] || 0) + 4.5;
+                        const norm = Math.max(0, Math.min(1, val / 9.0));
+                        color = new NGL.Color(getPaletteColor(norm, colorPalette)).getHex();
+                    }
+                    else if (currentColoring === 'bfactor') {
+                        color = new NGL.Color(getPaletteColor(Math.min(1, atom.bfactor / 100), colorPalette)).getHex();
+                    }
+                    else if (currentColoring === 'element') {
+                        const e = atom.element;
+                        if (e === 'C') color = 0x909090;
+                        else if (e === 'O') color = 0xFF0000;
+                        else if (e === 'N') color = 0x0000FF;
+                        else if (e === 'S') color = 0xFFFF00;
+                        else color = 0xDDDDDD;
+                    }
+                    else if (currentColoring === 'resname' || currentColoring === 'residue') {
+                        const safeRes = atom.resname || 'UNK';
+                        let hash = 0;
+                        for (let i = 0; i < safeRes.length; i++) hash = safeRes.charCodeAt(i) + ((hash << 5) - hash);
+                        const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
+                        color = parseInt("00000".substring(0, 6 - c.length) + c, 16);
+                    }
 
-                atomColormap.set(atom.index, color);
-            });
+                    atomColormap.set(atom.index, color);
+                });
 
-            // 2. Apply Custom Overrides ON TOP
-            if (customColors?.length > 0) {
+                // B. Apply Custom Overrides
                 customColors.forEach(rule => {
                     if (rule.color && rule.target) {
                         try {
@@ -1364,19 +1362,19 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         } catch (e) { }
                     }
                 });
+
+                // C. Register & Apply Scheme
+                const unifiedSchemeId = `unified_${Date.now()}_${Math.random()}`;
+                NGL.ColormakerRegistry.addScheme(function (this: any) {
+                    this.atomColor = function (atom: any) {
+                        const c = atomColormap.get(atom.index);
+                        // Fix 0x000000 bug: Check undefined
+                        return c !== undefined ? c : 0xCCCCCC;
+                    };
+                }, unifiedSchemeId);
+
+                component.addRepresentation(repType, { color: unifiedSchemeId });
             }
-
-            // 3. Register Simple Lookup Scheme
-            const unifiedSchemeId = `unified_${Date.now()}_${Math.random()}`;
-            NGL.ColormakerRegistry.addScheme(function (this: any) {
-                this.atomColor = function (atom: any) {
-                    // Direct lookup - Extremely fast and safe
-                    return atomColormap.get(atom.index) || 0xCCCCCC;
-                };
-            }, unifiedSchemeId);
-
-            // 4. Apply
-            component.addRepresentation(repType, { color: unifiedSchemeId });
 
             // --- OVERLAYS ---
             const tryApply = (r: string, c: string, sele: string, params: any = {}) => {
