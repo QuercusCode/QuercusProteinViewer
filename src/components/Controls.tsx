@@ -23,7 +23,7 @@ import {
     Loader2,
     ImageIcon,
     Grid3X3,
-    Bot,
+    // Bot,
     BookOpen
 } from 'lucide-react';
 import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette } from '../types';
@@ -49,8 +49,8 @@ interface ControlsProps {
     setIsLightMode: (mode: boolean) => void;
     highlightedResidue: { chain: string; resNo: number; resName?: string } | null;
     onResidueClick: (chain: string, resNo: number, resName?: string) => void;
-    onToggleAISidebar: () => void;
-    isAISidebarOpen: boolean;
+    // onToggleAISidebar: () => void;
+    // isAISidebarOpen: boolean;
     onToggleLibrary: () => void;
     showSurface: boolean;
     setShowSurface: (show: boolean) => void;
@@ -127,8 +127,8 @@ export const Controls: React.FC<ControlsProps> = ({
     setColorPalette,
     isDyslexicFont,
     setIsDyslexicFont,
-    onToggleAISidebar,
-    isAISidebarOpen,
+    // onToggleAISidebar,
+    // isAISidebarOpen,
     onToggleLibrary
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);

@@ -587,8 +587,8 @@ function App() {
         onToggleContactMap={() => setShowContactMap(true)}
         isDyslexicFont={isDyslexicFont}
         setIsDyslexicFont={setIsDyslexicFont}
-        onToggleAISidebar={() => setIsAISidebarOpen(prev => !prev)}
-        isAISidebarOpen={isAISidebarOpen}
+        // onToggleAISidebar={() => setIsAISidebarOpen(prev => !prev)}
+        // isAISidebarOpen={isAISidebarOpen}
         onToggleLibrary={() => setIsLibraryOpen(true)}
       />
 
