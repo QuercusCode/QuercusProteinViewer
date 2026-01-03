@@ -651,6 +651,9 @@ export const Controls: React.FC<ControlsProps> = ({
                                 {chains.length === 0 ? <p className={`italic text-[10px] ${subtleText}`}>No sequence data</p> : (
                                     chains.filter(c => viewSequenceChain ? c.name === viewSequenceChain : true).map(c => (
                                         <div key={c.name} className="mb-2">
+                                            <div className={`text-[9px] font-bold uppercase tracking-wider mb-1 opacity-70 sticky top-0 ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-800'}`}>
+                                                Chain {c.name}
+                                            </div>
                                             <div className="flex flex-wrap text-[10px] font-mono leading-none break-all">
                                                 {c.sequence.split('').map((char, idx) => {
                                                     const resNo = c.min + idx;
