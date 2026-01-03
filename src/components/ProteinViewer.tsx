@@ -1310,11 +1310,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     chainIdx++;
                 });
             } else if (currentColoring === 'charge') {
-                // CHARGE COLORING: Proper NGL ColorMaker scheme
-                // This works for ALL representation types including Cartoon and Ribbon
-                const chargeSchemeId = "charge_scheme";
+                // CHARGE COLORING: Use unique timestamped ID to avoid conflicts
+                const chargeSchemeId = `charge_${Date.now()}`;
 
-                // Define the color scheme using NGL's ColorMaker API
+                // Define the color scheme
                 NGL.ColormakerRegistry.addScheme(function (this: any) {
                     this.atomColor = (atom: any) => {
                         const resname = atom.resname;
