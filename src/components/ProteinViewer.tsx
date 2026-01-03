@@ -1312,26 +1312,27 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             } else if (currentColoring === 'charge') {
                 // IMPROVEMENT: MANUAL CHARGE COLORING
-                // NGL doesn't have a reliable 'charge' scheme, so we build it manually using selections.
+                // Use robust 'resname' syntax for lists
 
                 // 1. Positive (Basic) -> Blue
                 component.addRepresentation(repType, {
                     color: 0x0000FF, // Blue
-                    sele: "ARG or LYS or HIS",
+                    sele: "resname ARG LYS HIS",
                     name: "charge_pos"
                 });
 
                 // 2. Negative (Acidic) -> Red
                 component.addRepresentation(repType, {
                     color: 0xFF0000, // Red
-                    sele: "ASP or GLU",
+                    sele: "resname ASP GLU",
                     name: "charge_neg"
                 });
 
                 // 3. Neutral -> White (base)
+                // Use 'not resname ...' to handle the inverse safely
                 component.addRepresentation(repType, {
                     color: 0xFFFFFF, // White
-                    sele: "not (ARG or LYS or HIS or ASP or GLU)",
+                    sele: "not resname ARG LYS HIS ASP GLU",
                     name: "charge_neu"
                 });
 
