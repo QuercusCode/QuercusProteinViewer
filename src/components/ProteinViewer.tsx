@@ -1309,6 +1309,32 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     });
                     chainIdx++;
                 });
+
+            } else if (currentColoring === 'charge') {
+                // IMPROVEMENT: MANUAL CHARGE COLORING
+                // NGL doesn't have a reliable 'charge' scheme, so we build it manually using selections.
+
+                // 1. Positive (Basic) -> Blue
+                component.addRepresentation(repType, {
+                    color: 0x0000FF, // Blue
+                    sele: "ARG or LYS or HIS",
+                    name: "charge_pos"
+                });
+
+                // 2. Negative (Acidic) -> Red
+                component.addRepresentation(repType, {
+                    color: 0xFF0000, // Red
+                    sele: "ASP or GLU",
+                    name: "charge_neg"
+                });
+
+                // 3. Neutral -> White (base)
+                component.addRepresentation(repType, {
+                    color: 0xFFFFFF, // White
+                    sele: "not (ARG or LYS or HIS or ASP or GLU)",
+                    name: "charge_neu"
+                });
+
             } else {
                 // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL
                 component.addRepresentation(repType, {
