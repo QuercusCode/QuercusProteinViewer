@@ -1276,6 +1276,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             if (currentColoring === 'structure') currentColoring = 'sstruc';
 
+            console.log("Applying Unified Coloring:", { currentColoring, repType, customColorsCount: customColors.length });
+
             // --- STRATEGY: UNIFIED CUSTOM SCHEME ---
             // To prevent gaps in the 3D mesh, we must use a SINGLE representation.
             // We create a custom NGL Color Scheme that handles BOTH custom overrides and result fallback.
@@ -1287,7 +1289,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     if (rule.color && rule.target) {
                         try {
                             const sel = new NGL.Selection(rule.target);
-                            // NGL Selection doesn't track changes if structure changes, but structure is static here
                             const colorHex = new NGL.Color(rule.color).getHex();
 
                             component.structure.eachAtom((atom: any) => {
@@ -1312,15 +1313,27 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     }
 
                     // B. FALLBACK: Base Coloring Modes
-                    // We must replicate the logic for the supported modes since we are in a custom scheme
 
                     if (currentColoring === 'chainid') {
-                        // High Contrast D3 palette
+                        // ROBUST FALLBACK: Use chainname hash if chainIndex fails/is weird
+                        // NGL atom.chainIndex usually works, but if white, something is wrong.
+                        // Let's use a safe modulo on the index first, but verify availability.
+
+                        if (typeof atom.chainIndex === 'number') {
+                            const colors = [
+                                0x1f77b4, 0xff7f0e, 0x2ca02c, 0xd62728, 0x9467bd,
+                                0x8c564b, 0xe377c2, 0x7f7f7f, 0xbcbd22, 0x17becf
+                            ];
+                            return colors[atom.chainIndex % colors.length];
+                        }
+
+                        // Fallback to name hashing if index missing
+                        const name = atom.chainname || 'A';
+                        const code = name.charCodeAt(0);
                         const colors = [
                             0x1f77b4, 0xff7f0e, 0x2ca02c, 0xd62728, 0x9467bd,
-                            0x8c564b, 0xe377c2, 0x7f7f7f, 0xbcbd22, 0x17becf
                         ];
-                        return colors[atom.chainIndex % colors.length];
+                        return colors[code % colors.length];
                     }
 
                     else if (currentColoring === 'sstruc') {
@@ -1328,9 +1341,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         const s = atom.sstruc;
                         if (s === 'h') return 0xFF0080; // Magenta (Helix)
                         if (s === 's') return 0xFFC800; // Yellow/Orange (Sheet)
-                        if (s === 't') return 0x6080FF; // Turn (Light Blue - often nice to distinguish)
-                        // ' ' (Coil) or others
-                        return 0xFFFFFF; // White
+                        if (s === 't') return 0x6080FF; // Turn
+                        return 0xFFFFFF; // White (Coil)
                     }
 
                     else if (currentColoring === 'charge') {
@@ -1357,7 +1369,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     }
 
                     else if (currentColoring === 'element') {
-                        // Simple CPK-like fallback
                         const e = atom.element;
                         if (e === 'C') return 0x909090;
                         if (e === 'O') return 0xFF0000;
