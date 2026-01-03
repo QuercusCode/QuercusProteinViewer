@@ -492,6 +492,19 @@ export const Controls: React.FC<ControlsProps> = ({
                                         <option value="cividis">Cividis</option>
                                     </select>
                                 </div>
+                                <p className={`text-[9px] mt-1.5 opacity-70 leading-relaxed ${subtleText}`}>
+                                    {({
+                                        chainid: "Distinct colors for each chain.",
+                                        resname: "Standard amino acid colors (RasMol).",
+                                        residue: "Standard amino acid colors.",
+                                        structure: "Helices (Magenta), Sheets (Yellow), Loops (White).",
+                                        hydrophobicity: "Blue (Hydrophilic) → Red (Hydrophobic).",
+                                        bfactor: "Blue (Stable) → Red (Flexible/Mobile).",
+                                        charge: "Blue (Positive) → Red (Negative).",
+                                        secondary: "Secondary structure delineation.",
+                                        residueindex: "Rainbow gradient by residue position."
+                                    } as Record<string, string>)[coloring]}
+                                </p>
                             </div>
 
                             {/* Custom Rules */}
@@ -528,7 +541,13 @@ export const Controls: React.FC<ControlsProps> = ({
                                             <input
                                                 type="text"
                                                 value={residueRange}
-                                                onChange={(e) => setResidueRange(e.target.value)}
+                                                onChange={(e) => {
+                                                    const val = e.target.value;
+                                                    // Allow numbers, hyphens, and commas only
+                                                    if (/^[0-9,\-]*$/.test(val)) {
+                                                        setResidueRange(val);
+                                                    }
+                                                }}
                                                 placeholder="e.g. 10-20"
                                                 className={`flex-1 min-w-0 bg-transparent border-b ${isLightMode ? 'border-neutral-300' : 'border-neutral-700'} text-xs px-1 py-1 outline-none`}
                                             />
