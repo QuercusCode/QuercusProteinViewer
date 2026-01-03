@@ -1311,34 +1311,28 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 });
 
             } else if (currentColoring === 'charge') {
-                // IMPROVEMENT: MANUAL CHARGE COLORING (CUSTOM SCHEME STRATEGY)
-                // Selections proved to be fragile with "not" logic.
-                // We use a custom scheme to check resname directly in JS.
-                const chargeSchemeId = `charge_manual_${Date.now()}`;
-
-                NGL.ColormakerRegistry.addScheme(function (this: any) {
-                    this.atomColor = function (atom: any) {
-                        const r = atom.resname;
-                        if (r === 'ARG' || r === 'LYS' || r === 'HIS') return 0x0000FF; // Blue
-                        if (r === 'ASP' || r === 'GLU') return 0xFF0000; // Red
-                        return 0xFFFFFF; // White
-                    };
-                }, chargeSchemeId);
-
-                // IMPROVEMENT: MANUAL CHARGE COLORING (NATIVE SELECTION SCHEME)
-                // Single Representation + Selection Scheme = Continuous Backbone + Correct Colors.
-                const chargeSchemeId_Active = `charge_fixed_${Date.now()}`;
-
-                NGL.ColormakerRegistry.addSelectionScheme(chargeSchemeId_Active, [
-                    ["blue", "resname ARG LYS HIS"],
-                    ["red", "resname ASP GLU"],
-                    ["white", "*"]
-                ]);
-
+                // IMPROVEMENT: MANUAL CHARGE COLORING (BASE + SCALED OVERLAY STRATEGY)
+                // 1. Base Layer: ALL ATOMS -> White (Neutral) - Ensures continuous backbone
                 component.addRepresentation(repType, {
-                    color: chargeSchemeId_Active
+                    color: 0xFFFFFF,
+                    name: "charge_base_neu"
                 });
 
+                // 2. Overlay: Positive -> Blue (Scaled up to prevent occlusion/z-fighting)
+                component.addRepresentation(repType, {
+                    color: 0x0000FF,
+                    sele: "ARG or LYS or HIS",
+                    name: "charge_pos",
+                    scale: 1.05
+                });
+
+                // 3. Overlay: Negative -> Red (Scaled up)
+                component.addRepresentation(repType, {
+                    color: 0xFF0000,
+                    sele: "ASP or GLU",
+                    name: "charge_neg",
+                    scale: 1.05
+                });
             } else {
                 // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL
                 component.addRepresentation(repType, {
