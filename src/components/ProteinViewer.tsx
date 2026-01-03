@@ -1328,7 +1328,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 }, chargeSchemeId);
 
                 component.addRepresentation(repType, {
-                    color: chargeSchemeId
+                    colorScheme: chargeSchemeId
                 });
             } else {
                 // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL
