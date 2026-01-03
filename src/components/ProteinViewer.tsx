@@ -1282,9 +1282,39 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             // --- STRATEGY: MULTI-REPRESENTATION OVERLAY (RESTORED RESTORED) ---
             // The "Unified Scheme" was too fragile. We revert to the robust standard NGL approach.
+
+            let finalColoring = currentColoring;
+
+            // 1. IMPROVEMENT: HIGH CONTRAST CHAIN COLORING
+            if (currentColoring === 'chainid') {
+                const schemeId = "high_contrast_chain";
+                const highContrastColors = [
+                    0xFF0000, // Red
+                    0x0000FF, // Blue
+                    0x00CC00, // Green (slightly darker for visibility)
+                    0xFFD700, // Gold/Yellow
+                    0xFF00FF, // Magenta
+                    0x00FFFF, // Cyan
+                    0xFF8C00, // Dark Orange
+                    0x8A2BE2, // BlueViolet
+                    0xA52A2A, // Brown
+                    0x7FFF00, // Chartreuse
+                ];
+
+                // Register simplistic scheme that uses chainIndex
+                NGL.ColormakerRegistry.addScheme(function (this: any) {
+                    this.atomColor = function (atom: any) {
+                        const idx = typeof atom.chainIndex === 'number' ? atom.chainIndex : 0;
+                        return highContrastColors[idx % highContrastColors.length];
+                    };
+                }, schemeId);
+
+                finalColoring = schemeId;
+            }
+
             // 1. Add Base Representation
             component.addRepresentation(repType, {
-                color: currentColoring,
+                color: finalColoring,
                 // To minimize Z-fighting, we could try to subtract custom selections, but 
                 // for robust "it just works" behavior, we just add the base.
                 // If the user wants to hide the base, they can set base opacity maybe? 
