@@ -1310,21 +1310,25 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     chainIdx++;
                 });
             } else if (currentColoring === 'charge') {
-                // IMPROVEMENT: MANUAL CHARGE COLORING (SAFE SELECTION SCHEME)
-                // Rules are processed in order. First match wins.
-                // 1. Blue (Pos)
-                // 2. Red (Neg)
-                // 3. White (Base/Catch-all)
-                const chargeSchemeId = "charge_coloring_fixed";
-
-                NGL.ColormakerRegistry.addSelectionScheme(chargeSchemeId, [
-                    ["blue", "ARG or LYS or HIS"],
-                    ["red", "ASP or GLU"],
-                    ["white", "*"]
-                ]);
-
+                // CHARGE COLORING: Multi-representation approach
+                // Base layer (white) ensures continuous structure
                 component.addRepresentation(repType, {
-                    color: chargeSchemeId
+                    color: 0xFFFFFF,
+                    name: "charge_base"
+                });
+
+                // Overlay: Positive residues (blue)
+                component.addRepresentation(repType, {
+                    color: 0x0000FF,
+                    sele: "ARG or LYS or HIS",
+                    name: "charge_positive"
+                });
+
+                // Overlay: Negative residues (red)
+                component.addRepresentation(repType, {
+                    color: 0xFF0000,
+                    sele: "ASP or GLU",
+                    name: "charge_negative"
                 });
             } else {
                 // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL
