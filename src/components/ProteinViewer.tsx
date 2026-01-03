@@ -1287,29 +1287,34 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             // 1. IMPROVEMENT: HIGH CONTRAST CHAIN COLORING
             if (currentColoring === 'chainid') {
-                const schemeId = "high_contrast_chain";
+                const uniqueId = `high_contrast_chain_${Date.now()}`;
                 const highContrastColors = [
                     0xFF0000, // Red
                     0x0000FF, // Blue
-                    0x00CC00, // Green (slightly darker for visibility)
-                    0xFFD700, // Gold/Yellow
+                    0x00CC00, // Green 
+                    0xFFD700, // Gold
                     0xFF00FF, // Magenta
                     0x00FFFF, // Cyan
-                    0xFF8C00, // Dark Orange
-                    0x8A2BE2, // BlueViolet
+                    0xFF8C00, // Orange
+                    0x8A2BE2, // Purple
                     0xA52A2A, // Brown
                     0x7FFF00, // Chartreuse
                 ];
 
-                // Register simplistic scheme that uses chainIndex
                 NGL.ColormakerRegistry.addScheme(function (this: any) {
                     this.atomColor = function (atom: any) {
-                        const idx = typeof atom.chainIndex === 'number' ? atom.chainIndex : 0;
-                        return highContrastColors[idx % highContrastColors.length];
+                        // ROBUST: Use chainname hashing instead of index
+                        // (Indices proved unreliable for this user's PDBs)
+                        const name = atom.chainname || 'A';
+                        let code = 0;
+                        for (let i = 0; i < name.length; i++) {
+                            code += name.charCodeAt(i);
+                        }
+                        return highContrastColors[code % highContrastColors.length];
                     };
-                }, schemeId);
+                }, uniqueId);
 
-                finalColoring = schemeId;
+                finalColoring = uniqueId;
             }
 
             // 1. Add Base Representation
