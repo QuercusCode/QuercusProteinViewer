@@ -1313,17 +1313,20 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 // CHARGE COLORING: Use unique timestamped ID to avoid conflicts
                 const chargeSchemeId = `charge_${Date.now()}`;
 
-                // Define the color scheme
+                // Define the color scheme using proper NGL ColorMaker structure
                 NGL.ColormakerRegistry.addScheme(function (this: any) {
-                    this.atomColor = (atom: any) => {
-                        const resname = atom.residue?.resname || atom.resname;
+                    this.atomColor = function (atom: any) {
+                        const resname = atom.resname;
+                        // Positive residues - Blue
                         if (resname === 'ARG' || resname === 'LYS' || resname === 'HIS') {
-                            return 0x0000FF; // Blue for positive
-                        } else if (resname === 'ASP' || resname === 'GLU') {
-                            return 0xFF0000; // Red for negative
-                        } else {
-                            return 0xFFFFFF; // White for neutral
+                            return 0x0000FF;
                         }
+                        // Negative residues - Red
+                        if (resname === 'ASP' || resname === 'GLU') {
+                            return 0xFF0000;
+                        }
+                        // Neutral residues - White
+                        return 0xFFFFFF;
                     };
                 }, chargeSchemeId);
 
