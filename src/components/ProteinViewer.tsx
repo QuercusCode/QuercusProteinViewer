@@ -1269,7 +1269,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             // Handle special 1crn case
             if (coloring === 'chainid' && pdbId && pdbId.toLowerCase().includes('1crn')) {
-                // Legacy: Since we removed element, fallback to chainid or residue
                 currentColoring = 'residue';
                 repType = 'licorice';
             }
@@ -1278,119 +1277,105 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             console.log("Applying Unified Coloring:", { currentColoring, repType, customColorsCount: customColors.length });
 
-            // --- STRATEGY: UNIFIED CUSTOM SCHEME ---
-            // To prevent gaps in the 3D mesh, we must use a SINGLE representation.
-            // We create a custom NGL Color Scheme that handles BOTH custom overrides and result fallback.
+            // --- STRATEGY: UNIFIED COLOR MAP (PRE-CALCULATED) ---
+            // To ensure 100% robustness, we calculate the color for EVERY atom upfront and store it.
+            // This avoids any 'this' context issues or scope issues inside NGL's tight render loop.
 
-            // 1. Pre-calculate Atom Map for Custom Colors (Performance optimization)
-            const atomColorMap = new Map<number, number>(); // AtomIndex -> HexColor
+            const atomColormap = new Map<number, number>(); // Index -> Hex
+
+            // 1. Calculate Base Colors for ALL atoms
+            component.structure.eachAtom((atom: any) => {
+                let color = 0xCCCCCC; // Default Grey
+
+                if (currentColoring === 'chainid') {
+                    // Robust chain cycling
+                    const chainIdx = typeof atom.chainIndex === 'number' ? atom.chainIndex : 0;
+                    const colors = [
+                        0x1f77b4, 0xff7f0e, 0x2ca02c, 0xd62728, 0x9467bd,
+                        0x8c564b, 0xe377c2, 0x7f7f7f, 0xbcbd22, 0x17becf
+                    ];
+                    // Fallback to hashing if chainIndex seems broken (e.g. all 0s for some files)
+                    // But usually chainIndex is reliable. Let's trust it but fallback if needed.
+                    if (chainIdx >= 0) {
+                        color = colors[chainIdx % colors.length];
+                    } else {
+                        // Name hash fallback
+                        const name = atom.chainname || 'A';
+                        const code = name.charCodeAt(0);
+                        color = colors[code % colors.length];
+                    }
+                }
+                else if (currentColoring === 'sstruc') {
+                    const s = atom.sstruc;
+                    if (s === 'h') color = 0xFF0080; // Magenta
+                    else if (s === 's') color = 0xFFC800; // Orange
+                    else if (s === 't') color = 0x6080FF; // Blue
+                    else color = 0xFFFFFF; // White
+                }
+                else if (currentColoring === 'charge') {
+                    const r = atom.resname;
+                    if (['ARG', 'LYS', 'HIS'].includes(r)) color = 0x0000FF;
+                    else if (['ASP', 'GLU'].includes(r)) color = 0xFF0000;
+                    else color = 0xCCCCCC;
+                }
+                else if (currentColoring === 'hydrophobicity') {
+                    const scale: Record<string, number> = {
+                        ILE: 4.5, VAL: 4.2, LEU: 3.8, PHE: 2.8, CYS: 2.5,
+                        MET: 1.9, ALA: 1.8, GLY: -0.4, THR: -0.7, SER: -0.8,
+                        TRP: -0.9, TYR: -1.3, PRO: -1.6, HIS: -3.2, GLU: -3.5,
+                        GLN: -3.5, ASP: -3.5, ASN: -3.5, LYS: -3.9, ARG: -4.5
+                    };
+                    const val = (scale[atom.resname] || 0) + 4.5;
+                    const norm = Math.max(0, Math.min(1, val / 9.0));
+                    color = new NGL.Color(getPaletteColor(norm, colorPalette)).getHex();
+                }
+                else if (currentColoring === 'bfactor') {
+                    color = new NGL.Color(getPaletteColor(Math.min(1, atom.bfactor / 100), colorPalette)).getHex();
+                }
+                else if (currentColoring === 'element') {
+                    const e = atom.element;
+                    if (e === 'C') color = 0x909090;
+                    else if (e === 'O') color = 0xFF0000;
+                    else if (e === 'N') color = 0x0000FF;
+                    else if (e === 'S') color = 0xFFFF00;
+                    else color = 0xDDDDDD;
+                }
+                else if (currentColoring === 'resname' || currentColoring === 'residue') {
+                    const safeRes = atom.resname || 'UNK';
+                    let hash = 0;
+                    for (let i = 0; i < safeRes.length; i++) hash = safeRes.charCodeAt(i) + ((hash << 5) - hash);
+                    const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
+                    color = parseInt("00000".substring(0, 6 - c.length) + c, 16);
+                }
+
+                atomColormap.set(atom.index, color);
+            });
+
+            // 2. Apply Custom Overrides ON TOP
             if (customColors?.length > 0) {
                 customColors.forEach(rule => {
                     if (rule.color && rule.target) {
                         try {
                             const sel = new NGL.Selection(rule.target);
                             const colorHex = new NGL.Color(rule.color).getHex();
-
                             component.structure.eachAtom((atom: any) => {
-                                atomColorMap.set(atom.index, colorHex);
+                                atomColormap.set(atom.index, colorHex);
                             }, sel);
-                        } catch (e) {
-                            console.warn("Invalid selection for rule:", rule);
-                        }
+                        } catch (e) { }
                     }
                 });
             }
 
-            // 2. Define the Unified Scheme
-            // We use a unique ID each time to force NGL to refresh
+            // 3. Register Simple Lookup Scheme
             const unifiedSchemeId = `unified_${Date.now()}_${Math.random()}`;
-
             NGL.ColormakerRegistry.addScheme(function (this: any) {
                 this.atomColor = function (atom: any) {
-                    // A. PRIORITY: Custom Overrides (Map Lookup O(1))
-                    if (atomColorMap.has(atom.index)) {
-                        return atomColorMap.get(atom.index);
-                    }
-
-                    // B. FALLBACK: Base Coloring Modes
-
-                    if (currentColoring === 'chainid') {
-                        // ROBUST FALLBACK: Use chainname hash if chainIndex fails/is weird
-                        // NGL atom.chainIndex usually works, but if white, something is wrong.
-                        // Let's use a safe modulo on the index first, but verify availability.
-
-                        if (typeof atom.chainIndex === 'number') {
-                            const colors = [
-                                0x1f77b4, 0xff7f0e, 0x2ca02c, 0xd62728, 0x9467bd,
-                                0x8c564b, 0xe377c2, 0x7f7f7f, 0xbcbd22, 0x17becf
-                            ];
-                            return colors[atom.chainIndex % colors.length];
-                        }
-
-                        // Fallback to name hashing if index missing
-                        const name = atom.chainname || 'A';
-                        const code = name.charCodeAt(0);
-                        const colors = [
-                            0x1f77b4, 0xff7f0e, 0x2ca02c, 0xd62728, 0x9467bd,
-                        ];
-                        return colors[code % colors.length];
-                    }
-
-                    else if (currentColoring === 'sstruc') {
-                        // Standard Secondary Structure Colors
-                        const s = atom.sstruc;
-                        if (s === 'h') return 0xFF0080; // Magenta (Helix)
-                        if (s === 's') return 0xFFC800; // Yellow/Orange (Sheet)
-                        if (s === 't') return 0x6080FF; // Turn
-                        return 0xFFFFFF; // White (Coil)
-                    }
-
-                    else if (currentColoring === 'charge') {
-                        const r = atom.resname;
-                        if (['ARG', 'LYS', 'HIS'].includes(r)) return 0x0000FF; // Blue (+)
-                        if (['ASP', 'GLU'].includes(r)) return 0xFF0000; // Red (-)
-                        return 0xCCCCCC; // Grey (Neutral)
-                    }
-
-                    else if (currentColoring === 'hydrophobicity') {
-                        const scale: Record<string, number> = {
-                            ILE: 4.5, VAL: 4.2, LEU: 3.8, PHE: 2.8, CYS: 2.5,
-                            MET: 1.9, ALA: 1.8, GLY: -0.4, THR: -0.7, SER: -0.8,
-                            TRP: -0.9, TYR: -1.3, PRO: -1.6, HIS: -3.2, GLU: -3.5,
-                            GLN: -3.5, ASP: -3.5, ASN: -3.5, LYS: -3.9, ARG: -4.5
-                        };
-                        const val = (scale[atom.resname] || 0) + 4.5; // Shift to 0..9
-                        const norm = Math.max(0, Math.min(1, val / 9.0));
-                        return new NGL.Color(getPaletteColor(norm, colorPalette)).getHex();
-                    }
-
-                    else if (currentColoring === 'bfactor') {
-                        return new NGL.Color(getPaletteColor(Math.min(1, atom.bfactor / 100), colorPalette)).getHex();
-                    }
-
-                    else if (currentColoring === 'element') {
-                        const e = atom.element;
-                        if (e === 'C') return 0x909090;
-                        if (e === 'O') return 0xFF0000;
-                        if (e === 'N') return 0x0000FF;
-                        if (e === 'S') return 0xFFFF00;
-                        return 0xDDDDDD;
-                    }
-
-                    else if (currentColoring === 'resname' || currentColoring === 'residue') {
-                        const safeRes = atom.resname || 'UNK';
-                        let hash = 0;
-                        for (let i = 0; i < safeRes.length; i++) hash = safeRes.charCodeAt(i) + ((hash << 5) - hash);
-                        const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
-                        return parseInt("00000".substring(0, 6 - c.length) + c, 16);
-                    }
-
-                    // Default Fallback
-                    return 0xCCCCCC;
+                    // Direct lookup - Extremely fast and safe
+                    return atomColormap.get(atom.index) || 0xCCCCCC;
                 };
             }, unifiedSchemeId);
 
-            // 3. Apply Single Representation
+            // 4. Apply
             component.addRepresentation(repType, { color: unifiedSchemeId });
 
             // --- OVERLAYS ---
