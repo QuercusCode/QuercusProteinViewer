@@ -32,7 +32,7 @@ import {
 import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette } from '../types';
 
 // Reusable Sidebar Section Component - Defined outside to prevent re-renders losing focus
-const SidebarSection = ({ title, id, icon: Icon, children, isOpen, onToggle }: { title: string, id: string, icon: any, children: React.ReactNode, isOpen: boolean, onToggle: () => void }) => (
+const SidebarSection = ({ title, icon: Icon, children, isOpen, onToggle }: { title: string, icon: any, children: React.ReactNode, isOpen: boolean, onToggle: () => void }) => (
     <div className="border border-white/10 rounded-xl overflow-hidden bg-black/20">
         <button
             onClick={onToggle}
@@ -430,7 +430,6 @@ export const Controls: React.FC<ControlsProps> = ({
                     {/* ACCORDION 1: APPEARANCE */}
                     <SidebarSection
                         title="Appearance"
-                        id="appearance"
                         icon={Eye}
                         isOpen={openSections['appearance']}
                         onToggle={() => toggleSection('appearance')}
@@ -621,7 +620,6 @@ export const Controls: React.FC<ControlsProps> = ({
                     {/* ACCORDION 2: ANALYSIS */}
                     <SidebarSection
                         title="Analysis"
-                        id="analysis"
                         icon={Activity}
                         isOpen={openSections['analysis']}
                         onToggle={() => toggleSection('analysis')}
@@ -733,7 +731,6 @@ export const Controls: React.FC<ControlsProps> = ({
                     {/* ACCORDION 3: TOOLS */}
                     <SidebarSection
                         title="Tools"
-                        id="tools"
                         icon={Wrench}
                         isOpen={openSections['tools']}
                         onToggle={() => toggleSection('tools')}
