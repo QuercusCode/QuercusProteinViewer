@@ -1310,25 +1310,26 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     chainIdx++;
                 });
             } else if (currentColoring === 'charge') {
-                // CHARGE COLORING: Multi-representation approach
-                // Base layer (white) ensures continuous structure
-                component.addRepresentation(repType, {
-                    color: 0xFFFFFF,
-                    name: "charge_base"
-                });
+                // CHARGE COLORING: Proper NGL ColorMaker scheme
+                // This works for ALL representation types including Cartoon and Ribbon
+                const chargeSchemeId = "charge_scheme";
 
-                // Overlay: Positive residues (blue)
-                component.addRepresentation(repType, {
-                    color: 0x0000FF,
-                    sele: "ARG or LYS or HIS",
-                    name: "charge_positive"
-                });
+                // Define the color scheme using NGL's ColorMaker API
+                NGL.ColormakerRegistry.addScheme(function (this: any) {
+                    this.atomColor = (atom: any) => {
+                        const resname = atom.resname;
+                        if (resname === 'ARG' || resname === 'LYS' || resname === 'HIS') {
+                            return 0x0000FF; // Blue for positive
+                        } else if (resname === 'ASP' || resname === 'GLU') {
+                            return 0xFF0000; // Red for negative
+                        } else {
+                            return 0xFFFFFF; // White for neutral
+                        }
+                    };
+                }, chargeSchemeId);
 
-                // Overlay: Negative residues (red)
                 component.addRepresentation(repType, {
-                    color: 0xFF0000,
-                    sele: "ASP or GLU",
-                    name: "charge_negative"
+                    color: chargeSchemeId
                 });
             } else {
                 // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL
