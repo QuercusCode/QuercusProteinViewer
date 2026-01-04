@@ -704,6 +704,170 @@ const addTableOfContents = (doc: jsPDF, sections: { title: string; page: number 
     });
 };
 
+// Helper: Add Methodology Section
+const addMethodology = (doc: jsPDF) => {
+    doc.addPage();
+
+    const margin = 20;
+    let y = 30;
+
+    // Title
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.setTextColor(0);
+    doc.text("Methodology", margin, y);
+    y += 12;
+
+    // Underline
+    doc.setDrawColor(200);
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, 190, y);
+    y += 10;
+
+    // Section 1: Distance Calculations
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(30);
+    doc.text("Distance Calculations", margin, y);
+    y += 8;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(50);
+
+    const text1 = doc.splitTextToSize(
+        "All inter-residue distances are calculated using the Euclidean distance between Cα atoms " +
+        "(alpha carbons) of each residue. The distance matrix is computed for all pairwise residue " +
+        "combinations using the formula:",
+        170
+    );
+    doc.text(text1, margin, y);
+    y += text1.length * 5 + 5;
+
+    // Formula box
+    doc.setFillColor(248, 250, 252);
+    doc.setDrawColor(200);
+    doc.roundedRect(margin + 10, y, 150, 12, 2, 2, 'FD');
+    doc.setFont("courier", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(0);
+    doc.text("d = sqrt[(x2-x1)^2 + (y2-y1)^2 + (z2-z1)^2]", margin + 25, y + 8);
+    y += 18;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(50);
+    const text2 = doc.splitTextToSize(
+        "where (x1, y1, z1) and (x2, y2, z2) are the coordinates of the two Cα atoms.",
+        170
+    );
+    doc.text(text2, margin, y);
+    y += text2.length * 5 + 8;
+
+    // Section 2: Cutoff Thresholds
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(30);
+    doc.text("Cutoff Thresholds", margin, y);
+    y += 8;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(50);
+
+    const thresholds = [
+        { range: "< 5.0 A", label: "Close Contact", desc: "Direct interaction range" },
+        { range: "5.0 - 8.0 A", label: "Proximal Contact", desc: "Near-range interactions" },
+        { range: "> 8.0 A", label: "Distant", desc: "Not analyzed (filtered out)" }
+    ];
+
+    thresholds.forEach((t) => {
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.setTextColor(0);
+        doc.text(`${t.range}:`, margin + 5, y);
+
+        doc.setFont("helvetica", "normal");
+        doc.text(`${t.label}`, margin + 35, y);
+
+        doc.setTextColor(100);
+        doc.setFontSize(8);
+        doc.text(`(${t.desc})`, margin + 75, y);
+
+        y += 6;
+    });
+
+    y += 6;
+
+    // Section 3: Interaction Classification
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(30);
+    doc.text("Interaction Classification", margin, y);
+    y += 8;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(50);
+
+    const interactions = [
+        {
+            type: "Salt Bridge",
+            criteria: "Distance < 4.0 A between charged residues (ARG/LYS/HIS <-> ASP/GLU)",
+            color: "#ef4444"
+        },
+        {
+            type: "Disulfide Bond",
+            criteria: "Distance ~2.0 A between cysteine residues (CYS <-> CYS)",
+            color: "#eab308"
+        },
+        {
+            type: "Hydrophobic Contact",
+            criteria: "Non-polar residues within range (ILE, VAL, LEU, PHE, MET, etc.)",
+            color: "#22c55e"
+        },
+        {
+            type: "Pi-Stacking",
+            criteria: "Aromatic residues in proximity (PHE, TRP, TYR, HIS)",
+            color: "#a855f7"
+        }
+    ];
+
+    interactions.forEach((int) => {
+        // Color indicator
+        if (int.color) {
+            doc.setFillColor(int.color);
+            doc.circle(margin + 2, y - 1, 1.5, 'F');
+        }
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(9);
+        doc.setTextColor(0);
+        doc.text(`${int.type}:`, margin + 6, y);
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(70);
+        const criteriaText = doc.splitTextToSize(int.criteria, 150);
+        doc.text(criteriaText, margin + 6, y + 4);
+
+        y += 4 + (criteriaText.length * 4) + 4;
+    });
+
+    y += 4;
+
+    // Note
+    doc.setFontSize(8);
+    doc.setTextColor(100);
+    doc.setFont("helvetica", "italic");
+    const noteText = doc.splitTextToSize(
+        "Note: All classifications are based on geometric criteria and residue identity. " +
+        "Electronic structure and dynamic effects are not considered.",
+        170
+    );
+    doc.text(noteText, margin, y);
+};
+
 export const generateProteinReport = async (
     proteinName: string,
     _canvasIgnored: HTMLCanvasElement,
