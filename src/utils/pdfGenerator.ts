@@ -661,7 +661,7 @@ const addPageNumbers = (doc: jsPDF) => {
 // Helper: Add Table of Contents
 const addTableOfContents = (doc: jsPDF, sections: { title: string; page: number }[]) => {
     doc.addPage();
-    doc.movePage(doc.internal.getNumberOfPages(), 2); // Move TOC to page 2
+    doc.movePage(doc.internal.pages.length - 1, 2); // Move TOC to page 2
 
     const margin = 20;
     let y = 30;
@@ -742,7 +742,7 @@ export const generateProteinReport = async (
     // SECTIONS
 
     const allFilter = (t: string | null) => t !== null && t !== 'Close Contact';
-    sections.push({ title: 'All Significant Interactions', page: doc.internal.getNumberOfPages() + 1 });
+    sections.push({ title: 'All Significant Interactions', page: doc.internal.pages.length });
     addSection(doc, "All Significant Interactions", data, allFilter, isLightMode, false, 20);
 
     sections.push({ title: 'Salt Bridges (Ionic)', page: doc.internal.getNumberOfPages() + 1 });
@@ -760,7 +760,7 @@ export const generateProteinReport = async (
     // INTERFACE ANALYSIS (New)
     // Only show if there are multiple chains
     if (metadata.chainCount > 1) {
-        sections.push({ title: 'Interface Analysis', page: doc.internal.getNumberOfPages() + 1 });
+        sections.push({ title: 'Interface Analysis', page: doc.internal.pages.length });
         addSection(doc, "Interface Analysis (Chain Interactions)", data, (_t, l1, l2) => {
             if (l1 && l2 && l1.chain !== l2.chain) return true;
             return false;
