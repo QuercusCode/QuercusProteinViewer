@@ -704,7 +704,7 @@ function App() {
       <SequenceTrack
         chains={chains}
         highlightedResidue={highlightedResidue}
-        onHoverResidue={(chain, resNo) => viewerRef.current?.highlightResidue(chain, resNo)}
+        onHoverResidue={() => { }} // Hover disabled per user request
         onClickResidue={(chain, resNo) => viewerRef.current?.focusResidue(chain, resNo)}
         isLightMode={isLightMode}
       />
