@@ -130,10 +130,12 @@ function App() {
     setResetKey(prev => prev + 1);
   };
 
-  const handleUpload = (uploadedFile: File, isCif?: boolean) => {
+  const handleUpload = (uploadedFile: File, isCif?: boolean, preservePdbId?: boolean) => {
     setFile(uploadedFile);
     setFileType(isCif ? 'mmcif' : 'pdb');
-    setPdbId(''); // Clear PDB ID when file is uploaded
+    if (!preservePdbId) {
+      setPdbId(''); // Only clear PDB ID if not preserving (i.e., manual upload)
+    }
     setChains([]);
     setLigands([]);
     setCustomColors([]);
@@ -514,7 +516,7 @@ function App() {
             })
             .then(blob => {
               const file = new File([blob], `${id}.pdb`, { type: 'chemical/x-pdb' });
-              handleUpload(file);
+              handleUpload(file, false, true); // preservePdbId = true for library selections
 
               // Smart Title Lookup
               const libEntry = OFFLINE_LIBRARY.find(e => e.id.toLowerCase() === id.toLowerCase());
