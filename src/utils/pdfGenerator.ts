@@ -951,6 +951,10 @@ export const generateProteinReport = async (
     addInstructionPage(doc, proteinName, metadata, stats, snapshot, data.labels, qrCodeDataUrl);
     sections.push({ title: 'Overview & Summary', page: 1 });
 
+    // Add Methodology (will be page 3 after TOC insertion at page 2)
+    addMethodology(doc);
+    sections.push({ title: 'Methodology', page: 3 }); // TOC will be inserted at page 2
+
     // SECTIONS
 
     const allFilter = (t: string | null) => t !== null && t !== 'Close Contact';
