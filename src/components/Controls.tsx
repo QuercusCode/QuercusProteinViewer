@@ -418,7 +418,7 @@ export const Controls: React.FC<ControlsProps> = ({
                             {proteinTitle && (
                                 <div className="mb-2">
                                     <h3 className={`text-[10px] font-bold uppercase tracking-wider mb-0.5 ${subtleText}`}>Structure</h3>
-                                    <p className={`text-xs font-bold leading-snug ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>{proteinTitle}</p>
+                                    <p className={`text-xs font-bold leading-snug break-words ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>{proteinTitle}</p>
                                 </div>
                             )}
 
