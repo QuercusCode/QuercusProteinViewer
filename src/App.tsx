@@ -8,6 +8,7 @@ import { parseURLState, getShareableURL } from './utils/urlManager';
 import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Movie, ColorPalette, RepresentationType, ColoringType, ResidueInfo } from './types';
 
 import LibraryModal from './components/LibraryModal';
+import { ShareModal } from './components/ShareModal';
 import { OFFLINE_LIBRARY } from './data/library';
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
   const [showContactMap, setShowContactMap] = useState(false);
   const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [colorPalette, setColorPalette] = useState<ColorPalette>('standard');
 
   // Accessibility: Dyslexic Font
@@ -592,6 +594,7 @@ function App() {
         // onToggleAISidebar={() => setIsAISidebarOpen(prev => !prev)}
         // isAISidebarOpen={isAISidebarOpen}
         onToggleLibrary={() => setIsLibraryOpen(true)}
+        onToggleShare={() => setShowShareModal(true)}
       />
 
       <ProteinViewer
@@ -652,6 +655,21 @@ function App() {
       />
 
 
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        shareUrl={getShareableURL({
+          pdbId,
+          representation,
+          coloring,
+          isSpinning,
+          showLigands,
+          showSurface,
+          customColors,
+          orientation: viewerRef.current?.getCameraOrientation()
+        })}
+        isLightMode={isLightMode}
+      />
 
       <HelpGuide />
 

@@ -27,7 +27,8 @@ import {
     BookOpen,
     ChevronDown,
     Activity,
-    Wrench
+    Wrench,
+    Share2
 } from 'lucide-react';
 import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette } from '../types';
 
@@ -104,6 +105,7 @@ interface ControlsProps {
     setColorPalette: (palette: ColorPalette) => void;
     isDyslexicFont: boolean;
     setIsDyslexicFont: (isDyslexic: boolean) => void;
+    onToggleShare: () => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -155,7 +157,8 @@ export const Controls: React.FC<ControlsProps> = ({
     setIsDyslexicFont,
     // onToggleAISidebar,
     // isAISidebarOpen,
-    onToggleLibrary
+    onToggleLibrary,
+    onToggleShare
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const sessionInputRef = useRef<HTMLInputElement>(null);
@@ -769,6 +772,9 @@ export const Controls: React.FC<ControlsProps> = ({
                                         </button>
                                         <button onClick={onSnapshot} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:text-blue-500 hover:border-blue-500/50`}>
                                             <Camera className="w-3.5 h-3.5" /> <span className="text-xs">Snapshot</span>
+                                        </button>
+                                        <button onClick={onToggleShare} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:text-green-500 hover:border-green-500/50`}>
+                                            <Share2 className="w-3.5 h-3.5" /> <span className="text-xs">Share</span>
                                         </button>
                                     </div>
 
