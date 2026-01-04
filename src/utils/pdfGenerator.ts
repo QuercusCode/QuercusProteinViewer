@@ -702,6 +702,9 @@ const addLigandSection = (doc: jsPDF, interactions: import('../types').LigandInt
     doc.text("Contacts within 5.0Å of non-polymer heteroatoms (ligands, cofactors).", margin, y);
     y += 15;
 
+    // Track counts to handle duplicates (e.g. multiple CD ions on Chain A)
+    const ligandCounts: Record<string, number> = {};
+
     interactions.forEach(ligand => {
         // Check space
         if (y > doc.internal.pageSize.getHeight() - 40) {
@@ -709,23 +712,26 @@ const addLigandSection = (doc: jsPDF, interactions: import('../types').LigandInt
             y = 20;
         }
 
-        // Subheader - Simplified Format: "LigandName (Chain Identifier)" to avoid confusing residue numbers
+        const key = `${ligand.ligandName}_${ligand.ligandChain}`;
+        ligandCounts[key] = (ligandCounts[key] || 0) + 1;
+        const count = ligandCounts[key];
+
+        // Subheader - Simplified Format: "LigandName #N (Chain Identifier)"
         doc.setFont("helvetica", "bold");
         doc.setFontSize(11);
         doc.setTextColor(0);
         doc.setFillColor(243, 244, 246); // Gray-100
         doc.rect(margin, y - 5, 180, 8, 'F');
-        // Old: doc.text(`${ligand.ligandName} (${ligand.ligandChain}:${ligand.ligandResNo})`, margin + 3, y + 1);
-        // New: "HEM (Chain A)" - User specifically asked to avoid the confusing PDB number
-        doc.text(`${ligand.ligandName} (Chain ${ligand.ligandChain})`, margin + 3, y + 1);
+
+        // E.g. "CD #1 (Chain A)", "CD #2 (Chain A)"
+        doc.text(`${ligand.ligandName} #${count} (Chain ${ligand.ligandChain})`, margin + 3, y + 1);
         y += 8;
 
         // Table
         const rows = ligand.contacts.map(c => {
-            // Prefer Sequential Index if available: "VAL 15" instead of "VAL 108"
-            const resLabel = c.residueSeq
-                ? `${c.residueName} ${c.residueSeq}`
-                : `${c.residueName} ${c.residueNumber}`;
+            // User requested to match the 3D viewer's numbering (PDB Numbering)
+            // So we revert back to using residueNumber (e.g. "LYS 127") instead of sequential index
+            const resLabel = `${c.residueName} ${c.residueNumber}`;
 
             return [
                 // `${c.residueChain}:${c.residueName} ${c.residueNumber}`, <-- Old
