@@ -191,8 +191,8 @@ export const Controls: React.FC<ControlsProps> = ({
 
     // Styles
     const cardBg = isLightMode ? 'bg-white' : 'bg-neutral-900';
-    const subtleText = isLightMode ? 'text-neutral-500' : 'text-neutral-400';
-    const inputBg = isLightMode ? 'bg-white border-neutral-300 text-neutral-900 focus:ring-blue-500' : 'bg-neutral-800 border-neutral-700 text-white focus:ring-blue-500';
+    const subtleText = isLightMode ? 'text-neutral-600' : 'text-neutral-400';
+    const inputBg = isLightMode ? 'bg-white border-neutral-400 text-neutral-900 focus:ring-blue-500 shadow-sm' : 'bg-neutral-800 border-neutral-700 text-white focus:ring-blue-500';
 
     // Accordion State
     const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -324,7 +324,7 @@ export const Controls: React.FC<ControlsProps> = ({
                 flex flex-col
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
                 md:translate-x-0 md:top-4 md:left-4 md:h-[calc(100vh-2rem)] md:rounded-xl md:shadow-2xl md:z-10
-                ${isLightMode ? 'bg-white/80 border-neutral-200' : 'bg-neutral-900/80 border-white/10'}
+                ${isLightMode ? 'bg-white/95 border-neutral-300 shadow-xl' : 'bg-neutral-900/80 border-white/10'}
             `}>
                 {/* Header - Fixed */}
                 <div className="flex-none p-4 pb-2 relative">
@@ -346,14 +346,14 @@ export const Controls: React.FC<ControlsProps> = ({
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={onToggleLibrary}
-                                className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-neutral-100/80 text-neutral-500 hover:bg-neutral-200' : 'bg-neutral-800/80 text-neutral-400 hover:bg-neutral-700'}`}
+                                className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-white border border-neutral-300 text-neutral-600 hover:bg-neutral-100' : 'bg-neutral-800/80 text-neutral-400 hover:bg-neutral-700'}`}
                                 title="Open Offline Library"
                             >
                                 <BookOpen className="w-4 h-4" />
                             </button>
                             <button
                                 onClick={() => setIsLightMode(!isLightMode)}
-                                className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-neutral-100/80 text-amber-500 hover:bg-neutral-200' : 'bg-neutral-800/80 text-blue-300 hover:bg-neutral-700'}`}
+                                className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-white border border-neutral-300 text-amber-500 hover:bg-neutral-100' : 'bg-neutral-800/80 text-blue-300 hover:bg-neutral-700'}`}
                                 title="Toggle Theme"
                             >
                                 {isLightMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -549,7 +549,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                         {customBackgroundColor && (
                                             <button
                                                 onClick={() => setCustomBackgroundColor?.(null)}
-                                                className={`px-3 py-1.5 rounded border text-[10px] font-bold uppercase transition-colors hover:bg-red-500/10 hover:text-red-500 ${isLightMode ? 'border-neutral-200 text-neutral-500' : 'border-neutral-700 text-neutral-400'}`}
+                                                className={`px-3 py-1.5 rounded border text-[10px] font-bold uppercase transition-colors hover:bg-red-500/10 hover:text-red-500 ${isLightMode ? 'border-neutral-300 text-neutral-600 bg-white shadow-sm' : 'border-neutral-700 text-neutral-400'}`}
                                             >
                                                 Reset
                                             </button>

@@ -769,7 +769,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
             <div className={`relative w-full max-w-6xl h-[90vh] rounded-xl shadow-2xl flex flex-col overflow-hidden ${isLightMode ? 'bg-white text-neutral-900' : 'bg-neutral-900 text-white border border-neutral-800'}`}>
 
                 {/* Header */}
-                <div className={`flex items-center justify-between px-6 py-4 border-b ${isLightMode ? 'bg-white border-neutral-100' : 'bg-neutral-900 border-neutral-800'}`}>
+                <div className={`flex items-center justify-between px-6 py-4 border-b ${isLightMode ? 'bg-white border-neutral-300' : 'bg-neutral-900 border-neutral-800'}`}>
                     <div className="flex items-center gap-3">
                         <div className={`p-2 rounded-lg ${isLightMode ? 'bg-blue-50 text-blue-600' : 'bg-blue-900/20 text-blue-400'}`}>
                             <Maximize className="w-5 h-5" />
@@ -794,7 +794,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
                         <div className="hidden md:flex items-center gap-2">
                             <button
                                 onClick={handleDownloadCSV}
-                                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isLightMode ? 'bg-neutral-100 hover:bg-neutral-200 text-neutral-600' : 'bg-neutral-800 hover:bg-neutral-700 text-neutral-300'}`}
+                                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isLightMode ? 'bg-white border border-neutral-300 shadow-sm hover:bg-neutral-50 text-neutral-700' : 'bg-neutral-800 hover:bg-neutral-700 text-neutral-300'}`}
                             >
                                 <FileText className="w-4 h-4" />
                                 <span className="hidden sm:inline">Export CSV</span>
