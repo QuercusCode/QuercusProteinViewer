@@ -558,7 +558,7 @@ const addInstructionPage = (
     addLegendItem("#22c55e", "Hydrophobic Cluster", "Non-polar residue packing. Primary driving force of folding.");
     addLegendItem("#a855f7", "Pi-Stacking", "Aromatic ring interactions. Stabilizes core and interfaces.");
 
-    doc.addPage();
+    return y + 10;
 };
 
 const addSection = (
@@ -659,14 +659,14 @@ const addPageNumbers = (doc: jsPDF) => {
 };
 
 // Helper: Add Table of Contents
-const addTableOfContents = (doc: jsPDF, sections: { title: string; page: number }[], isNewPage: boolean = true) => {
-    if (isNewPage) {
-        doc.addPage();
-    }
-    // TOC is now page 2 - no need to move pages
-
+const addTableOfContents = (
+    doc: jsPDF,
+    sections: { title: string; page: number }[],
+    startY: number = 30,
+    renderNumbers: boolean = true
+) => {
     const margin = 20;
-    let y = 30;
+    let y = startY;
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
@@ -690,7 +690,12 @@ const addTableOfContents = (doc: jsPDF, sections: { title: string; page: number 
         const pageNumX = 180;
 
         // Section title with link
-        doc.textWithLink(section.title, margin, y, { pageNumber: section.page });
+        // Link only works if we have valid page numbers (pass 2)
+        if (renderNumbers && section.page > 0) {
+            doc.textWithLink(section.title, margin, y, { pageNumber: section.page });
+        } else {
+            doc.text(section.title, margin, y);
+        }
 
         // Dots
         const titleWidth = doc.getTextWidth(section.title);
@@ -699,11 +704,15 @@ const addTableOfContents = (doc: jsPDF, sections: { title: string; page: number 
         doc.text(dots, margin + titleWidth + 2, y);
 
         // Page number
-        doc.setTextColor(50);
-        doc.text(section.page.toString(), pageNumX, y, { align: 'right' });
+        if (renderNumbers) {
+            doc.setTextColor(50);
+            doc.text(section.page.toString(), pageNumX, y, { align: 'right' });
+        }
 
         y += 7;
     });
+
+    return y; // Return end Y position
 };
 
 
@@ -739,63 +748,73 @@ export const generateProteinReport = async (
         }
     }
 
-    // PAGE 1: Enhanced Instruction & Overview
-    addInstructionPage(doc, proteinName, metadata, stats, snapshot, data.labels, qrCodeDataUrl);
+    // PAGE 1: Overview & Legend
+    const overviewEndY = addInstructionPage(doc, proteinName, metadata, stats, snapshot, data.labels, qrCodeDataUrl);
     sections.push({ title: 'Overview & Summary', page: 1 });
 
-    // PAGE 2: Table of Contents Placeholder
+    // Pre-fill sections with titles for TOC placeholder rendering
+    sections.push({ title: 'All Significant Interactions', page: 0 });
+    sections.push({ title: 'Salt Bridges (Ionic)', page: 0 });
+    sections.push({ title: 'Disulfide Bonds (Covalent)', page: 0 });
+    sections.push({ title: 'Hydrophobic Clusters', page: 0 });
+    sections.push({ title: 'Pi-Stacking & Cation-Pi', page: 0 });
+    if (metadata.chainCount > 1) {
+        sections.push({ title: 'Interface Analysis', page: 0 });
+    }
+
+    // PAGE 1/2: TOC Placeholders
+    // Render TOC titles only (no numbers yet) to reserve space
+    // Capture where TOC starts (Page and Y)
+    const tocStartPage = doc.internal.pages.length - 1; // Current page count (1-based index usually matches length-1 if index 0 unused)
+    // Actually jsPDF: pages array has empty object at 0. So length - 1 is typically the current page index.
+    // doc.addPage adds to length.
+
+    const tocStartY = overviewEndY;
+    addTableOfContents(doc, sections, tocStartY, false); // Render placeholders
+
+    // FORCE PAGE BREAK for Analysis Sections (as requested: "page immediately after TOC")
     doc.addPage();
-    // We will come back to this page (index 2) later to fill it in
 
     // Helper to get current page number
     const getCurPage = () => doc.internal.pages.length - 1;
 
-    // PAGE 3+: Analysis Sections
-    // All addSection calls automatically add a new page (newPage=true by default)
+    // PAGE 2+: Analysis Sections
 
     // Add all analysis sections and track their pages
     const allFilter = (t: string | null) => t !== null && t !== 'Close Contact';
 
-    addSection(doc, "All Significant Interactions", data, allFilter, isLightMode, true);
-    const allInteractionsPage = getCurPage();
+    addSection(doc, "All Significant Interactions", data, allFilter, isLightMode, false, 20); // First section starts on the new page we just added
+    // Note: addSection usually adds a page if newPage=true.
+    // We want the FIRST section to start on the page we explicitly added? 
+    // Or we let addSection add the page?
+    // User said "page immediately after TOC".
+    // If I explicitly added a page, I should pass 'false' to newPage for the first section to use it.
+
+    sections[1].page = getCurPage(); // Update page number for "All Significant Interactions"
 
     addSection(doc, "Salt Bridges (Ionic Interactions)", data, (t) => t === 'Salt Bridge', isLightMode, true);
-    const saltBridgesPage = getCurPage();
+    sections[2].page = getCurPage(); // Update page number for "Salt Bridges"
 
     addSection(doc, "Disulfide Bonds (Covalent)", data, (t) => t === 'Disulfide Bond', isLightMode, true);
-    const disulfidePage = getCurPage();
+    sections[3].page = getCurPage(); // Update page number for "Disulfide Bonds"
 
     addSection(doc, "Hydrophobic Clusters", data, (t) => t === 'Hydrophobic Contact', isLightMode, true);
-    const hydrophobicPage = getCurPage();
+    sections[4].page = getCurPage(); // Update page number for "Hydrophobic Clusters"
 
     addSection(doc, "Pi-Stacking & Cation-Pi", data, (t) => t === 'Pi-Stacking' || t === 'Cation-Pi Interaction', isLightMode, true);
-    const piStackingPage = getCurPage();
+    sections[5].page = getCurPage(); // Update page number for "Pi-Stacking & Cation-Pi"
 
-    let interfacePage = 0;
     if (metadata.chainCount > 1) {
         addSection(doc, "Interface Analysis (Chain Interactions)", data, (_t, l1, l2) => {
             if (l1 && l2 && l1.chain !== l2.chain) return true;
             return false;
         }, isLightMode, true);
-        interfacePage = getCurPage();
+        sections[6].page = getCurPage(); // Update page number for "Interface Analysis"
     }
 
-    // Populate sections with correct page numbers
-    sections.push({ title: 'All Significant Interactions', page: allInteractionsPage });
-    sections.push({ title: 'Salt Bridges (Ionic)', page: saltBridgesPage });
-    sections.push({ title: 'Disulfide Bonds (Covalent)', page: disulfidePage });
-    sections.push({ title: 'Hydrophobic Clusters', page: hydrophobicPage });
-    sections.push({ title: 'Pi-Stacking & Cation-Pi', page: piStackingPage });
-    if (interfacePage > 0) {
-        sections.push({ title: 'Interface Analysis', page: interfacePage });
-    }
-
-    // Go back to Page 2 to generate TOC
-    doc.setPage(2);
-    addTableOfContents(doc, sections, false); // Pass false to NOT add a new page inside TOC helper
-
-    // Add page numbers to all pages
-    addPageNumbers(doc);
+    // Go back to the TOC page to fill in page numbers
+    doc.setPage(tocStartPage);
+    addTableOfContents(doc, sections, tocStartY, true); // Render with page numbers
 
     // Add page numbers to all pages
     addPageNumbers(doc);
