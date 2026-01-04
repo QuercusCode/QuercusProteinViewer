@@ -747,32 +747,15 @@ export const generateProteinReport = async (
     doc.addPage();
     // We will come back to this page (index 2) later to fill it in
 
+    // Helper to get current page number
+    const getCurPage = () => doc.internal.pages.length - 1;
+
     // PAGE 3+: Analysis Sections
     // All addSection calls automatically add a new page (newPage=true by default)
 
     // Add all analysis sections and track their pages
     const allFilter = (t: string | null) => t !== null && t !== 'Close Contact';
-    addSection(doc, "All Significant Interactions", data, allFilter, isLightMode, false, 20); // newPage=true by default from helper (wait, check helper default)
-    // Wait, helper defaults newPage=true? YES.
-    const allInteractionsPage = doc.internal.pages.length - 1; // -1 because doc.internal.pages includes metadata at index 0? No, checking helper.
-    // jsPDF page tracking is tricky.
-    // doc.internal.pages is an array. Length is typically NumberOfPages + 1 (index 0 unused).
-    // Let's rely on doc.internal.getNumberOfPages() which is cleaner.
 
-    // Correct way:
-    // Page 1 created by new jsPDF()
-    // Page 2 created by doc.addPage()
-    // Page 3 created by addSection -> doc.addPage()
-    // So after first addSection, getNumberOfPages should be 3.
-
-    const getCurPage = () => doc.internal.getNumberOfPages();
-
-    // Re-doing the flow with getNumberOfPages() for robustness
-
-    // 1 (Overview)
-    // 2 (TOC placeholder)
-
-    // 3 (All Interactions) - addSection calls addPage first
     addSection(doc, "All Significant Interactions", data, allFilter, isLightMode, true);
     const allInteractionsPage = getCurPage();
 
