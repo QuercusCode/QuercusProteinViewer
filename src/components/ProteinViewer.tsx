@@ -842,88 +842,67 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         getLigandInteractions: async () => {
             if (!componentRef.current) return [];
             const component = componentRef.current;
-            const NGL = window.NGL;
             const interactions: import('../types').LigandInteraction[] = [];
 
             try {
-                // 1. Identify Ligands (Heteroatoms, excluding water)
-                // Broadened selection to include ions (Zn, Mg, SO4, etc.) as they are often relevant
-                const selectionString = "(ligand or ion) and not water";
-                const ligandSelection = new NGL.Selection(selectionString);
-                const ligandAtoms: any[] = [];
-                component.structure.eachAtom((atom: any) => {
-                    ligandAtoms.push(atom);
-                }, ligandSelection);
+                // 1. Identify Ligands Manually (Robuster than NGL Selection Strings)
+                // Iterate all residues looking for small molecules
+                const ligandResidues: any[] = [];
 
-                console.log(`[LigandDebug] Selection '${selectionString}' found ${ligandAtoms.length} atoms.`);
+                component.structure.eachResidue((r: any) => {
+                    // Exclusion Criteria
+                    if (r.isWater()) return;
+                    if (r.isProtein()) return;
+                    if (r.isNucleic()) return; // DNA/RNA
+                    if (r.resname === 'HOH' || r.resname === 'WAT' || r.resname === 'DOD') return;
 
-                // FORCE DEBUG: Check if we are finding specific ions
-                const ionSel = new NGL.Selection("ion");
-                const ionCount = component.structure.getAtomSet(ionSel).length;
-                console.log(`[LigandDebug] Explicit 'ion' check found: ${ionCount}`);
-
-                if (ligandAtoms.length === 0) {
-                    // Fallback check: Try "not (polymer or water)"
-                    const fallbackSel = new NGL.Selection("not (polymer or water)");
-                    component.structure.eachAtom((atom: any) => {
-                        ligandAtoms.push(atom);
-                    }, fallbackSel);
-                    console.log(`[LigandDebug] Fallback 'not (polymer or water)' found ${ligandAtoms.length} atoms.`);
-                }
-
-                if (ligandAtoms.length === 0) return [];
-
-                // Group atoms by Residue (Ligand ID)
-                const ligandResidues = new Map<string, any[]>();
-                ligandAtoms.forEach(atom => {
-                    const key = `${atom.chainname}:${atom.resno}`;
-                    if (!ligandResidues.has(key)) ligandResidues.set(key, []);
-                    ligandResidues.get(key)?.push(atom);
+                    // If it survived, it's likely a ligand/ion
+                    ligandResidues.push(r);
                 });
 
-                // 2. Iterate each Ligand Residue
-                ligandResidues.forEach((atoms, _key) => {
-                    const firstAtom = atoms[0];
-                    const ligandName = firstAtom.resname;
-                    const ligandChain = firstAtom.chainname;
-                    const ligandResNo = firstAtom.resno;
+                console.log(`[LigandDebug] Found ${ligandResidues.length} potential ligands/ions via manual scan.`);
 
-                    console.log(`[LigandDebug] Checking Ligand: ${ligandName} ${ligandChain}:${ligandResNo}`);
+                if (ligandResidues.length === 0) return [];
+
+                // 2. Iterate each Ligand Residue
+                ligandResidues.forEach((res) => {
+                    const ligandName = res.resname;
+                    const ligandChain = res.chainname;
+                    const ligandResNo = res.resno;
 
                     const contacts: any[] = [];
                     const seenResidues = new Set<string>();
 
-                    // Check neighbors for EACH atom in the ligand
-                    atoms.forEach(lAtom => {
-                        // Radius Search (5.0A) - Manual Check for Robustness
-                        // Note: atomSet optimization caused issues with NGL types, iterating all atoms is fast enough
+                    // Get ligand atoms
+                    const lAtoms: any[] = [];
+                    res.eachAtom((a: any) => lAtoms.push(a));
 
-                        // Filter for Protein Polymer
-                        component.structure.eachAtom((pAtom: any) => {
-                            if (!pAtom.isHet() && pAtom.residue.isProtein()) { // Ensure protein
-                                const resKey = `${pAtom.chainname}:${pAtom.resno}`;
+                    // Check neighbors (Brute force against all protein atoms is safest)
+                    component.structure.eachAtom((pAtom: any) => {
+                        if (!pAtom.residue.isProtein()) return;
 
-                                // Avoid duplicates (one contact per residue is enough for the report table)
-                                if (!seenResidues.has(resKey)) {
-                                    // Calculate precise distance
-                                    const dist = Math.sqrt(
-                                        Math.pow(pAtom.x - lAtom.x, 2) +
-                                        Math.pow(pAtom.y - lAtom.y, 2) +
-                                        Math.pow(pAtom.z - lAtom.z, 2)
-                                    );
+                        const resKey = `${pAtom.chainname}:${pAtom.resno}`;
+                        if (seenResidues.has(resKey)) return;
 
-                                    if (dist <= 5.0) {
-                                        seenResidues.add(resKey);
-                                        contacts.push({
-                                            residueChain: pAtom.chainname,
-                                            residueNumber: pAtom.resno,
-                                            residueName: pAtom.resname,
-                                            distance: parseFloat(dist.toFixed(2))
-                                        });
-                                    }
-                                }
+                        // Check distance to ANY ligand atom
+                        for (const lAtom of lAtoms) {
+                            const dist = Math.sqrt(
+                                Math.pow(pAtom.x - lAtom.x, 2) +
+                                Math.pow(pAtom.y - lAtom.y, 2) +
+                                Math.pow(pAtom.z - lAtom.z, 2)
+                            );
+
+                            if (dist <= 5.0) {
+                                seenResidues.add(resKey);
+                                contacts.push({
+                                    residueChain: pAtom.chainname,
+                                    residueNumber: pAtom.resno,
+                                    residueName: pAtom.resname,
+                                    distance: parseFloat(dist.toFixed(2))
+                                });
+                                break;
                             }
-                        }); // Removed atomSet argument
+                        }
                     });
 
                     if (contacts.length > 0) {
