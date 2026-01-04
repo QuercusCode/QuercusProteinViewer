@@ -659,8 +659,10 @@ const addPageNumbers = (doc: jsPDF) => {
 };
 
 // Helper: Add Table of Contents
-const addTableOfContents = (doc: jsPDF, sections: { title: string; page: number }[]) => {
-    doc.addPage();
+const addTableOfContents = (doc: jsPDF, sections: { title: string; page: number }[], isNewPage: boolean = true) => {
+    if (isNewPage) {
+        doc.addPage();
+    }
     // TOC is now page 2 - no need to move pages
 
     const margin = 20;
@@ -741,27 +743,50 @@ export const generateProteinReport = async (
     addInstructionPage(doc, proteinName, metadata, stats, snapshot, data.labels, qrCodeDataUrl);
     sections.push({ title: 'Overview & Summary', page: 1 });
 
-    // Page 2: Add TOC now (before adding content, with placeholder page numbers)
-    // We'll add content first, then regenerate TOC with correct numbers
+    // PAGE 2: Table of Contents Placeholder
+    doc.addPage();
+    // We will come back to this page (index 2) later to fill it in
 
-
+    // PAGE 3+: Analysis Sections
+    // All addSection calls automatically add a new page (newPage=true by default)
 
     // Add all analysis sections and track their pages
     const allFilter = (t: string | null) => t !== null && t !== 'Close Contact';
-    addSection(doc, "All Significant Interactions", data, allFilter, isLightMode, false, 20);
-    const allInteractionsPage = doc.internal.pages.length;
+    addSection(doc, "All Significant Interactions", data, allFilter, isLightMode, false, 20); // newPage=true by default from helper (wait, check helper default)
+    // Wait, helper defaults newPage=true? YES.
+    const allInteractionsPage = doc.internal.pages.length - 1; // -1 because doc.internal.pages includes metadata at index 0? No, checking helper.
+    // jsPDF page tracking is tricky.
+    // doc.internal.pages is an array. Length is typically NumberOfPages + 1 (index 0 unused).
+    // Let's rely on doc.internal.getNumberOfPages() which is cleaner.
+
+    // Correct way:
+    // Page 1 created by new jsPDF()
+    // Page 2 created by doc.addPage()
+    // Page 3 created by addSection -> doc.addPage()
+    // So after first addSection, getNumberOfPages should be 3.
+
+    const getCurPage = () => doc.internal.getNumberOfPages();
+
+    // Re-doing the flow with getNumberOfPages() for robustness
+
+    // 1 (Overview)
+    // 2 (TOC placeholder)
+
+    // 3 (All Interactions) - addSection calls addPage first
+    addSection(doc, "All Significant Interactions", data, allFilter, isLightMode, true);
+    const allInteractionsPage = getCurPage();
 
     addSection(doc, "Salt Bridges (Ionic Interactions)", data, (t) => t === 'Salt Bridge', isLightMode, true);
-    const saltBridgesPage = doc.internal.pages.length;
+    const saltBridgesPage = getCurPage();
 
     addSection(doc, "Disulfide Bonds (Covalent)", data, (t) => t === 'Disulfide Bond', isLightMode, true);
-    const disulfidePage = doc.internal.pages.length;
+    const disulfidePage = getCurPage();
 
     addSection(doc, "Hydrophobic Clusters", data, (t) => t === 'Hydrophobic Contact', isLightMode, true);
-    const hydrophobicPage = doc.internal.pages.length;
+    const hydrophobicPage = getCurPage();
 
     addSection(doc, "Pi-Stacking & Cation-Pi", data, (t) => t === 'Pi-Stacking' || t === 'Cation-Pi Interaction', isLightMode, true);
-    const piStackingPage = doc.internal.pages.length;
+    const piStackingPage = getCurPage();
 
     let interfacePage = 0;
     if (metadata.chainCount > 1) {
@@ -769,7 +794,7 @@ export const generateProteinReport = async (
             if (l1 && l2 && l1.chain !== l2.chain) return true;
             return false;
         }, isLightMode, true);
-        interfacePage = doc.internal.pages.length;
+        interfacePage = getCurPage();
     }
 
     // Populate sections with correct page numbers
@@ -782,8 +807,12 @@ export const generateProteinReport = async (
         sections.push({ title: 'Interface Analysis', page: interfacePage });
     }
 
-    // Add TOC (will be at the end of PDF)
-    addTableOfContents(doc, sections);
+    // Go back to Page 2 to generate TOC
+    doc.setPage(2);
+    addTableOfContents(doc, sections, false); // Pass false to NOT add a new page inside TOC helper
+
+    // Add page numbers to all pages
+    addPageNumbers(doc);
 
     // Add page numbers to all pages
     addPageNumbers(doc);
