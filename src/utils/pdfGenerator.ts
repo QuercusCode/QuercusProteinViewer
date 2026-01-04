@@ -783,14 +783,9 @@ export const generateProteinReport = async (
     // Add all analysis sections and track their pages
     const allFilter = (t: string | null) => t !== null && t !== 'Close Contact';
 
-    addSection(doc, "All Significant Interactions", data, allFilter, isLightMode, false, 20); // First section starts on the new page we just added
-    // Note: addSection usually adds a page if newPage=true.
-    // We want the FIRST section to start on the page we explicitly added? 
-    // Or we let addSection add the page?
-    // User said "page immediately after TOC".
-    // If I explicitly added a page, I should pass 'false' to newPage for the first section to use it.
-
-    sections[1].page = getCurPage(); // Update page number for "All Significant Interactions" (Already on new page)
+    // Capture START page for "All Significant Interactions" (which starts on the current page)
+    sections[1].page = getCurPage();
+    addSection(doc, "All Significant Interactions", data, allFilter, isLightMode, false, 20);
 
     sections[2].page = getCurPage() + 1; // Starts on NEXT page
     addSection(doc, "Salt Bridges (Ionic Interactions)", data, (t) => t === 'Salt Bridge', isLightMode, true);
