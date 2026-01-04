@@ -33,11 +33,17 @@ import {
 import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, PDBMetadata } from '../types';
 
 // Reusable Sidebar Section Component - Defined outside to prevent re-renders losing focus
-const SidebarSection = ({ title, icon: Icon, children, isOpen, onToggle }: { title: string, icon: any, children: React.ReactNode, isOpen: boolean, onToggle: () => void }) => (
-    <div className="border border-white/10 rounded-xl overflow-hidden bg-black/20">
+const SidebarSection = ({ title, icon: Icon, children, isOpen, onToggle, isLightMode }: { title: string, icon: any, children: React.ReactNode, isOpen: boolean, onToggle: () => void, isLightMode: boolean }) => (
+    <div className={`rounded-xl overflow-hidden transition-colors ${isLightMode
+        ? 'border border-neutral-200 bg-white shadow-sm'
+        : 'border border-white/10 bg-black/20'
+        }`}>
         <button
             onClick={onToggle}
-            className={`w-full flex items-center justify-between p-3 text-xs font-bold uppercase tracking-wider transition-colors ${isOpen ? 'bg-white/5 text-blue-400' : 'hover:bg-white/5 text-neutral-400'}`}
+            className={`w-full flex items-center justify-between p-3 text-xs font-bold uppercase tracking-wider transition-colors ${isLightMode
+                ? (isOpen ? 'bg-blue-50 text-blue-600' : 'hover:bg-neutral-50 text-neutral-600 hover:text-neutral-900')
+                : (isOpen ? 'bg-white/5 text-blue-400' : 'hover:bg-white/5 text-neutral-400')
+                }`}
         >
             <div className="flex items-center gap-2">
                 <Icon className="w-4 h-4" />
@@ -48,7 +54,7 @@ const SidebarSection = ({ title, icon: Icon, children, isOpen, onToggle }: { tit
             </div>
         </button>
         {isOpen && (
-            <div className="p-3 space-y-3 border-t border-white/5">
+            <div className={`p-3 space-y-3 border-t ${isLightMode ? 'border-neutral-100' : 'border-white/5'}`}>
                 {children}
             </div>
         )}
@@ -479,6 +485,7 @@ export const Controls: React.FC<ControlsProps> = ({
                         icon={Eye}
                         isOpen={openSections['appearance']}
                         onToggle={() => toggleSection('appearance')}
+                        isLightMode={isLightMode}
                     >
                         <div className="space-y-3">
                             {/* Visual Style */}
@@ -721,6 +728,7 @@ export const Controls: React.FC<ControlsProps> = ({
                         icon={Activity}
                         isOpen={openSections['analysis']}
                         onToggle={() => toggleSection('analysis')}
+                        isLightMode={isLightMode}
                     >
 
                         {/* Ligands */}
@@ -832,6 +840,7 @@ export const Controls: React.FC<ControlsProps> = ({
                         icon={Wrench}
                         isOpen={openSections['tools']}
                         onToggle={() => toggleSection('tools')}
+                        isLightMode={isLightMode}
                     >
                         <div className="space-y-3">
                             {/* Session Controls */}
