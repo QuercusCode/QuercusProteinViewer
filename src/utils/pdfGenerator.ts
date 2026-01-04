@@ -995,10 +995,7 @@ export const generateProteinReport = async (
         sections.push({ title: 'Interface Analysis', page: interfacePage });
     }
 
-    // Insert TOC at page 2 position
-    addTableOfContents(doc, sections);
-    // Move TOC to position 2 (after Overview)
-    doc.movePage(doc.internal.pages.length, 2);
+    // Add TOC (will be at the end of PDF)\n    addTableOfContents(doc, sections);
 
     // Add page numbers to all pages
     addPageNumbers(doc);
