@@ -3,14 +3,24 @@ import type { PDBMetadata } from '../types';
 export const fetchPDBMetadata = async (pdbId: string): Promise<PDBMetadata | null> => {
     if (!pdbId) return null;
 
+    const lowerId = pdbId.toLowerCase();
+
     try {
-        const response = await fetch(`https://data.rcsb.org/rest/v1/core/entry/${pdbId.toLowerCase()}`);
-        if (!response.ok) {
-            console.warn(`Failed to fetch metadata for ${pdbId}`);
+        const [entryRes, entityRes] = await Promise.all([
+            fetch(`https://data.rcsb.org/rest/v1/core/entry/${lowerId}`),
+            fetch(`https://data.rcsb.org/rest/v1/core/polymer_entity/${lowerId}/1`) // Checking entity 1 is usually sufficient for source
+        ]);
+
+        if (!entryRes.ok) {
+            console.warn(`Failed to fetch entry metadata for ${pdbId}`);
             return null;
         }
 
-        const data = await response.json();
+        const data = await entryRes.json();
+        let entityData: any = {};
+        if (entityRes.ok) {
+            entityData = await entityRes.json();
+        }
 
         // Extract fields
         const method = data.exptl?.[0]?.method || 'Unknown';
@@ -24,7 +34,13 @@ export const fetchPDBMetadata = async (pdbId: string): Promise<PDBMetadata | nul
             resolution = 'N/A (NMR)';
         }
 
-        const organism = data.rcsb_entity_source_organism?.[0]?.scientific_name || 'Unknown source';
+        // Organism from Entity 1
+        let organism = 'Unknown source';
+        if (entityData.rcsb_entity_source_organism && entityData.rcsb_entity_source_organism.length > 0) {
+            organism = entityData.rcsb_entity_source_organism[0].scientific_name;
+        } else if (data.rcsb_entity_source_organism && data.rcsb_entity_source_organism.length > 0) {
+            organism = data.rcsb_entity_source_organism[0].scientific_name; // Fallback to entry if present (rare)
+        }
 
         // Date format: "2010-02-28T00:00:00Z" -> "2010-02-28"
         let date = data.rcsb_accession_info?.deposit_date || 'Unknown date';

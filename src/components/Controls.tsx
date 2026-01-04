@@ -448,10 +448,14 @@ export const Controls: React.FC<ControlsProps> = ({
                                             </span>
                                         </div>
                                         <div className="col-span-2">
-                                            <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Organism</span>
-                                            <span className={`text-[10px] font-medium leading-tight block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
-                                                {pdbMetadata.organism}
-                                            </span>
+                                            {pdbMetadata.organism && pdbMetadata.organism !== 'Unknown source' && (
+                                                <>
+                                                    <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Organism</span>
+                                                    <span className={`text-[10px] font-medium leading-tight block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                                        {pdbMetadata.organism}
+                                                    </span>
+                                                </>
+                                            )}
                                         </div>
                                         <div className="col-span-2">
                                             <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Deposited</span>

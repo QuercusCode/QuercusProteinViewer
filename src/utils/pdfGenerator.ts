@@ -463,7 +463,6 @@ const addInstructionPage = (
     innerY += nameHeight;
 
     doc.text(`Residues: ${metadata.residueCount}`, leftPad, innerY); innerY += 5;
-    doc.text(`Residues: ${metadata.residueCount}`, leftPad, innerY); innerY += 5;
     doc.text(`Chains: ${metadata.chains.join(', ')}`, leftPad, innerY); innerY += 5;
 
     // PDB Metadata (If available)
@@ -474,7 +473,11 @@ const addInstructionPage = (
 
         doc.text(`Method: ${pdbMetadata.method}`, leftPad, innerY); innerY += 4;
         doc.text(`Resolution: ${pdbMetadata.resolution}`, leftPad, innerY); innerY += 4;
-        doc.text(`Source: ${pdbMetadata.organism}`, leftPad, innerY); innerY += 4;
+
+        if (pdbMetadata.organism && pdbMetadata.organism !== 'Unknown source') {
+            doc.text(`Source: ${pdbMetadata.organism}`, leftPad, innerY); innerY += 4;
+        }
+
         doc.text(`Date: ${pdbMetadata.depositionDate}`, leftPad, innerY); innerY += 6;
 
         doc.setFontSize(9);
