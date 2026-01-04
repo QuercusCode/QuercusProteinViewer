@@ -61,21 +61,21 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
             backdrop-blur-md flex flex-col overflow-hidden`}>
 
             {/* Header / Tabs - Compact Vertical */}
-            <div className={`flex flex-col items-center py-3 gap-2 border-b ${isLightMode ? 'border-neutral-200' : 'border-neutral-800'} flex-shrink-0`}>
+            <div className={`flex flex-col items-center pt-3 pb-2 gap-2 border-b ${isLightMode ? 'border-neutral-200' : 'border-neutral-800'} flex-shrink-0 bg-opacity-50`}>
                 <div className="flex items-center justify-center w-full" title="Sequence">
                     <Map size={16} className="text-purple-500" />
                 </div>
 
                 {chains.length > 1 && (
-                    <div className="flex flex-col gap-1 w-full px-2">
+                    <div className="flex flex-col gap-1 w-full px-2 overflow-y-auto max-h-[25vh] scrollbar-hide items-center">
                         {chains.map((chain, idx) => (
                             <button
                                 key={chain.name}
                                 onClick={() => setActiveChainIndex(idx)}
-                                className={`w-full aspect-square flex items-center justify-center text-[10px] font-bold rounded-md transition-colors
+                                className={`w-8 h-8 flex items-center justify-center text-[10px] font-bold rounded-full transition-all duration-200 flex-shrink-0
                                     ${activeChainIndex === idx
-                                        ? 'bg-purple-600 text-white shadow-sm'
-                                        : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200'}`}
+                                        ? 'bg-purple-600 text-white shadow-md scale-105'
+                                        : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700'}`}
                                 title={`Chain ${chain.name}`}
                             >
                                 {chain.name}
@@ -84,7 +84,7 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
                     </div>
                 )}
 
-                <div className="text-[10px] text-neutral-500 font-mono font-bold text-center w-full mt-1">
+                <div className="text-[9px] text-neutral-500 font-mono font-bold text-center w-full mt-1 border-t border-neutral-800/30 pt-1 w-3/4 mx-auto">
                     {activeChain.sequence.length} res
                 </div>
             </div>
@@ -113,7 +113,7 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
                             >
                                 {/* Residue Box */}
                                 <span
-                                    className={`w-6 h-6 flex items-center justify-center rounded-md text-[11px] font-mono font-bold shadow-sm
+                                    className={`w-6 h-6 flex items-center justify-center rounded-md text-[11px] font-mono font-bold shadow-sm transition-transform
                                     ${isActive ? 'text-white scale-110' : 'text-neutral-900 dark:text-white'}`}
                                     style={{ backgroundColor: isActive ? '#8b5cf6' : color }}
                                 >
