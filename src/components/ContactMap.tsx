@@ -18,6 +18,7 @@ interface ContactMapProps {
     colorPalette?: ColorPalette;
     onHighlightResidue?: (chain: string, resNo: number) => void;
     pdbMetadata: PDBMetadata | null;
+    getLigandInteractions?: () => Promise<import('../types').LigandInteraction[]>;
 }
 
 
@@ -33,7 +34,8 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     getShareableLink,
     colorPalette = 'standard',
     // onHighlightResidue
-    pdbMetadata
+    pdbMetadata,
+    getLigandInteractions
 }) => {
     const mapCanvasRef = useRef<HTMLCanvasElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -579,7 +581,8 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         const finalName = customName || proteinName;
         // Pass current URL for QR Code
         const currentUrl = getShareableLink ? getShareableLink() : window.location.href;
-        generateProteinReport(finalName, mapCanvasRef.current, distanceData, metadata, snapshot, currentUrl, pdbMetadata);
+        const interactions = getLigandInteractions ? await getLigandInteractions() : null;
+        generateProteinReport(finalName, mapCanvasRef.current, distanceData, metadata, snapshot, currentUrl, pdbMetadata, interactions);
     };
 
     const handleDownload = () => {

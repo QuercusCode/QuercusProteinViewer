@@ -669,6 +669,12 @@ function App() {
           });
         }}
         pdbMetadata={pdbMetadata}
+        getLigandInteractions={async () => {
+          if (viewerRef.current) {
+            return await viewerRef.current.getLigandInteractions();
+          }
+          return [];
+        }}
       />
 
 

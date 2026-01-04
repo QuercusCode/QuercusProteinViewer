@@ -68,3 +68,16 @@ export interface PDBMetadata {
     depositionDate: string;
     title?: string;
 }
+
+export interface LigandInteraction {
+    ligandName: string;
+    ligandChain: string;
+    ligandResNo: number;
+    contacts: {
+        residueChain: string;
+        residueNumber: number;
+        residueName: string;
+        distance: number;
+        type?: string;
+    }[];
+}

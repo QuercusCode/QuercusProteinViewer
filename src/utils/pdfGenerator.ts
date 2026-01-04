@@ -674,6 +674,69 @@ const addSection = (
     });
 };
 
+// Helper: Add Ligand Section
+const addLigandSection = (doc: jsPDF, interactions: import('../types').LigandInteraction[]) => {
+    if (interactions.length === 0) return;
+
+    doc.addPage();
+    let y = 20;
+    const margin = 15;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.setTextColor(0);
+    doc.text("Ligand Interactions", margin, y);
+    y += 10;
+
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(80);
+    doc.text("Contacts within 5.0Å of non-polymer heteroatoms (ligands, cofactors).", margin, y);
+    y += 15;
+
+    interactions.forEach(ligand => {
+        // Check space
+        if (y > doc.internal.pageSize.getHeight() - 40) {
+            doc.addPage();
+            y = 20;
+        }
+
+        // Subheader
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+        doc.setTextColor(0);
+        doc.setFillColor(243, 244, 246); // Gray-100
+        doc.rect(margin, y - 5, 180, 8, 'F');
+        doc.text(`${ligand.ligandName} (${ligand.ligandChain}:${ligand.ligandResNo})`, margin + 3, y + 1);
+        y += 8;
+
+        // Table
+        const rows = ligand.contacts.map(c => [
+            `${c.residueChain}:${c.residueName} ${c.residueNumber}`,
+            `${c.distance.toFixed(2)} Å`,
+            // Simple inference for type based on distance (can be refined later if we pass type)
+            c.distance < 3.5 ? (c.residueName === 'CYS' ? 'Potential Bonding' : 'Hydrogen Bond (Est.)') : 'Hydrophobic/VdW'
+        ]);
+
+        autoTable(doc, {
+            startY: y,
+            head: [['Contact Residue', 'Distance', 'Interaction Est.']],
+            body: rows,
+            theme: 'grid',
+            styles: { fontSize: 9, cellPadding: 2 },
+            headStyles: { fillColor: [75, 85, 99], textColor: 255 }, // Gray-600
+            columnStyles: {
+                0: { cellWidth: 40 },
+                1: { cellWidth: 30 },
+                2: { cellWidth: 50 }
+            },
+            margin: { left: margin + 5 }
+        });
+
+        y = (doc as any).lastAutoTable.finalY + 15;
+    });
+};
+
 // Helper: Add page numbers to all pages
 const addPageNumbers = (doc: jsPDF) => {
     const pageCount = doc.internal.pages.length - 1; // First element is metadata
@@ -753,7 +816,8 @@ export const generateProteinReport = async (
     metadata: ProteinMetadata,
     snapshot: string | null = null,
     currentUrl: string | null = null,
-    pdbMetadata: PDBMetadata | null = null
+    pdbMetadata: PDBMetadata | null = null,
+    ligandInteractions: import('../types').LigandInteraction[] | null = null
 ) => {
     const doc = new jsPDF();
     const isLightMode = false; // Force DARK MODE for Maps (User Request)
@@ -785,6 +849,7 @@ export const generateProteinReport = async (
     sections.push({ title: 'Overview & Summary', page: 1 });
 
     // Pre-fill sections with titles for TOC placeholder rendering
+    // NOTE: Order must match generation order below
     sections.push({ title: 'All Significant Interactions', page: 0 });
     sections.push({ title: 'Salt Bridges (Ionic)', page: 0 });
     sections.push({ title: 'Disulfide Bonds (Covalent)', page: 0 });
@@ -792,6 +857,10 @@ export const generateProteinReport = async (
     sections.push({ title: 'Pi-Stacking & Cation-Pi', page: 0 });
     if (metadata.chainCount > 1) {
         sections.push({ title: 'Interface Analysis', page: 0 });
+    }
+    // Ligand Section Placeholder
+    if (ligandInteractions && ligandInteractions.length > 0) {
+        sections.push({ title: 'Ligand Interactions', page: 0 });
     }
 
     // PAGE BREAK -> TOC
@@ -823,20 +892,29 @@ export const generateProteinReport = async (
     addSection(doc, "Salt Bridges (Ionic Interactions)", data, (t) => t === 'Salt Bridge', isLightMode, true);
 
     sections[3].page = getCurPage() + 1;
-    addSection(doc, "Disulfide Bonds (Covalent)", data, (t) => t === 'Disulfide Bond', isLightMode, true);
+    addSection(doc, "Disulfide Bonds", data, (t) => t === 'Disulfide Bond', isLightMode, true);
 
     sections[4].page = getCurPage() + 1;
-    addSection(doc, "Hydrophobic Clusters", data, (t) => t === 'Hydrophobic Contact', isLightMode, true);
+    addSection(doc, "Hydrophobic Contacts", data, (t) => t === 'Hydrophobic Contact', isLightMode, true);
 
     sections[5].page = getCurPage() + 1;
     addSection(doc, "Pi-Stacking & Cation-Pi", data, (t) => t === 'Pi-Stacking' || t === 'Cation-Pi Interaction', isLightMode, true);
 
+    let nextSectionIdx = 6;
     if (metadata.chainCount > 1) {
-        sections[6].page = getCurPage() + 1;
+        sections[nextSectionIdx].page = getCurPage() + 1;
         addSection(doc, "Interface Analysis (Chain Interactions)", data, (_t, l1, l2) => {
             if (l1 && l2 && l1.chain !== l2.chain) return true;
             return false;
         }, isLightMode, true);
+        nextSectionIdx++;
+    }
+
+    // Ligand Interactions
+    if (ligandInteractions && ligandInteractions.length > 0) {
+        sections[nextSectionIdx].page = getCurPage() + 1;
+        addLigandSection(doc, ligandInteractions);
+        nextSectionIdx++;
     }
 
     // Go back to the TOC page to fill in page numbers

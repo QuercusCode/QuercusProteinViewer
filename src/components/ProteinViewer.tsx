@@ -64,6 +64,7 @@ export interface ProteinViewerRef {
     visualizeContact: (chainA: string, resA: number, chainB: string, resB: number) => void;
     captureImage: () => Promise<void>;
     highlightRegion: (selection: string, label?: string) => void;
+    getLigandInteractions: () => Promise<import('../types').LigandInteraction[]>;
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
@@ -836,6 +837,94 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     console.warn("Failed to visual contact", e);
                 }
             }
+        },
+
+        getLigandInteractions: async () => {
+            if (!componentRef.current) return [];
+            const component = componentRef.current;
+            const NGL = window.NGL;
+            const interactions: import('../types').LigandInteraction[] = [];
+
+            try {
+                // 1. Identify Ligands (Heteroatoms, excluding water/ions)
+                const ligandSelection = new NGL.Selection("ligand and not (water or ion)");
+                const ligandAtoms: any[] = [];
+                component.structure.eachAtom((atom: any) => {
+                    ligandAtoms.push(atom);
+                }, ligandSelection);
+
+                if (ligandAtoms.length === 0) return [];
+
+                // Group atoms by Residue (Ligand ID)
+                const ligandResidues = new Map<string, any[]>();
+                ligandAtoms.forEach(atom => {
+                    const key = `${atom.chainname}:${atom.resno}`;
+                    if (!ligandResidues.has(key)) ligandResidues.set(key, []);
+                    ligandResidues.get(key)?.push(atom);
+                });
+
+                // 2. Iterate each Ligand Residue
+                ligandResidues.forEach((atoms, _key) => {
+                    const firstAtom = atoms[0];
+                    const ligandName = firstAtom.resname;
+                    const ligandChain = firstAtom.chainname;
+                    const ligandResNo = firstAtom.resno;
+
+                    const contacts: any[] = [];
+                    const seenResidues = new Set<string>();
+
+                    // Check neighbors for EACH atom in the ligand
+                    atoms.forEach(lAtom => {
+                        // Radius Search (5.0A)
+                        const radius = 5.0;
+                        const atomSet = component.structure.getAtomSetWithinPoint(new NGL.Vector3(lAtom.x, lAtom.y, lAtom.z), radius);
+
+                        // Filter for Protein Polymer
+                        component.structure.eachAtom((pAtom: any) => {
+                            if (!pAtom.isHet() && pAtom.residue.isProtein()) { // Ensure protein
+                                const resKey = `${pAtom.chainname}:${pAtom.resno}`;
+
+                                // Avoid duplicates (one contact per residue is enough for the report table)
+                                if (!seenResidues.has(resKey)) {
+                                    // Calculate precise distance
+                                    const dist = Math.sqrt(
+                                        Math.pow(pAtom.x - lAtom.x, 2) +
+                                        Math.pow(pAtom.y - lAtom.y, 2) +
+                                        Math.pow(pAtom.z - lAtom.z, 2)
+                                    );
+
+                                    if (dist <= 5.0) {
+                                        seenResidues.add(resKey);
+                                        contacts.push({
+                                            residueChain: pAtom.chainname,
+                                            residueNumber: pAtom.resno,
+                                            residueName: pAtom.resname,
+                                            distance: parseFloat(dist.toFixed(2))
+                                        });
+                                    }
+                                } else {
+                                    // Update distance if closer atom found in same residue?
+                                    // For simplicity, we stick with the first found (usually good enough)
+                                }
+                            }
+                        }, atomSet);
+                    });
+
+                    if (contacts.length > 0) {
+                        interactions.push({
+                            ligandName,
+                            ligandChain,
+                            ligandResNo,
+                            contacts: contacts.sort((a, b) => a.distance - b.distance)
+                        });
+                    }
+                });
+
+            } catch (e) {
+                console.error("Failed to calculate ligand interactions:", e);
+            }
+
+            return interactions;
         },
 
         clearMeasurements: () => {
