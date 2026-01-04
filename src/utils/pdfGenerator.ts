@@ -995,7 +995,8 @@ export const generateProteinReport = async (
         sections.push({ title: 'Interface Analysis', page: interfacePage });
     }
 
-    // Add TOC (will be at the end of PDF)\n    addTableOfContents(doc, sections);
+    // Add TOC (will be at the end of PDF)
+    addTableOfContents(doc, sections);
 
     // Add page numbers to all pages
     addPageNumbers(doc);
