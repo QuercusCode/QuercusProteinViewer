@@ -779,7 +779,9 @@ export const generateProteinReport = async (
     }
 
     // PAGE 1: Enhanced Instruction & Overview
-    const overviewEndY = addInstructionPage(doc, proteinName, metadata, stats, snapshot, data.labels, qrCodeDataUrl, pdbMetadata);
+    // Note: addInstructionPage might span multiple pages internally.
+    // We don't care about overviewEndY anymore because TOC forces a new page.
+    addInstructionPage(doc, proteinName, metadata, stats, snapshot, data.labels, qrCodeDataUrl, pdbMetadata);
     sections.push({ title: 'Overview & Summary', page: 1 });
 
     // Pre-fill sections with titles for TOC placeholder rendering
@@ -792,17 +794,15 @@ export const generateProteinReport = async (
         sections.push({ title: 'Interface Analysis', page: 0 });
     }
 
-    // PAGE 1/2: TOC Placeholders
-    // Render TOC titles only (no numbers yet) to reserve space
-    // Capture where TOC starts (Page and Y)
-    const tocStartPage = doc.internal.pages.length - 1; // Current page count (1-based index usually matches length-1 if index 0 unused)
-    // Actually jsPDF: pages array has empty object at 0. So length - 1 is typically the current page index.
-    // doc.addPage adds to length.
+    // PAGE BREAK -> TOC
+    doc.addPage();
+    const tocStartPage = doc.internal.pages.length - 1;
+    const tocStartY = 30; // Start fresh at top of page
 
-    const tocStartY = overviewEndY;
-    addTableOfContents(doc, sections, tocStartY, false); // Render placeholders
+    // Render TOC placeholders
+    addTableOfContents(doc, sections, tocStartY, false);
 
-    // FORCE PAGE BREAK for Analysis Sections (as requested: "page immediately after TOC")
+    // PAGE BREAK -> All Significant Interactions
     doc.addPage();
 
     // Helper to get current page number
@@ -813,11 +813,13 @@ export const generateProteinReport = async (
     // Add all analysis sections and track their pages
     const allFilter = (t: string | null) => t !== null && t !== 'Close Contact';
 
-    // Capture START page for "All Significant Interactions" (which starts on the current page)
+    // Capture START page for "All Significant Interactions" (which starts on the current new page)
     sections[1].page = getCurPage();
+    // Pass newPage=false because we just added the page manually above
     addSection(doc, "All Significant Interactions", data, allFilter, isLightMode, false, 20);
 
-    sections[2].page = getCurPage() + 1; // Starts on NEXT page
+    // Subsequent sections use newPage=true (default) which does doc.addPage() internally
+    sections[2].page = getCurPage() + 1;
     addSection(doc, "Salt Bridges (Ionic Interactions)", data, (t) => t === 'Salt Bridge', isLightMode, true);
 
     sections[3].page = getCurPage() + 1;
