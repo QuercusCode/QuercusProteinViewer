@@ -745,16 +745,16 @@ export const generateProteinReport = async (
     sections.push({ title: 'All Significant Interactions', page: doc.internal.pages.length });
     addSection(doc, "All Significant Interactions", data, allFilter, isLightMode, false, 20);
 
-    sections.push({ title: 'Salt Bridges (Ionic)', page: doc.internal.getNumberOfPages() + 1 });
+    sections.push({ title: 'Salt Bridges (Ionic)', page: doc.internal.pages.length });
     addSection(doc, "Salt Bridges (Ionic Interactions)", data, (t) => t === 'Salt Bridge', isLightMode, true);
 
-    sections.push({ title: 'Disulfide Bonds (Covalent)', page: doc.internal.getNumberOfPages() + 1 });
+    sections.push({ title: 'Disulfide Bonds (Covalent)', page: doc.internal.pages.length });
     addSection(doc, "Disulfide Bonds (Covalent)", data, (t) => t === 'Disulfide Bond', isLightMode, true);
 
-    sections.push({ title: 'Hydrophobic Clusters', page: doc.internal.getNumberOfPages() + 1 });
+    sections.push({ title: 'Hydrophobic Clusters', page: doc.internal.pages.length });
     addSection(doc, "Hydrophobic Clusters", data, (t) => t === 'Hydrophobic Contact', isLightMode, true);
 
-    sections.push({ title: 'Pi-Stacking & Cation-Pi', page: doc.internal.getNumberOfPages() + 1 });
+    sections.push({ title: 'Pi-Stacking & Cation-Pi', page: doc.internal.pages.length });
     addSection(doc, "Pi-Stacking & Cation-Pi", data, (t) => t === 'Pi-Stacking' || t === 'Cation-Pi Interaction', isLightMode, true);
 
     // INTERFACE ANALYSIS (New)
