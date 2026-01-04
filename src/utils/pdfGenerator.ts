@@ -954,9 +954,7 @@ export const generateProteinReport = async (
     // Page 2: Add TOC now (before adding content, with placeholder page numbers)
     // We'll add content first, then regenerate TOC with correct numbers
 
-    // Page 2-3: Add Methodology
-    addMethodology(doc);
-    const methodologyPage = doc.internal.pages.length;
+
 
     // Add all analysis sections and track their pages
     const allFilter = (t: string | null) => t !== null && t !== 'Close Contact';
@@ -984,8 +982,7 @@ export const generateProteinReport = async (
         interfacePage = doc.internal.pages.length;
     }
 
-    // Now populate sections with correct page numbers
-    sections.push({ title: 'Methodology', page: methodologyPage });
+    // Populate sections with correct page numbers
     sections.push({ title: 'All Significant Interactions', page: allInteractionsPage });
     sections.push({ title: 'Salt Bridges (Ionic)', page: saltBridgesPage });
     sections.push({ title: 'Disulfide Bonds (Covalent)', page: disulfidePage });
