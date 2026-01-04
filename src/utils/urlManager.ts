@@ -11,6 +11,7 @@ export interface AppState {
     showSurface: boolean;
     customColors?: CustomColorRule[];
     measurements?: { atom1: any, atom2: any, distance: number }[];
+    customBackgroundColor?: string | null;
 }
 
 /**
@@ -62,6 +63,11 @@ export const getShareableURL = (state: AppState): string => {
             const b64 = btoa(json);
             params.set('meas', b64);
         } catch (e) { console.warn("Failed to serialize measurements", e); }
+    }
+
+    // 6. Custom Background
+    if (state.customBackgroundColor) {
+        params.set('bg', encodeURIComponent(state.customBackgroundColor));
     }
 
     const url = new URL(window.location.href);
@@ -124,6 +130,12 @@ export const parseURLState = (): Partial<AppState> => {
                 distance: 0 // Will be recalculated by viewer
             }));
         } catch (e) { console.warn("Failed to parse measurements", e); }
+    }
+
+    // 6. Custom Background
+    const bg = params.get('bg');
+    if (bg) {
+        state.customBackgroundColor = decodeURIComponent(bg);
     }
 
     return state;

@@ -108,6 +108,8 @@ interface ControlsProps {
     setIsDyslexicFont: (isDyslexic: boolean) => void;
     // Mobile
     onToggleShare: () => void;
+    customBackgroundColor?: string | null;
+    setCustomBackgroundColor?: (color: string | null) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -160,7 +162,9 @@ export const Controls: React.FC<ControlsProps> = ({
     // onToggleAISidebar,
     // isAISidebarOpen,
     onToggleLibrary,
-    onToggleShare
+    onToggleShare,
+    customBackgroundColor,
+    setCustomBackgroundColor
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const sessionInputRef = useRef<HTMLInputElement>(null);
@@ -508,6 +512,49 @@ export const Controls: React.FC<ControlsProps> = ({
                                         <span className="text-xs font-medium">Dyslexic Font</span>
                                         <div className={`w-1.5 h-1.5 rounded-full ${isDyslexicFont ? 'bg-blue-500' : 'bg-neutral-500'}`} />
                                     </button>
+                                </div>
+
+                                {/* Background Controls */}
+                                <div className="space-y-2 pt-2 border-t border-white/5">
+                                    <label className={`text-[10px] font-bold uppercase tracking-wider block ${subtleText}`}>Background</label>
+                                    <div className="grid grid-cols-5 gap-1">
+                                        {[
+                                            { color: '#000000', label: 'Black' },
+                                            { color: '#ffffff', label: 'White' },
+                                            { color: '#1a1a1a', label: 'Dark' },
+                                            { color: '#f5f5f5', label: 'Light' },
+                                            { color: '#000020', label: 'Navy' },
+                                        ].map((preset) => (
+                                            <button
+                                                key={preset.color}
+                                                onClick={() => setCustomBackgroundColor?.(preset.color)}
+                                                className={`h-6 rounded border transition-all ${customBackgroundColor === preset.color ? 'ring-2 ring-blue-500 ring-offset-1 ring-offset-black' : 'hover:scale-105'}`}
+                                                style={{ backgroundColor: preset.color, borderColor: isLightMode ? '#e5e5e5' : '#333' }}
+                                                title={preset.label}
+                                            />
+                                        ))}
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <div className={`flex-1 flex items-center gap-2 px-2 py-1.5 rounded border ${inputBg}`}>
+                                            <input
+                                                type="color"
+                                                value={customBackgroundColor || (isLightMode ? '#ffffff' : '#000000')}
+                                                onChange={(e) => setCustomBackgroundColor?.(e.target.value)}
+                                                className="w-5 h-5 rounded cursor-pointer bg-transparent border-none p-0"
+                                            />
+                                            <span className="text-[10px] font-mono opacity-70 uppercase">
+                                                {customBackgroundColor || 'Auto'}
+                                            </span>
+                                        </div>
+                                        {customBackgroundColor && (
+                                            <button
+                                                onClick={() => setCustomBackgroundColor?.(null)}
+                                                className={`px-3 py-1.5 rounded border text-[10px] font-bold uppercase transition-colors hover:bg-red-500/10 hover:text-red-500 ${isLightMode ? 'border-neutral-200 text-neutral-500' : 'border-neutral-700 text-neutral-400'}`}
+                                            >
+                                                Reset
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
 
                                 <div className="space-y-2">

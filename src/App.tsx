@@ -73,6 +73,7 @@ function App() {
 
   // Custom Colors need to be initialized too
   const [customColors, setCustomColors] = useState<CustomColorRule[]>(initialUrlState.customColors || []);
+  const [customBackgroundColor, setCustomBackgroundColor] = useState<string | null>(initialUrlState.customBackgroundColor || null);
   const [showLigands, setShowLigands] = useState(initialUrlState.showLigands || false);
   const [showSurface, setShowSurface] = useState(initialUrlState.showSurface || false);
 
@@ -611,6 +612,8 @@ function App() {
         // isAISidebarOpen={isAISidebarOpen}
         onToggleLibrary={() => setIsLibraryOpen(true)}
         onToggleShare={() => setShowShareModal(true)}
+        customBackgroundColor={customBackgroundColor}
+        setCustomBackgroundColor={setCustomBackgroundColor}
       />
 
       <ProteinViewer
@@ -628,7 +631,7 @@ function App() {
         onAtomClick={handleAtomClick}
         isMeasurementMode={isMeasurementMode}
 
-        backgroundColor={isLightMode ? 'white' : 'black'}
+        backgroundColor={customBackgroundColor || (isLightMode ? 'white' : 'black')}
         showSurface={showSurface}
         showLigands={showLigands}
         isSpinning={isSpinning}
