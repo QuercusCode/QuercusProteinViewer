@@ -846,8 +846,9 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             const interactions: import('../types').LigandInteraction[] = [];
 
             try {
-                // 1. Identify Ligands (Heteroatoms, excluding water/ions)
-                const ligandSelection = new NGL.Selection("ligand and not (water or ion)");
+                // 1. Identify Ligands (Heteroatoms, excluding water)
+                // Broadened selection to include ions (Zn, Mg, SO4, etc.) as they are often relevant
+                const ligandSelection = new NGL.Selection("(ligand or ion) and not water");
                 const ligandAtoms: any[] = [];
                 component.structure.eachAtom((atom: any) => {
                     ligandAtoms.push(atom);

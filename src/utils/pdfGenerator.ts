@@ -391,7 +391,8 @@ const addInstructionPage = (
     snapshot: string | null,
     labels: any[],
     qrCodeDataUrl: string | null = null,
-    pdbMetadata: PDBMetadata | null = null
+    pdbMetadata: PDBMetadata | null = null,
+    pdbAccession?: string
 ) => {
     const margin = 20;
     let y = 20;
@@ -439,6 +440,9 @@ const addInstructionPage = (
     if (pdbMetadata) {
         metadataHeight = 25; // Extra space for method, resolution, etc.
     }
+    if (pdbAccession) {
+        metadataHeight += 5;
+    }
 
     const contentHeight = 10 + 8 + nameHeight + 5 + 5 + metadataHeight + 10 + 8 + 25 + 5;
 
@@ -461,6 +465,10 @@ const addInstructionPage = (
     // Wrap Name
     doc.text(nameLines, leftPad, innerY);
     innerY += nameHeight;
+
+    if (pdbAccession) {
+        doc.text(`PDB Code: ${pdbAccession}`, leftPad, innerY); innerY += 5;
+    }
 
     doc.text(`Residues: ${metadata.residueCount}`, leftPad, innerY); innerY += 5;
     doc.text(`Chains: ${metadata.chains.join(', ')}`, leftPad, innerY); innerY += 5;
@@ -817,7 +825,8 @@ export const generateProteinReport = async (
     snapshot: string | null = null,
     currentUrl: string | null = null,
     pdbMetadata: PDBMetadata | null = null,
-    ligandInteractions: import('../types').LigandInteraction[] | null = null
+    ligandInteractions: import('../types').LigandInteraction[] | null = null,
+    pdbAccession?: string
 ) => {
     const doc = new jsPDF();
     const isLightMode = false; // Force DARK MODE for Maps (User Request)
@@ -845,7 +854,7 @@ export const generateProteinReport = async (
     // PAGE 1: Enhanced Instruction & Overview
     // Note: addInstructionPage might span multiple pages internally.
     // We don't care about overviewEndY anymore because TOC forces a new page.
-    addInstructionPage(doc, proteinName, metadata, stats, snapshot, data.labels, qrCodeDataUrl, pdbMetadata);
+    addInstructionPage(doc, proteinName, metadata, stats, snapshot, data.labels, qrCodeDataUrl, pdbMetadata, pdbAccession);
     sections.push({ title: 'Overview & Summary', page: 1 });
 
     // Pre-fill sections with titles for TOC placeholder rendering
