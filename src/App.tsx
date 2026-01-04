@@ -668,6 +668,7 @@ function App() {
             orientation: viewerRef.current?.getCameraOrientation()
           });
         }}
+        pdbMetadata={pdbMetadata}
       />
 
 

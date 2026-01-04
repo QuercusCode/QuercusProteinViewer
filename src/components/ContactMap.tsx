@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { X, ZoomIn, ZoomOut, Maximize, Download, Grid3X3, Check, FileText, Menu, BookOpen, Smartphone } from 'lucide-react';
-import type { ChainInfo, ColorPalette } from '../types';
+import type { ChainInfo, ColorPalette, PDBMetadata } from '../types';
 import { generateProteinReport } from '../utils/pdfGenerator';
 import { getInteractionType } from '../utils/interactionUtils';
 import { getPaletteColor } from '../utils/colorUtils';
@@ -17,6 +17,7 @@ interface ContactMapProps {
     getShareableLink?: () => string;
     colorPalette?: ColorPalette;
     onHighlightResidue?: (chain: string, resNo: number) => void;
+    pdbMetadata: PDBMetadata | null;
 }
 
 
@@ -32,6 +33,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
     getShareableLink,
     colorPalette = 'standard',
     // onHighlightResidue
+    pdbMetadata
 }) => {
     const mapCanvasRef = useRef<HTMLCanvasElement>(null);
     const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -577,7 +579,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         const finalName = customName || proteinName;
         // Pass current URL for QR Code
         const currentUrl = getShareableLink ? getShareableLink() : window.location.href;
-        generateProteinReport(finalName, mapCanvasRef.current, distanceData, metadata, snapshot, currentUrl);
+        generateProteinReport(finalName, mapCanvasRef.current, distanceData, metadata, snapshot, currentUrl, pdbMetadata);
     };
 
     const handleDownload = () => {

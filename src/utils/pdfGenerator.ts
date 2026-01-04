@@ -2,6 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import QRCode from 'qrcode'; // Import QR Code
 import { getInteractionType } from './interactionUtils';
+import type { PDBMetadata } from '../types';
 
 interface InteractionData {
     matrix: number[][];
@@ -389,7 +390,8 @@ const addInstructionPage = (
     stats: Record<string, number>,
     snapshot: string | null,
     labels: any[],
-    qrCodeDataUrl: string | null = null
+    qrCodeDataUrl: string | null = null,
+    pdbMetadata: PDBMetadata | null = null
 ) => {
     const margin = 20;
     let y = 20;
@@ -428,11 +430,17 @@ const addInstructionPage = (
     // Calculate Height Dynamically
     const nameLines = doc.splitTextToSize(`Name: ${proteinName}`, 70);
     const nameHeight = nameLines.length * 5;
-    // Base height breakdown: 
-    // Top Pad (10) + Struct Header (8) + Name (nameHeight) + Res (5) + Chains (10) + 
-    // Int Header (8) + Stats (25) + Bottom Pad (5) = 71 + nameHeight
-    // Let's compute exact needed height
-    const contentHeight = 10 + 8 + nameHeight + 5 + 10 + 8 + 25 + 5;
+    // Base height breakdown (approx):
+    // Top Pad (10) + Struct Header (8) + Name (nameHeight) + Res (5) + Chains (5) + 
+    // Metadata block (approx 20 if present) + Int Header (8) + Stats (25) + Bottom Pad (5)
+
+    // Metadata Height
+    let metadataHeight = 0;
+    if (pdbMetadata) {
+        metadataHeight = 25; // Extra space for method, resolution, etc.
+    }
+
+    const contentHeight = 10 + 8 + nameHeight + 5 + 5 + metadataHeight + 10 + 8 + 25 + 5;
 
     doc.setDrawColor(200);
     doc.setFillColor(248, 250, 252); // Slate-50
@@ -455,7 +463,25 @@ const addInstructionPage = (
     innerY += nameHeight;
 
     doc.text(`Residues: ${metadata.residueCount}`, leftPad, innerY); innerY += 5;
-    doc.text(`Chains: ${metadata.chains.join(', ')}`, leftPad, innerY); innerY += 10;
+    doc.text(`Residues: ${metadata.residueCount}`, leftPad, innerY); innerY += 5;
+    doc.text(`Chains: ${metadata.chains.join(', ')}`, leftPad, innerY); innerY += 5;
+
+    // PDB Metadata (If available)
+    if (pdbMetadata) {
+        innerY += 3;
+        doc.setFontSize(8);
+        doc.setTextColor(100);
+
+        doc.text(`Method: ${pdbMetadata.method}`, leftPad, innerY); innerY += 4;
+        doc.text(`Resolution: ${pdbMetadata.resolution}`, leftPad, innerY); innerY += 4;
+        doc.text(`Source: ${pdbMetadata.organism}`, leftPad, innerY); innerY += 4;
+        doc.text(`Date: ${pdbMetadata.depositionDate}`, leftPad, innerY); innerY += 6;
+
+        doc.setFontSize(9);
+        doc.setTextColor(0);
+    } // end metadata block
+
+    innerY += 5;
 
     doc.setFontSize(12);
     doc.setFont("helvetica", "bold");
@@ -723,7 +749,8 @@ export const generateProteinReport = async (
     data: InteractionData,
     metadata: ProteinMetadata,
     snapshot: string | null = null,
-    currentUrl: string | null = null
+    currentUrl: string | null = null,
+    pdbMetadata: PDBMetadata | null = null
 ) => {
     const doc = new jsPDF();
     const isLightMode = false; // Force DARK MODE for Maps (User Request)
@@ -748,8 +775,8 @@ export const generateProteinReport = async (
         }
     }
 
-    // PAGE 1: Overview & Legend
-    const overviewEndY = addInstructionPage(doc, proteinName, metadata, stats, snapshot, data.labels, qrCodeDataUrl);
+    // PAGE 1: Enhanced Instruction & Overview
+    const overviewEndY = addInstructionPage(doc, proteinName, metadata, stats, snapshot, data.labels, qrCodeDataUrl, pdbMetadata);
     sections.push({ title: 'Overview & Summary', page: 1 });
 
     // Pre-fill sections with titles for TOC placeholder rendering
