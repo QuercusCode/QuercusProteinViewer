@@ -10,6 +10,8 @@ import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Movie, ColorP
 import LibraryModal from './components/LibraryModal';
 import { ShareModal } from './components/ShareModal';
 import { OFFLINE_LIBRARY } from './data/library';
+import { fetchPDBMetadata } from './utils/pdbUtils';
+import type { PDBMetadata } from './types';
 
 function App() {
   // Parse Global URL State Once
@@ -249,6 +251,19 @@ function App() {
     setCustomColors([]);
     setHighlightedResidue(null);
   };
+
+  const [pdbMetadata, setPdbMetadata] = useState<PDBMetadata | null>(null);
+
+  // Fetch Metadata when PDB ID changes
+  useEffect(() => {
+    if (pdbId && !file) { // Only fetch if using PDB ID, not local file
+      fetchPDBMetadata(pdbId).then(data => {
+        if (data) setPdbMetadata(data);
+      });
+    } else {
+      setPdbMetadata(null); // Clear/Reset if file uploaded or no ID
+    }
+  }, [pdbId, file]);
 
   const [isRecording, setIsRecording] = useState(false);
 
@@ -589,6 +604,7 @@ function App() {
         onSaveSession={handleSaveSession}
         onLoadSession={handleLoadSession}
         onToggleContactMap={() => setShowContactMap(true)}
+        pdbMetadata={pdbMetadata}
         isDyslexicFont={isDyslexicFont}
         setIsDyslexicFont={setIsDyslexicFont}
         // onToggleAISidebar={() => setIsAISidebarOpen(prev => !prev)}

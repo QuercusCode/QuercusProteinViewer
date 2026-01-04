@@ -60,3 +60,11 @@ export interface ResidueInfo {
 export type RepresentationType = 'cartoon' | 'licorice' | 'backbone' | 'spacefill' | 'surface' | 'ribbon' | 'ball+stick' | 'line';
 export type ColoringType = 'chainid' | 'residue' | 'secondary' | 'hydrophobicity' | 'structure' | 'bfactor' | 'charge' | 'residueindex';
 export type ColorPalette = 'standard' | 'viridis' | 'magma' | 'cividis' | 'plasma';
+
+export interface PDBMetadata {
+    method: string;
+    resolution: string;
+    organism: string;
+    depositionDate: string;
+    title?: string;
+}

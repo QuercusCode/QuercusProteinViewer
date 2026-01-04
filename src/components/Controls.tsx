@@ -30,7 +30,7 @@ import {
     Wrench,
     Share2
 } from 'lucide-react';
-import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette } from '../types';
+import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, PDBMetadata } from '../types';
 
 // Reusable Sidebar Section Component - Defined outside to prevent re-renders losing focus
 const SidebarSection = ({ title, icon: Icon, children, isOpen, onToggle }: { title: string, icon: any, children: React.ReactNode, isOpen: boolean, onToggle: () => void }) => (
@@ -71,6 +71,7 @@ interface ControlsProps {
     isMeasurementMode: boolean;
     setIsMeasurementMode: (mode: boolean) => void;
     onClearMeasurements: () => void;
+    pdbMetadata: PDBMetadata | null;
 
     isLightMode: boolean;
     setIsLightMode: (mode: boolean) => void;
@@ -105,6 +106,7 @@ interface ControlsProps {
     setColorPalette: (palette: ColorPalette) => void;
     isDyslexicFont: boolean;
     setIsDyslexicFont: (isDyslexic: boolean) => void;
+    // Mobile
     onToggleShare: () => void;
 }
 
@@ -124,7 +126,7 @@ export const Controls: React.FC<ControlsProps> = ({
     isMeasurementMode,
     setIsMeasurementMode,
     onClearMeasurements,
-
+    pdbMetadata,
     isLightMode,
     setIsLightMode,
     highlightedResidue,
@@ -427,6 +429,39 @@ export const Controls: React.FC<ControlsProps> = ({
                                     </span>
                                 </div>
                             </div>
+
+
+                            {/* PDB Metadata Display */}
+                            {pdbMetadata && (
+                                <div className="mt-3 pt-3 border-t border-neutral-200 dark:border-neutral-700">
+                                    <div className="grid grid-cols-2 gap-y-2 gap-x-2">
+                                        <div>
+                                            <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Method</span>
+                                            <span className={`text-[10px] font-medium leading-tight block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                                {pdbMetadata.method.length > 18 ? pdbMetadata.method.substring(0, 15) + '...' : pdbMetadata.method}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Resolution</span>
+                                            <span className={`text-[10px] font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                                {pdbMetadata.resolution}
+                                            </span>
+                                        </div>
+                                        <div className="col-span-2">
+                                            <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Organism</span>
+                                            <span className={`text-[10px] font-medium leading-tight block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                                {pdbMetadata.organism}
+                                            </span>
+                                        </div>
+                                        <div className="col-span-2">
+                                            <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Deposited</span>
+                                            <span className={`text-[10px] font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                                {pdbMetadata.depositionDate}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
 
