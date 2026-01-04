@@ -828,6 +828,7 @@ export const generateProteinReport = async (
     ligandInteractions: import('../types').LigandInteraction[] | null = null,
     pdbAccession?: string
 ) => {
+    console.log("[pdfGenerator] Received ligand interactions:", ligandInteractions);
     const doc = new jsPDF();
     const isLightMode = false; // Force DARK MODE for Maps (User Request)
 

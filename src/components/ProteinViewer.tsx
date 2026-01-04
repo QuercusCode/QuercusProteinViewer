@@ -857,6 +857,11 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                 console.log(`[LigandDebug] Selection '${selectionString}' found ${ligandAtoms.length} atoms.`);
 
+                // FORCE DEBUG: Check if we are finding specific ions
+                const ionSel = new NGL.Selection("ion");
+                const ionCount = component.structure.getAtomSet(ionSel).length;
+                console.log(`[LigandDebug] Explicit 'ion' check found: ${ionCount}`);
+
                 if (ligandAtoms.length === 0) {
                     // Fallback check: Try "not (polymer or water)"
                     const fallbackSel = new NGL.Selection("not (polymer or water)");
@@ -890,9 +895,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                     // Check neighbors for EACH atom in the ligand
                     atoms.forEach(lAtom => {
-                        // Radius Search (5.0A)
-                        const radius = 5.0;
-                        const atomSet = component.structure.getAtomSetWithinPoint(new NGL.Vector3(lAtom.x, lAtom.y, lAtom.z), radius);
+                        // Radius Search (5.0A) - Manual Check for Robustness
+                        // Note: atomSet optimization caused issues with NGL types, iterating all atoms is fast enough
 
                         // Filter for Protein Polymer
                         component.structure.eachAtom((pAtom: any) => {
@@ -917,12 +921,9 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                             distance: parseFloat(dist.toFixed(2))
                                         });
                                     }
-                                } else {
-                                    // Update distance if closer atom found in same residue?
-                                    // For simplicity, we stick with the first found (usually good enough)
                                 }
                             }
-                        }, atomSet);
+                        }); // Removed atomSet argument
                     });
 
                     if (contacts.length > 0) {
