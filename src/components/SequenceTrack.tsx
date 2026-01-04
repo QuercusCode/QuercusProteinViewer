@@ -59,7 +59,7 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
     if (!activeChain) return null;
 
     return (
-        <div className={`fixed bottom-0 left-0 right-0 z-40 transition-transform duration-300 transform translate-y-0 pb-1
+        <div className={`fixed bottom-0 left-0 right-0 md:left-80 z-40 transition-transform duration-300 transform translate-y-0 pb-1
             ${isLightMode ? 'bg-white/95 border-t border-neutral-300' : 'bg-neutral-900/95 border-t border-neutral-700'} 
             backdrop-blur-md shadow-2xl safe-area-bottom`}>
 
