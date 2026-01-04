@@ -648,7 +648,7 @@ function App() {
         onPixelClick={handlePixelClick}
         isLightMode={isLightMode}
         colorPalette={colorPalette}
-        proteinName={file ? file.name.replace(/\.[^/.]+$/, "") : (proteinTitle || pdbId)}
+        proteinName={proteinTitle || (file ? file.name.replace(/\.[^/.]+$/, "") : pdbId)}
         pdbAccession={pdbId}
         getSnapshot={async () => {
           if (!viewerRef.current) return null;
