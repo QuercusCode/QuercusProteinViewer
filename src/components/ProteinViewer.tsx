@@ -849,8 +849,22 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 const ligandIndices = new Set<number>();
                 const ligandMetadata = new Map<number, { resname: string, chainname: string, resno: number }>();
 
+                // Sequential Numbering Logic
+                const residueSeqMap = new Map<string, number>(); // Key: "Chain:ResNo" -> SeqIdx
+                const chainCounters = new Map<string, number>();
+
                 component.structure.eachResidue((r: any) => {
                     const name = r.resname.trim().toUpperCase();
+
+                    // Track sequential index for proteins
+                    if (r.isProtein()) {
+                        const cName = r.chainname;
+                        const currentCount = chainCounters.get(cName) || 0;
+                        const newCount = currentCount + 1;
+                        chainCounters.set(cName, newCount);
+                        residueSeqMap.set(`${cName}:${r.resno}`, newCount);
+                    }
+
                     // Log everything for first few residues to sanity check
                     if (r.index < 5 || name === 'HEM' || name === 'ZN') {
                         console.log(`[LigandDebug] Inspect: ${name} (idx: ${r.index}) IsProtein: ${r.isProtein()} IsWater: ${r.isWater()} IsNucleic: ${r.isNucleic()}`);
@@ -878,7 +892,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                 // 2. Collect Atoms
                 const ligandAtomsMap = new Map<number, { x: number, y: number, z: number }[]>();
-                const proteinAtoms: { x: number, y: number, z: number, chain: string, resno: number, resname: string }[] = [];
+                const proteinAtoms: { x: number, y: number, z: number, chain: string, resno: number, resname: string, seqIdx?: number }[] = [];
 
                 let totalLigandAtoms = 0;
                 let totalProteinAtoms = 0;
@@ -893,9 +907,11 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         totalLigandAtoms++;
                     } else if (a.residue.isProtein()) {
                         // Protein Atom
+                        const seqIdx = residueSeqMap.get(`${a.chainname}:${a.resno}`);
                         proteinAtoms.push({
                             x: a.x, y: a.y, z: a.z,
-                            chain: a.chainname, resno: a.resno, resname: a.resname
+                            chain: a.chainname, resno: a.resno, resname: a.resname,
+                            seqIdx: seqIdx
                         });
                         totalProteinAtoms++;
                     }
@@ -938,6 +954,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             contacts.push({
                                 residueChain: pAtom.chain,
                                 residueNumber: pAtom.resno,
+                                residueSeq: pAtom.seqIdx, // Pass sequential index
                                 residueName: pAtom.resname,
                                 distance: parseFloat(minDist.toFixed(2))
                             });

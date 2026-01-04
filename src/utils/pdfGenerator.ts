@@ -709,22 +709,32 @@ const addLigandSection = (doc: jsPDF, interactions: import('../types').LigandInt
             y = 20;
         }
 
-        // Subheader
+        // Subheader - Simplified Format: "LigandName (Chain Identifier)" to avoid confusing residue numbers
         doc.setFont("helvetica", "bold");
         doc.setFontSize(11);
         doc.setTextColor(0);
         doc.setFillColor(243, 244, 246); // Gray-100
         doc.rect(margin, y - 5, 180, 8, 'F');
-        doc.text(`${ligand.ligandName} (${ligand.ligandChain}:${ligand.ligandResNo})`, margin + 3, y + 1);
+        // Old: doc.text(`${ligand.ligandName} (${ligand.ligandChain}:${ligand.ligandResNo})`, margin + 3, y + 1);
+        // New: "HEM (Chain A)" - User specifically asked to avoid the confusing PDB number
+        doc.text(`${ligand.ligandName} (Chain ${ligand.ligandChain})`, margin + 3, y + 1);
         y += 8;
 
         // Table
-        const rows = ligand.contacts.map(c => [
-            `${c.residueChain}:${c.residueName} ${c.residueNumber}`,
-            `${c.distance.toFixed(2)} Å`,
-            // Simple inference for type based on distance (can be refined later if we pass type)
-            c.distance < 3.5 ? (c.residueName === 'CYS' ? 'Potential Bonding' : 'Hydrogen Bond (Est.)') : 'Hydrophobic/VdW'
-        ]);
+        const rows = ligand.contacts.map(c => {
+            // Prefer Sequential Index if available: "VAL 15" instead of "VAL 108"
+            const resLabel = c.residueSeq
+                ? `${c.residueName} ${c.residueSeq}`
+                : `${c.residueName} ${c.residueNumber}`;
+
+            return [
+                // `${c.residueChain}:${c.residueName} ${c.residueNumber}`, <-- Old
+                `${c.residueChain}:${resLabel}`,
+                `${c.distance.toFixed(2)} Å`,
+                // Simple inference for type based on distance (can be refined later if we pass type)
+                c.distance < 3.5 ? (c.residueName === 'CYS' ? 'Potential Bonding' : 'Hydrogen Bond (Est.)') : 'Hydrophobic/VdW'
+            ];
+        });
 
         autoTable(doc, {
             startY: y,

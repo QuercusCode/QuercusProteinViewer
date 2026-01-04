@@ -76,6 +76,7 @@ export interface LigandInteraction {
     contacts: {
         residueChain: string;
         residueNumber: number;
+        residueSeq?: number; // 1-based sequential index
         residueName: string;
         distance: number;
         type?: string;
