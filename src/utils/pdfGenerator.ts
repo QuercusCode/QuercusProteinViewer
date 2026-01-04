@@ -983,11 +983,8 @@ export const generateProteinReport = async (
         }, isLightMode, true);
     }
 
-    // Add TOC as page 2
+    // Add TOC as page 2 (shifts all subsequent pages by +1)
     addTableOfContents(doc, sections);
-
-    // Add Methodology as page 3 (after TOC)
-    addMethodology(doc);
 
     // Add page numbers to all pages
     addPageNumbers(doc);
