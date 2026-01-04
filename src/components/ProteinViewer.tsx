@@ -846,34 +846,42 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             try {
                 // 1. Identify Ligands via Residue Scan
-                // We verify strictly to avoid Water (HOH) or standard amino acids
                 const ligandIndices = new Set<number>();
                 const ligandMetadata = new Map<number, { resname: string, chainname: string, resno: number }>();
 
                 component.structure.eachResidue((r: any) => {
+                    const name = r.resname.trim().toUpperCase();
+                    // Log everything for first few residues to sanity check
+                    if (r.index < 5 || name === 'HEM' || name === 'ZN') {
+                        console.log(`[LigandDebug] Inspect: ${name} (idx: ${r.index}) IsProtein: ${r.isProtein()} IsWater: ${r.isWater()} IsNucleic: ${r.isNucleic()}`);
+                    }
+
                     // Check standard flags
                     if (r.isWater()) return;
                     if (r.isProtein()) return;
                     if (r.isNucleic()) return;
 
-                    // Strict Name Check (Trim & Uppercase)
-                    const name = r.resname.trim().toUpperCase();
                     if (['HOH', 'WAT', 'DOD', 'SOL', 'TIP3', 'TIP4'].includes(name)) return;
 
                     // It's a valid ligand/ion
-                    // CRITICAL: NGL reuses 'r', so we MUST store the index and metadata primitively
                     ligandIndices.add(r.index);
                     ligandMetadata.set(r.index, { resname: name, chainname: r.chainname, resno: r.resno });
+                    console.log(`[LigandDebug] ACCEPTED: ${name} (idx: ${r.index})`);
                 });
 
-                console.log(`[LigandDebug] Identified ${ligandIndices.size} distinct ligand residues.`);
+                console.log(`[LigandDebug] Total identified ligand residues: ${ligandIndices.size}`);
 
-                if (ligandIndices.size === 0) return [];
+                if (ligandIndices.size === 0) {
+                    console.warn("[LigandDebug] No ligands passed filtering!");
+                    return [];
+                }
 
                 // 2. Collect Atoms
-                // We separate atoms into "Ligand Atoms" (grouped by residue) and "Protein Atoms" (flat list)
                 const ligandAtomsMap = new Map<number, { x: number, y: number, z: number }[]>();
                 const proteinAtoms: { x: number, y: number, z: number, chain: string, resno: number, resname: string }[] = [];
+
+                let totalLigandAtoms = 0;
+                let totalProteinAtoms = 0;
 
                 component.structure.eachAtom((a: any) => {
                     if (ligandIndices.has(a.residueIndex)) {
@@ -882,30 +890,33 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             ligandAtomsMap.set(a.residueIndex, []);
                         }
                         ligandAtomsMap.get(a.residueIndex)?.push({ x: a.x, y: a.y, z: a.z });
-                    } else if (a.residue.isProtein() && !a.isHet()) {
-                        // Protein Atom (exclude hetatoms attached to protein if any)
+                        totalLigandAtoms++;
+                    } else if (a.residue.isProtein()) {
+                        // Protein Atom
                         proteinAtoms.push({
                             x: a.x, y: a.y, z: a.z,
                             chain: a.chainname, resno: a.resno, resname: a.resname
                         });
+                        totalProteinAtoms++;
                     }
                 });
 
+
+
                 // 3. Distance Calculation
-                // Iterate each ligand residue found
                 for (const [rIndex, lAtoms] of ligandAtomsMap.entries()) {
                     const meta = ligandMetadata.get(rIndex);
                     if (!meta) continue;
 
+
+
                     const contacts: any[] = [];
                     const seenResidues = new Set<string>();
 
-                    // For this ligand, check against all protein atoms
                     for (const pAtom of proteinAtoms) {
                         const resKey = `${pAtom.chain}:${pAtom.resno}`;
                         if (seenResidues.has(resKey)) continue;
 
-                        // Check distance to ANY atom in this ligand
                         let isContact = false;
                         let minDist = 100.0;
 
@@ -934,18 +945,22 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     }
 
                     if (contacts.length > 0) {
+
                         interactions.push({
                             ligandName: meta.resname,
                             ligandChain: meta.chainname,
                             ligandResNo: meta.resno,
                             contacts: contacts.sort((a, b) => a.distance - b.distance)
                         });
+                    } else {
+
                     }
                 }
 
             } catch (e) {
                 console.error("Failed to calculate ligand interactions:", e);
             }
+
 
             return interactions;
         },
