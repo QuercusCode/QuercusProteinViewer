@@ -584,6 +584,7 @@ export const ContactMap: React.FC<ContactMapProps> = ({
         // Pass current URL for QR Code
         const currentUrl = getShareableLink ? getShareableLink() : window.location.href;
         const interactions = getLigandInteractions ? await getLigandInteractions() : null;
+        console.log("[LigandDebug] ContactMap received interactions:", interactions);
         generateProteinReport(finalName, mapCanvasRef.current, distanceData, metadata, snapshot, currentUrl, pdbMetadata, interactions, pdbAccession);
     };
 

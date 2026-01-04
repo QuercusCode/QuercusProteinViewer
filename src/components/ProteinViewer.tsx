@@ -848,11 +848,23 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             try {
                 // 1. Identify Ligands (Heteroatoms, excluding water)
                 // Broadened selection to include ions (Zn, Mg, SO4, etc.) as they are often relevant
-                const ligandSelection = new NGL.Selection("(ligand or ion) and not water");
+                const selectionString = "(ligand or ion) and not water";
+                const ligandSelection = new NGL.Selection(selectionString);
                 const ligandAtoms: any[] = [];
                 component.structure.eachAtom((atom: any) => {
                     ligandAtoms.push(atom);
                 }, ligandSelection);
+
+                console.log(`[LigandDebug] Selection '${selectionString}' found ${ligandAtoms.length} atoms.`);
+
+                if (ligandAtoms.length === 0) {
+                    // Fallback check: Try "not (polymer or water)"
+                    const fallbackSel = new NGL.Selection("not (polymer or water)");
+                    component.structure.eachAtom((atom: any) => {
+                        ligandAtoms.push(atom);
+                    }, fallbackSel);
+                    console.log(`[LigandDebug] Fallback 'not (polymer or water)' found ${ligandAtoms.length} atoms.`);
+                }
 
                 if (ligandAtoms.length === 0) return [];
 
@@ -870,6 +882,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     const ligandName = firstAtom.resname;
                     const ligandChain = firstAtom.chainname;
                     const ligandResNo = firstAtom.resno;
+
+                    console.log(`[LigandDebug] Checking Ligand: ${ligandName} ${ligandChain}:${ligandResNo}`);
 
                     const contacts: any[] = [];
                     const seenResidues = new Set<string>();
