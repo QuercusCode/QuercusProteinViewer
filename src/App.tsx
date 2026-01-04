@@ -669,6 +669,7 @@ function App() {
             showLigands,
             showSurface,
             customColors,
+            customBackgroundColor,
             orientation: viewerRef.current?.getCameraOrientation()
           });
         }}
@@ -693,6 +694,7 @@ function App() {
           showLigands,
           showSurface,
           customColors,
+          customBackgroundColor,
           orientation: viewerRef.current?.getCameraOrientation()
         })}
         isLightMode={isLightMode}
