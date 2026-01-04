@@ -645,6 +645,65 @@ const addSection = (
     });
 };
 
+// Helper: Add page numbers to all pages
+const addPageNumbers = (doc: jsPDF) => {
+    const pageCount = doc.internal.pages.length - 1; // First element is metadata
+    for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(9);
+        doc.setTextColor(150);
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        doc.text(`Page ${i} of ${pageCount}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+    }
+};
+
+// Helper: Add Table of Contents
+const addTableOfContents = (doc: jsPDF, sections: { title: string; page: number }[]) => {
+    doc.addPage();
+    doc.movePage(doc.internal.getNumberOfPages(), 2); // Move TOC to page 2
+
+    const margin = 20;
+    let y = 30;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.setTextColor(0);
+    doc.text("Table of Contents", margin, y);
+    y += 10;
+
+    // Underline
+    doc.setDrawColor(200);
+    doc.setLineWidth(0.5);
+    doc.line(margin, y, 190, y);
+    y += 10;
+
+    // List sections
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.setTextColor(50);
+
+    sections.forEach((section) => {
+        const dotWidth = 140;
+        const pageNumX = 180;
+
+        // Section title with link
+        doc.textWithLink(section.title, margin, y, { pageNumber: section.page });
+
+        // Dots
+        const titleWidth = doc.getTextWidth(section.title);
+        const dots = '.'.repeat(Math.floor((dotWidth - titleWidth) / 2));
+        doc.setTextColor(150);
+        doc.text(dots, margin + titleWidth + 2, y);
+
+        // Page number
+        doc.setTextColor(50);
+        doc.text(section.page.toString(), pageNumX, y, { align: 'right' });
+
+        y += 7;
+    });
+};
+
 export const generateProteinReport = async (
     proteinName: string,
     _canvasIgnored: HTMLCanvasElement,
@@ -655,6 +714,9 @@ export const generateProteinReport = async (
 ) => {
     const doc = new jsPDF();
     const isLightMode = false; // Force DARK MODE for Maps (User Request)
+
+    // Track sections for TOC
+    const sections: { title: string; page: number }[] = [];
 
     // Data Prep
     const stats = calculateStats(data);
@@ -675,25 +737,41 @@ export const generateProteinReport = async (
 
     // PAGE 1: Enhanced Instruction & Overview
     addInstructionPage(doc, proteinName, metadata, stats, snapshot, data.labels, qrCodeDataUrl);
+    sections.push({ title: 'Overview & Summary', page: 1 });
 
     // SECTIONS
 
     const allFilter = (t: string | null) => t !== null && t !== 'Close Contact';
+    sections.push({ title: 'All Significant Interactions', page: doc.internal.getNumberOfPages() + 1 });
     addSection(doc, "All Significant Interactions", data, allFilter, isLightMode, false, 20);
 
+    sections.push({ title: 'Salt Bridges (Ionic)', page: doc.internal.getNumberOfPages() + 1 });
     addSection(doc, "Salt Bridges (Ionic Interactions)", data, (t) => t === 'Salt Bridge', isLightMode, true);
+
+    sections.push({ title: 'Disulfide Bonds (Covalent)', page: doc.internal.getNumberOfPages() + 1 });
     addSection(doc, "Disulfide Bonds (Covalent)", data, (t) => t === 'Disulfide Bond', isLightMode, true);
+
+    sections.push({ title: 'Hydrophobic Clusters', page: doc.internal.getNumberOfPages() + 1 });
     addSection(doc, "Hydrophobic Clusters", data, (t) => t === 'Hydrophobic Contact', isLightMode, true);
+
+    sections.push({ title: 'Pi-Stacking & Cation-Pi', page: doc.internal.getNumberOfPages() + 1 });
     addSection(doc, "Pi-Stacking & Cation-Pi", data, (t) => t === 'Pi-Stacking' || t === 'Cation-Pi Interaction', isLightMode, true);
 
     // INTERFACE ANALYSIS (New)
     // Only show if there are multiple chains
     if (metadata.chainCount > 1) {
+        sections.push({ title: 'Interface Analysis', page: doc.internal.getNumberOfPages() + 1 });
         addSection(doc, "Interface Analysis (Chain Interactions)", data, (_t, l1, l2) => {
             if (l1 && l2 && l1.chain !== l2.chain) return true;
             return false;
         }, isLightMode, true);
     }
+
+    // Add TOC as page 2
+    addTableOfContents(doc, sections);
+
+    // Add page numbers to all pages
+    addPageNumbers(doc);
 
     const safeName = proteinName.replace(/[^a-z0-9]/yi, '_').toLowerCase();
     doc.save(`${safeName}_full_report.pdf`);
