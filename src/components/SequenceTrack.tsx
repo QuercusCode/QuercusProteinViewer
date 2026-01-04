@@ -43,9 +43,6 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
     useEffect(() => {
         if (highlightedResidue && activeChain && highlightedResidue.chain === activeChain.name) {
             const index = highlightedResidue.resNo - 1; // 1-based to 0-based approximation
-            // Ideally we need exact index mapping if numbering is discontinuous, 
-            // but for now assuming 1-based sequential or close enough for visual feedback.
-            // If we have residue mapping, use it. Here we assume sequence is 1..N
 
             if (scrollContainerRef.current) {
                 const element = scrollContainerRef.current.children[0]?.children[index] as HTMLElement;
@@ -59,50 +56,48 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
     if (!activeChain) return null;
 
     return (
-        <div className={`fixed bottom-0 left-0 right-0 md:left-80 z-40 transition-transform duration-300 transform translate-y-0 pb-1
-            ${isLightMode ? 'bg-white/95 border-t border-neutral-300' : 'bg-neutral-900/95 border-t border-neutral-700'} 
-            backdrop-blur-md shadow-2xl safe-area-bottom`}>
+        <div className={`fixed top-16 right-4 bottom-4 w-10 rounded-xl z-40 transition-transform duration-300 transform translate-x-0
+            ${isLightMode ? 'bg-white/90 border border-neutral-300 shadow-xl' : 'bg-black/60 border border-neutral-700 shadow-2xl'} 
+            backdrop-blur-md flex flex-col overflow-hidden`}>
 
-            {/* Header / Tabs */}
-            <div className={`flex items-center px-4 py-1 gap-2 border-b ${isLightMode ? 'border-neutral-200' : 'border-neutral-800'}`}>
-                <div className="flex items-center gap-1.5 mr-4">
-                    <Map size={14} className="text-purple-500" />
-                    <span className={`text-xs font-bold uppercase tracking-wider ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
-                        Sequence
-                    </span>
+            {/* Header / Tabs - Compact Vertical */}
+            <div className={`flex flex-col items-center py-2 gap-2 border-b ${isLightMode ? 'border-neutral-200' : 'border-neutral-800'} flex-shrink-0`}>
+                <div className="flex items-center justify-center w-full" title="Sequence">
+                    <Map size={16} className="text-purple-500" />
                 </div>
 
                 {chains.length > 1 && (
-                    <div className="flex bg-neutral-100 dark:bg-neutral-800 rounded-lg p-0.5 overflow-x-auto no-scrollbar max-w-[60vw]">
+                    <div className="flex flex-col gap-1 w-full px-1">
                         {chains.map((chain, idx) => (
                             <button
                                 key={chain.name}
                                 onClick={() => setActiveChainIndex(idx)}
-                                className={`px-2 py-1 text-[10px] font-bold rounded-md whitespace-nowrap transition-colors
+                                className={`w-full aspect-square flex items-center justify-center text-[10px] font-bold rounded-md transition-colors
                                     ${activeChainIndex === idx
                                         ? 'bg-purple-600 text-white shadow-sm'
-                                        : 'text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200'}`}
+                                        : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200'}`}
+                                title={`Chain ${chain.name}`}
                             >
-                                Chain {chain.name}
+                                {chain.name}
                             </button>
                         ))}
                     </div>
                 )}
 
-                <div className="flex-1 text-right text-[10px] text-neutral-400 font-mono">
-                    {activeChain.sequence.length} residues
+                <div className="text-[9px] text-neutral-400 font-mono text-center w-full transform -rotate-90 whitespace-nowrap mt-4 mb-2">
+                    {activeChain.sequence.length} res
                 </div>
             </div>
 
-            {/* Sequence Scroller */}
+            {/* Sequence Scroller - Vertical */}
             <div
                 ref={scrollContainerRef}
-                className="overflow-x-auto overflow-y-hidden py-2 px-4 select-none scrollbar-hide"
+                className="flex-1 overflow-y-auto overflow-x-hidden px-0 py-2 select-none scrollbar-hide w-full"
                 style={{ scrollBehavior: 'smooth' }}
             >
-                <div className="flex gap-[1px]">
+                <div className="flex flex-col items-center w-full gap-[1px]">
                     {activeChain.sequence.split('').map((res, idx) => {
-                        const resNo = idx + 1; // Assuming 1-based indexing for now
+                        const resNo = idx + 1; // Assuming 1-based indexing
                         const isActive = highlightedResidue?.chain === activeChain.name && highlightedResidue.resNo === resNo;
                         const color = getResidueColor(res, isLightMode);
 
@@ -111,21 +106,18 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
                                 key={idx}
                                 onMouseEnter={() => onHoverResidue(activeChain.name, resNo)}
                                 onClick={() => onClickResidue(activeChain.name, resNo)}
-                                className={`group relative flex flex-col items-center justify-center min-w-[20px] h-10 rounded-sm transition-all duration-150
+                                className={`group relative flex items-center justify-center w-8 h-5 rounded-sm transition-all duration-150 flex-shrink-0
                                     ${isActive
-                                        ? 'z-10 scale-125 ring-2 ring-purple-500 z-index-10'
+                                        ? 'z-10 scale-110 ring-2 ring-purple-500 z-index-10 shadow-lg'
                                         : 'hover:scale-110 hover:z-10 opacity-90 hover:opacity-100'}`}
                                 style={{ backgroundColor: isActive ? '#8b5cf6' : color }}
                             >
                                 <span className={`text-[10px] font-mono font-bold ${isActive ? 'text-white' : 'text-black/70'}`}>
                                     {res}
                                 </span>
-                                <span className="text-[7px] text-black/50 font-mono absolute bottom-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    {resNo}
-                                </span>
 
-                                {/* Tooltip for context */}
-                                <div className="absolute bottom-full mb-2 hidden group-hover:block z-50 whitespace-nowrap bg-black text-white text-[10px] px-2 py-1 rounded shadow-lg pointer-events-none">
+                                {/* Tooltip for context - Left side now */}
+                                <div className="absolute right-full mr-2 hidden group-hover:block z-50 whitespace-nowrap bg-black text-white text-[10px] px-2 py-1 rounded shadow-lg pointer-events-none">
                                     {res} {resNo}
                                 </div>
                             </button>
