@@ -497,7 +497,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                                 <option value="structure">Secondary Structure</option>
                                                 <option value="hydrophobicity">Hydrophobicity</option>
                                                 <option value="bfactor">B-Factor</option>
-                                                <option value="charge">Charge</option>
+
 
                                             </select>
                                             <select
@@ -519,7 +519,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                                 structure: "Helices (Magenta), Sheets (Yellow), Loops (White).",
                                                 hydrophobicity: "Blue (Hydrophilic) → Red (Hydrophobic).",
                                                 bfactor: "Blue (Stable) → Red (Flexible/Mobile).",
-                                                charge: "Blue (Positive) → Red (Negative).",
+
 
                                                 secondary: "Secondary structure delineation.",
                                                 residueindex: "Rainbow gradient by residue position."
