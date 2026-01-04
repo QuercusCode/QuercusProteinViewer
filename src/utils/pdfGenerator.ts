@@ -709,7 +709,7 @@ const addPageNumbers = (doc: jsPDF) => {
 // Helper: Add Table of Contents
 const addTableOfContents = (doc: jsPDF, sections: { title: string; page: number }[]) => {
     doc.addPage();
-    doc.movePage(doc.internal.pages.length - 1, 2); // Move TOC to page 2
+    // TOC is now page 2 - no need to move pages
 
     const margin = 20;
     let y = 30;
@@ -951,40 +951,54 @@ export const generateProteinReport = async (
     addInstructionPage(doc, proteinName, metadata, stats, snapshot, data.labels, qrCodeDataUrl);
     sections.push({ title: 'Overview & Summary', page: 1 });
 
-    // Add Methodology (will be page 3 after TOC insertion at page 2)
+    // Page 2: Add TOC now (before adding content, with placeholder page numbers)
+    // We'll add content first, then regenerate TOC with correct numbers
+
+    // Page 2-3: Add Methodology
     addMethodology(doc);
-    sections.push({ title: 'Methodology', page: 3 }); // TOC will be inserted at page 2
+    const methodologyPage = doc.internal.pages.length;
 
-    // SECTIONS
-
+    // Add all analysis sections and track their pages
     const allFilter = (t: string | null) => t !== null && t !== 'Close Contact';
-    sections.push({ title: 'All Significant Interactions', page: doc.internal.pages.length });
     addSection(doc, "All Significant Interactions", data, allFilter, isLightMode, false, 20);
+    const allInteractionsPage = doc.internal.pages.length;
 
-    sections.push({ title: 'Salt Bridges (Ionic)', page: doc.internal.pages.length });
     addSection(doc, "Salt Bridges (Ionic Interactions)", data, (t) => t === 'Salt Bridge', isLightMode, true);
+    const saltBridgesPage = doc.internal.pages.length;
 
-    sections.push({ title: 'Disulfide Bonds (Covalent)', page: doc.internal.pages.length });
     addSection(doc, "Disulfide Bonds (Covalent)", data, (t) => t === 'Disulfide Bond', isLightMode, true);
+    const disulfidePage = doc.internal.pages.length;
 
-    sections.push({ title: 'Hydrophobic Clusters', page: doc.internal.pages.length });
     addSection(doc, "Hydrophobic Clusters", data, (t) => t === 'Hydrophobic Contact', isLightMode, true);
+    const hydrophobicPage = doc.internal.pages.length;
 
-    sections.push({ title: 'Pi-Stacking & Cation-Pi', page: doc.internal.pages.length });
     addSection(doc, "Pi-Stacking & Cation-Pi", data, (t) => t === 'Pi-Stacking' || t === 'Cation-Pi Interaction', isLightMode, true);
+    const piStackingPage = doc.internal.pages.length;
 
-    // INTERFACE ANALYSIS (New)
-    // Only show if there are multiple chains
+    let interfacePage = 0;
     if (metadata.chainCount > 1) {
-        sections.push({ title: 'Interface Analysis', page: doc.internal.pages.length });
         addSection(doc, "Interface Analysis (Chain Interactions)", data, (_t, l1, l2) => {
             if (l1 && l2 && l1.chain !== l2.chain) return true;
             return false;
         }, isLightMode, true);
+        interfacePage = doc.internal.pages.length;
     }
 
-    // Add TOC as page 2 (shifts all subsequent pages by +1)
+    // Now populate sections with correct page numbers
+    sections.push({ title: 'Methodology', page: methodologyPage });
+    sections.push({ title: 'All Significant Interactions', page: allInteractionsPage });
+    sections.push({ title: 'Salt Bridges (Ionic)', page: saltBridgesPage });
+    sections.push({ title: 'Disulfide Bonds (Covalent)', page: disulfidePage });
+    sections.push({ title: 'Hydrophobic Clusters', page: hydrophobicPage });
+    sections.push({ title: 'Pi-Stacking & Cation-Pi', page: piStackingPage });
+    if (interfacePage > 0) {
+        sections.push({ title: 'Interface Analysis', page: interfacePage });
+    }
+
+    // Insert TOC at page 2 position
     addTableOfContents(doc, sections);
+    // Move TOC to position 2 (after Overview)
+    doc.movePage(doc.internal.pages.length, 2);
 
     // Add page numbers to all pages
     addPageNumbers(doc);
