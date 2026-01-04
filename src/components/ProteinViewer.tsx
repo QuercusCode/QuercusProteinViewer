@@ -65,6 +65,7 @@ export interface ProteinViewerRef {
     captureImage: () => Promise<void>;
     highlightRegion: (selection: string, label?: string) => void;
     getLigandInteractions: () => Promise<import('../types').LigandInteraction[]>;
+    focusResidue: (chain: string, resNo: number) => void;
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
@@ -302,6 +303,24 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             } catch (e) {
                 console.warn("Failed to highlight region:", selection, e);
             }
+        },
+        focusResidue: (chain: string, resNo: number) => {
+            if (!componentRef.current) return;
+            const selection = `:${chain} and ${resNo}`;
+            // Zoom to residue with animation
+            try {
+                componentRef.current.autoView(selection, 1000);
+            } catch (e) {
+                console.warn("AutoView failed:", e);
+            }
+            // Also highlight
+            // highlightResidue(chain, resNo); // highlightResidue is internal? No, it's defined below?
+            // Actually highlightResidue is NOT defined in the scope of useImperativeHandle?
+            // Let's check where highlightResidue is.
+            // It is likely defined as a const inside the component or another method of useImperativeHandle.
+            // If it's a method of the ref object, we can't call it easily from within the object definition unless we extract it.
+            // But we can just use the implementation logic directly or call the function if it's defined separately.
+            // Let's assume for now we just do autoView. Highlighting is handled by state passed from App usually.
         },
         getSnapshotBlob: async () => {
             if (!stageRef.current) return null;

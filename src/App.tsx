@@ -9,6 +9,7 @@ import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Movie, ColorP
 
 import LibraryModal from './components/LibraryModal';
 import { ShareModal } from './components/ShareModal';
+import { SequenceTrack } from './components/SequenceTrack';
 import { OFFLINE_LIBRARY } from './data/library';
 import { fetchPDBMetadata } from './utils/pdbUtils';
 import type { PDBMetadata } from './types';
@@ -697,6 +698,14 @@ function App() {
           customBackgroundColor,
           orientation: viewerRef.current?.getCameraOrientation()
         })}
+        isLightMode={isLightMode}
+      />
+
+      <SequenceTrack
+        chains={chains}
+        highlightedResidue={highlightedResidue}
+        onHoverResidue={(chain, resNo) => viewerRef.current?.highlightResidue(chain, resNo)}
+        onClickResidue={(chain, resNo) => viewerRef.current?.focusResidue(chain, resNo)}
         isLightMode={isLightMode}
       />
 
