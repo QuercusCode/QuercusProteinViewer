@@ -790,26 +790,26 @@ export const generateProteinReport = async (
     // User said "page immediately after TOC".
     // If I explicitly added a page, I should pass 'false' to newPage for the first section to use it.
 
-    sections[1].page = getCurPage(); // Update page number for "All Significant Interactions"
+    sections[1].page = getCurPage(); // Update page number for "All Significant Interactions" (Already on new page)
 
+    sections[2].page = getCurPage() + 1; // Starts on NEXT page
     addSection(doc, "Salt Bridges (Ionic Interactions)", data, (t) => t === 'Salt Bridge', isLightMode, true);
-    sections[2].page = getCurPage(); // Update page number for "Salt Bridges"
 
+    sections[3].page = getCurPage() + 1;
     addSection(doc, "Disulfide Bonds (Covalent)", data, (t) => t === 'Disulfide Bond', isLightMode, true);
-    sections[3].page = getCurPage(); // Update page number for "Disulfide Bonds"
 
+    sections[4].page = getCurPage() + 1;
     addSection(doc, "Hydrophobic Clusters", data, (t) => t === 'Hydrophobic Contact', isLightMode, true);
-    sections[4].page = getCurPage(); // Update page number for "Hydrophobic Clusters"
 
+    sections[5].page = getCurPage() + 1;
     addSection(doc, "Pi-Stacking & Cation-Pi", data, (t) => t === 'Pi-Stacking' || t === 'Cation-Pi Interaction', isLightMode, true);
-    sections[5].page = getCurPage(); // Update page number for "Pi-Stacking & Cation-Pi"
 
     if (metadata.chainCount > 1) {
+        sections[6].page = getCurPage() + 1;
         addSection(doc, "Interface Analysis (Chain Interactions)", data, (_t, l1, l2) => {
             if (l1 && l2 && l1.chain !== l2.chain) return true;
             return false;
         }, isLightMode, true);
-        sections[6].page = getCurPage(); // Update page number for "Interface Analysis"
     }
 
     // Go back to the TOC page to fill in page numbers
