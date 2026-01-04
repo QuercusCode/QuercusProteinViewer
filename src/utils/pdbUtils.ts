@@ -63,3 +63,16 @@ export const fetchPDBMetadata = async (pdbId: string): Promise<PDBMetadata | nul
         return null;
     }
 };
+
+/**
+ * Formats a PDB Ligand ID to Chemical Nomenclature.
+ * Specifically converts 1-2 letter codes (Ions) to Title Case (ZN -> Zn).
+ * Keeps 3+ letter codes (Molecules) as Uppercase (HEM -> HEM).
+ */
+export const formatChemicalId = (id: string): string => {
+    if (!id) return '';
+    if (id.length <= 2) {
+        return id.charAt(0).toUpperCase() + id.slice(1).toLowerCase();
+    }
+    return id.toUpperCase();
+};

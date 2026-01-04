@@ -31,18 +31,19 @@ import {
     Share2
 } from 'lucide-react';
 import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, PDBMetadata } from '../types';
+import { formatChemicalId } from '../utils/pdbUtils';
 
 // Reusable Sidebar Section Component - Defined outside to prevent re-renders losing focus
 const SidebarSection = ({ title, icon: Icon, children, isOpen, onToggle, isLightMode }: { title: string, icon: any, children: React.ReactNode, isOpen: boolean, onToggle: () => void, isLightMode: boolean }) => (
     <div className={`rounded-xl overflow-hidden transition-colors ${isLightMode
-            ? 'border border-neutral-900 bg-white'
-            : 'border border-white/10 bg-black/20'
+        ? 'border border-neutral-900 bg-white'
+        : 'border border-white/10 bg-black/20'
         }`}>
         <button
             onClick={onToggle}
             className={`w-full flex items-center justify-between p-3 text-xs font-bold uppercase tracking-wider transition-colors ${isLightMode
-                    ? (isOpen ? 'bg-neutral-100 text-black' : 'hover:bg-neutral-50 text-neutral-900 hover:text-black')
-                    : (isOpen ? 'bg-white/5 text-blue-400' : 'hover:bg-white/5 text-neutral-400')
+                ? (isOpen ? 'bg-neutral-100 text-black' : 'hover:bg-neutral-50 text-neutral-900 hover:text-black')
+                : (isOpen ? 'bg-white/5 text-blue-400' : 'hover:bg-white/5 text-neutral-400')
                 }`}
         >
             <div className="flex items-center gap-2">
@@ -757,7 +758,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <div className="flex flex-wrap gap-1">
                                     {ligands.map(lig => (
                                         <span key={lig} className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-300 border border-neutral-300 dark:border-neutral-600">
-                                            {lig}
+                                            {formatChemicalId(lig)}
                                         </span>
                                     ))}
                                 </div>

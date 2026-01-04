@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import QRCode from 'qrcode'; // Import QR Code
+import QRCode from 'qrcode';
+import { formatChemicalId } from './pdbUtils'; // Import QR Code
 import { getInteractionType } from './interactionUtils';
 import type { PDBMetadata } from '../types';
 
@@ -723,8 +724,8 @@ const addLigandSection = (doc: jsPDF, interactions: import('../types').LigandInt
         doc.setFillColor(243, 244, 246); // Gray-100
         doc.rect(margin, y - 5, 180, 8, 'F');
 
-        // E.g. "CD #1 (Chain A)", "CD #2 (Chain A)"
-        doc.text(`${ligand.ligandName} #${count} (Chain ${ligand.ligandChain})`, margin + 3, y + 1);
+        // E.g. "Cd #1 (Chain A)", "Cd #2 (Chain A)"
+        doc.text(`${formatChemicalId(ligand.ligandName)} #${count} (Chain ${ligand.ligandChain})`, margin + 3, y + 1);
         y += 8;
 
         // Table
