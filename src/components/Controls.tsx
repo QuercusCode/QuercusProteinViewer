@@ -35,14 +35,14 @@ import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snap
 // Reusable Sidebar Section Component - Defined outside to prevent re-renders losing focus
 const SidebarSection = ({ title, icon: Icon, children, isOpen, onToggle, isLightMode }: { title: string, icon: any, children: React.ReactNode, isOpen: boolean, onToggle: () => void, isLightMode: boolean }) => (
     <div className={`rounded-xl overflow-hidden transition-colors ${isLightMode
-        ? 'border border-neutral-200 bg-white shadow-sm'
-        : 'border border-white/10 bg-black/20'
+            ? 'border border-neutral-900 bg-white'
+            : 'border border-white/10 bg-black/20'
         }`}>
         <button
             onClick={onToggle}
             className={`w-full flex items-center justify-between p-3 text-xs font-bold uppercase tracking-wider transition-colors ${isLightMode
-                ? (isOpen ? 'bg-blue-50 text-blue-600' : 'hover:bg-neutral-50 text-neutral-600 hover:text-neutral-900')
-                : (isOpen ? 'bg-white/5 text-blue-400' : 'hover:bg-white/5 text-neutral-400')
+                    ? (isOpen ? 'bg-neutral-100 text-black' : 'hover:bg-neutral-50 text-neutral-900 hover:text-black')
+                    : (isOpen ? 'bg-white/5 text-blue-400' : 'hover:bg-white/5 text-neutral-400')
                 }`}
         >
             <div className="flex items-center gap-2">
@@ -54,7 +54,7 @@ const SidebarSection = ({ title, icon: Icon, children, isOpen, onToggle, isLight
             </div>
         </button>
         {isOpen && (
-            <div className={`p-3 space-y-3 border-t ${isLightMode ? 'border-neutral-100' : 'border-white/5'}`}>
+            <div className={`p-3 space-y-3 border-t ${isLightMode ? 'border-neutral-900' : 'border-white/5'}`}>
                 {children}
             </div>
         )}
@@ -197,8 +197,8 @@ export const Controls: React.FC<ControlsProps> = ({
 
     // Styles
     const cardBg = isLightMode ? 'bg-white' : 'bg-neutral-900';
-    const subtleText = isLightMode ? 'text-neutral-600' : 'text-neutral-400';
-    const inputBg = isLightMode ? 'bg-white border-neutral-400 text-neutral-900 focus:ring-blue-500 shadow-sm' : 'bg-neutral-800 border-neutral-700 text-white focus:ring-blue-500';
+    const subtleText = isLightMode ? 'text-neutral-950 font-medium' : 'text-neutral-400';
+    const inputBg = isLightMode ? 'bg-white border-neutral-900 text-black focus:ring-black' : 'bg-neutral-800 border-neutral-700 text-white focus:ring-blue-500';
 
     // Accordion State
     const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -317,7 +317,7 @@ export const Controls: React.FC<ControlsProps> = ({
         <>
             <button
                 onClick={() => setIsOpen(true)}
-                className={`absolute top-4 left-4 z-40 md:hidden p-2 rounded-lg backdrop-blur-md shadow-lg transition-opacity hover:opacity-80 border ${isLightMode ? 'bg-white/90 border-neutral-200 text-neutral-800' : 'bg-neutral-900/90 border-white/10 text-white'}`}
+                className={`absolute top-4 left-4 z-40 md:hidden p-2 rounded-lg backdrop-blur-md shadow-lg transition-opacity hover:opacity-80 border ${isLightMode ? 'bg-white border-neutral-900 text-black' : 'bg-neutral-900/90 border-white/10 text-white'}`}
             >
                 <Menu className="w-6 h-6" />
             </button>
@@ -329,8 +329,8 @@ export const Controls: React.FC<ControlsProps> = ({
                 transition-transform duration-300 ease-in-out
                 flex flex-col
                 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-                md:translate-x-0 md:top-4 md:left-4 md:h-[calc(100vh-2rem)] md:rounded-xl md:shadow-2xl md:z-10
-                ${isLightMode ? 'bg-white/95 border-neutral-300 shadow-xl' : 'bg-neutral-900/80 border-white/10'}
+                md:translate-x-0 md:top-4 md:left-4 md:h-[calc(100vh-2rem)] md:rounded-xl md:z-10
+                ${isLightMode ? 'bg-white border-neutral-900 shadow-none' : 'bg-neutral-900/80 border-white/10 md:shadow-2xl'}
             `}>
                 {/* Header - Fixed */}
                 <div className="flex-none p-4 pb-2 relative">
@@ -352,14 +352,14 @@ export const Controls: React.FC<ControlsProps> = ({
                         <div className="flex items-center gap-2">
                             <button
                                 onClick={onToggleLibrary}
-                                className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-white border border-neutral-300 text-neutral-600 hover:bg-neutral-100' : 'bg-neutral-800/80 text-neutral-400 hover:bg-neutral-700'}`}
+                                className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-white border border-neutral-900 text-black hover:bg-neutral-100' : 'bg-neutral-800/80 text-neutral-400 hover:bg-neutral-700'}`}
                                 title="Open Offline Library"
                             >
                                 <BookOpen className="w-4 h-4" />
                             </button>
                             <button
                                 onClick={() => setIsLightMode(!isLightMode)}
-                                className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-white border border-neutral-300 text-amber-500 hover:bg-neutral-100' : 'bg-neutral-800/80 text-blue-300 hover:bg-neutral-700'}`}
+                                className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-white border border-neutral-900 text-black hover:bg-neutral-100' : 'bg-neutral-800/80 text-blue-300 hover:bg-neutral-700'}`}
                                 title="Toggle Theme"
                             >
                                 {isLightMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -556,7 +556,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                         {customBackgroundColor && (
                                             <button
                                                 onClick={() => setCustomBackgroundColor?.(null)}
-                                                className={`px-3 py-1.5 rounded border text-[10px] font-bold uppercase transition-colors hover:bg-red-500/10 hover:text-red-500 ${isLightMode ? 'border-neutral-300 text-neutral-600 bg-white shadow-sm' : 'border-neutral-700 text-neutral-400'}`}
+                                                className={`px-3 py-1.5 rounded border text-[10px] font-bold uppercase transition-colors hover:bg-red-500/10 hover:text-red-500 ${isLightMode ? 'border-neutral-900 text-black bg-white' : 'border-neutral-700 text-neutral-400'}`}
                                             >
                                                 Reset
                                             </button>
