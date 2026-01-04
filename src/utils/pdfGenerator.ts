@@ -528,55 +528,7 @@ const addInstructionPage = (
 
     y += 10;
 
-    // 4. Analysis Settings Box
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(11);
-    doc.setTextColor(0);
-    doc.text("Analysis Settings", margin, y);
-    y += 8;
-
-    doc.setDrawColor(200);
-    doc.setFillColor(250, 250, 250);
-    const settingsBoxHeight = 35;
-    doc.roundedRect(margin, y, 170, settingsBoxHeight, 2, 2, 'FD');
-
-    let settingsY = y + 8;
-    const settingsLeftPad = margin + 8;
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(50);
-
-    // Distance Thresholds
-    doc.setFont("helvetica", "bold");
-    doc.text("Distance Cutoffs:", settingsLeftPad, settingsY);
-    doc.setFont("helvetica", "normal");
-    doc.text("Close Contact < 5.0 A  |  Proximal 5.0-8.0 A", settingsLeftPad + 42, settingsY);
-    settingsY += 6;
-
-    // Analysis Type
-    doc.setFont("helvetica", "bold");
-    doc.text("Method:", settingsLeftPad, settingsY);
-    doc.setFont("helvetica", "normal");
-    doc.text("Euclidean distance between Ca atoms", settingsLeftPad + 42, settingsY);
-    settingsY += 6;
-
-    // Interaction Types Detected
-    doc.setFont("helvetica", "bold");
-    doc.text("Interaction Types:", settingsLeftPad, settingsY);
-    doc.setFont("helvetica", "normal");
-    doc.text("Salt Bridges, Disulfide Bonds, Hydrophobic, Pi-Stacking", settingsLeftPad + 42, settingsY);
-    settingsY += 6;
-
-    // Note about reproducibility
-    doc.setFont("helvetica", "italic");
-    doc.setFontSize(8);
-    doc.setTextColor(100);
-    doc.text("Settings ensure reproducible analysis. Scan QR for interactive view.", settingsLeftPad, settingsY);
-
-    y += settingsBoxHeight + 10;
-
-    // 5. Interaction Legend (Bottom)
+    // 4. Interaction Legend (Bottom)
     // Check space
     if (y > doc.internal.pageSize.getHeight() - 60) {
         doc.addPage();
