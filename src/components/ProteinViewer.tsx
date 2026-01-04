@@ -307,20 +307,37 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         focusResidue: (chain: string, resNo: number) => {
             if (!componentRef.current) return;
             const selection = `:${chain} and ${resNo}`;
-            // Zoom to residue with animation
+
+            // 1. Remove previous click-highlight if any
+            // We need a way to track the specific representation added by this click action.
+            // Since we don't have a dedicated state for "click highlight rep" in the ref easily accessible here 
+            // without refactoring the whole component state, we can use a "name" for the representation 
+            // and remove it by name if NGL supports it, or just manage it if we add a ref for it.
+            // For now, let's try to add a uniquely named representation or just use the highlight mechanism.
+
+            // Actually, let's use a simpler approach: Add a new Ball+Stick representation for just this residue.
+            // We should ideally track it to remove it later when another residue is clicked.
+            // Let's assume we want "only one focused residue at a time".
+
+            // Remove ANY existing 'user-focus' representations
+            componentRef.current.stage.getRepresentationsByName('user-focus').dispose();
+
+            // 2. Add new Ball+Stick representation
+            componentRef.current.addRepresentation('ball+stick', {
+                sele: selection,
+                name: 'user-focus',
+                colorVal: '#ff0000', // Highlight color? Or keep element colors?
+                // Let's use element coloring but maybe specific scale or just default
+                colorScheme: 'element',
+                radiusScale: 2.0 // Make it pop
+            });
+
+            // 3. Zoom
             try {
                 componentRef.current.autoView(selection, 1000);
             } catch (e) {
                 console.warn("AutoView failed:", e);
             }
-            // Also highlight
-            // highlightResidue(chain, resNo); // highlightResidue is internal? No, it's defined below?
-            // Actually highlightResidue is NOT defined in the scope of useImperativeHandle?
-            // Let's check where highlightResidue is.
-            // It is likely defined as a const inside the component or another method of useImperativeHandle.
-            // If it's a method of the ref object, we can't call it easily from within the object definition unless we extract it.
-            // But we can just use the implementation logic directly or call the function if it's defined separately.
-            // Let's assume for now we just do autoView. Highlighting is handled by state passed from App usually.
         },
         getSnapshotBlob: async () => {
             if (!stageRef.current) return null;
