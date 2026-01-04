@@ -903,6 +903,10 @@ export const generateProteinReport = async (
     addInstructionPage(doc, proteinName, metadata, stats, snapshot, data.labels, qrCodeDataUrl);
     sections.push({ title: 'Overview & Summary', page: 1 });
 
+    // Add Methodology page
+    addMethodology(doc);
+    sections.push({ title: 'Methodology', page: doc.internal.pages.length });
+
     // SECTIONS
 
     const allFilter = (t: string | null) => t !== null && t !== 'Close Contact';
