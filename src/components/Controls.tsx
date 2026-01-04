@@ -558,7 +558,14 @@ export const Controls: React.FC<ControlsProps> = ({
                                                         {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
                                                     </select>
                                                 ) : (
-                                                    <div className="flex-1 min-w-0">
+                                                    <div className="flex-1 min-w-0 space-y-1.5">
+                                                        <select
+                                                            value={selectedChain}
+                                                            onChange={(e) => setSelectedChain(e.target.value)}
+                                                            className={`w-full bg-transparent border-b ${isLightMode ? 'border-neutral-300' : 'border-neutral-700'} text-[10px] px-1 py-1 outline-none`}
+                                                        >
+                                                            {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
+                                                        </select>
                                                         <input
                                                             type="text"
                                                             value={residueRange}
