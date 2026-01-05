@@ -12,13 +12,14 @@ interface MeasurementPanelProps {
     onClose: () => void;
     isLightMode: boolean;
     textColorMode: MeasurementTextColor;
-    onToggleTextColor: () => void;
+    onSetTextColor: (color: MeasurementTextColor) => void;
 }
 
-export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements, onUpdate, onDelete, onClearAll, isOpen, onClose, textColorMode, onToggleTextColor }) => {
+export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements, onUpdate, onDelete, onClearAll, isOpen, onClose, textColorMode, onSetTextColor }) => {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editName, setEditName] = useState("");
     const [activeColorPickerId, setActiveColorPickerId] = useState<string | null>(null);
+    const [showTextColorPalette, setShowTextColorPalette] = useState(false);
 
     if (!isOpen) return null;
 
@@ -73,13 +74,50 @@ export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements
                     </span>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button
-                        onClick={onToggleTextColor}
-                        className="p-1.5 hover:bg-white/10 rounded text-neutral-400 hover:text-white"
-                        title={`Text Color: ${textColorMode.charAt(0).toUpperCase() + textColorMode.slice(1)}`}
-                    >
-                        <Type className={`w-4 h-4 ${textColorMode === 'auto' ? 'opacity-50' : 'text-blue-400'}`} />
-                    </button>
+                    <div className="relative">
+                        <button
+                            onClick={() => setShowTextColorPalette(!showTextColorPalette)}
+                            className="p-1.5 hover:bg-white/10 rounded text-neutral-400 hover:text-white"
+                            title={`Text Color: ${textColorMode === 'auto' ? 'Auto' : textColorMode}`}
+                        >
+                            <Type className={`w-4 h-4 ${textColorMode !== 'auto' ? 'text-blue-400' : 'opacity-50'}`} />
+                        </button>
+                        {showTextColorPalette && (
+                            <>
+                                <div className="fixed inset-0 z-40" onClick={() => setShowTextColorPalette(false)} />
+                                <div className="absolute top-8 right-0 z-50 bg-neutral-900 border border-neutral-700 rounded-lg shadow-xl p-2 w-48 ml-2">
+                                    <div className="mb-2 pb-2 border-b border-neutral-800">
+                                        <button
+                                            className={`w-full text-left px-2 py-1 text-xs rounded ${textColorMode === 'auto' ? 'bg-blue-500/20 text-blue-400' : 'text-neutral-400 hover:bg-white/5'}`}
+                                            onClick={() => {
+                                                onSetTextColor('auto');
+                                                setShowTextColorPalette(false);
+                                            }}
+                                        >
+                                            Auto (Dynamic)
+                                        </button>
+                                    </div>
+                                    <div className="grid grid-cols-5 gap-1.5">
+                                        {[
+                                            '#ffffff', '#000000', '#fbbf24', '#f87171', '#60a5fa',
+                                            '#34d399', '#a78bfa', '#f472b6', '#9ca3af', '#fcd34d'
+                                        ].map(c => (
+                                            <button
+                                                key={c}
+                                                className={`w-6 h-6 rounded-full border ${textColorMode === c ? 'border-white scale-110' : 'border-white/10 hover:scale-110'} transition-all`}
+                                                style={{ backgroundColor: c }}
+                                                onClick={() => {
+                                                    onSetTextColor(c);
+                                                    setShowTextColorPalette(false);
+                                                }}
+                                                title={c}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
                     <button
                         onClick={onClearAll}
                         disabled={measurements.length === 0}

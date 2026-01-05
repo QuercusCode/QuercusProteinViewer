@@ -828,12 +828,8 @@ function App() {
             viewerRef.current?.clearMeasurements();
           }}
           textColorMode={measurementTextColorMode}
-          onToggleTextColor={() => {
-            setMeasurementTextColorMode((prev: MeasurementTextColor) => {
-              if (prev === 'auto') return 'black';
-              if (prev === 'black') return 'white';
-              return 'auto';
-            });
+          onSetTextColor={(color) => {
+            setMeasurementTextColorMode(color);
           }}
           onClose={() => {
             setIsMeasurementMode(false);
