@@ -60,7 +60,7 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
             if (scrollContainerRef.current) {
                 const element = scrollContainerRef.current.children[0]?.children[index] as HTMLElement;
                 if (element) {
-                    element.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
                 }
             }
         }
@@ -121,20 +121,20 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
                                 onClick={() => onClickResidue(activeChain.name, resNo)}
                                 className={`group relative flex items-center gap-2 px-2 w-full h-8 rounded-lg transition-all duration-150 flex-shrink-0
                                     ${isActive
-                                        ? 'bg-purple-500/10 z-10 ring-1 ring-purple-500'
+                                        ? 'bg-purple-500/20 z-10 ring-2 ring-purple-500 scale-105 shadow-lg shadow-purple-500/10'
                                         : 'hover:bg-black/5 dark:hover:bg-white/5'}`}
                             >
                                 {/* Residue Box */}
                                 <span
                                     className={`w-6 h-6 flex items-center justify-center rounded-md text-[11px] font-mono font-bold shadow-sm transition-transform
-                                    ${isActive ? 'text-white scale-110' : 'text-neutral-900 dark:text-white'}`}
-                                    style={{ backgroundColor: isActive ? '#8b5cf6' : color }}
+                                    ${isActive ? 'text-white scale-110 ring-2 ring-white/20' : 'text-neutral-900 dark:text-white'}`}
+                                    style={{ backgroundColor: isActive ? '#7c3aed' : color }}
                                 >
                                     {res}
                                 </span>
 
                                 {/* Residue Number */}
-                                <span className={`text-[10px] font-mono flex-1 text-right ${isActive ? 'text-purple-400 font-bold' : 'text-neutral-400'}`}>
+                                <span className={`text-[10px] font-mono flex-1 text-right ${isActive ? 'text-purple-600 dark:text-purple-300 font-bold' : 'text-neutral-400'}`}>
                                     {resNo}
                                 </span>
                             </button>
