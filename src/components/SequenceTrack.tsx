@@ -41,6 +41,17 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
 
     const activeChain = chains[activeChainIndex];
 
+    // Auto-switch chain if highlighting a residue in a different chain (e.g. from 3D click)
+    useEffect(() => {
+        if (highlightedResidue) {
+            const targetIndex = chains.findIndex(c => c.name === highlightedResidue.chain);
+            // Only switch if found and different, to allow manual switching
+            if (targetIndex !== -1 && targetIndex !== activeChainIndex) {
+                setActiveChainIndex(targetIndex);
+            }
+        }
+    }, [highlightedResidue, chains]);
+
     // Scroll to highlighted residue
     useEffect(() => {
         if (highlightedResidue && activeChain && highlightedResidue.chain === activeChain.name) {
