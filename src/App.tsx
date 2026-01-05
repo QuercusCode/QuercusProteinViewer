@@ -545,6 +545,27 @@ function App() {
     }
   };
 
+  const handleDownloadSequence = () => {
+    if (chains.length === 0) return;
+
+    let fastaContent = '';
+    chains.forEach(chain => {
+      // Header: >PDBID|Chain|Name
+      const header = `>${pdbId || 'Structure'}|${chain.name}\n`;
+      // Split sequence into 80-char lines
+      const sequence = chain.sequence.match(/.{1,80}/g)?.join('\n') || '';
+      fastaContent += header + sequence + '\n';
+    });
+
+    const blob = new Blob([fastaContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${pdbId || 'structure'}.fasta`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const handleDeleteSnapshot = (id: string) => {
     const snapshot = snapshots.find(s => s.id === id);
     if (snapshot) {
@@ -926,6 +947,7 @@ function App() {
         onSaveSession={handleSaveSession}
         onLoadSession={handleLoadSession}
         onDownloadPDB={handleDownloadPDB}
+        onDownloadSequence={handleDownloadSequence}
         onToggleContactMap={() => setShowContactMap(!showContactMap)}
         movies={movies}
         onDownloadMovie={handleDownloadMovie}

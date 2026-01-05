@@ -127,6 +127,7 @@ interface ControlsProps {
     setCustomBackgroundColor?: (color: string | null) => void;
     onHighlightRegion?: (selection: string, label: string) => void;
     onDownloadPDB: () => void;
+    onDownloadSequence: () => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -186,7 +187,8 @@ export const Controls: React.FC<ControlsProps> = ({
     customBackgroundColor,
     setCustomBackgroundColor,
     onHighlightRegion,
-    onDownloadPDB
+    onDownloadPDB,
+    onDownloadSequence
 }) => {
     // Motif Search State
     const [searchPattern, setSearchPattern] = useState('');
@@ -954,7 +956,16 @@ export const Controls: React.FC<ControlsProps> = ({
                         {/* Sequence Viewer Component */}
                         <div className={`p-2 rounded-lg border flex flex-col ${cardBg}`}>
                             <div className="flex items-center justify-between mb-2">
-                                <span className={`text-xs font-bold ${subtleText}`}>Sequence</span>
+                                <div className="flex items-center gap-2">
+                                    <span className={`text-xs font-bold ${subtleText}`}>Sequence</span>
+                                    <button
+                                        onClick={onDownloadSequence}
+                                        title="Download FASTA Sequence"
+                                        className={`p-1 rounded-md transition-colors ${isLightMode ? 'hover:bg-neutral-200 text-neutral-500 hover:text-black' : 'hover:bg-white/10 text-neutral-400 hover:text-white'}`}
+                                    >
+                                        <Download className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
                                 <select
                                     value={viewSequenceChain}
                                     onChange={(e) => setViewSequenceChain(e.target.value)}
