@@ -418,18 +418,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <span className="text-xs font-medium">Library</span>
                             </button>
 
-                            <button
-                                onClick={() => {
-                                    setIsMeasurementMode(!isMeasurementMode);
-                                    if (!isMeasurementMode && onToggleMeasurement) onToggleMeasurement();
-                                }}
-                                className={`col-span-2 w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all group ${isMeasurementMode
-                                    ? 'bg-cyan-500/10 border-cyan-500/50 text-cyan-500'
-                                    : `${cardBg} hover:opacity-80`}`}
-                            >
-                                <Ruler className={`w-3.5 h-3.5 ${isMeasurementMode ? 'text-cyan-500' : 'group-hover:text-cyan-500'} transition-colors`} />
-                                <span className="text-xs font-medium">Measure Distance</span>
-                            </button>
+
                         </div>
                     </div>
 
@@ -806,6 +795,16 @@ export const Controls: React.FC<ControlsProps> = ({
 
                         <div className="grid grid-cols-2 gap-2">
 
+                            <button
+                                onClick={() => {
+                                    setIsMeasurementMode(!isMeasurementMode);
+                                    if (!isMeasurementMode && onToggleMeasurement) onToggleMeasurement();
+                                }}
+                                className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isMeasurementMode ? 'bg-amber-500/10 border-amber-500 text-amber-500' : `${cardBg} hover:opacity-80`}`}
+                            >
+                                <span className="text-xs font-medium">Measure</span>
+                                <Ruler className="w-3.5 h-3.5" />
+                            </button>
                             <button
                                 onClick={onToggleContactMap}
                                 className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
