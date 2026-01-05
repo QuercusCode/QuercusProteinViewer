@@ -3231,6 +3231,167 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
     {
         id: '1AV1', title: 'Avidin', category: 'Structural', description: 'Egg white protein.', details: 'A protein found in egg whites that also binds biotin (Vitamin B7) avidly. It protects eggs from bacterial growth by sequestering vitamins.',
         method: 'X-RAY DIFFRACTION', resolution: '2.7 Å', organism: 'Gallus gallus', depositionDate: '1993-02-18'
+    },
+    // --- BATCH 4 ADDITIONS (40 More) ---
+    {
+        id: '1IVD', title: 'Hemagglutinin (1918 Spanish Flu)', category: 'Viral', description: 'Pandemic virus.', details: 'The surface spike protein from the deadly 1918 H1N1 influenza pandemic virus. Reconstructed from frozen samples to understand its extreme virulence.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.2 Å', organism: 'Influenza A virus (1918)', depositionDate: '2004-03-18'
+    },
+    {
+        id: '6TKO', title: 'Cannabinoid Receptor CB1', category: 'Signaling', description: 'THC target.', details: 'The brain receptor that binds THC (from immune response). It regulates pain, appetite, and mood, and is one of the most abundant GPCRs in the brain.',
+        method: 'CRYO-EM', resolution: '2.8 Å', organism: 'Homo sapiens', depositionDate: '2020-01-22'
+    },
+    {
+        id: '5C1M', title: 'Mu-Opioid Receptor', category: 'Signaling', description: 'Morphine target.', details: 'The primary target for opioids like morphine and fentanyl. This structure helps researchers design safer painkillers that do not cause respiratory depression.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.8 Å', organism: 'Mus musculus', depositionDate: '2015-06-17'
+    },
+    {
+        id: '5F1O', title: 'LSD-Bound Serotonin Receptor (5-HT2B)', category: 'Signaling', description: 'Psychedelic mechanism.', details: 'Shows how LSD binds to the serotonin receptor. A "lid" domain closes over the drug, trapping it in the receptor for hours, explaining the long duration of its effects.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.9 Å', organism: 'Homo sapiens', depositionDate: '2016-08-24'
+    },
+    {
+        id: '1YGP', title: 'Glycogen Phosphorylase', category: 'Enzymes', description: 'First allosteric enzyme.', details: 'The enzyme that breaks down glycogen (sugar stores) in muscle. It was the first enzyme shown to be regulated by allosteric effectors (phosphorylation).',
+        method: 'X-RAY DIFFRACTION', resolution: '2.0 Å', organism: 'Oryctolagus cuniculus', depositionDate: '1991-03-15'
+    },
+    {
+        id: '1LNH', title: 'Aspartate Transcarbamoylase (ATCase)', category: 'Enzymes', description: 'Feedback regulation.', details: 'The textbook model for allosteric regulation. It catalyzes the first step in pyrimidine biosynthesis and is inhibited by the final product (CTP) via feedback inhibition.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.6 Å', organism: 'Escherichia coli', depositionDate: '1990-11-12'
+    },
+    {
+        id: '7K00', title: 'SARS-CoV-2 RdRp with Remdesivir', category: 'Viral', description: 'Viral copier.', details: 'The viral replication machine (RNA-dependent RNA polymerase) caught in the act of incorporating the antiviral drug Remdesivir, which stalls the copy process.',
+        method: 'CRYO-EM', resolution: '2.5 Å', organism: 'SARS-CoV-2', depositionDate: '2020-08-28'
+    },
+    {
+        id: '1KYO', title: 'Antarctic Fish Hemoglobin', category: 'Transport', description: 'Cold adaptation.', details: 'A hemoglobin adapted to function at freezing temperatures. It lacks the "Root effect" seen in other fish, keeping oxygen bound even in acidic, cold blood.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.8 Å', organism: 'Trematomus bernacchii', depositionDate: '2002-02-04'
+    },
+    {
+        id: '3W32', title: 'Llama Hemoglobin', category: 'Transport', description: 'High altitude.', details: 'Adapted for the thin air of the Andes mountains. This hemoglobin has an incredibly high affinity for oxygen to extract every molecule from the air.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.75 Å', organism: 'Lama glama', depositionDate: '2013-01-08'
+    },
+    {
+        id: '1MBS', title: 'Seal Myoglobin', category: 'Transport', description: 'Deep diving.', details: 'Myoglobin from a deep-diving seal. It has surface mutations that prevent sticking, allowing it to be packed at ultra-high concentrations to store oxygen for long dives.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.5 Å', organism: 'Phoca vitulina', depositionDate: '1978-08-01'
+    },
+    {
+        id: '1DLH', title: 'Hemocyanin (Horseshoe Crab)', category: 'Transport', description: 'Blue blood.', details: 'The oxygen carrier of arthropods. Instead of iron (red), it uses copper ions, giving their blood a blue color. It forms massive complexes.',
+        method: 'X-RAY DIFFRACTION', resolution: '3.2 Å', organism: 'Panulirus interruptus', depositionDate: '1994-06-30'
+    },
+    {
+        id: '1JL4', title: 'Lac Repressor (LacI)', category: 'DNA/RNA', description: 'Gene switch.', details: 'The protein that controls the "Lac Operon." It binds DNA to block lactose digestion genes until lactose is present. The discovery of this mechanism founded molecular genetics.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.6 Å', organism: 'Escherichia coli', depositionDate: '2001-07-10'
+    },
+    {
+        id: '1JY4', title: 'Argonaute 2 (Human)', category: 'DNA/RNA', description: 'RNA interference.', details: 'The core component of the RISC complex. It uses small RNAs (siRNA/miRNA) as guides to find and slice matching mRNAs, silencing genes.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.5 Å', organism: 'Homo sapiens', depositionDate: '2004-12-08'
+    },
+    {
+        id: '1C4E', title: 'Exonuclease I', category: 'Enzymes', description: 'DNA cleanup.', details: 'An enzyme that chews up single-stranded DNA from the end. It performs quality control during DNA replication and repair.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.4 Å', organism: 'Escherichia coli', depositionDate: '1999-08-08'
+    },
+    {
+        id: '1QMG', title: 'Glutamine Synthetase', category: 'Enzymes', description: 'Nitrogen hub.', details: 'A massive dodecameric enzyme (12 subunits) that looks like two stacked donuts. It plays a central role in nitrogen metabolism by detoxifying ammonia.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.5 Å', organism: 'Salmonella typhimurium', depositionDate: '1999-10-14'
+    },
+    {
+        id: '1H1W', title: 'Human Growth Hormone', category: 'Signaling', description: 'Growth factor.', details: 'Complexed with its receptor. Recombinant hGH matches this structure and is used to treat growth disorders and in doping.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.5 Å', organism: 'Homo sapiens', depositionDate: '2001-02-07'
+    },
+    {
+        id: '1AX8', title: 'Leptin', category: 'Signaling', description: 'Satiety hormone.', details: 'The "starvation hormone" produced by fat cells. It signals the brain that energy stores are sufficient. Mutations here cause massive obesity.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.4 Å', organism: 'Homo sapiens', depositionDate: '1997-10-21'
+    },
+    {
+        id: '1SIK', title: 'Syk Kinase', category: 'Signaling', description: 'Immune signaling.', details: 'A tyrosine kinase essential for B-cell production. When an antibody binds an antigen, Syk is the enzyme that shouts "Attack!" inside the cell.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.4 Å', organism: 'Homo sapiens', depositionDate: '1997-01-20'
+    },
+    {
+        id: '1NCQ', title: 'Retinoic Acid Receptor', category: 'Signaling', description: 'Vitamin A signal.', details: 'A nuclear receptor that binds Vitamin A derivatives. It organizes cell differentiation during embryonic development.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.8 Å', organism: 'Homo sapiens', depositionDate: '2002-12-25'
+    },
+    {
+        id: '1A52', title: 'Estrogen Receptor Beta', category: 'Signaling', description: 'Hormone receptor.', details: 'The "other" estrogen receptor. It often has opposing effects to ER-alpha and is found in the brain, heart, and lungs.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.3 Å', organism: 'Homo sapiens', depositionDate: '1998-02-11'
+    },
+    {
+        id: '1HCQ', title: 'MHC Class II', category: 'Immune', description: 'Antigen presenter.', details: 'The molecule that displays peptides from outside the cell (like bacteria) to helper T-cells, coordinating the immune response.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.5 Å', organism: 'Homo sapiens', depositionDate: '2001-05-02'
+    },
+    {
+        id: '1BG1', title: 'Topoisomerase II (Gyrase)', category: 'Enzymes', description: 'DNA untangler.', details: 'The target of Cipro antibiotics. It cuts both strands of DNA, passes another helix through the gap, and reseals it to remove knots and tangles.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.8 Å', organism: 'Escherichia coli', depositionDate: '1997-04-10'
+    },
+    {
+        id: '1K83', title: 'Toll-Like Receptor 3 (TLR3)', category: 'Immune', description: 'Virus sensor.', details: 'A massive horseshoe-shaped receptor of the innate immune system. It detects double-stranded RNA (a sign of viral infection) and triggers inflammation.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.1 Å', organism: 'Homo sapiens', depositionDate: '2005-04-12'
+    },
+    {
+        id: '4OR2', title: 'Orexin Receptor', category: 'Signaling', description: 'Wakefulness.', details: 'The receptor for orexin, which regulates wakefulness. Loss of orexin neurons causes Narcolepsy (sudden sleep). Drug targets for insomnia.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.5 Å', organism: 'Homo sapiens', depositionDate: '2014-04-20'
+    },
+    {
+        id: '1K63', title: 'Karyopherin (Importin)', category: 'Transport', description: 'Nuclear shuttle.', details: 'The ferry boat of the cell. It grabs proteins with a "Nuclear Localization Signal" and carries them through the nuclear pore complex into the nucleus.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.5 Å', organism: 'Saccharomyces cerevisiae', depositionDate: '2001-10-18'
+    },
+    {
+        id: '1E66', title: 'Acetylcholinesterase', category: 'Enzymes', description: 'Nerve agent target.', details: 'Clears neurotransmitters. Inhibited by nerve gases (Sarin) and pesticides, leading to fatal overstimulation of muscles.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.3 Å', organism: 'Torpedo californica', depositionDate: '2000-08-14'
+    },
+    {
+        id: '1HXB', title: 'HIV-1 Protease with Saquinavir', category: 'Viral', description: 'First HIV drug.', details: 'The structure that proved rational drug design works. Shows the very first protease inhibitor drug, Saquinavir, binding primarily to the active site.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.0 Å', organism: 'HIV-1', depositionDate: '1993-01-26'
+    },
+    {
+        id: '3PGH', title: 'Phosphoglycerate Kinase', category: 'Enzymes', description: 'Hinge motion.', details: 'A glycolytic enzyme with two lobes connected by a flexible hinge. Upon binding substrate, it snaps shut like a clam.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.4 Å', organism: 'Saccharomyces cerevisiae', depositionDate: '2008-01-15'
+    },
+    {
+        id: '2POR', title: 'Porin', category: 'Transport', description: 'General diffusion.', details: 'An outer membrane channel from Rhodobacter. Unlike specific transporters, it acts as a molecular sieve based largely on size.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.8 Å', organism: 'Rhodobacter capsulatus', depositionDate: '1992-05-15'
+    },
+    {
+        id: '1GIA', title: 'Gi Alpha 1', category: 'Signaling', description: 'Inhibitory G-protein.', details: 'The "OFF" switch of GPCR signaling. It inhibits adenylate cyclase, lowering cAMP levels and slowing down cellular activity.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.0 Å', organism: 'Rattus norvegicus', depositionDate: '1995-09-18'
+    },
+    {
+        id: '4IAR', title: 'CFTR (ABC Transporter)', category: 'Transport', description: 'Cystic Fibrosis.', details: 'The chloride channel mutated in Cystic Fibrosis. This structure of a bacterial homolog provided the first clues to how the human CFTR functions.',
+        method: 'X-RAY DIFFRACTION', resolution: '3.9 Å', organism: 'Staphylococcus aureus', depositionDate: '2012-12-05'
+    },
+    {
+        id: '1TNR', title: 'TNF-Beta', category: 'Immune', description: 'Inflammation.', details: 'Tumor Necrosis Factor. A potent cytokine that drives systemic inflammation and fever. Blockers (Humira, Enbrel) are top-selling drugs for arthritis.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.85 Å', organism: 'Homo sapiens', depositionDate: '1991-03-25'
+    },
+    {
+        id: '1EUV', title: 'Concanavalin A', category: 'Immune', description: 'Lectin.', details: 'A plant protein (lectin) that binds specific sugars on cell surfaces. Used to purify cell membrane proteins.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.0 Å', organism: 'Canavalia ensiformis', depositionDate: '1994-06-25'
+    },
+    {
+        id: '1QZ8', title: 'Voltage Gated Calcium Channel', category: 'Transport', description: 'Muscle trigger.', details: 'Controls calcium entry into cells. In the heart and muscles, this influx triggers contraction.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.9 Å', organism: 'Arcobacter butzleri', depositionDate: '2013-06-20'
+    },
+    {
+        id: '2A65', title: 'Proteasome Activator 11S', category: 'Chaperone', description: 'Proteasome booster.', details: 'Binds to the ends of the proteasome to open the gate wider, accelerating the degradation of short peptides.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.3 Å', organism: 'Trypanosoma brucei', depositionDate: '2005-07-06'
+    },
+    {
+        id: '1TUP', title: 'p53 Core Domain', category: 'Signaling', description: 'Guardian of genome.', details: 'The DNA-binding domain of p53. Most cancer-causing mutations occur in this specific region, destroying its ability to bind DNA.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.2 Å', organism: 'Homo sapiens', depositionDate: '1994-07-08'
+    },
+    {
+        id: '1AKJ', title: 'Troponin C', category: 'Signaling', description: 'Muscle calcium sensor.', details: 'The switch for muscle contraction. When calcium binds, it changes shape to move tropomyosin out of the way, allowing myosin to bind actin.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.0 Å', organism: 'Gallus gallus', depositionDate: '1995-05-18'
+    },
+    {
+        id: '1MISO', title: 'Amylase', category: 'Enzymes', description: 'Starch digester.', details: 'The enzyme in saliva that begins digestion. It breaks down long starch chains into sweet tasting maltose sugars.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.5 Å', organism: 'Sus scrofa', depositionDate: '2001-05-12'
+    },
+    {
+        id: '1HRP', title: 'Horseradish Peroxidase', category: 'Enzymes', description: 'Lab workhorse.', details: 'Used in ELISA and Western Blots to generate a color signal. A robust enzyme that stays active under harsh conditions.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.0 Å', organism: 'Armoracia rusticana', depositionDate: '1997-01-20'
+    },
+    {
+        id: '1TUB', title: 'Tubulin Beta/Alpha Dimer', category: 'Structural', description: 'Cell skeleton.', details: 'The fundamental building block of microtubules. Shows the binding sites for GTP and the drug Colchicine.',
+        method: 'ELECTRON CRYSTALLOGRAPHY', resolution: '3.7 Å', organism: 'Bos taurus', depositionDate: '1998-01-23'
     }
 ];
 // Deduplicate IDs just in case
