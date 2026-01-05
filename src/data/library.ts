@@ -2973,40 +2973,40 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         depositionDate: '1999-09-24'
     },
     {
-        id: '1R9F',
+        id: '2AAI',
         title: 'Ricin A-Chain',
         category: 'Toxins',
         description: 'Ribosome killer.',
         details: 'The catalytic domain of the deadly Ricin toxin. A single molecule can inactivate thousands of ribosomes, killing the cell.',
         organism: 'Ricinus communis',
         method: 'X-RAY DIFFRACTION',
-        resolution: '1.8 Å',
-        depositionDate: '2003-10-31'
+        resolution: '2.1 Å',
+        depositionDate: '1989-12-07'
     },
     {
-        id: '1S76',
-        title: 'Snake Venom Metalloprotease',
+        id: '1S6B',
+        title: 'Snake Venom Metalloprotease (Adamalysin)',
         category: 'Toxins',
         description: 'Tissue destroyer.',
         details: 'A hemorrhagic toxin from rattlesnake venom. It degrades tissues and prevents blood clotting.',
-        organism: 'Crotalus atrox',
+        organism: 'Crotalus adamanteus',
         method: 'X-RAY DIFFRACTION',
-        resolution: '2.1 Å',
-        depositionDate: '2004-01-28'
+        resolution: '2.0 Å',
+        depositionDate: '2004-01-20'
     },
     {
-        id: '1T66',
+        id: '1F3I',
         title: 'Transposase Tn5',
         category: 'DNA/RNA',
         description: 'Jumping gene enzyme.',
         details: 'The enzyme responsible for moving "jumping genes" (transposons). It cuts DNA and pastes it elsewhere.',
         organism: 'Escherichia coli',
         method: 'X-RAY DIFFRACTION',
-        resolution: '2.9 Å',
-        depositionDate: '2004-05-09'
+        resolution: '2.3 Å',
+        depositionDate: '2000-06-03'
     },
     {
-        id: '1U8D',
+        id: '1W36',
         title: 'RecBCD Helicase',
         category: 'Enzymes',
         description: 'DNA repair motor.',
@@ -3014,62 +3014,62 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         organism: 'Escherichia coli',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.6 Å',
-        depositionDate: '2004-08-11'
+        depositionDate: '2004-02-12'
     },
     {
-        id: '1V2X',
-        title: 'Voltage-gated Sodium Channel',
+        id: '4DXW',
+        title: 'Voltage-gated Sodium Channel (NavAb)',
         category: 'Transport',
         description: 'Nerve impulse.',
         details: 'The channel that initiates action potentials in neurons. Target of local anesthetics and many toxins.',
         organism: 'Arcobacter butzleri',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.7 Å',
-        depositionDate: '2011-06-15'
+        depositionDate: '2012-05-16'
     },
     {
-        id: '1W63',
+        id: '4WYQ',
         title: 'Dicer',
         category: 'DNA/RNA',
         description: 'RNA silencer.',
         details: 'The molecular ruler that cuts double-stranded RNA into siRNA, triggering gene silencing (RNAi).',
-        organism: 'Giardia intestinalis',
-        method: 'X-RAY DIFFRACTION',
-        resolution: '3.3 Å',
-        depositionDate: '2004-08-10'
+        organism: 'Homo sapiens',
+        method: 'CRYO-EM',
+        resolution: '4.4 Å',
+        depositionDate: '2014-12-31'
     },
     {
-        id: '1XQ8',
+        id: '1AXC',
         title: 'PCNA (Proliferating Cell Nuclear Antigen)',
         category: 'DNA/RNA',
         description: 'Sliding clamp.',
         details: 'A ring-shaped protein that encircles DNA. It acts as a sliding clamp to tether DNA polymerase to the DNA for rapid replication.',
-        organism: 'Homo sapiens',
+        organism: 'Saccharomyces cerevisiae',
         method: 'X-RAY DIFFRACTION',
-        resolution: '2.3 Å',
-        depositionDate: '2004-10-18'
+        resolution: '2.5 Å',
+        depositionDate: '1997-12-04'
     },
     {
-        id: '1YGE',
+        id: '2H2Z',
         title: 'SARS-CoV Main Protease',
         category: 'Viral',
         description: 'Coronavirus target.',
         details: 'The main protease of the original SARS virus (2003). Highly similar to SARS-CoV-2 Mpro, it processes the viral polyprotein.',
         organism: 'SARS coronavirus',
         method: 'X-RAY DIFFRACTION',
-        resolution: '1.9 Å',
-        depositionDate: '2005-01-05'
+        resolution: '1.8 Å',
+        depositionDate: '2006-03-31'
     },
     {
-        id: '3J3Q',
-        title: 'HIV-1 Env Trimer (Cryo-EM)',
+        id: '4NCO',
+        title: 'HIV-1 Env Trimer (BG505 SOSIP)',
         category: 'Viral',
         description: 'HIV Spike.',
         details: 'The elusive structure of the native HIV envelope trimer. This is the sole target for neutralizing antibodies against HIV.',
         organism: 'Human immunodeficiency virus 1',
-        method: 'ELECTRON MICROSCOPY',
-        resolution: '5.8 Å',
-        depositionDate: '2013-05-23'
+        method: 'X-RAY DIFFRACTION',
+        resolution: '3.1 Å',
+        depositionDate: '2013-11-20'
     },
     // --- BATCH 3 ADDITIONS (40 More) ---
     {
@@ -3109,12 +3109,12 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         method: 'ELECTRON MICROSCOPY', resolution: '3.6 Å', organism: 'Human poliovirus 1', depositionDate: '2013-09-04'
     },
     {
-        id: '1J1E', title: 'Cholera Toxin B-Pentamer', category: 'Toxins', description: 'Cholera delivery.', details: 'The non-toxic "doughnut" part of cholera toxin. It binds to sugars on the gut wall to deliver the toxic enzymatic payload into cells.',
-        method: 'X-RAY DIFFRACTION', resolution: '1.25 Å', organism: 'Vibrio cholerae', depositionDate: '2001-09-17'
+        id: '1XTC', title: 'Cholera Toxin B-Pentamer', category: 'Toxins', description: 'Cholera delivery.', details: 'The non-toxic "doughnut" part of cholera toxin. It binds to sugars on the gut wall to deliver the toxic enzymatic payload into cells.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.5 Å', organism: 'Vibrio cholerae', depositionDate: '1995-10-18'
     },
     {
-        id: '1XTC', title: 'Diphtheria Toxin', category: 'Toxins', description: 'Protein synthesis blocker.', details: 'A bacterial toxin that kills cells by inactivating Elongation Factor-2, permanently stopping protein production.',
-        method: 'X-RAY DIFFRACTION', resolution: '2.3 Å', organism: 'Corynebacterium diphtheriae', depositionDate: '1996-01-29'
+        id: '1TOX', title: 'Diphtheria Toxin', category: 'Toxins', description: 'Protein synthesis blocker.', details: 'A bacterial toxin that kills cells by inactivating Elongation Factor-2, permanently stopping protein production.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.5 Å', organism: 'Corynebacterium diphtheriae', depositionDate: '1996-05-18'
     },
     {
         id: '2WSO', title: 'mCherry Fluorescent Protein', category: 'Structural', description: 'Red fluorescent tag.', details: 'A red variant of GFP derived from mushroom coral. It allows scientists to tag and track multiple proteins simultaneously in different colors.',
@@ -3201,36 +3201,36 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         method: 'X-RAY DIFFRACTION', resolution: '1.9 Å', organism: 'Discosoma sp.', depositionDate: '2000-11-20'
     },
     {
-        id: '1AY1', title: 'Zinc Finger Zif268 (Bound)', category: 'DNA/RNA', description: 'Classic DNA binder.', details: 'A perfect example of Zinc Fingers interacting with the major groove of DNA to read the genetic sequence.',
-        method: 'X-RAY DIFFRACTION', resolution: '1.6 Å', organism: 'Mus musculus', depositionDate: '1997-11-13'
+        id: '1ZAA', title: 'Zinc Finger Zif268 (Bound)', category: 'DNA/RNA', description: 'Classic DNA binder.', details: 'A perfect example of Zinc Fingers interacting with the major groove of DNA to read the genetic sequence.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.1 Å', organism: 'Mus musculus', depositionDate: '1996-05-15'
     },
     {
-        id: '1L8J', title: 'Cobratoxin', category: 'Toxins', description: 'Snake bite.', details: 'A potent neurotoxin from the Cobra. It binds irreversibly to acetylcholine receptors, causing paralysis.',
-        method: 'X-RAY DIFFRACTION', resolution: '2.0 Å', organism: 'Naja kaouthia', depositionDate: '2002-03-20'
+        id: '1CTX', title: 'Cobratoxin', category: 'Toxins', description: 'Snake bite.', details: 'A potent neurotoxin from the Cobra. It binds irreversibly to acetylcholine receptors, causing paralysis.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.5 Å', organism: 'Naja kaouthia', depositionDate: '1976-06-01'
     },
     {
-        id: '1YHU', title: 'PCNA (Human)', category: 'DNA/RNA', description: 'Human sliding clamp.', details: 'The human version of the DNA sliding clamp. It is often stained in biopsies to check how fast a tumor is growing.',
-        method: 'X-RAY DIFFRACTION', resolution: '2.3 Å', organism: 'Homo sapiens', depositionDate: '2005-01-11'
+        id: '1U76', title: 'PCNA (Human)', category: 'DNA/RNA', description: 'Human sliding clamp.', details: 'The human version of the DNA sliding clamp. It is often stained in biopsies to check how fast a tumor is growing.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.5 Å', organism: 'Homo sapiens', depositionDate: '2003-05-01'
     },
     {
-        id: '1BIPV', title: 'Barnase-Barstar Complex', category: 'Enzymes', description: 'Tightest interaction.', details: 'One of the strongest protein-protein interactions known. Barstar binds to Barnase (a bacterial RNase) to stop it from killing the host cell.',
-        method: 'X-RAY DIFFRACTION', resolution: '2.0 Å', organism: 'Bacillus amyloliquefaciens', depositionDate: '1999-05-18'
+        id: '1BRN', title: 'Barnase-Barstar Complex', category: 'Enzymes', description: 'Tightest interaction.', details: 'One of the strongest protein-protein interactions known. Barstar binds to Barnase (a bacterial RNase) to stop it from killing the host cell.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.0 Å', organism: 'Bacillus amyloliquefaciens', depositionDate: '1982-10-01'
     },
     {
-        id: '1QJ8', title: 'Magainin 2', category: 'Immune', description: 'Frog antibiotic.', details: 'An antibiotic peptide secreted from the skin of the African Clawed Frog. It disrupts bacterial membranes.',
-        method: 'SOLUTION NMR', resolution: 'N/A', organism: 'Xenopus laevis', depositionDate: '1999-06-25'
+        id: '2MAG', title: 'Magainin 2', category: 'Immune', description: 'Frog antibiotic.', details: 'An antibiotic peptide secreted from the skin of the African Clawed Frog. It disrupts bacterial membranes.',
+        method: 'NMR', resolution: 'N/A', organism: 'Xenopus laevis', depositionDate: '1993-01-08'
     },
     {
-        id: '2B3Y', title: 'Human Prion Protein (Variant)', category: 'Structural', description: 'Prion disease.', details: 'A mutant form of the human prion protein associated with inherited prion disease. It reveals destabilizing features.',
-        method: 'SOLUTION NMR', resolution: 'N/A', organism: 'Homo sapiens', depositionDate: '2005-09-21'
+        id: '1QM2', title: 'Human Prion Protein', category: 'Structural', description: 'Prion disease.', details: 'The NMR structure of the cellular prion protein. Misfolding of this protein leads to fatal diseases like Creutzfeldt-Jakob.',
+        method: 'SOLUTION NMR', resolution: 'N/A', organism: 'Homo sapiens', depositionDate: '1999-07-30'
     },
     {
-        id: '1SVA', title: 'Streptavidin', category: 'Structural', description: 'Biotech glue.', details: 'The core tetrameric structure of Streptavidin. Its ability to bind Biotin is the basis for thousands of biotechnology assays.',
-        method: 'X-RAY DIFFRACTION', resolution: '1.5 Å', organism: 'Streptomyces avidinii', depositionDate: '1989-06-21'
+        id: '1STP', title: 'Streptavidin', category: 'Structural', description: 'Biotech glue.', details: 'The core tetrameric structure of Streptavidin. Its ability to bind Biotin is the basis for thousands of biotechnology assays.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.7 Å', organism: 'Streptomyces avidinii', depositionDate: '1989-10-18'
     },
     {
-        id: '1AV1', title: 'Avidin', category: 'Structural', description: 'Egg white protein.', details: 'A protein found in egg whites that also binds biotin (Vitamin B7) avidly. It protects eggs from bacterial growth by sequestering vitamins.',
-        method: 'X-RAY DIFFRACTION', resolution: '2.7 Å', organism: 'Gallus gallus', depositionDate: '1993-02-18'
+        id: '2AVI', title: 'Avidin', category: 'Structural', description: 'Egg white protein.', details: 'A protein found in egg whites that also binds biotin (Vitamin B7) avidly. It protects eggs from bacterial growth by sequestering vitamins.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.7 Å', organism: 'Gallus gallus', depositionDate: '2005-06-25'
     },
     // --- BATCH 4 ADDITIONS (40 More) ---
     {
@@ -3274,20 +3274,20 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         method: 'X-RAY DIFFRACTION', resolution: '2.8 Å', organism: 'Limulus polyphemus', depositionDate: '1990-01-01'
     },
     {
-        id: '1JL4', title: 'Lac Repressor (LacI)', category: 'DNA/RNA', description: 'Gene switch.', details: 'The protein that controls the "Lac Operon." It binds DNA to block lactose digestion genes until lactose is present. The discovery of this mechanism founded molecular genetics.',
-        method: 'X-RAY DIFFRACTION', resolution: '2.6 Å', organism: 'Escherichia coli', depositionDate: '2001-07-10'
+        id: '1LBI', title: 'Lac Repressor (LacI)', category: 'DNA/RNA', description: 'Gene switch.', details: 'The protein that controls the "Lac Operon." It binds DNA to block lactose digestion genes until lactose is present. The discovery of this mechanism founded molecular genetics.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.7 Å', organism: 'Escherichia coli', depositionDate: '1996-06-13'
     },
     {
         id: '1JY4', title: 'Argonaute 2 (Human)', category: 'DNA/RNA', description: 'RNA interference.', details: 'The core component of the RISC complex. It uses small RNAs (siRNA/miRNA) as guides to find and slice matching mRNAs, silencing genes.',
         method: 'X-RAY DIFFRACTION', resolution: '2.5 Å', organism: 'Homo sapiens', depositionDate: '2004-12-08'
     },
     {
-        id: '1C4E', title: 'Exonuclease I', category: 'Enzymes', description: 'DNA cleanup.', details: 'An enzyme that chews up single-stranded DNA from the end. It performs quality control during DNA replication and repair.',
-        method: 'X-RAY DIFFRACTION', resolution: '2.4 Å', organism: 'Escherichia coli', depositionDate: '1999-08-08'
+        id: '1KSP', title: 'Exonuclease I', category: 'Enzymes', description: 'DNA cleanup.', details: 'An enzyme that chews up single-stranded DNA from the end. It performs quality control during DNA replication and repair.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.4 Å', organism: 'Escherichia coli', depositionDate: '2002-01-01'
     },
     {
-        id: '1QMG', title: 'Glutamine Synthetase', category: 'Enzymes', description: 'Nitrogen hub.', details: 'A massive dodecameric enzyme (12 subunits) that looks like two stacked donuts. It plays a central role in nitrogen metabolism by detoxifying ammonia.',
-        method: 'X-RAY DIFFRACTION', resolution: '2.5 Å', organism: 'Salmonella typhimurium', depositionDate: '1999-10-14'
+        id: '2GLS', title: 'Glutamine Synthetase', category: 'Enzymes', description: 'Nitrogen hub.', details: 'A massive dodecameric enzyme (12 subunits) that looks like two stacked donuts. It plays a central role in nitrogen metabolism by detoxifying ammonia.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.1 Å', organism: 'Salmonella typhimurium', depositionDate: '1989-07-25'
     },
     {
         id: '1H1W', title: 'Human Growth Hormone', category: 'Signaling', description: 'Growth factor.', details: 'Complexed with its receptor. Recombinant hGH matches this structure and is used to treat growth disorders and in doping.',
@@ -3298,8 +3298,8 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         method: 'X-RAY DIFFRACTION', resolution: '2.4 Å', organism: 'Homo sapiens', depositionDate: '1997-10-21'
     },
     {
-        id: '1SIK', title: 'Syk Kinase', category: 'Signaling', description: 'Immune signaling.', details: 'A tyrosine kinase essential for B-cell production. When an antibody binds an antigen, Syk is the enzyme that shouts "Attack!" inside the cell.',
-        method: 'X-RAY DIFFRACTION', resolution: '2.4 Å', organism: 'Homo sapiens', depositionDate: '1997-01-20'
+        id: '4FL2', title: 'Syk Kinase', category: 'Signaling', description: 'Immune signaling.', details: 'A tyrosine kinase essential for B-cell production. When an antibody binds an antigen, Syk is the enzyme that shouts "Attack!" inside the cell.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.3 Å', organism: 'Homo sapiens', depositionDate: '2012-07-18'
     },
     {
         id: '1NCQ', title: 'Retinoic Acid Receptor', category: 'Signaling', description: 'Vitamin A signal.', details: 'A nuclear receptor that binds Vitamin A derivatives. It organizes cell differentiation during embryonic development.',
@@ -3310,8 +3310,8 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         method: 'X-RAY DIFFRACTION', resolution: '2.3 Å', organism: 'Homo sapiens', depositionDate: '1998-02-11'
     },
     {
-        id: '1HCQ', title: 'MHC Class II', category: 'Immune', description: 'Antigen presenter.', details: 'The molecule that displays peptides from outside the cell (like bacteria) to helper T-cells, coordinating the immune response.',
-        method: 'X-RAY DIFFRACTION', resolution: '2.5 Å', organism: 'Homo sapiens', depositionDate: '2001-05-02'
+        id: '3L6F', title: 'MHC Class II', category: 'Immune', description: 'Antigen presenter.', details: 'The molecule that displays peptides from outside the cell (like bacteria) to helper T-cells, coordinating the immune response.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.1 Å', organism: 'Homo sapiens', depositionDate: '2010-10-21'
     },
     {
         id: '1BG1', title: 'Topoisomerase II (Gyrase)', category: 'Enzymes', description: 'DNA untangler.', details: 'The target of Cipro antibiotics. It cuts both strands of DNA, passes another helix through the gap, and reseals it to remove knots and tangles.',
@@ -3338,8 +3338,8 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         method: 'X-RAY DIFFRACTION', resolution: '2.0 Å', organism: 'HIV-1', depositionDate: '1993-01-26'
     },
     {
-        id: '3PGH', title: 'Phosphoglycerate Kinase', category: 'Enzymes', description: 'Hinge motion.', details: 'A glycolytic enzyme with two lobes connected by a flexible hinge. Upon binding substrate, it snaps shut like a clam.',
-        method: 'X-RAY DIFFRACTION', resolution: '2.4 Å', organism: 'Saccharomyces cerevisiae', depositionDate: '2008-01-15'
+        id: '3C39', title: 'Phosphoglycerate Kinase', category: 'Enzymes', description: 'Hinge motion.', details: 'A glycolytic enzyme with two lobes connected by a flexible hinge. Upon binding substrate, it snaps shut like a clam.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.0 Å', organism: 'Homo sapiens', depositionDate: '2008-01-15'
     },
     {
         id: '2POR', title: 'Porin', category: 'Transport', description: 'General diffusion.', details: 'An outer membrane channel from Rhodobacter. Unlike specific transporters, it acts as a molecular sieve based largely on size.',
@@ -3374,16 +3374,16 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         method: 'X-RAY DIFFRACTION', resolution: '2.2 Å', organism: 'Homo sapiens', depositionDate: '1994-07-08'
     },
     {
-        id: '1AKJ', title: 'Troponin C', category: 'Signaling', description: 'Muscle calcium sensor.', details: 'The switch for muscle contraction. When calcium binds, it changes shape to move tropomyosin out of the way, allowing myosin to bind actin.',
-        method: 'X-RAY DIFFRACTION', resolution: '2.0 Å', organism: 'Gallus gallus', depositionDate: '1995-05-18'
+        id: '4TNC', title: 'Troponin C', category: 'Signaling', description: 'Muscle calcium sensor.', details: 'The switch for muscle contraction. When calcium binds, it changes shape to move tropomyosin out of the way, allowing myosin to bind actin.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.0 Å', organism: 'Meleagris gallopavo', depositionDate: '1980-05-15'
     },
     {
-        id: '1MISO', title: 'Amylase', category: 'Enzymes', description: 'Starch digester.', details: 'The enzyme in saliva that begins digestion. It breaks down long starch chains into sweet tasting maltose sugars.',
-        method: 'X-RAY DIFFRACTION', resolution: '1.5 Å', organism: 'Sus scrofa', depositionDate: '2001-05-12'
+        id: '1B2Y', title: 'Amylase', category: 'Enzymes', description: 'Starch digester.', details: 'The enzyme in saliva that begins digestion. It breaks down long starch chains into sweet tasting maltose sugars.',
+        method: 'X-RAY DIFFRACTION', resolution: '3.2 Å', organism: 'Homo sapiens', depositionDate: '1998-12-03'
     },
     {
-        id: '1HRP', title: 'Horseradish Peroxidase', category: 'Enzymes', description: 'Lab workhorse.', details: 'Used in ELISA and Western Blots to generate a color signal. A robust enzyme that stays active under harsh conditions.',
-        method: 'X-RAY DIFFRACTION', resolution: '2.0 Å', organism: 'Armoracia rusticana', depositionDate: '1997-01-20'
+        id: '1W4W', title: 'Horseradish Peroxidase', category: 'Enzymes', description: 'Lab workhorse.', details: 'Used in ELISA and Western Blots to generate a color signal. A robust enzyme that stays active under harsh conditions.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.0 Å', organism: 'Armoracia rusticana', depositionDate: '2004-12-04'
     },
     {
         id: '1TUB', title: 'Tubulin Beta/Alpha Dimer', category: 'Structural', description: 'Cell skeleton.', details: 'The fundamental building block of microtubules. Shows the binding sites for GTP and the drug Colchicine.',
