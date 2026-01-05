@@ -11,9 +11,15 @@ import LibraryModal from './components/LibraryModal';
 import { ShareModal } from './components/ShareModal';
 import { SequenceTrack } from './components/SequenceTrack';
 import { DragDropOverlay } from './components/DragDropOverlay';
+import { CommandPalette, type CommandAction } from './components/CommandPalette';
 import { OFFLINE_LIBRARY } from './data/library';
 import { fetchPDBMetadata } from './utils/pdbUtils';
 import type { PDBMetadata } from './types';
+import {
+  Camera, RefreshCw, Upload,
+  Settings, Zap, Activity, Grid3X3, Palette,
+  Share2, Save, FolderOpen, Video
+} from 'lucide-react';
 
 function App() {
   // Parse Global URL State Once
@@ -558,6 +564,8 @@ function App() {
     }
   };
 
+
+
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
@@ -576,6 +584,145 @@ function App() {
     }
   };
 
+  // --- COMMAND PALETTE LOGIC ---
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const commandActions: CommandAction[] = useMemo(() => [
+    // --- FILES & LOADING ---
+    {
+      id: 'load-upload',
+      label: 'Upload File',
+      icon: Upload,
+      category: 'File',
+      perform: () => document.getElementById('file-upload-input')?.click() // Indirect trigger if possible, or we need a ref
+    },
+    {
+      id: 'load-library',
+      label: 'Open Structure Library',
+      icon: FolderOpen,
+      category: 'File',
+      perform: () => setIsLibraryOpen(true)
+    },
+    {
+      id: 'save-session',
+      label: 'Save Session',
+      icon: Save,
+      category: 'File',
+      perform: handleSaveSession
+    },
+
+    // --- VIEW & EXPORT ---
+    {
+      id: 'reset-view',
+      label: 'Reset Camera View',
+      icon: RefreshCw,
+      shortcut: 'R',
+      category: 'View',
+      perform: handleResetView
+    },
+    {
+      id: 'toggle-pub-mode',
+      label: isPublicationMode ? 'Exit Publication Mode' : 'Enter Publication Mode',
+      icon: Camera,
+      category: 'View',
+      perform: () => setIsPublicationMode(prev => !prev)
+    },
+    {
+      id: 'take-snapshot',
+      label: 'Take Snapshot',
+      icon: Camera,
+      category: 'Export',
+      perform: handleSnapshot
+    },
+    {
+      id: 'record-movie',
+      label: 'Record Turntable Movie',
+      icon: Video,
+      category: 'Export',
+      perform: () => handleRecordMovie()
+    },
+    {
+      id: 'share-link',
+      label: 'Share via QR / Link',
+      icon: Share2,
+      category: 'Export',
+      perform: () => setShowShareModal(true)
+    },
+
+    // --- APPEARANCE ---
+    {
+      id: 'style-cartoon',
+      label: 'Style: Cartoon',
+      icon: Activity,
+      category: 'Appearance',
+      perform: () => setRepresentation('cartoon')
+    },
+    {
+      id: 'style-surface',
+      label: 'Style: Molecular Surface',
+      icon: Grid3X3,
+      category: 'Appearance',
+      perform: () => {
+        setRepresentation('cartoon'); // Surface usually adds to cartoon
+        setShowSurface(true);
+      }
+    },
+    {
+      id: 'style-sphere',
+      label: 'Style: Spacefill (Sphere)',
+      icon: Zap,
+      category: 'Appearance',
+      perform: () => setRepresentation('spacefill')
+    },
+    {
+      id: 'color-chain',
+      label: 'Color by Chain',
+      icon: Palette,
+      category: 'Appearance',
+      perform: () => setColoring('chainid')
+    },
+    {
+      id: 'color-hydro',
+      label: 'Color by Hydrophobicity',
+      icon: Palette,
+      category: 'Appearance',
+      perform: () => setColoring('hydrophobicity')
+    },
+    {
+      id: 'color-bfactor',
+      label: 'Color by B-Factor (Mobility)',
+      icon: Palette,
+      category: 'Appearance',
+      perform: () => setColoring('bfactor')
+    },
+    {
+      id: 'toggle-spin',
+      label: isSpinning ? 'Stop Spinning' : 'Start Spinning',
+      icon: RefreshCw,
+      category: 'View',
+      perform: () => setIsSpinning(prev => !prev)
+    },
+    {
+      id: 'toggle-theme',
+      label: isLightMode ? 'Switch to Dark Mode' : 'Switch to Light Mode',
+      icon: Settings,
+      category: 'View',
+      perform: () => setIsLightMode(prev => !prev)
+    },
+  ], [isPublicationMode, isSpinning, isLightMode, handleSaveSession, handleSnapshot, handleResetView]);
+
+
   return (
     <main
       className={`w-full h-full relative overflow-hidden transition-colors duration-300 ${isLightMode ? 'bg-slate-50 text-slate-900' : 'bg-neutral-950 text-white'}`}
@@ -585,6 +732,13 @@ function App() {
       onDrop={handleDrop}
     >
       <DragDropOverlay isDragging={isDragging} />
+
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        actions={commandActions}
+        isLightMode={isLightMode}
+      />
 
       <LibraryModal
         isOpen={isLibraryOpen}
