@@ -10,6 +10,7 @@ import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Movie, ColorP
 import LibraryModal from './components/LibraryModal';
 import { ShareModal } from './components/ShareModal';
 import { SequenceTrack } from './components/SequenceTrack';
+import { DragDropOverlay } from './components/DragDropOverlay';
 import { OFFLINE_LIBRARY } from './data/library';
 import { fetchPDBMetadata } from './utils/pdbUtils';
 import type { PDBMetadata } from './types';
@@ -512,8 +513,53 @@ function App() {
     }
   };
 
+  // Drag and Drop State
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (e.relatedTarget === null) {
+      setIsDragging(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      const droppedFile = files[0];
+      const validExtensions = ['.pdb', '.cif', '.ent'];
+      const fileExt = droppedFile.name.substring(droppedFile.name.lastIndexOf('.')).toLowerCase();
+
+      if (validExtensions.includes(fileExt)) {
+        handleUpload(droppedFile); // Reuse existing upload handler
+      } else {
+        alert("Invalid file type. Please drop a .pdb, .cif, or .ent file.");
+      }
+    }
+  };
+
   return (
-    <main className={`w-full h-full relative overflow-hidden transition-colors duration-300 ${isLightMode ? 'bg-slate-50 text-slate-900' : 'bg-neutral-950 text-white'}`}>
+    <main
+      className={`w-full h-full relative overflow-hidden transition-colors duration-300 ${isLightMode ? 'bg-slate-50 text-slate-900' : 'bg-neutral-950 text-white'}`}
+      onDragOver={handleDragOver}
+      onDragEnter={handleDragEnter}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      <DragDropOverlay isDragging={isDragging} />
 
       <LibraryModal
         isOpen={isLibraryOpen}
