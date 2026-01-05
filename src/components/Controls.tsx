@@ -128,6 +128,8 @@ interface ControlsProps {
     onHighlightRegion?: (selection: string, label: string) => void;
     onDownloadPDB: () => void;
     onDownloadSequence: () => void;
+    showIons?: boolean;
+    setShowIons?: (show: boolean) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -158,6 +160,8 @@ export const Controls: React.FC<ControlsProps> = ({
     setShowSurface,
     showLigands,
     setShowLigands,
+    showIons,
+    setShowIons,
     onFocusLigands,
     onRecordMovie,
     isRecording,
@@ -897,7 +901,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                             <Hexagon className="w-3.5 h-3.5 text-blue-500" />
                                             <span className={`text-xs font-bold ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>Ligands ({ligands.length})</span>
                                         </div>
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-1">
                                             <button
                                                 onClick={onFocusLigands}
                                                 className={`text-[10px] px-2 py-0.5 rounded border transition-colors bg-transparent text-neutral-500 hover:bg-neutral-50`}
@@ -908,7 +912,13 @@ export const Controls: React.FC<ControlsProps> = ({
                                                 onClick={() => setShowLigands(!showLigands)}
                                                 className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${showLigands ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-transparent text-neutral-500 hover:bg-neutral-50'}`}
                                             >
-                                                {showLigands ? 'Hide' : 'Show'}
+                                                {showLigands ? 'Hide Ligands' : 'Show Ligands'}
+                                            </button>
+                                            <button
+                                                onClick={() => setShowIons && setShowIons(!showIons)}
+                                                className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${showIons ? 'bg-purple-50 text-purple-600 border-purple-200' : 'bg-transparent text-neutral-500 hover:bg-neutral-50'}`}
+                                            >
+                                                {showIons ? 'Hide Ions' : 'Show Ions'}
                                             </button>
                                         </div>
                                     </div>

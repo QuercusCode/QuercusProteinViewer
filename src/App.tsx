@@ -87,6 +87,7 @@ function App() {
   const [customColors, setCustomColors] = useState<CustomColorRule[]>(initialUrlState.customColors || []);
   const [customBackgroundColor, setCustomBackgroundColor] = useState<string | null>(initialUrlState.customBackgroundColor || null);
   const [showLigands, setShowLigands] = useState(initialUrlState.showLigands || false);
+  const [showIons, setShowIons] = useState(false);
   const [showSurface, setShowSurface] = useState(initialUrlState.showSurface || false);
 
   // ... (lines 53-343) ...
@@ -934,6 +935,8 @@ function App() {
         setShowSurface={setShowSurface}
         showLigands={showLigands}
         setShowLigands={setShowLigands}
+        showIons={showIons}
+        setShowIons={setShowIons}
         onFocusLigands={handleFocusLigands}
         onRecordMovie={handleRecordMovie}
         isRecording={isRecording}
@@ -979,6 +982,8 @@ function App() {
         isSpinning={isSpinning}
         representation={representation}
         showSurface={showSurface}
+        showLigands={showLigands}
+        showIons={showIons}
         coloring={coloring}
         palette={colorPalette}
         backgroundColor={customBackgroundColor || (isLightMode ? 'white' : 'black')}
@@ -994,7 +999,6 @@ function App() {
         quality={isPublicationMode ? 'high' : 'medium'}
         enableAmbientOcclusion={isPublicationMode}
         resetCamera={resetKey}
-        showLigands={showLigands}
         customColors={customColors}
         className="w-full h-full"
       />

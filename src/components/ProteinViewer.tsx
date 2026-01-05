@@ -38,6 +38,7 @@ export interface ProteinViewerProps {
     representation: RepresentationType;
     showSurface: boolean;
     showLigands?: boolean;  // Optional, defaults to true
+    showIons?: boolean;     // New prop
     coloring: ColoringType;
     palette: ColorPalette;
     backgroundColor: string;
@@ -112,6 +113,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     backgroundColor = "black",
     showSurface = false,
     showLigands = false,
+    showIons = false,
     isSpinning = false,
     isMeasurementMode = false,
     measurements,
@@ -1694,6 +1696,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             if (showSurface) tryApply('surface', 'white', "*", { opacity: 0.4, depthWrite: false, side: 'front' });
             if (showLigands) tryApply('ball+stick', 'element', 'ligand and not (water or ion)', { scale: 2.0 });
+            if (showIons) tryApply('ball+stick', 'element', 'ion', { scale: 2.0 });
 
             if (stageRef.current?.viewer) {
                 stageRef.current.viewer.requestRender();
@@ -1706,7 +1709,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     useEffect(() => {
         updateRepresentation();
-    }, [representation, coloring, customColors, showSurface, showLigands, colorPalette]);
+    }, [representation, coloring, customColors, showSurface, showLigands, showIons, colorPalette]);
 
     useEffect(() => {
         if (stageRef.current) {
