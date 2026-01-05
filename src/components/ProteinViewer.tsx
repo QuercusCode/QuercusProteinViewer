@@ -117,7 +117,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     measurements,
     onAddMeasurement,
     onHover,
-    isLightMode
+    isLightMode,
+    measurementTextColor = 'auto'
 }: ProteinViewerProps, ref: React.Ref<ProteinViewerRef>) => {
 
     const containerRef = useRef<HTMLDivElement>(null);

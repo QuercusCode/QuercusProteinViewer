@@ -16,7 +16,7 @@ import { HUD } from './components/HUD';
 import { MeasurementPanel } from './components/MeasurementPanel';
 import { OFFLINE_LIBRARY } from './data/library';
 import { fetchPDBMetadata } from './utils/pdbUtils';
-import type { PDBMetadata, Measurement } from './types';
+import type { PDBMetadata, Measurement, MeasurementTextColor } from './types';
 import {
   Camera, RefreshCw, Upload,
   Settings, Zap, Activity, Grid3X3, Palette,
