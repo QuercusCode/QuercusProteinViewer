@@ -525,11 +525,22 @@ export const Controls: React.FC<ControlsProps> = ({
                                     </button>
                                     <button
                                         onClick={() => setIsDyslexicFont(!isDyslexicFont)}
-                                        className={`col-span-2 flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isDyslexicFont ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
+                                        className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isDyslexicFont ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
                                     >
-                                        <span className="text-xs font-medium">Dyslexic Font</span>
+                                        <span className="text-xs font-medium">Dyslexic</span>
                                         <div className={`w-1.5 h-1.5 rounded-full ${isDyslexicFont ? 'bg-blue-500' : 'bg-neutral-500'}`} />
                                     </button>
+                                    <select
+                                        value={colorPalette}
+                                        onChange={(e) => setColorPalette(e.target.value as ColorPalette)}
+                                        className={`w-full border rounded-lg px-2 py-2 text-xs outline-none ${inputBg} opacity-80 hover:opacity-100`}
+                                        title="Color Palette"
+                                    >
+                                        <option value="standard">Standard</option>
+                                        <option value="viridis">Viridis</option>
+                                        <option value="magma">Magma</option>
+                                        <option value="cividis">Cividis</option>
+                                    </select>
                                 </div>
 
                                 {/* Background Controls */}
@@ -624,19 +635,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                     </div>
                                 </div>
 
-                                <div>
-                                    <label className={`text-[10px] font-bold uppercase tracking-wider mb-1 block ${subtleText}`}>Palette</label>
-                                    <select
-                                        value={colorPalette}
-                                        onChange={(e) => setColorPalette(e.target.value as ColorPalette)}
-                                        className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
-                                    >
-                                        <option value="standard">Standard</option>
-                                        <option value="viridis">Viridis</option>
-                                        <option value="magma">Magma</option>
-                                        <option value="cividis">Cividis</option>
-                                    </select>
-                                </div>
+
                             </div>
 
                             <p className={`text-[9px] mt-1.5 opacity-70 leading-relaxed ${subtleText}`}>
