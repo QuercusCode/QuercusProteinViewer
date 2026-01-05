@@ -847,7 +847,10 @@ function App() {
         setIsMeasurementMode={setIsMeasurementMode}
         isPublicationMode={isPublicationMode}
         setIsPublicationMode={setIsPublicationMode}
-        onClearMeasurements={() => viewerRef.current?.clearMeasurements()}
+        onClearMeasurements={() => {
+          setMeasurements([]);
+          viewerRef.current?.clearMeasurements();
+        }}
         isLightMode={isLightMode}
         setIsLightMode={setIsLightMode}
         highlightedResidue={highlightedResidue}
