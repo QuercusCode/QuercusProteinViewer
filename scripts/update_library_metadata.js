@@ -150,7 +150,8 @@ async function main() {
         organism: '${safeOrganism.replace(/'/g, "\\'")}',
         depositionDate: '${meta.depositionDate}'`;
 
-        const specificRegex = new RegExp(`(id:\\s*'${id}',[\\s\\S]*?details:\\s*'.*?')`, 'm');
+        // Updated regex ensures we match the full string even if it has escaped quotes
+        const specificRegex = new RegExp(`(id:\\s*'${id}',[\\s\\S]*?details:\\s*'((?:[^'\\\\]|\\\\.)*)')`, 'm');
 
         if (newContent.match(specificRegex)) {
             newContent = newContent.replace(specificRegex, `$1${insertion}`);
