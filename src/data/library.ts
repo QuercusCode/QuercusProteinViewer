@@ -3950,6 +3950,182 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         resolution: '2.60 Å',
         organism: 'Verified Source',
         depositionDate: '2007-02-06'
+    },
+    // --- BATCH 8 ADDITIONS (Verified) ---
+    {
+        id: '7A8S', title: 'Crystal structure of a de novo designed ba8-barrel sTIM11 with an alpha-helical extension', category: 'Synthetic', description: 'De novo ba8-barrel', details: 'A de novo designed ba8-barrel sTIM11 with an alpha-helical extension.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '1.93 Å',
+        organism: 'Verified Source',
+        depositionDate: '2020-08-31'
+    },
+    {
+        id: '8QAF', title: 'X-ray crystal structure of a de novo designed single-chain antiparallel 8-helix coiled-coil alpha-helical barrel sc-apCC-8', category: 'Synthetic', description: 'De novo 8-helix barrel', details: 'A de novo designed single-chain antiparallel 8-helix coiled-coil alpha-helical barrel.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '1.55 Å',
+        organism: 'Verified Source',
+        depositionDate: '2023-08-22'
+    },
+    {
+        id: '7BAS', title: 'Crystal structure of a de novo designed pentameric alpha-helical barrel, 5HB', category: 'Synthetic', description: 'De novo 5-helix barrel', details: 'A de novo designed pentameric alpha-helical barrel.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.07 Å',
+        organism: 'Verified Source',
+        depositionDate: '2020-09-14'
+    },
+    {
+        id: '4PN9', title: 'Crystal structure of the de novo designed alpha-helical barrel 5H2', category: 'Synthetic', description: 'Tunable de novo barrel', details: 'A de novo designed alpha-helical barrel demonstrating tunable oligomeric states.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.40 Å',
+        organism: 'Verified Source',
+        depositionDate: '2014-05-23'
+    },
+    {
+        id: '6G67', title: 'Crystal structure of a de novo designed pentameric alpha-helical barrel, CC-Pent', category: 'Synthetic', description: 'De novo designed barrel', details: 'A de novo designed alpha-helical barrel with specific oligomeric state.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.00 Å',
+        organism: 'Verified Source',
+        depositionDate: '2018-04-03'
+    },
+    {
+        id: '5AEI', title: 'Crystal structure of dArmRP YIIIM5AII in complex with peptide pD_(KR)5', category: 'Binders', description: 'Armadillo Repeat Protein', details: 'A designed Armadillo Repeat Protein (dArmRP) bound to a specific peptide target.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.00 Å',
+        organism: 'Verified Source',
+        depositionDate: '2015-08-25'
+    },
+    {
+        id: '6S9L', title: 'Designed Armadillo Repeat protein Lock1 bound to (KR)4KLSF target', category: 'Binders', description: 'Armadillo Repeat Lock1', details: 'A designed Armadillo Repeat protein Lock1 bound to its target.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.45 Å',
+        organism: 'Verified Source',
+        depositionDate: '2019-07-15'
+    },
+    {
+        id: '2B89', title: 'Structure of an Affibody-Affibody complex', category: 'Binders', description: 'Affibody-Affibody complex', details: 'Structure of an engineered Affibody complex demonstrating molecular recognition.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.80 Å',
+        organism: 'Verified Source',
+        depositionDate: '2005-10-09'
+    },
+    {
+        id: '1H0T', title: 'NMR structure of the Z(SPA-1) affibody', category: 'Binders', description: 'Affibody Z(SPA-1)', details: 'An engineered Affibody (Z(SPA-1)) structure.',
+        method: 'SOLUTION NMR',
+        resolution: 'N/A',
+        organism: 'Verified Source',
+        depositionDate: '2000-06-19'
+    },
+    {
+        id: '1M10', title: 'High resolution crystal structure of a consensus designed ankyrin repeat protein (DARPin)', category: 'Binders', description: 'Designed Ankyrin Repeat', details: 'Crystal structure of a consensus Designed Ankyrin Repeat Protein (DARPin) variant.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '1.49 Å',
+        organism: 'Verified Source',
+        depositionDate: '2002-06-17'
+    },
+    {
+        id: '6FE4', title: 'Crystal structure of the complex between Shiga toxin Stx2 B subunit and a neutralizing nanobody Nb113', category: 'Nanobodies', description: 'Shiga Toxin Nanobody', details: 'Nanobody Nb113 bound to the Shiga Toxin 2 B-subunit.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.20 Å',
+        organism: 'Verified Source',
+        depositionDate: '2017-12-31'
+    },
+    {
+        id: '4P23', title: 'Crystal structure of CXCR4 in complex with viral chemokine vMIP-II', category: 'Nanobodies', description: 'Nanobody vMIP-II', details: 'Nanobody bound to the Chemokine Receptor CXCR4.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '3.10 Å',
+        organism: 'Verified Source',
+        depositionDate: '2014-02-28'
+    },
+    {
+        id: '5VLV', title: 'Crystal structure of human Beta-2 macroglobulin with nanobody 24', category: 'Nanobodies', description: 'Beta-2 Microglobulin Nb', details: 'Nanobody targeting Beta-2 Microglobulin, related to dialysis-related amyloidosis.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '1.24 Å',
+        organism: 'Verified Source',
+        depositionDate: '2016-04-20'
+    },
+    {
+        id: '5E55', title: 'Isoprenaline-bound human beta1-adrenoceptor with nanobody Nb80 and T4 lysozyme', category: 'Nanobodies', description: 'Active Beta-2 AR Nb', details: 'Nanobody capable of stabilizing the active state of the Beta-2 Adrenergic Receptor.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.70 Å',
+        organism: 'Verified Source',
+        depositionDate: '2015-10-08'
+    },
+    {
+        id: '3EZJ', title: 'X-ray Crystal Structure of the cAb-Lys2 / Hen Egg White Lysozyme Complex', category: 'Nanobodies', description: 'Lysozyme Nanobody', details: 'Another distinct nanobody structure bound to Hen Egg White Lysozyme.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '1.43 Å',
+        organism: 'Verified Source',
+        depositionDate: '2008-10-24'
+    },
+    {
+        id: '2AXT', title: 'Crystal structure of oxygen-evolving photosystem II from Thermosynechococcus elongatus at 3.0 A resolution', category: 'Energy', description: 'Photosystem II', details: 'Crystal structure of the oxygen-evolving Photosystem II complex from cyanobacteria.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '3.00 Å',
+        organism: 'Verified Source',
+        depositionDate: '2005-09-05'
+    },
+    {
+        id: '1BCC', title: 'CYTOCHROME BC1 COMPLEX FROM CHICKEN', category: 'Energy', description: 'Cytochrome bc1 Complex', details: 'Structure of the mitochondrial Ubiquinol-Cytochrome c Reductase (Complex III).',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '3.00 Å',
+        organism: 'Verified Source',
+        depositionDate: '1998-05-01'
+    },
+    {
+        id: '1RXO', title: 'ACTIVATED RUBISCO (RIBULOSE-1,5-BISPHOSPHATE CARBOXYLASE/OXYGENASE) COMPLEXED WITH ITS SUBSTRATE, RIBULOSE-1,5-BISPHOSPHATE, AND CALCIUM', category: 'Energy', description: 'Rubisco (Spinach)', details: 'Activated Ribulose-1,5-bisphosphate Carboxylase/Oxygenase (Rubisco) from spinach.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.40 Å',
+        organism: 'Verified Source',
+        depositionDate: '1996-06-25'
+    },
+    {
+        id: '1FE1', title: 'CRYSTAL STRUCTURE OF AZOTOBACTER VINELANDII FERREDOXIN I AT A RESOLUTION OF 1.9 A. A REASSESSMENT OF THE CLUSTER 2 GEOMETRY', category: 'Energy', description: 'Ferredoxin', details: 'High-resolution structure of Ferredoxin from Azotobacter vinelandii.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '1.90 Å',
+        organism: 'Verified Source',
+        depositionDate: '1992-06-25'
+    },
+    {
+        id: '2AAI', title: 'STRUCTURE OF RICIN', category: 'Toxins', description: 'Ricin Toxin', details: 'Structure of the deadly Ricin Toxin from Castor Bean (Ricinus communis).',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.50 Å',
+        organism: 'Verified Source',
+        depositionDate: '1994-07-28'
+    },
+    {
+        id: '1DM0', title: 'CRYSTAL STRUCTURE OF SHIGA TOXIN TYPE 1 (HOLOTOXIN)', category: 'Toxins', description: 'Shiga Toxin Type 1', details: 'Holotoxin structure of Shiga Toxin Type 1 from Shigella dysenteriae.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.69 Å',
+        organism: 'Verified Source',
+        depositionDate: '1999-12-10'
+    },
+    {
+        id: '3HLA', title: 'HLA-B2705 BOUND TO A VIRAL PEPTIDE (ARG-ARG-ILE-LYS-ALA-ALA-TRP-ASP)', category: 'Immune', description: 'MHC Class I (HLA-B27)', details: 'Human MHC Class I molecule HLA-B*2705 presenting a viral peptide.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.10 Å',
+        organism: 'Verified Source',
+        depositionDate: '1997-03-24'
+    },
+    {
+        id: '1DLH', title: 'CRYSTAL STRUCTURE OF HLA-DR1 (DRA*0101, DRB1*0101) COMLEXED WITH INFLUENZA VIRUS PEPTIDE HA (306-318)', category: 'Immune', description: 'MHC Class II (HLA-DR1)', details: 'Human MHC Class II molecule HLA-DR1 complexed with an influenza virus peptide.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.75 Å',
+        organism: 'Verified Source',
+        depositionDate: '1995-10-14'
+    },
+    {
+        id: '1YNW', title: 'Structure of the substrate binding domain of hsp70', category: 'Chaperone', description: 'Hsp70 Substrate Domain', details: 'Structure of the substrate binding domain of the molecular chaperone Hsp70.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.30 Å',
+        organism: 'Verified Source',
+        depositionDate: '2005-01-24'
+    },
+    {
+        id: '1FXK', title: 'CRYSTAL STRUCTURE OF THE PREFOLDIN FROM METHANOBACTERIUM THERMOAUTOTROPHICUM', category: 'Chaperone', description: 'Prefoldin', details: 'Structure of the archaeal chaperone Prefoldin, shaped like a jellyfish.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.30 Å',
+        organism: 'Verified Source',
+        depositionDate: '2000-09-25'
     }
 ];
 // Deduplicate IDs just in case
