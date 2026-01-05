@@ -7,12 +7,12 @@ interface MeasurementPanelProps {
     measurements: Measurement[];
     onUpdate: (id: string, updates: Partial<Measurement>) => void;
     onDelete: (id: string) => void;
+    onClearAll: () => void;
     isOpen: boolean;
     onClose: () => void;
     isLightMode: boolean;
 }
-
-export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements, onUpdate, onDelete, isOpen, onClose }) => {
+export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements, onUpdate, onDelete, onClearAll, isOpen, onClose }) => {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editName, setEditName] = useState("");
     const [activeColorPickerId, setActiveColorPickerId] = useState<string | null>(null);
@@ -70,6 +70,14 @@ export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements
                     </span>
                 </div>
                 <div className="flex items-center gap-2">
+                    <button
+                        onClick={onClearAll}
+                        disabled={measurements.length === 0}
+                        className="p-1.5 hover:bg-white/10 rounded text-neutral-400 hover:text-red-400 disabled:opacity-30 disabled:cursor-not-allowed"
+                        title="Clear All Measurements"
+                    >
+                        <Trash2 className="w-4 h-4" />
+                    </button>
                     <button
                         onClick={handleExport}
                         disabled={measurements.length === 0}

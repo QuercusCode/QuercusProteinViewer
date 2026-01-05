@@ -822,6 +822,10 @@ function App() {
           measurements={measurements}
           onUpdate={handleUpdateMeasurement}
           onDelete={handleDeleteMeasurement}
+          onClearAll={() => {
+            setMeasurements([]);
+            viewerRef.current?.clearMeasurements();
+          }}
           onClose={() => {
             setIsMeasurementMode(false);
             setIsMeasurementPanelOpen(false);
