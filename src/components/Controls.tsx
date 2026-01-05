@@ -538,6 +538,22 @@ export const Controls: React.FC<ControlsProps> = ({
                         <div className="space-y-3">
                             <div className="space-y-1">
                                 <label className="text-[10px] uppercase tracking-wider opacity-60 font-bold">Sequence Pattern</label>
+                                <select
+                                    onChange={(e) => {
+                                        if (e.target.value) setSearchPattern(e.target.value);
+                                    }}
+                                    className={`w-full mb-1 bg-transparent border rounded px-2 py-1 text-xs outline-none focus:border-blue-500
+                                            ${isLightMode
+                                            ? 'border-neutral-300 text-black'
+                                            : 'border-white/20 text-white'}`}
+                                    defaultValue=""
+                                >
+                                    {MOTIF_LIBRARY.map((m) => (
+                                        <option key={m.name} value={m.pattern} className="text-black">
+                                            {m.name}
+                                        </option>
+                                    ))}
+                                </select>
                                 <div className="flex gap-2">
                                     <input
                                         type="text"
@@ -984,22 +1000,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                     <button onClick={() => sessionInputRef.current?.click()} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
                                         <Upload className="w-3.5 h-3.5" /> Load
                                     </button>
-                                    <select
-                                        onChange={(e) => {
-                                            setSearchPattern(e.target.value);
-                                        }}
-                                        className={`w-full mb-2 bg-transparent border rounded px-2 py-1 text-xs outline-none focus:border-blue-500
-                                                ${isLightMode
-                                                ? 'border-neutral-300 text-black'
-                                                : 'border-white/20 text-white'}`}
-                                        defaultValue=""
-                                    >
-                                        {MOTIF_LIBRARY.map((m) => (
-                                            <option key={m.name} value={m.pattern} className={isLightMode ? 'text-black' : 'text-black'}>
-                                                {m.name}
-                                            </option>
-                                        ))}
-                                    </select>
+
                                     <input type="file" accept=".json" className="hidden" ref={sessionInputRef} onChange={(e) => e.target.files?.[0] && onLoadSession(e.target.files[0])} />
                                 </div>
                             </div>
