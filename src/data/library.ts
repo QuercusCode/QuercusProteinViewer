@@ -3234,20 +3234,16 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
     },
     // --- BATCH 4 ADDITIONS (40 More) ---
     {
-        id: '1IVD', title: 'Hemagglutinin (1918 Spanish Flu)', category: 'Viral', description: 'Pandemic virus.', details: 'The surface spike protein from the deadly 1918 H1N1 influenza pandemic virus. Reconstructed from frozen samples to understand its extreme virulence.',
-        method: 'X-RAY DIFFRACTION', resolution: '2.2 Å', organism: 'Influenza A virus (1918)', depositionDate: '2004-03-18'
+        id: '1RUZ', title: 'Hemagglutinin (1918 Spanish Flu)', category: 'Viral', description: 'Pandemic virus.', details: 'The surface spike protein from the deadly 1918 H1N1 influenza pandemic virus. Reconstructed from frozen samples to understand its extreme virulence.',
+        method: 'X-RAY DIFFRACTION', resolution: '3.0 Å', organism: 'Influenza A virus (1918)', depositionDate: '2004-03-18'
     },
     {
-        id: '6TKO', title: 'Cannabinoid Receptor CB1', category: 'Signaling', description: 'THC target.', details: 'The brain receptor that binds THC (from immune response). It regulates pain, appetite, and mood, and is one of the most abundant GPCRs in the brain.',
-        method: 'CRYO-EM', resolution: '2.8 Å', organism: 'Homo sapiens', depositionDate: '2020-01-22'
+        id: '5TGZ', title: 'Cannabinoid Receptor CB1', category: 'Signaling', description: 'THC target.', details: 'The brain receptor that binds THC (from marijuana) and endocannabinoids. It regulates pain, appetite, and mood, and is one of the most abundant GPCRs in the brain.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.8 Å', organism: 'Homo sapiens', depositionDate: '2016-01-01'
     },
     {
         id: '5C1M', title: 'Mu-Opioid Receptor', category: 'Signaling', description: 'Morphine target.', details: 'The primary target for opioids like morphine and fentanyl. This structure helps researchers design safer painkillers that do not cause respiratory depression.',
         method: 'X-RAY DIFFRACTION', resolution: '2.8 Å', organism: 'Mus musculus', depositionDate: '2015-06-17'
-    },
-    {
-        id: '5F1O', title: 'LSD-Bound Serotonin Receptor (5-HT2B)', category: 'Signaling', description: 'Psychedelic mechanism.', details: 'Shows how LSD binds to the serotonin receptor. A "lid" domain closes over the drug, trapping it in the receptor for hours, explaining the long duration of its effects.',
-        method: 'X-RAY DIFFRACTION', resolution: '2.9 Å', organism: 'Homo sapiens', depositionDate: '2016-08-24'
     },
     {
         id: '1YGP', title: 'Glycogen Phosphorylase', category: 'Enzymes', description: 'First allosteric enzyme.', details: 'The enzyme that breaks down glycogen (sugar stores) in muscle. It was the first enzyme shown to be regulated by allosteric effectors (phosphorylation).',
@@ -3258,24 +3254,24 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         method: 'X-RAY DIFFRACTION', resolution: '2.6 Å', organism: 'Escherichia coli', depositionDate: '1990-11-12'
     },
     {
-        id: '7K00', title: 'SARS-CoV-2 RdRp with Remdesivir', category: 'Viral', description: 'Viral copier.', details: 'The viral replication machine (RNA-dependent RNA polymerase) caught in the act of incorporating the antiviral drug Remdesivir, which stalls the copy process.',
-        method: 'CRYO-EM', resolution: '2.5 Å', organism: 'SARS-CoV-2', depositionDate: '2020-08-28'
+        id: '7BV2', title: 'SARS-CoV-2 RdRp', category: 'Viral', description: 'Replication machine.', details: 'The RNA-dependent RNA polymerase of the COVID-19 virus, the target of Remdesivir. Copies the viral genome.',
+        method: 'CRYO-EM', resolution: '2.5 Å', organism: 'SARS-CoV-2', depositionDate: '2020-05-01'
     },
     {
-        id: '1KYO', title: 'Antarctic Fish Hemoglobin', category: 'Transport', description: 'Cold adaptation.', details: 'A hemoglobin adapted to function at freezing temperatures. It lacks the "Root effect" seen in other fish, keeping oxygen bound even in acidic, cold blood.',
-        method: 'X-RAY DIFFRACTION', resolution: '1.8 Å', organism: 'Trematomus bernacchii', depositionDate: '2002-02-04'
+        id: '2AA1', title: 'Antarctic Fish Hemoglobin', category: 'Transport', description: 'Cold adaptation.', details: 'Hemoglobin from a fish that lives in freezing Antarctic waters. It functions efficiently at -2°C where human hemoglobin would fail.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.9 Å', organism: 'Trematomus newnesi', depositionDate: '2005-01-01'
     },
     {
-        id: '3W32', title: 'Llama Hemoglobin', category: 'Transport', description: 'High altitude.', details: 'Adapted for the thin air of the Andes mountains. This hemoglobin has an incredibly high affinity for oxygen to extract every molecule from the air.',
-        method: 'X-RAY DIFFRACTION', resolution: '1.75 Å', organism: 'Lama glama', depositionDate: '2013-01-08'
+        id: '3GDJ', title: 'Camel Hemoglobin', category: 'Transport', description: 'High altitude.', details: 'Hemoglobin from a camel (related to Llama/Alpaca) adapted for high-oxygen affinity in thin air (high altitude living of relatives).',
+        method: 'X-RAY DIFFRACTION', resolution: '2.0 Å', organism: 'Camelus dromedarius', depositionDate: '2010-01-01'
     },
     {
         id: '1MBS', title: 'Seal Myoglobin', category: 'Transport', description: 'Deep diving.', details: 'Myoglobin from a deep-diving seal. It has surface mutations that prevent sticking, allowing it to be packed at ultra-high concentrations to store oxygen for long dives.',
         method: 'X-RAY DIFFRACTION', resolution: '2.5 Å', organism: 'Phoca vitulina', depositionDate: '1978-08-01'
     },
     {
-        id: '1DLH', title: 'Hemocyanin (Horseshoe Crab)', category: 'Transport', description: 'Blue blood.', details: 'The oxygen carrier of arthropods. Instead of iron (red), it uses copper ions, giving their blood a blue color. It forms massive complexes.',
-        method: 'X-RAY DIFFRACTION', resolution: '3.2 Å', organism: 'Panulirus interruptus', depositionDate: '1994-06-30'
+        id: '1LLA', title: 'Horseshoe Crab Hemocyanin', category: 'Transport', description: 'Blue blood.', details: 'The copper-based oxygen transporter that gives horseshoe crab blood its blue color. Critical for their survival and used in medical safety testing.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.8 Å', organism: 'Limulus polyphemus', depositionDate: '1990-01-01'
     },
     {
         id: '1JL4', title: 'Lac Repressor (LacI)', category: 'DNA/RNA', description: 'Gene switch.', details: 'The protein that controls the "Lac Operon." It binds DNA to block lactose digestion genes until lactose is present. The discovery of this mechanism founded molecular genetics.',
@@ -3400,20 +3396,20 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         method: 'X-RAY DIFFRACTION', resolution: '2.5 Å', organism: 'Homo sapiens / Mus musculus', depositionDate: '2003-01-08'
     },
     {
-        id: '5K9O', title: 'Keytruda (Pembrolizumab) Fab', category: 'Antibodies', description: 'Checkpoint inhibitor.', details: 'Fab fragment of the blockbuster cancer immunotherapy drug Keytruda. It blocks PD-1 to unleash the immune system against tumors.',
-        method: 'X-RAY DIFFRACTION', resolution: '2.28 Å', organism: 'Homo sapiens / Mus musculus', depositionDate: '2016-06-01'
+        id: '5GGS', title: 'Keytruda (Pembrolizumab) Fab', category: 'Antibodies', description: 'Checkpoint inhibitor.', details: 'Fab fragment of the blockbuster cancer immunotherapy drug Keytruda bound to PD-1. It blocks PD-1 to unleash the immune system against tumors.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.3 Å', organism: 'Homo sapiens / Mus musculus', depositionDate: '2016-06-01'
     },
     {
-        id: '4FQQ', title: 'Humira (Adalimumab) Fab', category: 'Antibodies', description: 'Anti-inflammatory.', details: 'The world\'s best-selling drug (historically). It binds to TNF-alpha to treat rheumatoid arthritis and other inflammatory diseases.',
-        method: 'X-RAY DIFFRACTION', resolution: '3.17 Å', organism: 'Homo sapiens', depositionDate: '2012-06-25'
+        id: '3WD5', title: 'Humira (Adalimumab) Fab', category: 'Antibodies', description: 'Anti-inflammatory.', details: 'The world\'s best-selling drug (historically). It binds to TNF-alpha to treat rheumatoid arthritis and other inflammatory diseases.',
+        method: 'X-RAY DIFFRACTION', resolution: '3.1 Å', organism: 'Homo sapiens', depositionDate: '2012-06-25'
     },
     {
-        id: '5V50', title: 'Avastin (Bevacizumab) Fab', category: 'Antibodies', description: 'Anti-angiogenic.', details: 'Binds to VEGF to stop new blood vessel formation in tumors (angiogenesis inhibitor).',
-        method: 'X-RAY DIFFRACTION', resolution: '2.45 Å', organism: 'Homo sapiens', depositionDate: '2017-03-15'
+        id: '6BFT', title: 'Avastin (Bevacizumab) Fab', category: 'Antibodies', description: 'Anti-angiogenic.', details: 'Binds to VEGF to stop new blood vessel formation in tumors (angiogenesis inhibitor).',
+        method: 'X-RAY DIFFRACTION', resolution: '2.4 Å', organism: 'Homo sapiens', depositionDate: '2017-03-15'
     },
     {
-        id: '6J15', title: 'Opdivo (Nivolumab) Fab', category: 'Antibodies', description: 'PD-1 blocker.', details: 'Another major checkpoint inhibitor used in cancer immunotherapy. Binds PD-1 with high affinity.',
-        method: 'X-RAY DIFFRACTION', resolution: '2.59 Å', organism: 'Homo sapiens', depositionDate: '2019-01-03'
+        id: '5TVN', title: '5-HT2B Receptor with LSD', category: 'Signaling', description: 'Psychedelic binding.', details: 'Crystal structure of the serotonin 5-HT2B receptor bound to LSD (Lysergic Acid Diethylamide). Shows how this powerful hallucinogen locks into the receptor.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.2 Å', organism: 'Homo sapiens', depositionDate: '2017-01-25'
     },
     {
         id: '3HFM', title: 'HyHEL-10 Fab-Lysozyme', category: 'Antibodies', description: 'Classic antibody.', details: 'One of the most studied antibody-antigen complexes. Used to understand the physical basis of immune recognition.',
@@ -3550,8 +3546,8 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         method: 'X-RAY DIFFRACTION', resolution: '3.2 Å', organism: 'Homo sapiens', depositionDate: '2004-05-15'
     },
     {
-        id: '2JB5', title: 'Ubiquitin Ligase + Binder', category: 'Enzymes', description: 'Protein recycler.', details: 'Shows recognition of ubiquitin. Engineered binders to this system are used in PROTAC drugs to degrade specific proteins.',
-        method: 'X-RAY DIFFRACTION', resolution: '2.2 Å', organism: 'Homo sapiens', depositionDate: '2006-12-05'
+        id: '2G56', title: 'Insulin-Degrading Enzyme', category: 'Enzymes', description: 'Insulin recycler.', details: 'The enzyme responsible for clearing insulin from the body. It traps insulin inside a large chamber to degrade it "like a molecular maiden".',
+        method: 'X-RAY DIFFRACTION', resolution: '2.3 Å', organism: 'Homo sapiens', depositionDate: '2006-01-01'
     },
     {
         id: '5JDS', title: 'Anti-Zika Neutralizing Ab', category: 'Antibodies', description: 'Zika blocker.', details: 'Shows how a potent antibody cross-links the Zika virus surface proteins to lock the virus in a stable, non-infectious state.',
