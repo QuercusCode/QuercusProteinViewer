@@ -5,7 +5,7 @@ import { ContactMap } from './components/ContactMap';
 import { AISidebar, type AIAction } from './components/AISidebar';
 import { HelpGuide } from './components/HelpGuide';
 import { parseURLState, getShareableURL } from './utils/urlManager';
-import type { ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, RepresentationType, ColoringType, ResidueInfo } from './types';
+import type { ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, RepresentationType, ColoringType, ResidueInfo, StructureInfo } from './types';
 
 import LibraryModal from './components/LibraryModal';
 import { ShareModal } from './components/ShareModal';
@@ -232,8 +232,13 @@ function App() {
     viewerRef.current?.highlightResidue(chain, resNo);
   };
 
-  const handleStructureLoaded = (hasLigands: boolean) => {
+  const handleStructureLoaded = (info: StructureInfo) => {
     setIsLoading(false);
+    setChains(info.chains);
+    setLigands(info.ligands);
+
+    const hasLigands = info.ligands.length > 0;
+
     if (hasLigands && !showLigands && !initialUrlState.showLigands) {
       // Optional logic
     }

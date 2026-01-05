@@ -7,7 +7,8 @@ import type {
     RepresentationType,
     ColoringType,
     ResidueInfo,
-    Measurement
+    Measurement,
+    StructureInfo
 } from '../types';
 
 
@@ -46,7 +47,7 @@ export interface ProteinViewerProps {
     enableAmbientOcclusion?: boolean;
 
     // Callbacks
-    onStructureLoaded?: (hasLigands: boolean) => void;
+    onStructureLoaded?: (info: StructureInfo) => void;
     onError?: (error: string) => void;
     loading?: boolean;
     setLoading?: (loading: boolean) => void;
@@ -1354,7 +1355,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             const ligands = Array.from(ligandSet).sort();
 
                             if (onStructureLoaded) {
-                                onStructureLoaded(ligands.length > 0);
+                                onStructureLoaded({ chains, ligands });
                             }
                         } catch (e) { console.warn("Chain parsing error", e); }
                     }
