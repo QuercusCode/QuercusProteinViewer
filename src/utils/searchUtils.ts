@@ -34,7 +34,7 @@ export const findMotifs = (chains: ChainInfo[], pattern: string): MotifMatch[] =
 
     // 1. Clean and normalize the pattern
     // Remove whitespace
-    let cleanPattern = pattern.replace(/\s/g, '');
+    let cleanPattern = pattern.replace(/[\s\-]/g, '');
 
     // Convert 'x' or 'X' or '?' to '.' for wildcards
     // We replace x/X/? with . globablly
