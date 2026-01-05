@@ -1319,6 +1319,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                 let seq = "";
                                 let minSeq = Infinity;
                                 let maxSeq = -Infinity;
+                                let nucleicCount = 0;
+                                let proteinCount = 0;
 
                                 const resMap: number[] = [];
                                 try {
@@ -1337,9 +1339,25 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                             resMap.push((maxSeq > -Infinity ? maxSeq : 0) + 1);
                                         }
 
+                                        // Determine Type
+                                        if (r.isNucleic()) nucleicCount++;
+                                        else if (r.isProtein()) proteinCount++;
+
+                                        // Parse Residue Name
                                         let resName = 'X';
-                                        if (r.getResname1) resName = r.getResname1();
-                                        else if (r.resname) resName = r.resname[0];
+                                        if (r.isNucleic()) {
+                                            const rawName = r.resname.trim().toUpperCase();
+                                            // DNA: DA, DT, DC, DG
+                                            // RNA: A, U, C, G
+                                            if (rawName.length === 1) resName = rawName;
+                                            else if (rawName.length === 2 && rawName.startsWith('D')) resName = rawName[1];
+                                            else if (rawName.length === 2 && rawName.endsWith('A')) resName = 'A'; // Weird cases
+                                            else resName = rawName.substring(0, 1); // Best guess
+                                        } else {
+                                            // Protein
+                                            if (r.getResname1) resName = r.getResname1();
+                                            else if (r.resname) resName = r.resname[0];
+                                        }
                                         seq += resName;
                                     });
                                 } catch (eRes) {
@@ -1349,8 +1367,13 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                 if (minSeq === Infinity) minSeq = 0;
                                 if (maxSeq === -Infinity) maxSeq = 0;
 
-                                console.log(`Chain ${c.chainname}: Range ${minSeq}-${maxSeq}, SeqLen: ${seq.length}`);
-                                chains.push({ name: c.chainname, min: minSeq, max: maxSeq, sequence: seq, residueMap: resMap });
+                                // Infer Chain Type
+                                let chainType: 'protein' | 'nucleic' | 'unknown' = 'unknown';
+                                if (nucleicCount > proteinCount) chainType = 'nucleic';
+                                else if (proteinCount > 0) chainType = 'protein';
+
+                                console.log(`Chain ${c.chainname}: Range ${minSeq}-${maxSeq}, SeqLen: ${seq.length}, Type: ${chainType}`);
+                                chains.push({ name: c.chainname, min: minSeq, max: maxSeq, sequence: seq, residueMap: resMap, type: chainType });
                             });
 
                             // Extract Ligands

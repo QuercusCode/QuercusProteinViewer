@@ -23,10 +23,21 @@ const AMINO_ACID_COLORS: Record<string, string> = {
     D: '#f472b6', E: '#ec4899'
 };
 
-const getResidueColor = (res: string, isLight: boolean) => {
-    // Basic Hydrophobicity/Charge coloring
-    // For now, let's use a simpler verified palette or the one above
-    return AMINO_ACID_COLORS[res.toUpperCase()] || (isLight ? '#e5e5e5' : '#404040');
+const NUCLEIC_ACID_COLORS: Record<string, string> = {
+    A: '#86efac', // Green-300
+    G: '#fde047', // Yellow-300
+    C: '#93c5fd', // Blue-300
+    T: '#fca5a5', // Red-300
+    U: '#fca5a5', // Red-300 (RNA)
+};
+
+const getResidueColor = (res: string, isLight: boolean, type: 'protein' | 'nucleic' | 'unknown' = 'protein') => {
+    const char = res.toUpperCase();
+    if (type === 'nucleic') {
+        return NUCLEIC_ACID_COLORS[char] || (isLight ? '#e5e5e5' : '#404040');
+    }
+    // Default Protein
+    return AMINO_ACID_COLORS[char] || (isLight ? '#e5e5e5' : '#404040');
 };
 
 export const SequenceTrack: React.FC<SequenceTrackProps> = ({
@@ -123,7 +134,7 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
                     {activeChain.sequence.split('').map((res, idx) => {
                         const resNo = activeChain.residueMap ? activeChain.residueMap[idx] : idx + 1;
                         const isActive = highlightedResidue?.chain === activeChain.name && highlightedResidue.resNo === resNo;
-                        const color = getResidueColor(res, isLightMode);
+                        const color = getResidueColor(res, isLightMode, activeChain.type);
 
                         return (
                             <button

@@ -20,6 +20,7 @@ export interface ChainInfo {
     max: number;
     sequence: string;
     residueMap?: number[]; // Added: Maps sequence index to actual PDB residue number
+    type?: 'protein' | 'nucleic' | 'unknown'; // Added: To distinguish polymer type
 }
 
 export interface StructureInfo {
