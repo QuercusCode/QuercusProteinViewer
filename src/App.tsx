@@ -298,7 +298,7 @@ function App() {
 
   // Fetch Metadata when PDB ID changes
   useEffect(() => {
-    if (pdbId && !file) { // Only fetch if using PDB ID, not local file
+    if (pdbId) {
       const libraryEntry = OFFLINE_LIBRARY.find(entry => entry.id.toLowerCase() === pdbId.toLowerCase());
 
       if (libraryEntry && libraryEntry.method) {
@@ -310,8 +310,8 @@ function App() {
           depositionDate: libraryEntry.depositionDate || 'Unknown',
           title: libraryEntry.title
         });
-      } else {
-        // Fallback to API fetch
+      } else if (!file) {
+        // Fallback to API fetch ONLY if no file
         fetchPDBMetadata(pdbId).then(data => {
           if (data) setPdbMetadata(data);
         });
