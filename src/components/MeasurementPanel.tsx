@@ -123,7 +123,7 @@ export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements
                                                     {activeColorPickerId === m.id && (
                                                         <>
                                                             <div className="fixed inset-0 z-40" onClick={() => setActiveColorPickerId(null)} />
-                                                            <div className="absolute top-full left-0 mt-2 z-50 bg-neutral-900 border border-neutral-700 rounded-lg shadow-xl p-2 grid grid-cols-4 gap-1 w-28">
+                                                            <div className="absolute top-1/2 left-4 z-50 bg-neutral-900 border border-neutral-700 rounded-lg shadow-xl p-1.5 grid grid-cols-8 gap-1 -translate-y-1/2 w-max ml-2">
                                                                 {[
                                                                     '#ef4444', '#f97316', '#f59e0b', '#eab308',
                                                                     '#84cc16', '#22c55e', '#10b981', '#14b8a6',
@@ -132,7 +132,7 @@ export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements
                                                                 ].map(c => (
                                                                     <button
                                                                         key={c}
-                                                                        className="w-4 h-4 rounded-full border border-white/10 hover:scale-110 transition-transform"
+                                                                        className="w-3 h-3 rounded-full border border-white/10 hover:scale-125 transition-transform"
                                                                         style={{ backgroundColor: c }}
                                                                         onClick={() => {
                                                                             onUpdate(m.id, { color: c });
