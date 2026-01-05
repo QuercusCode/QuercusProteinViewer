@@ -245,8 +245,22 @@ function App() {
 
     const hasLigands = info.ligands.length > 0;
 
+    // Smart Representation Switching
+    // If we detect ONLY unknown/small chains (likely .mol/.sdf chemicals) or no protein/nucleic, switch to ball+stick
+    // This ensures chemicals are visible immediately instead of empty cartoon
+    const hasPolymer = info.chains.some(c => c.type === 'protein' || c.type === 'nucleic');
+    const totalResidues = info.chains.reduce((acc, c) => acc + c.sequence.length, 0);
+
+    if (!hasPolymer || totalResidues < 5) {
+      console.log("App: Detected small molecule or non-polymer. Switching to Ball+Stick.");
+      setRepresentation('ball+stick');
+      setShowLigands(true);
+      if (info.chains.length > 0) setShowIons(true); // Ensure single-atom ions are also seen
+    }
+
     if (hasLigands && !showLigands && !initialUrlState.showLigands) {
-      // Optional logic
+      // Optional logic: if mixed, maybe prompt or simple notification?
+      // For now, we leave it to user unless it's the *only* thing (handled above)
     }
   }, [showLigands, initialUrlState.showLigands]);
 
