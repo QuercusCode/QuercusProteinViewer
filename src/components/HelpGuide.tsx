@@ -101,7 +101,7 @@ export const HelpGuide: React.FC = () => {
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <span className="w-1.5 h-1.5 rounded-full bg-pink-400 mt-1.5 flex-shrink-0" />
-                                        <span>Advanced Analysis: Use the <strong>Contact Map</strong> or <strong>Ramachandran Plot</strong> for structural insights.</span>
+                                        <span>Advanced Analysis: Use the <strong>Contact Map</strong> for structural insights.</span>
                                     </li>
                                 </ul>
                             </div>
