@@ -432,9 +432,10 @@ export const Controls: React.FC<ControlsProps> = ({
                                 </div>
                             )}
 
-                            <div className="grid grid-cols-2 gap-2">
-                                <div className="flex flex-col">
-                                    <span className={`text-[9px] font-bold uppercase tracking-wider ${subtleText}`}>Residues</span>
+                            <div className="grid grid-cols-2 gap-y-3 gap-x-4 mt-2">
+                                {/* Stats */}
+                                <div>
+                                    <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Residues</span>
                                     <span className={`text-sm font-mono font-bold ${isLightMode ? 'text-neutral-700' : 'text-neutral-300'}`}>
                                         {chains.reduce((acc, chain) => {
                                             if (chain.sequence) return acc + chain.sequence.length;
@@ -443,50 +444,47 @@ export const Controls: React.FC<ControlsProps> = ({
                                         }, 0).toLocaleString()}
                                     </span>
                                 </div>
-                                <div className="flex flex-col border-l pl-3 border-neutral-200 dark:border-neutral-700">
-                                    <span className={`text-[9px] font-bold uppercase tracking-wider ${subtleText}`}>Chains</span>
+                                <div className="pl-2 border-l border-neutral-200 dark:border-neutral-800">
+                                    <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Chains</span>
                                     <span className={`text-sm font-mono font-bold ${isLightMode ? 'text-neutral-700' : 'text-neutral-300'}`}>
                                         {chains.length}
                                     </span>
                                 </div>
-                            </div>
 
-
-                            {/* PDB Metadata Display */}
-                            {pdbMetadata && (
-                                <div className="mt-3 pt-3 border-t border-neutral-200 dark:border-neutral-700">
-                                    <div className="grid grid-cols-2 gap-y-2 gap-x-2">
+                                {/* Metadata */}
+                                {pdbMetadata && (
+                                    <>
                                         <div>
                                             <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Method</span>
                                             <span className={`text-[10px] font-medium leading-tight block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
-                                                {pdbMetadata.method.length > 18 ? pdbMetadata.method.substring(0, 15) + '...' : pdbMetadata.method}
+                                                {pdbMetadata.method.length > 20 ? pdbMetadata.method.substring(0, 18) + '...' : pdbMetadata.method}
                                             </span>
                                         </div>
-                                        <div>
+                                        <div className="pl-2 border-l border-neutral-200 dark:border-neutral-800">
                                             <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Resolution</span>
                                             <span className={`text-[10px] font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
                                                 {pdbMetadata.resolution}
                                             </span>
                                         </div>
-                                        <div className="col-span-2">
-                                            {pdbMetadata.organism && pdbMetadata.organism !== 'Unknown source' && (
-                                                <>
-                                                    <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Organism</span>
-                                                    <span className={`text-[10px] font-medium leading-tight block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
-                                                        {pdbMetadata.organism}
-                                                    </span>
-                                                </>
-                                            )}
-                                        </div>
+
+                                        {pdbMetadata.organism && pdbMetadata.organism !== 'Unknown source' && (
+                                            <div className="col-span-2 pt-1 border-t border-dashed border-neutral-200 dark:border-neutral-800">
+                                                <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Organism</span>
+                                                <span className={`text-[10px] font-medium leading-tight block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                                    {pdbMetadata.organism}
+                                                </span>
+                                            </div>
+                                        )}
+
                                         <div className="col-span-2">
                                             <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Deposited</span>
                                             <span className={`text-[10px] font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
                                                 {pdbMetadata.depositionDate}
                                             </span>
                                         </div>
-                                    </div>
-                                </div>
-                            )}
+                                    </>
+                                )}
+                            </div>
                         </div>
                     )}
 
