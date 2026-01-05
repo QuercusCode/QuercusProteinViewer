@@ -57,12 +57,15 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
         if (highlightedResidue && activeChain && highlightedResidue.chain === activeChain.name) {
             const index = highlightedResidue.resNo - 1; // 1-based to 0-based approximation
 
-            if (scrollContainerRef.current) {
-                const element = scrollContainerRef.current.children[0]?.children[index] as HTMLElement;
-                if (element) {
-                    element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+            // Small timeout to ensure DOM is ready after chain switch
+            setTimeout(() => {
+                if (scrollContainerRef.current) {
+                    const element = scrollContainerRef.current.children[0]?.children[index] as HTMLElement;
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+                    }
                 }
-            }
+            }, 50);
         }
     }, [highlightedResidue, activeChain]);
 
@@ -74,13 +77,13 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
             backdrop-blur-md flex-col overflow-hidden`}>
 
             {/* Header / Tabs - Compact Vertical */}
-            <div className={`flex flex-col items-center pt-3 pb-2 gap-2 border-b ${isLightMode ? 'border-neutral-200' : 'border-neutral-800'} flex-shrink-0 bg-opacity-50`}>
+            <div className={`flex flex-col items-center pt-3 pb-2 gap-2 border-b ${isLightMode ? 'border-neutral-200 bg-white/50' : 'border-neutral-800 bg-black/50'} z-10 flex-shrink-0 backdrop-blur-md`}>
                 <div className="flex items-center justify-center w-full" title="Sequence">
                     <Map size={16} className="text-purple-500" />
                 </div>
 
                 {chains.length > 1 && (
-                    <div className="flex flex-col gap-1 w-full px-2 overflow-y-auto max-h-[25vh] scrollbar-hide items-center">
+                    <div className="flex flex-col gap-1 w-full px-2 overflow-y-auto max-h-[20vh] scrollbar-hide items-center">
                         {chains.map((chain, idx) => (
                             <button
                                 key={chain.name}
