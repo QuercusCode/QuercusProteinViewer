@@ -3071,6 +3071,167 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         resolution: '5.8 Å',
         depositionDate: '2013-05-23'
     },
+    // --- BATCH 3 ADDITIONS (40 More) ---
+    {
+        id: '5P21', title: 'H-Ras p21 Protein (GTP-bound)', category: 'Signaling', description: 'Oncogene switch.', details: 'The Ras protein is a molecular switch that controls cell division. Mutations locking it in the "ON" state (like this G12V mutant) are found in 30% of human cancers.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.35 Å', organism: 'Homo sapiens', depositionDate: '1990-05-23'
+    },
+    {
+        id: '2SRC', title: 'Rous Sarcoma Virus Src Kinase', category: 'Signaling', description: 'The first oncogene.', details: 'The protein that revealed the genetic basis of cancer. It is a tyrosine kinase that is normally tightly regulated, but becomes hyperactive in viral transformation.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.5 Å', organism: 'Rous sarcoma virus', depositionDate: '1997-02-14'
+    },
+    {
+        id: '1OPY', title: 'Abl Kinase domain complexed with Gleevec', category: 'Signaling', description: 'Cancer drug target.', details: 'A landmark structure in medicine. It shows how the drug Gleevec binds to the Abl kinase (caused by the BCR-Abl fusion in leukemia) to turn it off.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.05 Å', organism: 'Homo sapiens', depositionDate: '2000-11-06'
+    },
+    {
+        id: '3ERT', title: 'Estrogen Receptor Alpha with Tamoxifen', category: 'Signaling', description: 'Breast cancer target.', details: 'Shows how the drug Tamoxifen binds to the Estrogen Receptor to block hormone signaling, stopping the growth of ER-positive breast cancer cells.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.9 Å', organism: 'Homo sapiens', depositionDate: '1998-05-21'
+    },
+    {
+        id: '1FIN', title: 'CDK2-Cyclin A complex', category: 'Signaling', description: 'Cell cycle controller.', details: 'Cyclin-Dependent Kinases (CDKs) are the master clocks of cell division. This structure shows the active complex that drives the cell into DNA replication.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.3 Å', organism: 'Homo sapiens', depositionDate: '1995-10-31'
+    },
+    {
+        id: '1YCR', title: 'MDM2 - p53 Complex', category: 'Signaling', description: 'p53 regulator.', details: 'MDM2 is the negative regulator of p53. It binds to the p53 activation domain to inhibit it. Drugs that block this interaction can reactivate p53 in cancer.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.6 Å', organism: 'Homo sapiens', depositionDate: '1996-07-22'
+    },
+    {
+        id: '3M24', title: 'Channelrhodopsin-2', category: 'Transport', description: 'Optogenetics tool.', details: 'A light-gated cation channel from green algae. When expressed in neurons, it allows scientists to activate specific brain circuits with flashes of blue light.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.3 Å', organism: 'Chlamydomonas reinhardtii', depositionDate: '2012-05-23'
+    },
+    {
+        id: '5IRE', title: 'Zika Virus', category: 'Viral', description: 'Mosquito-borne virus.', details: 'The mature Zika virus structure determined by Cryo-EM. Understanding this shell helps researchers design vaccines against this flavivirus.',
+        method: 'ELECTRON MICROSCOPY', resolution: '3.8 Å', organism: 'Zika virus', depositionDate: '2016-03-31'
+    },
+    {
+        id: '3J5P', title: 'Poliovirus Type 1', category: 'Viral', description: 'Polio.', details: 'The empty capsid of the poliovirus. Vaccines have nearly eradicated this virus, which causes paralysis by destroying motor neurons.',
+        method: 'ELECTRON MICROSCOPY', resolution: '3.6 Å', organism: 'Human poliovirus 1', depositionDate: '2013-09-04'
+    },
+    {
+        id: '1J1E', title: 'Cholera Toxin B-Pentamer', category: 'Toxins', description: 'Cholera delivery.', details: 'The non-toxic "doughnut" part of cholera toxin. It binds to sugars on the gut wall to deliver the toxic enzymatic payload into cells.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.25 Å', organism: 'Vibrio cholerae', depositionDate: '2001-09-17'
+    },
+    {
+        id: '1XTC', title: 'Diphtheria Toxin', category: 'Toxins', description: 'Protein synthesis blocker.', details: 'A bacterial toxin that kills cells by inactivating Elongation Factor-2, permanently stopping protein production.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.3 Å', organism: 'Corynebacterium diphtheriae', depositionDate: '1996-01-29'
+    },
+    {
+        id: '2WSO', title: 'mCherry Fluorescent Protein', category: 'Structural', description: 'Red fluorescent tag.', details: 'A red variant of GFP derived from mushroom coral. It allows scientists to tag and track multiple proteins simultaneously in different colors.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.4 Å', organism: 'Discosoma sp.', depositionDate: '2009-09-15'
+    },
+    {
+        id: '1U6B', title: 'SERCA Calcium Pump', category: 'Transport', description: 'Muscle relaxer.', details: 'This massive pump consumes ATP to suck calcium back into the sarcoplasmic reticulum, allowing muscle fibers to relax after contraction.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.6 Å', organism: 'Oryctolagus cuniculus', depositionDate: '2000-06-21'
+    },
+    {
+        id: '1JWP', title: 'ClC Chloride Channel', category: 'Transport', description: 'Chloride pore.', details: 'A channel controlling the flow of chloride ions. Defects in similar channels cause Cystic Fibrosis (CFTR) and myotonia.',
+        method: 'X-RAY DIFFRACTION', resolution: '3.0 Å', organism: 'Salmonella typhimurium', depositionDate: '2001-09-03'
+    },
+    {
+        id: '2K0E', title: 'Amyloid Beta (1-42) Fibril', category: 'Structural', description: 'Alzheimers plaque.', details: 'The atomic structure of the toxic fibrils that accumulate in the brains of Alzheimer\'s patients, determined by Solid-State NMR.',
+        method: 'SOLID-STATE NMR', resolution: 'N/A', organism: 'Homo sapiens', depositionDate: '2008-01-24'
+    },
+    {
+        id: '3VKH', title: 'Dynein Motor Domain', category: 'Structural', description: 'Giant transport motor.', details: 'The largest molecular motor. It hauls organelles and vesicles along microtubules towards the center of the cell.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.8 Å', organism: 'Dictyostelium discoideum', depositionDate: '2011-11-17'
+    },
+    {
+        id: '5J7V', title: 'CRISPR-Cpf1 (Cas12a)', category: 'Enzymes', description: 'Alternative gene editor.', details: 'A cousin of Cas9 that cuts DNA differently (staggered cut). It offers new options for precise gene editing.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.38 Å', organism: 'Lachnospiraceae bacterium', depositionDate: '2016-04-06'
+    },
+    {
+        id: '1GST', title: 'Glutathione S-Transferase', category: 'Enzymes', description: 'Detoxifier & Tag.', details: 'Detoxifies drugs and xenobiotics. In the lab, it is widely used as a "GST tag" to purify recombinant proteins.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.9 Å', organism: 'Schistosoma japonicum', depositionDate: '1994-06-01'
+    },
+    {
+        id: '1MAL', title: 'Maltodextrin Binding Protein', category: 'Transport', description: 'Sugar scavenger.', details: 'Bacteria use this hinged protein to grab sugar from the environment. In the lab, "MBP tags" help make other proteins soluble.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.7 Å', organism: 'Escherichia coli', depositionDate: '1991-09-17'
+    },
+    {
+        id: '1OMF', title: 'OmpF Porin', category: 'Transport', description: 'Outer membrane sieve.', details: 'A trimeric beta-barrel protein that forms large water-filled channels in the outer membrane of bacteria, allowing passive diffusion.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.4 Å', organism: 'Escherichia coli', depositionDate: '1995-09-07'
+    },
+    {
+        id: '1G6X', title: 'Human Beta-Defensin 1', category: 'Immune', description: 'Natural antibiotic.', details: 'A tiny antimicrobial peptide produced by our skin and mucosal linings to poke holes in invading bacteria.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.6 Å', organism: 'Homo sapiens', depositionDate: '2000-11-13'
+    },
+    {
+        id: '1TRZ', title: 'Insulin (T-State)', category: 'Signaling', description: 'Insulin storage form.', details: 'Insulin stored in the pancreas forms hexamers coordination by zinc ions. This "T-state" is stable for storage but inactive.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.9 Å', organism: 'Homo sapiens', depositionDate: '1992-06-15'
+    },
+    {
+        id: '3D2S', title: 'Vitamin D Receptor', category: 'Signaling', description: 'Bone health regulator.', details: 'When bound to Vitamin D, this receptor binds to DNA to control calcium absorption. Essential for strong bones.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.4 Å', organism: 'Homo sapiens', depositionDate: '2008-05-09'
+    },
+    {
+        id: '1M9S', title: 'Glucocorticoid Receptor', category: 'Signaling', description: 'Cortisol receptor.', details: 'The target of stress hormones like cortisol and anti-inflammatory drugs like prednisone.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.85 Å', organism: 'Homo sapiens', depositionDate: '2002-07-29'
+    },
+    {
+        id: '1IR3', title: 'Insulin Receptor Kinase', category: 'Signaling', description: 'Insulin signal starter.', details: 'The catalytic part of the Insulin Receptor. When insulin binds outside the cell, this kinase activates inside to tell the cell to absorb glucose.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.9 Å', organism: 'Homo sapiens', depositionDate: '1995-10-18'
+    },
+    {
+        id: '1CSK', title: 'C-terminal Src Kinase (Csk)', category: 'Signaling', description: 'The boss of Src.', details: 'Csk acts as a "manager" enzyme that phosphorylates Src kinase to turn it off, preventing uncontrolled cell growth.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.4 Å', organism: 'Homo sapiens', depositionDate: '1997-01-22'
+    },
+    {
+        id: '6W17', title: 'Cas13d-crRNA Complex', category: 'Enzymes', description: 'RNA editor.', details: 'A CRISPR system that targets RNA instead of DNA. It has potential for fighting RNA viruses and treating genetic diseases without altering the genome.',
+        method: 'ELECTRON MICROSCOPY', resolution: '3.4 Å', organism: 'Ruminococcus flavefaciens', depositionDate: '2020-03-05'
+    },
+    {
+        id: '3CSY', title: 'Ebola Virus Glycoprotein', category: 'Viral', description: 'Ebola target.', details: 'The surface spike of Ebola, bound to a neutralizing antibody. This structure guided the design of therapeutics for hemorrhagic fever.',
+        method: 'X-RAY DIFFRACTION', resolution: '3.0 Å', organism: 'Ebola virus', depositionDate: '2008-04-10'
+    },
+    {
+        id: '1HRA', title: 'Ribonuclease A', category: 'Enzymes', description: 'RNA digester.', details: 'A robust enzyme used in labs to degrade RNA. It was the subject of famous refolding experiments that proved protein sequence dictates structure.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.0 Å', organism: 'Bos taurus', depositionDate: '2001-08-30'
+    },
+    {
+        id: '3R0R', title: 'Ricin Complex', category: 'Toxins', description: 'Ricin A+B chains.', details: 'The complete Ricin toxin structure, showing both the catalytic A-chain (killer) and the lectin B-chain (cell binder).',
+        method: 'X-RAY DIFFRACTION', resolution: '2.5 Å', organism: 'Ricinus communis', depositionDate: '2011-03-08'
+    },
+    {
+        id: '1S58', title: 'Shiga Toxin Type 1', category: 'Toxins', description: 'Dysentery toxin.', details: 'Produced by Shigella and E. coli O157:H7. It halts protein synthesis in intestinal cells, causing severe illness.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.6 Å', organism: 'Shigella dysenteriae', depositionDate: '2004-01-20'
+    },
+    {
+        id: '1G7K', title: 'DsRed Fluorescent Protein', category: 'Structural', description: 'Red glow.', details: 'The first red fluorescent protein isolated from Discosoma coral. It forms a tetramer (group of 4), unlike the monomeric GFP.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.9 Å', organism: 'Discosoma sp.', depositionDate: '2000-11-20'
+    },
+    {
+        id: '1AY1', title: 'Zinc Finger Zif268 (Bound)', category: 'DNA/RNA', description: 'Classic DNA binder.', details: 'A perfect example of Zinc Fingers interacting with the major groove of DNA to read the genetic sequence.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.6 Å', organism: 'Mus musculus', depositionDate: '1997-11-13'
+    },
+    {
+        id: '1L8J', title: 'Cobratoxin', category: 'Toxins', description: 'Snake bite.', details: 'A potent neurotoxin from the Cobra. It binds irreversibly to acetylcholine receptors, causing paralysis.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.0 Å', organism: 'Naja kaouthia', depositionDate: '2002-03-20'
+    },
+    {
+        id: '1YHU', title: 'PCNA (Human)', category: 'DNA/RNA', description: 'Human sliding clamp.', details: 'The human version of the DNA sliding clamp. It is often stained in biopsies to check how fast a tumor is growing.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.3 Å', organism: 'Homo sapiens', depositionDate: '2005-01-11'
+    },
+    {
+        id: '1BIPV', title: 'Barnase-Barstar Complex', category: 'Enzymes', description: 'Tightest interaction.', details: 'One of the strongest protein-protein interactions known. Barstar binds to Barnase (a bacterial RNase) to stop it from killing the host cell.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.0 Å', organism: 'Bacillus amyloliquefaciens', depositionDate: '1999-05-18'
+    },
+    {
+        id: '1QJ8', title: 'Magainin 2', category: 'Immune', description: 'Frog antibiotic.', details: 'An antibiotic peptide secreted from the skin of the African Clawed Frog. It disrupts bacterial membranes.',
+        method: 'SOLUTION NMR', resolution: 'N/A', organism: 'Xenopus laevis', depositionDate: '1999-06-25'
+    },
+    {
+        id: '2B3Y', title: 'Human Prion Protein (Variant)', category: 'Structural', description: 'Prion disease.', details: 'A mutant form of the human prion protein associated with inherited prion disease. It reveals destabilizing features.',
+        method: 'SOLUTION NMR', resolution: 'N/A', organism: 'Homo sapiens', depositionDate: '2005-09-21'
+    },
+    {
+        id: '1SVA', title: 'Streptavidin', category: 'Structural', description: 'Biotech glue.', details: 'The core tetrameric structure of Streptavidin. Its ability to bind Biotin is the basis for thousands of biotechnology assays.',
+        method: 'X-RAY DIFFRACTION', resolution: '1.5 Å', organism: 'Streptomyces avidinii', depositionDate: '1989-06-21'
+    },
+    {
+        id: '1AV1', title: 'Avidin', category: 'Structural', description: 'Egg white protein.', details: 'A protein found in egg whites that also binds biotin (Vitamin B7) avidly. It protects eggs from bacterial growth by sequestering vitamins.',
+        method: 'X-RAY DIFFRACTION', resolution: '2.7 Å', organism: 'Gallus gallus', depositionDate: '1993-02-18'
+    }
 ];
 // Deduplicate IDs just in case
 export const getUniqueModels = () => Array.from(new Map(OFFLINE_LIBRARY.map(item => [item.id, item])).values());
