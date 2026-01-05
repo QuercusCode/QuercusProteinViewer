@@ -1719,7 +1719,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             if (showSurface) tryApply('surface', 'white', "*", { opacity: 0.4, depthWrite: false, side: 'front' });
             if (showLigands) tryApply('ball+stick', 'element', 'ligand and not (water or ion)', { scale: 2.0 });
-            if (showIons) tryApply('spacefill', 'element', 'ion', { scale: 1.5 });
+            if (showIons) tryApply('ball+stick', 'element', 'ion', { scale: 2.0 });
 
             if (stageRef.current?.viewer) {
                 stageRef.current.viewer.requestRender();
