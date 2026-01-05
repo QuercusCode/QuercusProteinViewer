@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { ProteinViewer, type ProteinViewerRef } from './components/ProteinViewer';
 import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
@@ -80,7 +80,7 @@ function App() {
 
   // ... (lines 53-343) ...
 
-  const handleStructureLoaded = (info: StructureInfo) => {
+  const handleStructureLoaded = useCallback((info: StructureInfo) => {
     const hasChains = info.chains && info.chains.length > 0;
 
     if (hasChains) {
@@ -110,7 +110,7 @@ function App() {
     } else {
       console.warn("App: Loaded structure has no chains?", info);
     }
-  };
+  }, [hasRestoredState, initialUrlState.measurements]);
 
 
 
