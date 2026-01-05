@@ -84,10 +84,6 @@ export const HelpGuide: React.FC = () => {
                                         <span><strong>Library Browser</strong>: Explore 300+ curated proteins with categories and search.</span>
                                     </li>
                                     <li className="flex items-start gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-teal-400 mt-1.5 flex-shrink-0" />
-                                        <span><strong>Dr. AI</strong>: Ask context-aware questions about the loaded protein structure.</span>
-                                    </li>
-                                    <li className="flex items-start gap-2">
                                         <span className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 flex-shrink-0" />
                                         <span><strong>Custom Color Rules</strong>: Highlight specific chains or residues with any color.</span>
                                     </li>
