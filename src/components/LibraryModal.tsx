@@ -202,7 +202,7 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
                                                         {item.category}
                                                     </span>
                                                 </div>
-                                                <h3 className="font-bold text-white mb-1 group-hover:text-blue-300 transition-colors line-clamp-1 w-full" title={item.title}>
+                                                <h3 className="font-bold text-white mb-1 group-hover:text-blue-300 transition-colors text-sm leading-snug w-full" title={item.title}>
                                                     {item.title}
                                                 </h3>
                                                 <p className="text-[11px] text-gray-400 line-clamp-2 leading-relaxed h-8 w-full">
