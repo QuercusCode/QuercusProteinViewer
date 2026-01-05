@@ -15,6 +15,7 @@ interface MeasurementPanelProps {
 export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements, onUpdate, onDelete, isOpen, onClose }) => {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editName, setEditName] = useState("");
+    const [activeColorPickerId, setActiveColorPickerId] = useState<string | null>(null);
 
     if (!isOpen) return null;
 
@@ -112,18 +113,37 @@ export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements
                                             </div>
                                         ) : (
                                             <div className="flex items-center gap-2 group/title">
-                                                <div
-                                                    className="w-2.5 h-2.5 rounded-full shrink-0 cursor-pointer border border-white/10 hover:border-white/50 transition-colors"
-                                                    style={{ backgroundColor: m.color }}
-                                                    onClick={() => {
-                                                        // Cycle colors simply for now
-                                                        const colors = ['#22c55e', '#ef4444', '#3b82f6', '#eab308', '#ec4899'];
-                                                        const currentIdx = colors.indexOf(m.color);
-                                                        const nextColor = colors[(currentIdx + 1) % colors.length];
-                                                        onUpdate(m.id, { color: nextColor });
-                                                    }}
-                                                    title="Click to cycle color"
-                                                />
+                                                <div className="relative">
+                                                    <div
+                                                        className="w-2.5 h-2.5 rounded-full shrink-0 cursor-pointer border border-white/10 hover:border-white/50 transition-colors"
+                                                        style={{ backgroundColor: m.color }}
+                                                        onClick={() => setActiveColorPickerId(activeColorPickerId === m.id ? null : m.id)}
+                                                        title="Change Color"
+                                                    />
+                                                    {activeColorPickerId === m.id && (
+                                                        <>
+                                                            <div className="fixed inset-0 z-40" onClick={() => setActiveColorPickerId(null)} />
+                                                            <div className="absolute top-full left-0 mt-2 z-50 bg-neutral-900 border border-neutral-700 rounded-lg shadow-xl p-2 grid grid-cols-4 gap-1 w-32">
+                                                                {[
+                                                                    '#ef4444', '#f97316', '#f59e0b', '#eab308',
+                                                                    '#84cc16', '#22c55e', '#10b981', '#14b8a6',
+                                                                    '#06b6d4', '#0ea5e9', '#3b82f6', '#6366f1',
+                                                                    '#8b5cf6', '#a855f7', '#d946ef', '#ec4899'
+                                                                ].map(c => (
+                                                                    <button
+                                                                        key={c}
+                                                                        className="w-6 h-6 rounded-full border border-white/10 hover:scale-110 transition-transform"
+                                                                        style={{ backgroundColor: c }}
+                                                                        onClick={() => {
+                                                                            onUpdate(m.id, { color: c });
+                                                                            setActiveColorPickerId(null);
+                                                                        }}
+                                                                    />
+                                                                ))}
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                </div>
                                                 <span className="text-sm font-medium truncate text-neutral-200" title={m.name}>
                                                     {m.name}
                                                 </span>
