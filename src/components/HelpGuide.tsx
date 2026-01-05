@@ -81,31 +81,31 @@ export const HelpGuide: React.FC = () => {
                                 <ul className="space-y-2 text-sm text-neutral-300">
                                     <li className="flex items-start gap-2">
                                         <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1.5 flex-shrink-0" />
-                                        <span>Use the <strong>Sidebar</strong> (Top Left) to load PDBs or upload files.</span>
+                                        <span><strong>Library Browser</strong>: Explore 300+ curated proteins with categories and search.</span>
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <span className="w-1.5 h-1.5 rounded-full bg-teal-400 mt-1.5 flex-shrink-0" />
-                                        <span><strong>Sequence View</strong> lets you see amino acids and their chains.</span>
+                                        <span><strong>Dr. AI</strong>: Ask context-aware questions about the loaded protein structure.</span>
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <span className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 flex-shrink-0" />
-                                        <span>Create <strong>Custom Color Rules</strong> to highlight specific chains or residues.</span>
+                                        <span><strong>Custom Color Rules</strong>: Highlight specific chains or residues with any color.</span>
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <span className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 flex-shrink-0" />
-                                        <span><strong>Record Movies & GIFs</strong> (Turntable). Saved to gallery. (Note: GIFs take a moment to process).</span>
+                                        <span><strong>Measurement Tool</strong>: Measure distances with custom colors and clearer legibility.</span>
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
-                                        <span>Manage <strong>Snapshots & Movies</strong> in the gallery. Preview, download, or delete media.</span>
+                                        <span><strong>Publication Mode</strong>: Hide UI elements for clean, high-quality screenshots (Esc to exit).</span>
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <span className="w-1.5 h-1.5 rounded-full bg-green-400 mt-1.5 flex-shrink-0" />
-                                        <span><strong>Save & Load Sessions</strong> to persist your visualization settings and custom rules.</span>
+                                        <span><strong>Save & Load Sessions</strong>: Persist your visualization settings and custom rules.</span>
                                     </li>
                                     <li className="flex items-start gap-2">
                                         <span className="w-1.5 h-1.5 rounded-full bg-pink-400 mt-1.5 flex-shrink-0" />
-                                        <span>Advanced Analysis: Use the <strong>Contact Map</strong> or <strong>Measurement Tool</strong> for structural insights.</span>
+                                        <span>Advanced Analysis: Use the <strong>Contact Map</strong> or <strong>Ramachandran Plot</strong> for structural insights.</span>
                                     </li>
                                 </ul>
                             </div>
