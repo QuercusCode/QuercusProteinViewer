@@ -56,9 +56,9 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
     if (!activeChain) return null;
 
     return (
-        <div className={`fixed top-16 right-4 bottom-4 w-24 rounded-xl z-40 transition-transform duration-300 transform translate-x-0
+        <div className={`hidden md:flex fixed top-16 right-4 bottom-4 w-24 rounded-xl z-40 transition-transform duration-300 transform translate-x-0
             ${isLightMode ? 'bg-white/90 border border-neutral-300 shadow-xl' : 'bg-black/60 border border-neutral-700 shadow-2xl'} 
-            backdrop-blur-md flex flex-col overflow-hidden`}>
+            backdrop-blur-md flex-col overflow-hidden`}>
 
             {/* Header / Tabs - Compact Vertical */}
             <div className={`flex flex-col items-center pt-3 pb-2 gap-2 border-b ${isLightMode ? 'border-neutral-200' : 'border-neutral-800'} flex-shrink-0 bg-opacity-50`}>
