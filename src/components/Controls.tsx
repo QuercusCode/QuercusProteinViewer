@@ -162,7 +162,6 @@ export const Controls: React.FC<ControlsProps> = ({
     setShowLigands,
     showIons,
     setShowIons,
-    onFocusLigands,
     onRecordMovie,
     isRecording,
     proteinTitle,
