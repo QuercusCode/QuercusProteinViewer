@@ -143,6 +143,7 @@ function App() {
     setChains([]);
     setLigands([]);
     setCustomColors([]);
+    setMeasurements([]);
 
     // If implementing "Publication Mode", checking if we need to reset it?
     // Probably keep it active if user wants to load many files in high quality.
@@ -286,6 +287,7 @@ function App() {
     setChains([]);
     setCustomColors([]);
     setHighlightedResidue(null);
+    setMeasurements([]);
   };
 
   const [pdbMetadata, setPdbMetadata] = useState<PDBMetadata | null>(null);
