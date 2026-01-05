@@ -126,6 +126,7 @@ interface ControlsProps {
     customBackgroundColor?: string | null;
     setCustomBackgroundColor?: (color: string | null) => void;
     onHighlightRegion?: (selection: string, label: string) => void;
+    onDownloadPDB: () => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -184,7 +185,8 @@ export const Controls: React.FC<ControlsProps> = ({
     onToggleShare,
     customBackgroundColor,
     setCustomBackgroundColor,
-    onHighlightRegion
+    onHighlightRegion,
+    onDownloadPDB
 }) => {
     // Motif Search State
     const [searchPattern, setSearchPattern] = useState('');
@@ -463,7 +465,16 @@ export const Controls: React.FC<ControlsProps> = ({
                         <div className={`p-3 rounded-xl border ${cardBg} shadow-sm`}>
                             {proteinTitle && (
                                 <div className="mb-2">
-                                    <h3 className={`text-[10px] font-bold uppercase tracking-wider mb-0.5 ${subtleText}`}>Structure</h3>
+                                    <div className="flex items-center justify-between mb-0.5">
+                                        <h3 className={`text-[10px] font-bold uppercase tracking-wider ${subtleText}`}>Structure</h3>
+                                        <button
+                                            onClick={onDownloadPDB}
+                                            title="Download PDB Structure"
+                                            className={`p-1 rounded-md transition-colors ${isLightMode ? 'hover:bg-neutral-200 text-neutral-500 hover:text-black' : 'hover:bg-white/10 text-neutral-400 hover:text-white'}`}
+                                        >
+                                            <Download className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
                                     <p className={`text-xs font-bold leading-snug break-words ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>{proteinTitle}</p>
                                 </div>
                             )}

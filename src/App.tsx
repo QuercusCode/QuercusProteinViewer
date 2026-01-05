@@ -522,9 +522,26 @@ function App() {
       const link = document.createElement('a');
       link.href = snapshot.url;
       link.download = `snapshot-${pdbId || 'structure'}-${snapshot.id.slice(0, 4)}.png`;
-      document.body.appendChild(link);
       link.click();
-      document.body.removeChild(link);
+    }
+  };
+
+  const handleDownloadPDB = () => {
+    if (file) {
+      // Download local/library file
+      const url = URL.createObjectURL(file);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = file.name;
+      a.click();
+      URL.revokeObjectURL(url);
+    } else if (pdbId) {
+      // Download from RCSB
+      const url = `https://files.rcsb.org/download/${pdbId}.pdb`;
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${pdbId}.pdb`;
+      a.click();
     }
   };
 
@@ -908,6 +925,7 @@ function App() {
         setIsSpinning={setIsSpinning}
         onSaveSession={handleSaveSession}
         onLoadSession={handleLoadSession}
+        onDownloadPDB={handleDownloadPDB}
         onToggleContactMap={() => setShowContactMap(!showContactMap)}
         movies={movies}
         onDownloadMovie={handleDownloadMovie}
