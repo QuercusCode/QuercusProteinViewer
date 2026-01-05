@@ -299,9 +299,23 @@ function App() {
   // Fetch Metadata when PDB ID changes
   useEffect(() => {
     if (pdbId && !file) { // Only fetch if using PDB ID, not local file
-      fetchPDBMetadata(pdbId).then(data => {
-        if (data) setPdbMetadata(data);
-      });
+      const libraryEntry = OFFLINE_LIBRARY.find(entry => entry.id.toLowerCase() === pdbId.toLowerCase());
+
+      if (libraryEntry && libraryEntry.method) {
+        // Use local metadata if available
+        setPdbMetadata({
+          method: libraryEntry.method,
+          resolution: libraryEntry.resolution || 'N/A',
+          organism: libraryEntry.organism || 'Unknown source',
+          depositionDate: libraryEntry.depositionDate || 'Unknown',
+          title: libraryEntry.title
+        });
+      } else {
+        // Fallback to API fetch
+        fetchPDBMetadata(pdbId).then(data => {
+          if (data) setPdbMetadata(data);
+        });
+      }
     } else {
       setPdbMetadata(null); // Clear/Reset if file uploaded or no ID
     }
