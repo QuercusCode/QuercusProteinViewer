@@ -114,7 +114,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     isMeasurementMode = false,
     measurements,
     onAddMeasurement,
-    onHover
+    onHover,
+    isLightMode
 }: ProteinViewerProps, ref: React.Ref<ProteinViewerRef>) => {
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -1427,21 +1428,29 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             };
             const colorArr = hexToRgb(m.color);
 
+            // Determine text color based on background
+            // Simple heuristic: if background is "white" or bright, use black text. Otherwise white.
+            // In a real scenario, we'd parse backgroundColor hex/prop.
+            // Assuming backgroundColor is passed as prop. 
+            // If isLightMode prop is available (it is), we can use that.
+            // UPDATED: High Contrast Gold for Dark Mode
+            const labelColor = isLightMode ? [0, 0, 0] : [1.0, 0.8, 0.0];
+
             shape.addCylinder(p1, p2, colorArr, 0.1);
             shape.addSphere(p1, colorArr, 0.2);
             shape.addSphere(p2, colorArr, 0.2);
             shape.addText(
                 [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2, (p1[2] + p2[2]) / 2],
-                [1, 1, 1],
-                0.8,
-                m.distance.toFixed(2)
+                labelColor,
+                2.5, // Increased size from 0.8
+                m.distance.toFixed(2) + " Å" // Added Angstrom symbol
             );
 
             const comp = stage.addComponentFromObject(shape);
             comp.addRepresentation("buffer", { depthTest: false });
         });
 
-    }, [measurements]);
+    }, [measurements, isLightMode, backgroundColor]);
 
 
     useEffect(() => {
