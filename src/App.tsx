@@ -612,9 +612,19 @@ function App() {
   // --- GLOBAL SHORTCUTS ---
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Command Palette Trigger
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         setIsCommandPaletteOpen(prev => !prev);
+        return;
+      }
+
+      // Exit Publication Mode on Escape
+      if (e.key === 'Escape') {
+        setIsPublicationMode(false);
+        setIsMeasurementMode(false); // Also good UX to exit measurement mode
+        setIsCommandPaletteOpen(false); // Close other overlays
+        setIsLibraryOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
