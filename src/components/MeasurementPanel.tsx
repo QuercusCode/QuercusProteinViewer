@@ -58,10 +58,10 @@ export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements
     };
 
     return (
-        <div className="absolute top-20 right-4 md:right-32 z-20 w-80 bg-black/90 backdrop-blur-md border border-neutral-800 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[70vh]">
+        <div className="absolute top-20 right-4 md:right-32 z-20 w-80 bg-black/90 backdrop-blur-md border border-neutral-800 rounded-xl shadow-2xl flex flex-col max-h-[70vh]">
 
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-neutral-800 bg-neutral-900/50">
+            <div className="flex items-center justify-between p-4 border-b border-neutral-800 bg-neutral-900/50 rounded-t-xl">
                 <div className="flex items-center gap-2 text-white">
                     <Ruler className="w-4 h-4 text-cyan-400" />
                     <span className="font-bold text-sm">Measurements</span>
@@ -85,7 +85,7 @@ export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements
             </div>
 
             {/* List */}
-            <div className="flex-1 overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent">
+            <div className="flex-1 overflow-y-auto p-2 scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-transparent rounded-b-xl">
                 {measurements.length === 0 ? (
                     <div className="text-center py-8 opacity-40 text-sm italic">
                         No measurements yet.<br />
@@ -123,7 +123,7 @@ export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements
                                                     {activeColorPickerId === m.id && (
                                                         <>
                                                             <div className="fixed inset-0 z-40" onClick={() => setActiveColorPickerId(null)} />
-                                                            <div className="absolute top-full left-0 mt-2 z-50 bg-neutral-900 border border-neutral-700 rounded-lg shadow-xl p-2 grid grid-cols-4 gap-1 w-32">
+                                                            <div className="absolute top-full left-0 mt-2 z-50 bg-neutral-900 border border-neutral-700 rounded-lg shadow-xl p-2 grid grid-cols-4 gap-1 w-28">
                                                                 {[
                                                                     '#ef4444', '#f97316', '#f59e0b', '#eab308',
                                                                     '#84cc16', '#22c55e', '#10b981', '#14b8a6',
@@ -132,7 +132,7 @@ export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements
                                                                 ].map(c => (
                                                                     <button
                                                                         key={c}
-                                                                        className="w-6 h-6 rounded-full border border-white/10 hover:scale-110 transition-transform"
+                                                                        className="w-4 h-4 rounded-full border border-white/10 hover:scale-110 transition-transform"
                                                                         style={{ backgroundColor: c }}
                                                                         onClick={() => {
                                                                             onUpdate(m.id, { color: c });
