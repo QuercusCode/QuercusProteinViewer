@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { ProteinViewer, type ProteinViewerRef } from './components/ProteinViewer';
 import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
@@ -232,7 +232,7 @@ function App() {
     viewerRef.current?.highlightResidue(chain, resNo);
   };
 
-  const handleStructureLoaded = (info: StructureInfo) => {
+  const handleStructureLoaded = useCallback((info: StructureInfo) => {
     setIsLoading(false);
     setChains(info.chains);
     setLigands(info.ligands);
@@ -242,7 +242,7 @@ function App() {
     if (hasLigands && !showLigands && !initialUrlState.showLigands) {
       // Optional logic
     }
-  };
+  }, [showLigands, initialUrlState.showLigands]);
 
   const [proteinTitle, setProteinTitle] = useState<string | null>(null);
 
