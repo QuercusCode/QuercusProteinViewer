@@ -587,24 +587,24 @@ export const Controls: React.FC<ControlsProps> = ({
                                 </div>
 
                                 <div className="space-y-2">
-                                    <div>
-                                        <label className={`text-[10px] font-bold uppercase tracking-wider mb-1 block ${subtleText}`}>Style</label>
-                                        <select
-                                            value={representation}
-                                            onChange={(e) => setRepresentation(e.target.value as RepresentationType)}
-                                            className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
-                                        >
-                                            <option value="cartoon">Cartoon</option>
-                                            <option value="ball+stick">Ball & Stick</option>
-                                            <option value="spacefill">Spacefill</option>
-                                            <option value="surface">Surface</option>
-                                            <option value="ribbon">Ribbon</option>
-                                        </select>
-                                    </div>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className={`text-[10px] font-bold uppercase tracking-wider mb-1 block ${subtleText}`}>Style</label>
+                                            <select
+                                                value={representation}
+                                                onChange={(e) => setRepresentation(e.target.value as RepresentationType)}
+                                                className={`w-full border rounded px-2 py-1.5 text-xs outline-none ${inputBg}`}
+                                            >
+                                                <option value="cartoon">Cartoon</option>
+                                                <option value="ball+stick">Ball & Stick</option>
+                                                <option value="spacefill">Spacefill</option>
+                                                <option value="surface">Surface</option>
+                                                <option value="ribbon">Ribbon</option>
+                                            </select>
+                                        </div>
 
-                                    <div>
-                                        <label className={`text-[10px] font-bold uppercase tracking-wider mb-1 block ${subtleText}`}>Colors</label>
-                                        <div className="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label className={`text-[10px] font-bold uppercase tracking-wider mb-1 block ${subtleText}`}>Colors</label>
                                             <select
                                                 value={coloring}
                                                 onChange={(e) => setColoring(e.target.value as ColoringType)}
