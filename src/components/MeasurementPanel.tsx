@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Ruler, Trash2, Download, Edit2, Check, X, Type } from 'lucide-react';
+import { Ruler, Trash2, Download, Edit2, Check, X, Palette } from 'lucide-react';
 import type { Measurement, MeasurementTextColor } from '../types';
 
 interface MeasurementPanelProps {
@@ -73,14 +73,14 @@ export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements
                         {measurements.length}
                     </span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                     <div className="relative">
                         <button
                             onClick={() => setShowTextColorPalette(!showTextColorPalette)}
-                            className="p-1.5 hover:bg-white/10 rounded text-neutral-400 hover:text-white"
+                            className="p-1 hover:bg-white/10 rounded text-neutral-400 hover:text-white"
                             title={`Text Color: ${textColorMode === 'auto' ? 'Auto' : textColorMode}`}
                         >
-                            <Type className={`w-4 h-4 ${textColorMode !== 'auto' ? 'text-blue-400' : 'opacity-50'}`} />
+                            <Palette className={`w-3.5 h-3.5 ${textColorMode !== 'auto' ? 'text-blue-400' : 'opacity-50'}`} />
                         </button>
                         {showTextColorPalette && (
                             <>
@@ -121,21 +121,21 @@ export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements
                     <button
                         onClick={onClearAll}
                         disabled={measurements.length === 0}
-                        className="p-1.5 hover:bg-white/10 rounded text-neutral-400 hover:text-red-400 disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="p-1 hover:bg-white/10 rounded text-neutral-400 hover:text-red-400 disabled:opacity-30 disabled:cursor-not-allowed"
                         title="Clear All Measurements"
                     >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
                     </button>
                     <button
                         onClick={handleExport}
                         disabled={measurements.length === 0}
-                        className="p-1.5 hover:bg-white/10 rounded text-neutral-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="p-1 hover:bg-white/10 rounded text-neutral-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
                         title="Export CSV"
                     >
-                        <Download className="w-4 h-4" />
+                        <Download className="w-3.5 h-3.5" />
                     </button>
-                    <button onClick={onClose} className="p-1.5 hover:bg-white/10 rounded text-neutral-400 hover:text-white">
-                        <X className="w-4 h-4" />
+                    <button onClick={onClose} className="p-1 hover:bg-white/10 rounded text-neutral-400 hover:text-white">
+                        <X className="w-3.5 h-3.5" />
                     </button>
                 </div>
             </div>
