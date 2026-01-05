@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, X, BookOpen, Database, FlaskConical, Dna, Activity, Zap, Shield, Grid, Archive, Anchor, Layers, ArrowLeft } from 'lucide-react';
+import { Search, X, BookOpen, Database, FlaskConical, Dna, Activity, Zap, Shield, Grid, Archive, Anchor, Layers, ArrowLeft, Syringe, Hexagon, Magnet } from 'lucide-react';
 import clsx from 'clsx';
 import { OFFLINE_LIBRARY } from '../data/library';
 
@@ -25,6 +25,10 @@ const CATEGORY_CONFIG: Record<string, { icon: React.ReactNode, style: string, de
     'Immune': { icon: <Shield size={20} />, style: 'text-rose-400 border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 active-color:bg-rose-500', description: 'Antibodies and defense systems.' },
     'Energy': { icon: <Zap size={20} />, style: 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10 hover:bg-yellow-500/20 active-color:bg-yellow-500', description: 'Photosynthesis and metabolism.' },
     'Chaperone': { icon: <Anchor size={20} />, style: 'text-indigo-400 border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 active-color:bg-indigo-500', description: 'Helpers for protein folding.' },
+    // New Categories
+    'Antibodies': { icon: <Syringe size={20} />, style: 'text-teal-400 border-teal-500/30 bg-teal-500/10 hover:bg-teal-500/20 active-color:bg-teal-500', description: 'Therapeutic and functional antibodies.' },
+    'Nanobodies': { icon: <Hexagon size={20} />, style: 'text-pink-400 border-pink-500/30 bg-pink-500/10 hover:bg-pink-500/20 active-color:bg-pink-500', description: 'Single-domain antibody fragments.' },
+    'Binders': { icon: <Magnet size={20} />, style: 'text-violet-400 border-violet-500/30 bg-violet-500/10 hover:bg-violet-500/20 active-color:bg-violet-500', description: 'Engineered binding proteins.' },
 };
 
 const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }) => {
