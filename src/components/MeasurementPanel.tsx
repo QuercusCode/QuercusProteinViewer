@@ -57,7 +57,7 @@ export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements
     };
 
     return (
-        <div className="absolute top-20 right-4 z-20 w-80 bg-black/90 backdrop-blur-md border border-neutral-800 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[70vh]">
+        <div className="absolute top-20 right-4 md:right-32 z-20 w-80 bg-black/90 backdrop-blur-md border border-neutral-800 rounded-xl shadow-2xl overflow-hidden flex flex-col max-h-[70vh]">
 
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-neutral-800 bg-neutral-900/50">
