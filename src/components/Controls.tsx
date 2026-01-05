@@ -901,26 +901,32 @@ export const Controls: React.FC<ControlsProps> = ({
                                             <Hexagon className="w-3.5 h-3.5 text-blue-500" />
                                             <span className={`text-xs font-bold ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>Ligands ({ligands.length})</span>
                                         </div>
-                                        <div className="flex items-center gap-1">
-                                            <button
-                                                onClick={onFocusLigands}
-                                                className={`text-[10px] px-2 py-0.5 rounded border transition-colors bg-transparent text-neutral-500 hover:bg-neutral-50`}
-                                            >
-                                                Focus
-                                            </button>
-                                            <button
-                                                onClick={() => setShowLigands(!showLigands)}
-                                                className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${showLigands ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-transparent text-neutral-500 hover:bg-neutral-50'}`}
-                                            >
-                                                {showLigands ? 'Hide Ligands' : 'Show Ligands'}
-                                            </button>
-                                            <button
-                                                onClick={() => setShowIons && setShowIons(!showIons)}
-                                                className={`text-[10px] px-2 py-0.5 rounded border transition-colors ${showIons ? 'bg-purple-50 text-purple-600 border-purple-200' : 'bg-transparent text-neutral-500 hover:bg-neutral-50'}`}
-                                            >
-                                                {showIons ? 'Hide Ions' : 'Show Ions'}
-                                            </button>
-                                        </div>
+                                    </div>
+
+                                    {/* Toggles */}
+                                    <div className="grid grid-cols-2 gap-2 mb-2">
+                                        <button
+                                            onClick={() => setShowLigands(!showLigands)}
+                                            className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-md border text-[10px] font-medium transition-all
+                                                ${showLigands
+                                                    ? 'bg-blue-500/10 border-blue-500 text-blue-600 dark:text-blue-400'
+                                                    : `${isLightMode ? 'bg-white border-neutral-200 text-neutral-600 hover:bg-neutral-50' : 'bg-white/5 border-white/10 text-neutral-400 hover:bg-white/10'}`
+                                                }`}
+                                        >
+                                            <span className={`w-1.5 h-1.5 rounded-full ${showLigands ? 'bg-blue-500' : 'bg-neutral-400'}`} />
+                                            {showLigands ? 'Ligands On' : 'Ligands Off'}
+                                        </button>
+                                        <button
+                                            onClick={() => setShowIons && setShowIons(!showIons)}
+                                            className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-md border text-[10px] font-medium transition-all
+                                                ${showIons
+                                                    ? 'bg-purple-500/10 border-purple-500 text-purple-600 dark:text-purple-400'
+                                                    : `${isLightMode ? 'bg-white border-neutral-200 text-neutral-600 hover:bg-neutral-50' : 'bg-white/5 border-white/10 text-neutral-400 hover:bg-white/10'}`
+                                                }`}
+                                        >
+                                            <span className={`w-1.5 h-1.5 rounded-full ${showIons ? 'bg-purple-500' : 'bg-neutral-400'}`} />
+                                            {showIons ? 'Ions On' : 'Ions Off'}
+                                        </button>
                                     </div>
                                     <div className="flex flex-wrap gap-1">
                                         {ligands.map(lig => (
