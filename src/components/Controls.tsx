@@ -468,7 +468,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                         </div>
 
                                         {pdbMetadata.organism && pdbMetadata.organism !== 'Unknown source' && (
-                                            <div className="col-span-2 pt-1 border-t border-dashed border-neutral-200 dark:border-neutral-800">
+                                            <div className="pt-1 border-t border-neutral-200 dark:border-neutral-800" style={{ borderTopStyle: 'dashed' }}>
                                                 <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Organism</span>
                                                 <span className={`text-[10px] font-medium leading-tight block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
                                                     {pdbMetadata.organism}
@@ -476,7 +476,10 @@ export const Controls: React.FC<ControlsProps> = ({
                                             </div>
                                         )}
 
-                                        <div className="col-span-2">
+                                        <div
+                                            className={`pt-1 border-t border-neutral-200 dark:border-neutral-800 ${pdbMetadata.organism && pdbMetadata.organism !== 'Unknown source' ? 'pl-2 border-l' : ''}`}
+                                            style={{ borderTopStyle: 'dashed' }}
+                                        >
                                             <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Deposited</span>
                                             <span className={`text-[10px] font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
                                                 {pdbMetadata.depositionDate}
