@@ -925,6 +925,9 @@ function App() {
         customBackgroundColor={customBackgroundColor}
         setCustomBackgroundColor={setCustomBackgroundColor}
         pdbMetadata={pdbMetadata}
+        onHighlightRegion={(selection, label) => {
+          viewerRef.current?.highlightRegion(selection, label);
+        }}
       />
 
       <ProteinViewer

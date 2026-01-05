@@ -28,10 +28,13 @@ import {
     ChevronDown,
     Activity,
     Wrench,
-    Share2
+    Share2,
+    ScanSearch // Added Icon
 } from 'lucide-react';
 import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, PDBMetadata } from '../types';
 import { formatChemicalId } from '../utils/pdbUtils';
+import { findMotifs } from '../utils/searchUtils';
+import type { MotifMatch } from '../utils/searchUtils';
 
 // Reusable Sidebar Section Component - Defined outside to prevent re-renders losing focus
 const SidebarSection = ({ title, icon: Icon, children, isOpen, onToggle, isLightMode }: { title: string, icon: any, children: React.ReactNode, isOpen: boolean, onToggle: () => void, isLightMode: boolean }) => (
@@ -121,6 +124,7 @@ interface ControlsProps {
     onToggleShare: () => void;
     customBackgroundColor?: string | null;
     setCustomBackgroundColor?: (color: string | null) => void;
+    onHighlightRegion?: (selection: string, label: string) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -178,8 +182,39 @@ export const Controls: React.FC<ControlsProps> = ({
     onToggleLibrary,
     onToggleShare,
     customBackgroundColor,
-    setCustomBackgroundColor
+    setCustomBackgroundColor,
+    onHighlightRegion
 }) => {
+    // Motif Search State
+    const [searchPattern, setSearchPattern] = useState('');
+    const [searchResults, setSearchResults] = useState<MotifMatch[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [isMotifSearchOpen, setIsMotifSearchOpen] = useState(false);
+
+    const handleSearch = () => {
+        setIsSearching(true);
+        setTimeout(() => {
+            const results = findMotifs(chains, searchPattern);
+            setSearchResults(results);
+            setIsSearching(false);
+        }, 10);
+    };
+
+    const handleResultClick = (match: MotifMatch) => {
+        if (onHighlightRegion) {
+            let range = `${match.startResNo}`;
+            if (match.startResNo !== match.endResNo) {
+                range = `${match.startResNo}-${match.endResNo}`;
+            }
+            const selection = `:${match.chain} and ${range}`;
+            onHighlightRegion(selection, `Motif: ${match.sequence}`);
+        } else {
+            // Fallback
+            onResidueClick(match.chain, match.startResNo, match.sequence);
+        }
+    };
+
+
     const fileInputRef = useRef<HTMLInputElement>(null);
     const sessionInputRef = useRef<HTMLInputElement>(null);
     const [localPdbId, setLocalPdbId] = React.useState(pdbId);
@@ -490,6 +525,68 @@ export const Controls: React.FC<ControlsProps> = ({
                             </div>
                         </div>
                     )}
+
+                    {/* ACCORDION X: MOTIF SEARCH */}
+                    <SidebarSection
+                        title="Motif Search"
+                        icon={ScanSearch}
+                        isOpen={isMotifSearchOpen}
+                        onToggle={() => setIsMotifSearchOpen(!isMotifSearchOpen)}
+                        isLightMode={isLightMode}
+                    >
+                        <div className="space-y-3">
+                            <div className="space-y-1">
+                                <label className="text-[10px] uppercase tracking-wider opacity-60 font-bold">Sequence Pattern</label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={searchPattern}
+                                        onChange={(e) => setSearchPattern(e.target.value)}
+                                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                                        placeholder="e.g. R-G-D or H-x-x-H"
+                                        className={`flex-1 bg-transparent border rounded px-2 py-1 text-xs font-mono outline-none focus:border-blue-500
+                                            ${isLightMode
+                                                ? 'border-neutral-300 placeholder-neutral-400 text-black'
+                                                : 'border-white/20 placeholder-white/20 text-white'}`}
+                                    />
+                                    <button
+                                        onClick={handleSearch}
+                                        disabled={!searchPattern}
+                                        className={`p-1 rounded transition-colors ${!searchPattern ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-500/20 text-blue-400'}`}
+                                    >
+                                        {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                                    </button>
+                                </div>
+                                <p className="text-[9px] opacity-50">Use 'x' as wildcard. Dashes ignored.</p>
+                            </div>
+
+                            {/* Results List */}
+                            {searchResults.length > 0 && (
+                                <div className="max-h-40 overflow-y-auto space-y-1 scrollbar-thin scrollbar-thumb-white/10">
+                                    <div className="flex justify-between items-center pb-1 border-b border-white/5">
+                                        <span className="text-[10px] font-bold opacity-70">{searchResults.length} Matches</span>
+                                        <button onClick={() => setSearchResults([])} className="p-1 hover:text-red-400"><Trash2 className="w-3 h-3" /></button>
+                                    </div>
+                                    {searchResults.map((match, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => handleResultClick(match)}
+                                            className={`w-full text-left p-2 rounded flex justify-between items-center group transition-colors
+                                                ${isLightMode
+                                                    ? 'hover:bg-neutral-100 border border-transparent hover:border-neutral-200'
+                                                    : 'hover:bg-white/5 border border-transparent hover:border-white/10'}`}
+                                        >
+                                            <div className="flex flex-col">
+                                                <span className="text-xs font-mono font-bold text-blue-400">{match.sequence}</span>
+                                                <span className="text-[10px] opacity-60">Chain {match.chain} : {match.startResNo}-{match.endResNo}</span>
+                                            </div>
+                                            <ScanSearch className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity text-blue-400" />
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </SidebarSection>
 
                     {/* ACCORDION 1: APPEARANCE */}
                     <SidebarSection
