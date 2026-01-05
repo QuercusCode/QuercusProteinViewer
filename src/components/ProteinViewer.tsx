@@ -1318,6 +1318,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                 let minSeq = Infinity;
                                 let maxSeq = -Infinity;
 
+                                const resMap: number[] = [];
                                 try {
                                     c.eachResidue((r: any) => {
                                         let resNo = r.resno;
@@ -1328,6 +1329,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                         if (typeof resNo === 'number') {
                                             if (resNo < minSeq) minSeq = resNo;
                                             if (resNo > maxSeq) maxSeq = resNo;
+                                            resMap.push(resNo); // Valid residue number
+                                        } else {
+                                            // Fallback for weird cases
+                                            resMap.push((maxSeq > -Infinity ? maxSeq : 0) + 1);
                                         }
 
                                         let resName = 'X';
@@ -1343,7 +1348,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                 if (maxSeq === -Infinity) maxSeq = 0;
 
                                 console.log(`Chain ${c.chainname}: Range ${minSeq}-${maxSeq}, SeqLen: ${seq.length}`);
-                                chains.push({ name: c.chainname, min: minSeq, max: maxSeq, sequence: seq });
+                                chains.push({ name: c.chainname, min: minSeq, max: maxSeq, sequence: seq, residueMap: resMap });
                             });
 
                             // Extract Ligands

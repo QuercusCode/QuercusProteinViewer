@@ -2,8 +2,10 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Map } from 'lucide-react';
 
+import type { ChainInfo } from '../types';
+
 interface SequenceTrackProps {
-    chains: { name: string; sequence: string }[];
+    chains: ChainInfo[];
     highlightedResidue: { chain: string; resNo: number } | null;
     onHoverResidue: (chain: string, resNo: number) => void;
     onClickResidue: (chain: string, resNo: number) => void;
@@ -97,7 +99,7 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
             >
                 <div className="flex flex-col items-center w-full gap-1">
                     {activeChain.sequence.split('').map((res, idx) => {
-                        const resNo = idx + 1; // Assuming 1-based indexing
+                        const resNo = activeChain.residueMap ? activeChain.residueMap[idx] : idx + 1;
                         const isActive = highlightedResidue?.chain === activeChain.name && highlightedResidue.resNo === resNo;
                         const color = getResidueColor(res, isLightMode);
 

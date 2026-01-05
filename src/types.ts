@@ -19,6 +19,7 @@ export interface ChainInfo {
     min: number;
     max: number;
     sequence: string;
+    residueMap?: number[]; // Added: Maps sequence index to actual PDB residue number
 }
 
 export interface StructureInfo {
