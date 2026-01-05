@@ -55,17 +55,25 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
     // Scroll to highlighted residue
     useEffect(() => {
         if (highlightedResidue && activeChain && highlightedResidue.chain === activeChain.name) {
-            const index = highlightedResidue.resNo - 1; // 1-based to 0-based approximation
+            // Calculate correct index based on residue numbering
+            let index = -1;
+            if (activeChain.residueMap) {
+                index = activeChain.residueMap.findIndex(r => r === highlightedResidue.resNo);
+            } else {
+                index = highlightedResidue.resNo - 1;
+            }
 
-            // Small timeout to ensure DOM is ready after chain switch
-            setTimeout(() => {
-                if (scrollContainerRef.current) {
-                    const element = scrollContainerRef.current.children[0]?.children[index] as HTMLElement;
-                    if (element) {
-                        element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+            if (index !== -1) {
+                // Small timeout to ensure DOM is ready after chain switch
+                setTimeout(() => {
+                    if (scrollContainerRef.current) {
+                        const element = scrollContainerRef.current.children[0]?.children[index] as HTMLElement;
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+                        }
                     }
-                }
-            }, 50);
+                }, 100);
+            }
         }
     }, [highlightedResidue, activeChain]);
 
