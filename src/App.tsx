@@ -631,13 +631,13 @@ function App() {
     const files = e.dataTransfer.files;
     if (files && files.length > 0) {
       const droppedFile = files[0];
-      const validExtensions = ['.pdb', '.cif', '.ent'];
+      const validExtensions = ['.pdb', '.cif', '.ent', '.mol', '.sdf', '.mol2'];
       const fileExt = droppedFile.name.substring(droppedFile.name.lastIndexOf('.')).toLowerCase();
 
       if (validExtensions.includes(fileExt)) {
         handleUpload(droppedFile); // Reuse existing upload handler
       } else {
-        alert("Invalid file type. Please drop a .pdb, .cif, or .ent file.");
+        alert("Invalid file type. Please drop a valid structure file (.pdb, .cif, .mol, .sdf, etc.)");
       }
     }
   };

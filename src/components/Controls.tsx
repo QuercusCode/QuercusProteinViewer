@@ -449,7 +449,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <Upload className="w-3.5 h-3.5 group-hover:text-blue-500 transition-colors" />
                                 <span className="text-xs font-medium">Upload File</span>
                             </button>
-                            <input type="file" accept=".pdb,.cif,.ent,.mmcif" className="hidden" ref={fileInputRef} onChange={(e) => {
+                            <input type="file" accept=".pdb,.cif,.ent,.mmcif,.mol,.sdf,.mol2" className="hidden" ref={fileInputRef} onChange={(e) => {
                                 if (e.target.files?.[0]) onUpload(e.target.files[0]);
                             }} />
 
