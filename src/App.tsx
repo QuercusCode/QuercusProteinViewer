@@ -147,10 +147,35 @@ function App() {
     setLigands([]);
     setCustomColors([]);
 
+    // If implementing "Publication Mode", checking if we need to reset it?
+    // Probably keep it active if user wants to load many files in high quality.
+
     setHighlightedResidue(null);
     // Auto-set title from filename (removing extension)
     setProteinTitle(uploadedFile.name.replace(/\.[^/.]+$/, ""));
   };
+
+  const [isPublicationMode, setIsPublicationMode] = useState(false);
+
+  // Effect to apply Publication Mode settings
+  // Note: we control these via props to ProteinViewer, not direct state setter here mostly
+  // But we might want to override some defaults
+  useEffect(() => {
+    if (isPublicationMode) {
+      // Auto-set High Quality Defaults
+      setRepresentation('cartoon'); // or hyperball? Cartoon is standard
+      setIsCleanMode(true);
+      setColoring('chainid');
+      setCustomBackgroundColor('#ffffff'); // White background
+      setIsLightMode(true); // Ensure light mode for paper look
+    } else {
+      // Revert? Hard to store "previous" state easily without complex logic.
+      // For now, just turn off "Clean Mode" and maybe set quality back.
+      // We won't auto-revert data like coloring as that might be annoying.
+      setIsCleanMode(false);
+      setCustomBackgroundColor(null); // Revert to theme
+    }
+  }, [isPublicationMode]);
 
   // ... (fetchTitle logic) ... 
 
@@ -623,6 +648,8 @@ function App() {
         setCustomColors={setCustomColors}
         isMeasurementMode={isMeasurementMode}
         setIsMeasurementMode={setIsMeasurementMode}
+        isPublicationMode={isPublicationMode}
+        setIsPublicationMode={setIsPublicationMode}
         onClearMeasurements={() => viewerRef.current?.clearMeasurements()}
         isLightMode={isLightMode}
         setIsLightMode={setIsLightMode}
@@ -682,6 +709,8 @@ function App() {
         showSurface={showSurface}
         showLigands={showLigands}
         isSpinning={isSpinning}
+        quality={isPublicationMode ? 'high' : 'medium'}
+        enableAmbientOcclusion={isPublicationMode}
 
         className="w-full h-full"
       />

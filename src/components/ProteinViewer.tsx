@@ -42,6 +42,8 @@ interface ProteinViewerProps {
     showLigands?: boolean;
     isSpinning?: boolean;
     isMeasurementMode?: boolean;
+    quality?: 'low' | 'medium' | 'high';
+    enableAmbientOcclusion?: boolean;
 }
 
 export interface ProteinViewerRef {
