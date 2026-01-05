@@ -1443,7 +1443,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2, (p1[2] + p2[2]) / 2],
                 labelColor,
                 2.5, // Increased size from 0.8
-                m.distance.toFixed(2) + " Å" // Added Angstrom symbol
+                m.distance.toFixed(2) + " A" // Use 'A' instead of symbol for compatibility
             );
 
             const comp = stage.addComponentFromObject(shape);
