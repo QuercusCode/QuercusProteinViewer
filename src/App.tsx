@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { ProteinViewer, type ProteinViewerRef } from './components/ProteinViewer';
 import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
 import { AISidebar, type AIAction } from './components/AISidebar';
 import { HelpGuide } from './components/HelpGuide';
 import { parseURLState, getShareableURL } from './utils/urlManager';
-import type { ChainInfo, CustomColorRule, StructureInfo, Snapshot, Movie, ColorPalette, RepresentationType, ColoringType, ResidueInfo } from './types';
+import type { ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, RepresentationType, ColoringType, ResidueInfo } from './types';
 
 import LibraryModal from './components/LibraryModal';
 import { ShareModal } from './components/ShareModal';
@@ -13,9 +13,10 @@ import { SequenceTrack } from './components/SequenceTrack';
 import { DragDropOverlay } from './components/DragDropOverlay';
 import { CommandPalette, type CommandAction } from './components/CommandPalette';
 import { HUD } from './components/HUD';
+import { MeasurementPanel } from './components/MeasurementPanel';
 import { OFFLINE_LIBRARY } from './data/library';
 import { fetchPDBMetadata } from './utils/pdbUtils';
-import type { PDBMetadata } from './types';
+import type { PDBMetadata, Measurement } from './types';
 import {
   Camera, RefreshCw, Upload,
   Settings, Zap, Activity, Grid3X3, Palette,
@@ -23,11 +24,13 @@ import {
 } from 'lucide-react';
 
 function App() {
+  const viewerRef = useRef<ProteinViewerRef>(null);
   // Parse Global URL State Once
   const initialUrlState = parseURLState();
 
   const [pdbId, setPdbId] = useState(() => initialUrlState.pdbId || '2b3p');
   const [file, setFile] = useState<File | null>(null);
+  const [, setIsLoading] = useState(false);
 
   const [representation, setRepresentation] = useState<RepresentationType>(
     initialUrlState.representation || 'cartoon'
@@ -88,37 +91,24 @@ function App() {
 
   // ... (lines 53-343) ...
 
-  const handleStructureLoaded = useCallback((info: StructureInfo) => {
-    const hasChains = info.chains && info.chains.length > 0;
+  // Actually, we should only clear if not restoring? 
+  // If we loaded from URL, customColors are set. 
+  // If we upload a file or change PDB manually, we reset customColors in handlePdbIdChange/handleUpload.
+  // So here we should NOT clear them.
 
-    if (hasChains) {
-      setChains(info.chains);
-      setLigands(info.ligands);
-      // setCustomColors([]); // REMOVED: Do not clear custom colors if we just restored them! 
-      // Actually, we should only clear if not restoring? 
-      // If we loaded from URL, customColors are set. 
-      // If we upload a file or change PDB manually, we reset customColors in handlePdbIdChange/handleUpload.
-      // So here we should NOT clear them.
+  // Restore Orientation & Measurements if pending
+  if (hasRestoredState && viewerRef.current) {
+    try {
+      setTimeout(() => {
+        if ((window as any).__pendingOrientation) {
+          viewerRef.current?.setCameraOrientation((window as any).__pendingOrientation);
+          delete (window as any).__pendingOrientation;
+        }
+        setHasRestoredState(false);
+      }, 500);
+    } catch (e) { console.warn("App: Failed to restore state", e); }
+  }
 
-      // Restore Orientation & Measurements if pending
-      if (hasRestoredState && viewerRef.current) {
-        try {
-          setTimeout(() => {
-            if ((window as any).__pendingOrientation) {
-              viewerRef.current?.setCameraOrientation((window as any).__pendingOrientation);
-              delete (window as any).__pendingOrientation;
-            }
-            if (initialUrlState.measurements) {
-              viewerRef.current?.restoreMeasurements(initialUrlState.measurements);
-            }
-            setHasRestoredState(false);
-          }, 500);
-        } catch (e) { console.warn("App: Failed to restore state", e); }
-      }
-    } else {
-      console.warn("App: Loaded structure has no chains?", info);
-    }
-  }, [hasRestoredState, initialUrlState.measurements]);
 
 
 
@@ -204,7 +194,7 @@ function App() {
   }, [chains, ligands]);
 
   // Need to insert logic into handleAtomClick
-  const handleAtomClick = async (info: { chain: string; resNo: number; resName: string; atomIndex: number; position?: { x: number, y: number, z: number } } | null) => {
+  const handleAtomClick = async (info: ResidueInfo | null) => {
     if (!info) {
       setHighlightedResidue(null);
       return;
@@ -242,6 +232,12 @@ function App() {
     viewerRef.current?.highlightResidue(chain, resNo);
   };
 
+  const handleStructureLoaded = (hasLigands: boolean) => {
+    setIsLoading(false);
+    if (hasLigands && !showLigands && !initialUrlState.showLigands) {
+      // Optional logic
+    }
+  };
 
   const [proteinTitle, setProteinTitle] = useState<string | null>(null);
 
@@ -302,8 +298,6 @@ function App() {
 
   const [isRecording, setIsRecording] = useState(false);
 
-  const viewerRef = useRef<ProteinViewerRef>(null);
-
   const handleRecordMovie = async (duration: number = 4000) => {
     if (viewerRef.current && !isRecording) {
       setIsRecording(true);
@@ -325,7 +319,6 @@ function App() {
 
         setMovies(prev => [newMovie, ...prev]);
 
-        // Auto Download removed per user request: saved to gallery instead.
       } catch (e: any) {
         console.error("Recording failed", e);
         alert(`Recording failed: ${e.message || e.toString() || "Unknown error"}`);
@@ -591,6 +584,24 @@ function App() {
   // --- HUD STATE ---
   const [hoveredResidue, setHoveredResidue] = useState<ResidueInfo | null>(null);
 
+  // --- MEASUREMENT STATE ---
+  const [measurements, setMeasurements] = useState<Measurement[]>([]);
+  const [isMeasurementPanelOpen, setIsMeasurementPanelOpen] = useState(false);
+
+  const handleAddMeasurement = (m: Measurement) => {
+    setMeasurements(prev => [...prev, m]);
+    setIsMeasurementPanelOpen(true); // Auto-open when adding
+  };
+
+  const handleUpdateMeasurement = (id: string, updates: Partial<Measurement>) => {
+    setMeasurements(prev => prev.map(m => m.id === id ? { ...m, ...updates } : m));
+  };
+
+  const handleDeleteMeasurement = (id: string) => {
+    setMeasurements(prev => prev.filter(m => m.id !== id));
+  };
+
+  // --- GLOBAL SHORTCUTS ---
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -797,6 +808,21 @@ function App() {
         pdbId={pdbId}
         isLightMode={isLightMode}
       />
+
+      {isMeasurementPanelOpen && (
+        <MeasurementPanel
+          isOpen={isMeasurementPanelOpen}
+          measurements={measurements}
+          onUpdate={handleUpdateMeasurement}
+          onDelete={handleDeleteMeasurement}
+          onClose={() => {
+            setIsMeasurementMode(false);
+            setIsMeasurementPanelOpen(false);
+          }}
+          isLightMode={isLightMode}
+        />
+      )}
+
       <Controls
         pdbId={pdbId}
         setPdbId={handlePdbIdChange}
@@ -831,27 +857,27 @@ function App() {
         onSnapshot={handleSnapshot}
         onDownloadSnapshot={handleDownloadSnapshot}
         onDeleteSnapshot={handleDeleteSnapshot}
+        isSpinning={isSpinning}
+        setIsSpinning={setIsSpinning}
+        onSaveSession={handleSaveSession}
+        onLoadSession={handleLoadSession}
+        onToggleContactMap={() => setShowContactMap(!showContactMap)}
         movies={movies}
         onDownloadMovie={handleDownloadMovie}
         onDeleteMovie={handleDeleteMovie}
-        isSpinning={isSpinning}
-        setIsSpinning={setIsSpinning}
         isCleanMode={isCleanMode}
         setIsCleanMode={setIsCleanMode}
+        onShare={() => setShowShareModal(true)}
+        onToggleShare={() => setShowShareModal(true)}
+        onToggleLibrary={() => setIsLibraryOpen(!isLibraryOpen)}
+        onToggleMeasurement={() => setIsMeasurementMode(!isMeasurementMode)}
         colorPalette={colorPalette}
         setColorPalette={setColorPalette}
-        onSaveSession={handleSaveSession}
-        onLoadSession={handleLoadSession}
-        onToggleContactMap={() => setShowContactMap(true)}
-        pdbMetadata={pdbMetadata}
         isDyslexicFont={isDyslexicFont}
         setIsDyslexicFont={setIsDyslexicFont}
-        // onToggleAISidebar={() => setIsAISidebarOpen(prev => !prev)}
-        // isAISidebarOpen={isAISidebarOpen}
-        onToggleLibrary={() => setIsLibraryOpen(true)}
-        onToggleShare={() => setShowShareModal(true)}
         customBackgroundColor={customBackgroundColor}
         setCustomBackgroundColor={setCustomBackgroundColor}
+        pdbMetadata={pdbMetadata}
       />
 
       <ProteinViewer
@@ -859,35 +885,26 @@ function App() {
         pdbId={pdbId}
         file={file || undefined}
         fileType={fileType}
+        isLightMode={isLightMode}
+        isSpinning={isSpinning}
         representation={representation}
+        showSurface={showSurface}
         coloring={coloring}
-        customColors={customColors}
-        colorPalette={colorPalette}
-        onStructureLoaded={handleStructureLoaded}
-        resetCamera={resetKey}
+        palette={colorPalette}
+        backgroundColor={customBackgroundColor || (isLightMode ? 'white' : 'black')}
 
+        onStructureLoaded={handleStructureLoaded}
         onAtomClick={handleAtomClick}
         isMeasurementMode={isMeasurementMode}
-        onHover={(info) => {
-          // Mapping ProteinViewer hover info to ResidueInfo format
-          if (info) {
-            setHoveredResidue({
-              chain: info.chain,
-              resNo: info.resNo,
-              resName: info.resName
-            });
-          } else {
-            setHoveredResidue(null);
-          }
-        }}
+        measurements={measurements}
+        onAddMeasurement={handleAddMeasurement}
+        onHover={setHoveredResidue}
 
-        backgroundColor={customBackgroundColor || (isLightMode ? 'white' : 'black')}
-        showSurface={showSurface}
-        showLigands={showLigands}
-        isSpinning={isSpinning}
         quality={isPublicationMode ? 'high' : 'medium'}
         enableAmbientOcclusion={isPublicationMode}
-
+        resetCamera={resetKey}
+        showLigands={showLigands}
+        customColors={customColors}
         className="w-full h-full"
       />
 

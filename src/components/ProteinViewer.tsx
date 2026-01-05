@@ -1,7 +1,14 @@
 import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import clsx from 'clsx';
 import { Loader2 } from 'lucide-react';
-import type { CustomColorRule, ChainInfo, ColorPalette } from '../types';
+import type {
+    ChainInfo,
+    ColorPalette,
+    RepresentationType,
+    ColoringType,
+    ResidueInfo,
+    Measurement
+} from '../types';
 
 
 declare global {
@@ -18,33 +25,45 @@ export interface MeasurementData {
     shapeId: string;
 }
 
-interface ProteinViewerProps {
-    pdbId?: string;
+export interface ProteinViewerProps {
+    pdbId: string;
     file?: File;
-    fileType?: string; // e.g. 'pdb' or 'mmcif'
-    representation?: string;
-    coloring?: string;
-    customColors?: CustomColorRule[];
-    colorPalette?: ColorPalette;
+    fileType?: 'pdb' | 'mmcif';
 
-    className?: string;
-    onStructureLoaded?: (info: { chains: ChainInfo[], ligands: string[] }) => void;
+    // Appearance
+    isLightMode: boolean;
+    isSpinning: boolean;
+    representation: RepresentationType;
+    showSurface: boolean;
+    showLigands?: boolean;  // Optional, defaults to true
+    coloring: ColoringType;
+    palette: ColorPalette;
+    backgroundColor: string;
+    customColors?: any[]; // Simplified type for now
+
+    // Quality
+    quality?: 'low' | 'medium' | 'high';
+    enableAmbientOcclusion?: boolean;
+
+    // Callbacks
+    onStructureLoaded?: (hasLigands: boolean) => void;
     onError?: (error: string) => void;
     loading?: boolean;
     setLoading?: (loading: boolean) => void;
     error?: string | null;
     setError?: (error: string | null) => void;
-    resetCamera?: number;
 
-    onAtomClick: (info: { chain: string; resNo: number; resName: string; atomIndex: number; position?: { x: number, y: number, z: number } } | null) => void;
-    backgroundColor?: string;
-    showSurface?: boolean;
-    showLigands?: boolean;
-    isSpinning?: boolean;
+    onAtomClick?: (info: ResidueInfo | null) => void;
+    onHover?: (info: ResidueInfo | null) => void;
+
+    // Measurement
     isMeasurementMode?: boolean;
-    quality?: 'low' | 'medium' | 'high';
-    enableAmbientOcclusion?: boolean;
-    onHover?: (info: { chain: string; resNo: number; resName: string; atomCount?: number } | null) => void;
+    measurements?: Measurement[];
+    onAddMeasurement?: (m: Measurement) => void;
+
+    // Actions
+    resetCamera?: number; // Increment to trigger reset
+    className?: string;
 }
 
 export interface ProteinViewerRef {
@@ -63,7 +82,7 @@ export interface ProteinViewerRef {
     resetCamera: () => void;
     clearMeasurements: () => void;
     getMeasurements: () => MeasurementData[];
-    restoreMeasurements: (measurements: { atom1: any, atom2: any }[]) => void;
+    restoreMeasurements: (measurements: { atom1: any, atom2: any }[]) => void; // Legacy internal
     visualizeContact: (chainA: string, resA: number, chainB: string, resB: number) => void;
     captureImage: () => Promise<void>;
     highlightRegion: (selection: string, label?: string) => void;
@@ -77,7 +96,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     representation = 'cartoon',
     coloring = 'chainid',
     customColors = [],
-    colorPalette = 'standard',
+    palette: colorPalette = 'standard', // Rename to matches internal usage
     className,
     onStructureLoaded,
     loading: externalLoading,
@@ -92,6 +111,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     showLigands = false,
     isSpinning = false,
     isMeasurementMode = false,
+    measurements,
+    onAddMeasurement,
     onHover
 }: ProteinViewerProps, ref: React.Ref<ProteinViewerRef>) => {
 
@@ -128,6 +149,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     };
 
     const drawMeasurement = (m: MeasurementData) => {
+        // Legacy internal measurement drawing - kept for compatibility if needed,
+        // but we are moving to props-driven measurements.
+        // Unused for now in new mode.
+        console.log(m);
         const atom1 = findAtom(m.atom1.chain, m.atom1.resNo, m.atom1.atomName);
         const atom2 = findAtom(m.atom2.chain, m.atom2.resNo, m.atom2.atomName);
 
@@ -1328,7 +1353,9 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             });
                             const ligands = Array.from(ligandSet).sort();
 
-                            onStructureLoaded({ chains, ligands });
+                            if (onStructureLoaded) {
+                                onStructureLoaded(ligands.length > 0);
+                            }
                         } catch (e) { console.warn("Chain parsing error", e); }
                     }
 
@@ -1369,70 +1396,110 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
 
 
+    // --- MEASUREMENT RENDERING ---
+    useEffect(() => {
+        if (!stageRef.current) return;
+        const stage = stageRef.current;
+
+        // Clean up old measurement shapes
+        stage.getComponentsByName("measurement-shape").list.forEach((c: any) => stage.removeComponent(c));
+
+        measurements?.forEach((m: Measurement) => {
+            const shape = new window.NGL.Shape("measurement-shape");
+            const p1 = [m.atom1.position?.x || 0, m.atom1.position?.y || 0, m.atom1.position?.z || 0];
+            const p2 = [m.atom2.position?.x || 0, m.atom2.position?.y || 0, m.atom2.position?.z || 0];
+
+            // Draw Line
+            // NGL colors are [r, g, b] 0-1. We need to convert hex string.
+            // For simplicity, let's use a standard color or parse the hex.
+            // Using a simple hash for now or default to orange [1, 0.5, 0]
+            // Ideally we parse m.color
+
+            // Convert simple hex (e.g. #ff0000) to RGB array
+            const hexToRgb = (hex: string) => {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? [
+                    parseInt(result[1], 16) / 255,
+                    parseInt(result[2], 16) / 255,
+                    parseInt(result[3], 16) / 255
+                ] : [1, 1, 1];
+            };
+            const colorArr = hexToRgb(m.color);
+
+            shape.addCylinder(p1, p2, colorArr, 0.1);
+            shape.addSphere(p1, colorArr, 0.2);
+            shape.addSphere(p2, colorArr, 0.2);
+            shape.addText(
+                [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2, (p1[2] + p2[2]) / 2],
+                [1, 1, 1],
+                0.8,
+                m.distance.toFixed(2)
+            );
+
+            const comp = stage.addComponentFromObject(shape);
+            comp.addRepresentation("buffer", { depthTest: false });
+        });
+
+    }, [measurements]);
+
+
     useEffect(() => {
         if (!stageRef.current) return;
         const stage = stageRef.current;
 
         const handleClick = (pickingProxy: any) => {
             if (!pickingProxy || !pickingProxy.atom) {
-                // Only clear highlight if we are NOT in measurement mode and clicked background
                 if (onAtomClick) onAtomClick(null);
+                selectedAtomsRef.current = []; // Reset selection on background click
+                // Clear temp selection shapes?
+                stage.getComponentsByName("temp-selection").list.forEach((c: any) => stage.removeComponent(c));
                 return;
             }
             const atom = pickingProxy.atom;
 
             // MEASUREMENT MODE LOGIC
             if (isMeasurementMode) {
-                console.log("Measurement Mode Click:", atom);
-
-                // IMPORTANT: NGL reuses the same AtomProxy object for performance during iteration.
-                // We MUST clone the data immediately, otherwise both references in our array will 
-                // point to the same updated object (the last clicked atom), resulting in distance 0.
                 const atomData = {
-                    chainname: atom.chainname,
-                    resno: atom.resno,
-                    atomname: atom.atomname,
-                    x: atom.x,
-                    y: atom.y,
-                    z: atom.z,
-                    index: atom.index // Store index directly!
+                    chain: atom.chainname,
+                    resNo: atom.resno,
+                    resName: atom.resname,
+                    atomIndex: atom.index,
+                    position: { x: atom.x, y: atom.y, z: atom.z }
                 };
 
                 selectedAtomsRef.current.push(atomData);
 
-                // Highlight the selected atom temporarily?
-                // Maybe draw a small sphere?
-                const shapeId = `sel-${Date.now()}`;
-                const shape = new window.NGL.Shape(shapeId);
-                shape.addSphere([atom.x, atom.y, atom.z], [1, 0.5, 0], 0.3); // Orange selection
+                // Highlight choice
+                const shape = new window.NGL.Shape("temp-selection");
+                shape.addSphere([atom.x, atom.y, atom.z], [1, 0.84, 0], 0.3); // Gold
                 const comp = stage.addComponentFromObject(shape);
                 comp.addRepresentation("buffer", { depthTest: false });
-                // Track this temp shape to remove later? 
-                // For now just leave it until measurement is done or cleared.
 
+                // Check for pair
                 if (selectedAtomsRef.current.length === 2) {
                     const a1 = selectedAtomsRef.current[0];
                     const a2 = selectedAtomsRef.current[1];
-                    const dx = a1.x - a2.x;
-                    const dy = a1.y - a2.y;
-                    const dz = a1.z - a2.z;
+
+                    // Calculate distance
+                    const dx = a1.position.x - a2.position.x;
+                    const dy = a1.position.y - a2.position.y;
+                    const dz = a1.position.z - a2.position.z;
                     const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-                    const mData: MeasurementData = {
-                        atom1: { chain: a1.chainname, resNo: a1.resno, atomName: a1.atomname, x: a1.x, y: a1.y, z: a1.z, index: a1.index },
-                        atom2: { chain: a2.chainname, resNo: a2.resno, atomName: a2.atomname, x: a2.x, y: a2.y, z: a2.z, index: a2.index },
+                    const newMeasurement: Measurement = {
+                        id: crypto.randomUUID(),
+                        name: `${a1.resName} ${a1.resNo}-${a2.resName} ${a2.resNo}`,
                         distance: dist,
-                        shapeId: `measure-${Date.now()}`
+                        color: '#3b82f6', // Default blue
+                        atom1: a1,
+                        atom2: a2
                     };
 
-                    measurementsRef.current.push(mData);
-                    drawMeasurement(mData);
+                    if (onAddMeasurement) onAddMeasurement(newMeasurement);
 
-                    // Clear selection
+                    // Reset selection
                     selectedAtomsRef.current = [];
-                    // Optionally clear the temp spheres? 
-                    // Currently clearMeasurements clears ALL measurement- components. 
-                    // We should name our shapes consistently.
+                    stage.getComponentsByName("temp-selection").list.forEach((c: any) => stage.removeComponent(c));
                 }
                 return;
             }
@@ -1492,7 +1559,9 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 repType = 'licorice';
             }
 
-            if (currentColoring === 'structure') currentColoring = 'sstruc';
+            if (coloring === 'structure' || (coloring as string) === 'sstruc') {
+                currentColoring = 'sstruc' as ColoringType;
+            }
 
             // Check for VALID custom rules only
             const hasValidCustomRules = customColors && customColors.length > 0 && customColors.some(r => r.target && r.color);

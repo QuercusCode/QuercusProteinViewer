@@ -78,7 +78,9 @@ interface ControlsProps {
     isMeasurementMode: boolean;
     setIsMeasurementMode: (mode: boolean) => void;
     isPublicationMode: boolean;
-    setIsPublicationMode: (mode: boolean) => void;
+    setIsPublicationMode: (val: boolean) => void;
+    onShare: () => void;
+    onToggleMeasurement?: () => void;
     onClearMeasurements: () => void;
     pdbMetadata: PDBMetadata | null;
 
@@ -136,7 +138,10 @@ export const Controls: React.FC<ControlsProps> = ({
     setCustomColors,
     isMeasurementMode,
     setIsMeasurementMode,
+    onToggleMeasurement,
     onClearMeasurements,
+    isPublicationMode,
+    setIsPublicationMode,
     pdbMetadata,
     isLightMode,
     setIsLightMode,
@@ -173,9 +178,7 @@ export const Controls: React.FC<ControlsProps> = ({
     onToggleLibrary,
     onToggleShare,
     customBackgroundColor,
-    setCustomBackgroundColor,
-    isPublicationMode,
-    setIsPublicationMode
+    setCustomBackgroundColor
 }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const sessionInputRef = useRef<HTMLInputElement>(null);
@@ -355,6 +358,20 @@ export const Controls: React.FC<ControlsProps> = ({
                         </div>
 
                         <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => {
+                                    setIsMeasurementMode(!isMeasurementMode);
+                                    if (!isMeasurementMode && onToggleMeasurement) onToggleMeasurement();
+                                }}
+                                className={`p-2 rounded-lg transition-colors ${isMeasurementMode
+                                    ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50'
+                                    : 'bg-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-700'
+                                    }`}
+                                title="Measure Distance"
+                            >
+                                <Ruler className="w-5 h-5" />
+                            </button>
+                            <div className="w-px h-6 bg-neutral-800 mx-1" />
                             <button
                                 onClick={onToggleLibrary}
                                 className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-white border border-neutral-900 text-black hover:bg-neutral-100' : 'bg-neutral-800/80 text-neutral-400 hover:bg-neutral-700'}`}

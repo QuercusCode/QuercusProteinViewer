@@ -82,3 +82,12 @@ export interface LigandInteraction {
         type?: string;
     }[];
 }
+
+export interface Measurement {
+    id: string;
+    name: string;
+    distance: number;
+    color: string;
+    atom1: ResidueInfo;
+    atom2: ResidueInfo;
+}
