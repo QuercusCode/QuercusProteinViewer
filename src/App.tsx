@@ -631,7 +631,7 @@ function App() {
     const files = e.dataTransfer.files;
     if (files && files.length > 0) {
       const droppedFile = files[0];
-      const validExtensions = ['.pdb', '.cif', '.ent', '.mol', '.sdf', '.mol2'];
+      const validExtensions = ['.pdb', '.cif', '.ent', '.mol', '.sdf', '.mol2', '.xyz'];
       const fileExt = droppedFile.name.substring(droppedFile.name.lastIndexOf('.')).toLowerCase();
 
       if (validExtensions.includes(fileExt)) {
