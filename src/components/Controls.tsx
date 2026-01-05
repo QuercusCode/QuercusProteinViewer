@@ -358,20 +358,7 @@ export const Controls: React.FC<ControlsProps> = ({
                         </div>
 
                         <div className="flex items-center gap-2">
-                            <button
-                                onClick={() => {
-                                    setIsMeasurementMode(!isMeasurementMode);
-                                    if (!isMeasurementMode && onToggleMeasurement) onToggleMeasurement();
-                                }}
-                                className={`p-2 rounded-lg transition-colors ${isMeasurementMode
-                                    ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50'
-                                    : 'bg-neutral-800 text-neutral-400 hover:text-white hover:bg-neutral-700'
-                                    }`}
-                                title="Measure Distance"
-                            >
-                                <Ruler className="w-5 h-5" />
-                            </button>
-                            <div className="w-px h-6 bg-neutral-800 mx-1" />
+
                             <button
                                 onClick={onToggleLibrary}
                                 className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-white border border-neutral-900 text-black hover:bg-neutral-100' : 'bg-neutral-800/80 text-neutral-400 hover:bg-neutral-700'}`}
@@ -429,6 +416,19 @@ export const Controls: React.FC<ControlsProps> = ({
                             >
                                 <BookOpen className="w-3.5 h-3.5 group-hover:text-purple-500 transition-colors" />
                                 <span className="text-xs font-medium">Library</span>
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    setIsMeasurementMode(!isMeasurementMode);
+                                    if (!isMeasurementMode && onToggleMeasurement) onToggleMeasurement();
+                                }}
+                                className={`col-span-2 w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all group ${isMeasurementMode
+                                    ? 'bg-cyan-500/10 border-cyan-500/50 text-cyan-500'
+                                    : `${cardBg} hover:opacity-80`}`}
+                            >
+                                <Ruler className={`w-3.5 h-3.5 ${isMeasurementMode ? 'text-cyan-500' : 'group-hover:text-cyan-500'} transition-colors`} />
+                                <span className="text-xs font-medium">Measure Distance</span>
                             </button>
                         </div>
                     </div>
@@ -805,13 +805,7 @@ export const Controls: React.FC<ControlsProps> = ({
                         }
 
                         <div className="grid grid-cols-2 gap-2">
-                            <button
-                                onClick={() => setIsMeasurementMode(!isMeasurementMode)}
-                                className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isMeasurementMode ? 'bg-amber-500/10 border-amber-500 text-amber-500' : `${cardBg} hover:opacity-80`}`}
-                            >
-                                <span className="text-xs font-medium">Measure</span>
-                                <Ruler className="w-3.5 h-3.5" />
-                            </button>
+
                             <button
                                 onClick={onToggleContactMap}
                                 className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
