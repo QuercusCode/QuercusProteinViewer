@@ -155,24 +155,28 @@ function App() {
 
   const [isPublicationMode, setIsPublicationMode] = useState(false);
 
+  // Store previous theme to restore after exiting Publication Mode
+  const previousThemeRef = useRef(isLightMode);
+
   // Effect to apply Publication Mode settings
-  // Note: we control these via props to ProteinViewer, not direct state setter here mostly
-  // But we might want to override some defaults
   useEffect(() => {
     if (isPublicationMode) {
+      // Save current theme before overriding
+      previousThemeRef.current = isLightMode;
+
       // Auto-set High Quality Defaults
-      setRepresentation('cartoon'); // or hyperball? Cartoon is standard
+      setRepresentation('cartoon');
       setIsCleanMode(true);
       setColoring('chainid');
       setCustomBackgroundColor('#ffffff'); // White background
       setIsLightMode(true); // Ensure light mode for paper look
     } else {
-      // Revert? Hard to store "previous" state easily without complex logic.
-      // For now, just turn off "Clean Mode" and maybe set quality back.
-      // We won't auto-revert data like coloring as that might be annoying.
+      // Restore previous configuration
       setIsCleanMode(false);
       setCustomBackgroundColor(null); // Revert to theme
+      setIsLightMode(previousThemeRef.current); // Restore original theme
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isPublicationMode]);
 
   // ... (fetchTitle logic) ... 
