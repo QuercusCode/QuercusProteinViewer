@@ -263,1323 +263,1983 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
     // Instead of full details for all 100 which bloats the file, I will add high-value entries.
     // I am adding a curated selection that covers major families.
     // PHOTOSYNTHESIS
-    { id: '1RCF', title: 'STRUCTURE OF THE TRIGONAL FORM OF RECOMBINANT OXIDIZED FLAVODOXIN FROM ANABAENA 7120 AT 1.40 ANGSTROMS RESOLUTION', category: 'Enzymes', description: 'Carbon fixation enzyme.', details: 'Ribulose-1,5-bisphosphate carboxylase/oxygenase (Rubisco) is the most abundant protein on Earth. It catalyzes the first major step of carbon fixation, converting atmospheric CO2 into energy-rich molecules.',
+    {
+        id: '1RCF', title: 'STRUCTURE OF THE TRIGONAL FORM OF RECOMBINANT OXIDIZED FLAVODOXIN FROM ANABAENA 7120 AT 1.40 ANGSTROMS RESOLUTION', category: 'Enzymes', description: 'Carbon fixation enzyme.', details: 'Ribulose-1,5-bisphosphate carboxylase/oxygenase (Rubisco) is the most abundant protein on Earth. It catalyzes the first major step of carbon fixation, converting atmospheric CO2 into energy-rich molecules.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.4 Å',
         organism: 'Nostoc sp.',
-        depositionDate: '1994-10-31' },
-    { id: '1RCX', title: 'NON-ACTIVATED SPINACH RUBISCO IN COMPLEX WITH ITS SUBSTRATE RIBULOSE-1,5-BISPHOSPHATE', category: 'Energy', description: 'Light harvesting complex.', details: 'Photosystem I is a massive integral membrane protein complex that uses light energy to catalyze the transfer of electrons across the thylakoid membrane, driving the energy needs of plants.',
+        depositionDate: '1994-10-31'
+    },
+    {
+        id: '1RCX', title: 'NON-ACTIVATED SPINACH RUBISCO IN COMPLEX WITH ITS SUBSTRATE RIBULOSE-1,5-BISPHOSPHATE', category: 'Energy', description: 'Light harvesting complex.', details: 'Photosystem I is a massive integral membrane protein complex that uses light energy to catalyze the transfer of electrons across the thylakoid membrane, driving the energy needs of plants.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.4 Å',
         organism: 'Spinacia oleracea',
-        depositionDate: '1996-12-06' },
+        depositionDate: '1996-12-06'
+    },
     // MEMBRANE PROTEINS
-    { id: '1BL8', title: 'POTASSIUM CHANNEL (KCSA) FROM STREPTOMYCES LIVIDANS', category: 'Transport', description: 'Ion channel.', details: 'The KcsA channel reveals nature\'s secret to ion selectivity. It allows potassium ions to pass at close to diffusion limits while blocking smaller sodium ions using a precise geometry of carbonyl oxygens.',
+    {
+        id: '1BL8', title: 'POTASSIUM CHANNEL (KCSA) FROM STREPTOMYCES LIVIDANS', category: 'Transport', description: 'Ion channel.', details: 'The KcsA channel reveals nature\'s secret to ion selectivity. It allows potassium ions to pass at close to diffusion limits while blocking smaller sodium ions using a precise geometry of carbonyl oxygens.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.2 Å',
         organism: 'Streptomyces lividans',
-        depositionDate: '1998-07-23' },
-    { id: '2RH1', title: 'High resolution crystal structure of human B2-adrenergic G protein-coupled receptor.', category: 'Signaling', description: 'GPCR.', details: 'A classic G-protein coupled receptor (GPCR) that binds epinephrine (adrenaline). It mediates "fight or flight" responses and is a key target for beta-blocker heart medications.',
+        depositionDate: '1998-07-23'
+    },
+    {
+        id: '2RH1', title: 'High resolution crystal structure of human B2-adrenergic G protein-coupled receptor.', category: 'Signaling', description: 'GPCR.', details: 'A classic G-protein coupled receptor (GPCR) that binds epinephrine (adrenaline). It mediates "fight or flight" responses and is a key target for beta-blocker heart medications.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.4 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2007-10-05' },
+        depositionDate: '2007-10-05'
+    },
     { id: '1MSL', title: 'Mechanosensitive Channel', category: 'Transport', description: 'Touch sensation.', details: 'MscL is a mechanically gated channel that acts as an emergency safety valve. It opens in response to physical stretching of the cell membrane, preventing bacteria from bursting during osmotic shock.' },
     // NEURO
-    { id: '2A79', title: 'Mammalian Shaker Kv1.2 potassium channel- beta subunit complex', category: 'Transport', description: 'Neurotransmitter recycling.', details: 'This transporter acts as a molecular vacuum, sucking serotonin back into neurons to terminate signaling. It is the direct target of SSRI antidepressants like Prozac.',
+    {
+        id: '2A79', title: 'Mammalian Shaker Kv1.2 potassium channel- beta subunit complex', category: 'Transport', description: 'Neurotransmitter recycling.', details: 'This transporter acts as a molecular vacuum, sucking serotonin back into neurons to terminate signaling. It is the direct target of SSRI antidepressants like Prozac.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.9 Å',
         organism: 'Rattus norvegicus',
-        depositionDate: '2005-07-05' },
-    { id: '3G5U', title: 'Structure of P-glycoprotein Reveals a Molecular Basis for Poly-Specific Drug Binding', category: 'Signaling', description: 'Synaptic signaling.', details: 'A structural homolog of the nicotinic acetylcholine receptor. It helps researchers understand how neurotransmitters bind to synapses to trigger muscle contraction.',
+        depositionDate: '2005-07-05'
+    },
+    {
+        id: '3G5U', title: 'Structure of P-glycoprotein Reveals a Molecular Basis for Poly-Specific Drug Binding', category: 'Signaling', description: 'Synaptic signaling.', details: 'A structural homolog of the nicotinic acetylcholine receptor. It helps researchers understand how neurotransmitters bind to synapses to trigger muscle contraction.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.8 Å',
         organism: 'Mus musculus',
-        depositionDate: '2009-02-05' },
+        depositionDate: '2009-02-05'
+    },
     // MORE ENZYMES
-    { id: '1AKE', title: 'STRUCTURE OF THE COMPLEX BETWEEN ADENYLATE KINASE FROM ESCHERICHIA COLI AND THE INHIBITOR AP5A REFINED AT 1.9 ANGSTROMS RESOLUTION: A MODEL FOR A CATALYTIC TRANSITION STATE', category: 'Enzymes', description: 'Energy regulation.', details: 'A textbook example of "induced fit." The enzyme acts like a clamp, closing massive "lid" domains over ATP and AMP to transfer a phosphate group and maintain cellular energy balance.',
+    {
+        id: '1AKE', title: 'STRUCTURE OF THE COMPLEX BETWEEN ADENYLATE KINASE FROM ESCHERICHIA COLI AND THE INHIBITOR AP5A REFINED AT 1.9 ANGSTROMS RESOLUTION: A MODEL FOR A CATALYTIC TRANSITION STATE', category: 'Enzymes', description: 'Energy regulation.', details: 'A textbook example of "induced fit." The enzyme acts like a clamp, closing massive "lid" domains over ATP and AMP to transfer a phosphate group and maintain cellular energy balance.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2 Å',
         organism: 'Escherichia coli',
-        depositionDate: '1991-11-08' },
-    { id: '6Q40', title: 'A secreted LysM effector of the wheat pathogen Zymoseptoria tritici protects the fungal hyphae against chitinase hydrolysis through ligand-dependent polymerisation of LysM homodimers', category: 'Enzymes', description: 'Associated with Parkinsons.', details: 'Parkin is an E3 ubiquitin ligase that tags damaged mitochondria for destruction. Mutations in this gene disrupt cellular quality control and are a cause of familial Parkinson\'s disease.',
+        depositionDate: '1991-11-08'
+    },
+    {
+        id: '6Q40', title: 'A secreted LysM effector of the wheat pathogen Zymoseptoria tritici protects the fungal hyphae against chitinase hydrolysis through ligand-dependent polymerisation of LysM homodimers', category: 'Enzymes', description: 'Associated with Parkinsons.', details: 'Parkin is an E3 ubiquitin ligase that tags damaged mitochondria for destruction. Mutations in this gene disrupt cellular quality control and are a cause of familial Parkinson\'s disease.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.412 Å',
         organism: 'Zymoseptoria tritici IPO323',
-        depositionDate: '2018-12-05' },
-    { id: '1J5E', title: 'Structure of the Thermus thermophilus 30S Ribosomal Subunit', category: 'DNA/RNA', description: 'Small subunit.', details: 'The small subunit of the bacterial ribosome. It decodes the mRNA to ensure the correct amino acids are added to the chain. A target for aminoglycoside antibiotics.',
+        depositionDate: '2018-12-05'
+    },
+    {
+        id: '1J5E', title: 'Structure of the Thermus thermophilus 30S Ribosomal Subunit', category: 'DNA/RNA', description: 'Small subunit.', details: 'The small subunit of the bacterial ribosome. It decodes the mRNA to ensure the correct amino acids are added to the chain. A target for aminoglycoside antibiotics.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.05 Å',
         organism: 'Thermus thermophilus',
-        depositionDate: '2002-04-08' },
+        depositionDate: '2002-04-08'
+    },
     // ... Filling out structure diversity
-    { id: '1YRF', title: 'Chicken villin subdomain HP-35, N68H, pH6.7', category: 'Signaling', description: 'Tumor suppressor.', details: 'P53 is often called the "Guardian of the Genome." It binds to DNA to trigger repair or cell death (apoptosis) when damage is detected. Over 50% of human cancers involve a mutation here.',
+    {
+        id: '1YRF', title: 'Chicken villin subdomain HP-35, N68H, pH6.7', category: 'Signaling', description: 'Tumor suppressor.', details: 'P53 is often called the "Guardian of the Genome." It binds to DNA to trigger repair or cell death (apoptosis) when damage is detected. Over 50% of human cancers involve a mutation here.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.07 Å',
         organism: 'Unknown source',
-        depositionDate: '2005-02-03' },
-    { id: '1ATP', title: '2.2 angstrom refined crystal structure of the catalytic subunit of cAMP-dependent protein kinase complexed with MNATP and a peptide inhibitor', category: 'Signaling', description: 'Protein Kinase A.', details: 'A master regulator enzyme. When cAMP levels rise, PKA comes alive to phosphorylate downstream targets, regulating metabolism, gene expression, and cell division.',
+        depositionDate: '2005-02-03'
+    },
+    {
+        id: '1ATP', title: '2.2 angstrom refined crystal structure of the catalytic subunit of cAMP-dependent protein kinase complexed with MNATP and a peptide inhibitor', category: 'Signaling', description: 'Protein Kinase A.', details: 'A master regulator enzyme. When cAMP levels rise, PKA comes alive to phosphorylate downstream targets, regulating metabolism, gene expression, and cell division.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.2 Å',
         organism: 'Mus musculus',
-        depositionDate: '1993-01-08' },
-    { id: '3HUB', title: 'Human p38 MAP Kinase in Complex with Scios-469', category: 'Signaling', description: 'Calcium sensor.', details: 'A ubiquitous calcium-binding protein. It has a dumbbell shape that collapses upon binding calcium, allowing it to wrap around and activate target enzymes.',
+        depositionDate: '1993-01-08'
+    },
+    {
+        id: '3HUB', title: 'Human p38 MAP Kinase in Complex with Scios-469', category: 'Signaling', description: 'Calcium sensor.', details: 'A ubiquitous calcium-binding protein. It has a dumbbell shape that collapses upon binding calcium, allowing it to wrap around and activate target enzymes.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.25 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2009-06-13' },
-    { id: '4F5S', title: 'Crystal Structure of Bovine Serum Albumin', category: 'Signaling', description: 'Signal transducer.', details: 'The molecular switchboard. Composed of Alpha, Beta, and Gamma subunits, it transmits signals from receptors to the cell interior. It toggles between active (GTP) and inactive (GDP) states.',
+        depositionDate: '2009-06-13'
+    },
+    {
+        id: '4F5S', title: 'Crystal Structure of Bovine Serum Albumin', category: 'Signaling', description: 'Signal transducer.', details: 'The molecular switchboard. Composed of Alpha, Beta, and Gamma subunits, it transmits signals from receptors to the cell interior. It toggles between active (GTP) and inactive (GDP) states.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.47 Å',
         organism: 'Bos taurus',
-        depositionDate: '2012-05-13' },
+        depositionDate: '2012-05-13'
+    },
     // Additional entries to support the "100" request (Populating with valid IDs)
-    { id: '1AON', title: 'CRYSTAL STRUCTURE OF THE ASYMMETRIC CHAPERONIN COMPLEX GROEL/GROES/(ADP)7', category: 'Chaperone', description: 'Protein folding machine.', details: 'This massive chaperonin complex acts as a "protein folding machine". It provides a protected central cavity where unfolded proteins can safely fold in isolation, preventing aggregation.',
+    {
+        id: '1AON', title: 'CRYSTAL STRUCTURE OF THE ASYMMETRIC CHAPERONIN COMPLEX GROEL/GROES/(ADP)7', category: 'Chaperone', description: 'Protein folding machine.', details: 'This massive chaperonin complex acts as a "protein folding machine". It provides a protected central cavity where unfolded proteins can safely fold in isolation, preventing aggregation.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3 Å',
         organism: 'Escherichia coli',
-        depositionDate: '1997-07-08' } as any,
-    { id: '1B07', title: 'CRK SH3 DOMAIN COMPLEXED WITH PEPTOID INHIBITOR', category: 'Enzymes', description: 'Ribonuclease.', details: 'Barnase is a bacterial ribonuclease (RNase) that is lethal to cells because it degrades RNA. It is famously studied alongside its inhibitor, Barstar, as a model for extremely tight protein-protein interactions.',
+        depositionDate: '1997-07-08'
+    } as any,
+    {
+        id: '1B07', title: 'CRK SH3 DOMAIN COMPLEXED WITH PEPTOID INHIBITOR', category: 'Enzymes', description: 'Ribonuclease.', details: 'Barnase is a bacterial ribonuclease (RNase) that is lethal to cells because it degrades RNA. It is famously studied alongside its inhibitor, Barstar, as a model for extremely tight protein-protein interactions.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.5 Å',
         organism: 'Mus musculus',
-        depositionDate: '1998-11-17' },
+        depositionDate: '1998-11-17'
+    },
     { id: '1brc', title: 'Bacteriorhodopsin', category: 'Transport', description: 'Light-driven proton pump.', details: 'Found in salt-loving archaea, this protein uses retinal (like the eye) to capture light energy. It pumps protons out of the cell to create a gradient for ATP synthesis.' },
-    { id: '1CGI', title: 'THREE-DIMENSIONAL STRUCTURE OF THE COMPLEXES BETWEEN BOVINE CHYMOTRYPSINOGEN*A AND TWO RECOMBINANT VARIANTS OF HUMAN PANCREATIC SECRETORY TRYPSIN INHIBITOR (KAZAL-TYPE)', category: 'Enzymes', description: 'Zymogen precursor.', details: 'This is the inactive precursor (zymogen) of the digestive enzyme chymotrypsin. It prevents the pancreas from digesting itself until the enzyme reaches the intestine.',
+    {
+        id: '1CGI', title: 'THREE-DIMENSIONAL STRUCTURE OF THE COMPLEXES BETWEEN BOVINE CHYMOTRYPSINOGEN*A AND TWO RECOMBINANT VARIANTS OF HUMAN PANCREATIC SECRETORY TRYPSIN INHIBITOR (KAZAL-TYPE)', category: 'Enzymes', description: 'Zymogen precursor.', details: 'This is the inactive precursor (zymogen) of the digestive enzyme chymotrypsin. It prevents the pancreas from digesting itself until the enzyme reaches the intestine.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.3 Å',
         organism: 'Bos taurus',
-        depositionDate: '1991-10-08' },
-    { id: '1D66', title: 'DNA RECOGNITION BY GAL4: STRUCTURE OF A PROTEIN/DNA COMPLEX', category: 'DNA/RNA', description: 'Transcription factor.', details: 'A classic yeast transcription factor. Its Zn2Cys6 DNA-binding domain uses zinc ions to recognize specific DNA sequences and activate gene expression.',
+        depositionDate: '1991-10-08'
+    },
+    {
+        id: '1D66', title: 'DNA RECOGNITION BY GAL4: STRUCTURE OF A PROTEIN/DNA COMPLEX', category: 'DNA/RNA', description: 'Transcription factor.', details: 'A classic yeast transcription factor. Its Zn2Cys6 DNA-binding domain uses zinc ions to recognize specific DNA sequences and activate gene expression.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.7 Å',
         organism: 'Saccharomyces cerevisiae',
-        depositionDate: '1992-03-06' },
-    { id: '1ECA', title: 'STRUCTURE OF ERYTHROCRUORIN IN DIFFERENT LIGAND STATES REFINED AT 1.4 ANGSTROMS RESOLUTION', category: 'Transport', description: 'Invertebrate hemoglobin.', details: 'A giant oxygen-transport protein found in earthworms. Unlike human hemoglobin (4 subunits), this massive complex has 144 subunits and floats free in the blood plasma.',
+        depositionDate: '1992-03-06'
+    },
+    {
+        id: '1ECA', title: 'STRUCTURE OF ERYTHROCRUORIN IN DIFFERENT LIGAND STATES REFINED AT 1.4 ANGSTROMS RESOLUTION', category: 'Transport', description: 'Invertebrate hemoglobin.', details: 'A giant oxygen-transport protein found in earthworms. Unlike human hemoglobin (4 subunits), this massive complex has 144 subunits and floats free in the blood plasma.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.4 Å',
         organism: 'Chironomus thummi thummi',
-        depositionDate: '1979-03-07' },
-    { id: '1F39', title: 'CRYSTAL STRUCTURE OF THE LAMBDA REPRESSOR C-TERMINAL DOMAIN', category: 'Signaling', description: 'Immunophilin.', details: 'This protein regulates immune response and protein folding. It is the target of the immunosuppressant drug rapamycin, used to prevent organ transplant rejection.',
+        depositionDate: '1979-03-07'
+    },
+    {
+        id: '1F39', title: 'CRYSTAL STRUCTURE OF THE LAMBDA REPRESSOR C-TERMINAL DOMAIN', category: 'Signaling', description: 'Immunophilin.', details: 'This protein regulates immune response and protein folding. It is the target of the immunosuppressant drug rapamycin, used to prevent organ transplant rejection.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.9 Å',
         organism: 'Enterobacteria phage lambda',
-        depositionDate: '2000-06-01' },
-    { id: '1GCN', title: 'X-RAY ANALYSIS OF GLUCAGON AND ITS RELATIONSHIP TO RECEPTOR BINDING', category: 'Signaling', description: 'Glucose regulation hormone.', details: 'The hormonal counterpart to insulin. Released by the pancreas when blood sugar is low, it triggers the liver to release stored glucose into the bloodstream.',
+        depositionDate: '2000-06-01'
+    },
+    {
+        id: '1GCN', title: 'X-RAY ANALYSIS OF GLUCAGON AND ITS RELATIONSHIP TO RECEPTOR BINDING', category: 'Signaling', description: 'Glucose regulation hormone.', details: 'The hormonal counterpart to insulin. Released by the pancreas when blood sugar is low, it triggers the liver to release stored glucose into the bloodstream.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3 Å',
         organism: 'Sus scrofa',
-        depositionDate: '1977-10-17' },
-    { id: '1HJO', title: 'ATPase domain of human heat shock 70kDa protein 1', category: 'Transport', description: 'Non-heme iron protein.', details: 'An oxygen carrier found in marine invertebrates. Unlike hemoglobin, it uses a binuclear iron center (no heme group) to bind oxygen directly.',
+        depositionDate: '1977-10-17'
+    },
+    {
+        id: '1HJO', title: 'ATPase domain of human heat shock 70kDa protein 1', category: 'Transport', description: 'Non-heme iron protein.', details: 'An oxygen carrier found in marine invertebrates. Unlike hemoglobin, it uses a binuclear iron center (no heme group) to bind oxygen directly.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.3 Å',
         organism: 'Homo sapiens',
-        depositionDate: '1998-10-13' },
-    { id: '1IDR', title: 'CRYSTAL STRUCTURE OF THE TRUNCATED-HEMOGLOBIN-N FROM MYCOBACTERIUM TUBERCULOSIS', category: 'Enzymes', description: 'DNA synthesis.', details: 'A critical enzyme that converts RNA building blocks into DNA building blocks. It is the rate-limiting step in DNA synthesis and a target for cancer drugs.',
+        depositionDate: '1998-10-13'
+    },
+    {
+        id: '1IDR', title: 'CRYSTAL STRUCTURE OF THE TRUNCATED-HEMOGLOBIN-N FROM MYCOBACTERIUM TUBERCULOSIS', category: 'Enzymes', description: 'DNA synthesis.', details: 'A critical enzyme that converts RNA building blocks into DNA building blocks. It is the rate-limiting step in DNA synthesis and a target for cancer drugs.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.9 Å',
         organism: 'Mycobacterium tuberculosis',
-        depositionDate: '2001-04-05' },
-    { id: '1J4N', title: 'Crystal Structure of the AQP1 water channel', category: 'DNA/RNA', description: 'DNA recombination.', details: 'Use to visualize genetic recombination. This cross-shaped structure forms when two DNA helices swap strands during meiosis or repair.',
+        depositionDate: '2001-04-05'
+    },
+    {
+        id: '1J4N', title: 'Crystal Structure of the AQP1 water channel', category: 'DNA/RNA', description: 'DNA recombination.', details: 'Use to visualize genetic recombination. This cross-shaped structure forms when two DNA helices swap strands during meiosis or repair.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.2 Å',
         organism: 'Bos taurus',
-        depositionDate: '2001-10-19' },
-    { id: '1K4C', title: 'Potassium Channel KcsA-Fab complex in high concentration of K+', category: 'Transport', description: 'Selective ion filter.', details: 'The structural basis of electrical signaling. This channel allows K+ ions to flow out of the cell to "reset" the neuron after it fires.',
+        depositionDate: '2001-10-19'
+    },
+    {
+        id: '1K4C', title: 'Potassium Channel KcsA-Fab complex in high concentration of K+', category: 'Transport', description: 'Selective ion filter.', details: 'The structural basis of electrical signaling. This channel allows K+ ions to flow out of the cell to "reset" the neuron after it fires.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2 Å',
         organism: 'Mus musculus',
-        depositionDate: '2001-10-07' },
-    { id: '1L2Y', title: 'NMR Structure of Trp-Cage Miniprotein Construct TC5b', category: 'Synthetic', description: 'Miniprotein.', details: 'The "Trp-Cage" is a tiny, 20-residue synthetic protein designed to fold incredibly fast. It is one of the smallest proteins that adopts a stable 3D structure.',
+        depositionDate: '2001-10-07'
+    },
+    {
+        id: '1L2Y', title: 'NMR Structure of Trp-Cage Miniprotein Construct TC5b', category: 'Synthetic', description: 'Miniprotein.', details: 'The "Trp-Cage" is a tiny, 20-residue synthetic protein designed to fold incredibly fast. It is one of the smallest proteins that adopts a stable 3D structure.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Unknown source',
-        depositionDate: '2002-02-25' },
-    { id: '1M4H', title: 'Crystal Structure of Beta-secretase complexed with Inhibitor OM00-3', category: 'Immune', description: 'Antigen presentation.', details: 'This molecule displays peptide fragments from inside the cell to the immune system. If the fragment is viral, T-cells will destroy the infected cell.',
+        depositionDate: '2002-02-25'
+    },
+    {
+        id: '1M4H', title: 'Crystal Structure of Beta-secretase complexed with Inhibitor OM00-3', category: 'Immune', description: 'Antigen presentation.', details: 'This molecule displays peptide fragments from inside the cell to the immune system. If the fragment is viral, T-cells will destroy the infected cell.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.1 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2002-07-02' },
-    { id: '1N2C', title: 'NITROGENASE COMPLEX FROM AZOTOBACTER VINELANDII STABILIZED BY ADP-TETRAFLUOROALUMINATE', category: 'DNA/RNA', description: 'DNA packaging.', details: 'The fundamental unit of DNA packaging. 147 base pairs of DNA are wrapped around a core of 8 histone proteins, like thread on a spool.',
+        depositionDate: '2002-07-02'
+    },
+    {
+        id: '1N2C', title: 'NITROGENASE COMPLEX FROM AZOTOBACTER VINELANDII STABILIZED BY ADP-TETRAFLUOROALUMINATE', category: 'DNA/RNA', description: 'DNA packaging.', details: 'The fundamental unit of DNA packaging. 147 base pairs of DNA are wrapped around a core of 8 histone proteins, like thread on a spool.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3 Å',
         organism: 'Azotobacter vinelandii',
-        depositionDate: '1997-05-02' },
-    { id: '1OAA', title: 'MOUSE SEPIAPTERIN REDUCTASE COMPLEXED WITH NADP AND OXALOACETATE', category: 'Transport', description: 'Oxygen bound form.', details: 'This structure captures hemoglobin in the "R-state" (Relaxed), fully loaded with oxygen. Notice how the subunits have rotated compared to the deoxy form.',
+        depositionDate: '1997-05-02'
+    },
+    {
+        id: '1OAA', title: 'MOUSE SEPIAPTERIN REDUCTASE COMPLEXED WITH NADP AND OXALOACETATE', category: 'Transport', description: 'Oxygen bound form.', details: 'This structure captures hemoglobin in the "R-state" (Relaxed), fully loaded with oxygen. Notice how the subunits have rotated compared to the deoxy form.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.25 Å',
         organism: 'Mus musculus',
-        depositionDate: '1997-08-25' },
-    { id: '1PGB', title: 'TWO CRYSTAL STRUCTURES OF THE B1 IMMUNOGLOBULIN-BINDING DOMAIN OF STREPTOCCOCAL PROTEIN G AND COMPARISON WITH NMR', category: 'Structural', description: 'Ig binding domain.', details: 'A bacterial protein that binds to the constant region of antibodies. Scientists use it as a tool to purify antibodies from serum.',
+        depositionDate: '1997-08-25'
+    },
+    {
+        id: '1PGB', title: 'TWO CRYSTAL STRUCTURES OF THE B1 IMMUNOGLOBULIN-BINDING DOMAIN OF STREPTOCCOCAL PROTEIN G AND COMPARISON WITH NMR', category: 'Structural', description: 'Ig binding domain.', details: 'A bacterial protein that binds to the constant region of antibodies. Scientists use it as a tool to purify antibodies from serum.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.92 Å',
         organism: 'Streptococcus sp. GX7805',
-        depositionDate: '1993-11-23' },
-    { id: '1QYS', title: 'Crystal structure of Top7: A computationally designed protein with a novel fold', category: 'Synthetic', description: 'Designed protein.', details: 'Top7 is an artificial protein designed by Brian Kuhlman and David Baker. It was the first globular protein with a fold not found in nature to be designed from scratch.',
+        depositionDate: '1993-11-23'
+    },
+    {
+        id: '1QYS', title: 'Crystal structure of Top7: A computationally designed protein with a novel fold', category: 'Synthetic', description: 'Designed protein.', details: 'Top7 is an artificial protein designed by Brian Kuhlman and David Baker. It was the first globular protein with a fold not found in nature to be designed from scratch.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.5 Å',
         organism: 'Computationally Designed Sequence',
-        depositionDate: '2003-09-11' },
-    { id: '1R0R', title: '1.1 Angstrom Resolution Structure of the Complex Between the Protein Inhibitor, OMTKY3, and the Serine Protease, Subtilisin Carlsberg', category: 'Enzymes', description: 'Transcription.', details: 'The enzyme that transcribes DNA into RNA. It unwinds the DNA helix and builds a matching RNA strand base by base.',
+        depositionDate: '2003-09-11'
+    },
+    {
+        id: '1R0R', title: '1.1 Angstrom Resolution Structure of the Complex Between the Protein Inhibitor, OMTKY3, and the Serine Protease, Subtilisin Carlsberg', category: 'Enzymes', description: 'Transcription.', details: 'The enzyme that transcribes DNA into RNA. It unwinds the DNA helix and builds a matching RNA strand base by base.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.1 Å',
         organism: 'Bacillus licheniformis',
-        depositionDate: '2003-09-22' },
-    { id: '1S5L', title: 'Architecture of the photosynthetic oxygen evolving center', category: 'Enzymes', description: 'Antioxidant.', details: 'An extremely fast enzyme that protects cells from oxidative damage. It instantly converts dangerous superoxide radicals into oxygen and hydrogen peroxide.',
+        depositionDate: '2003-09-22'
+    },
+    {
+        id: '1S5L', title: 'Architecture of the photosynthetic oxygen evolving center', category: 'Enzymes', description: 'Antioxidant.', details: 'An extremely fast enzyme that protects cells from oxidative damage. It instantly converts dangerous superoxide radicals into oxygen and hydrogen peroxide.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.5 Å',
         organism: 'Thermosynechococcus elongatus',
-        depositionDate: '2004-01-21' },
-    { id: '1TUP', title: 'TUMOR SUPPRESSOR P53 COMPLEXED WITH DNA', category: 'Signaling', description: 'Tumor suppressor.', details: 'The central DNA-binding unit of p53. This specific structure shows how p53 recognizes its target DNA sequence to control cell fate.',
+        depositionDate: '2004-01-21'
+    },
+    {
+        id: '1TUP', title: 'TUMOR SUPPRESSOR P53 COMPLEXED WITH DNA', category: 'Signaling', description: 'Tumor suppressor.', details: 'The central DNA-binding unit of p53. This specific structure shows how p53 recognizes its target DNA sequence to control cell fate.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.2 Å',
         organism: 'Homo sapiens',
-        depositionDate: '1995-07-11' },
-    { id: '1U19', title: 'Crystal Structure of Bovine Rhodopsin at 2.2 Angstroms Resolution', category: 'Signaling', description: 'Vision pigment.', details: 'The primary light sensor in the human eye (rods). When a photon hits the retinal molecule inside, the entire protein changes shape to trigger a nerve signal.',
+        depositionDate: '1995-07-11'
+    },
+    {
+        id: '1U19', title: 'Crystal Structure of Bovine Rhodopsin at 2.2 Angstroms Resolution', category: 'Signaling', description: 'Vision pigment.', details: 'The primary light sensor in the human eye (rods). When a photon hits the retinal molecule inside, the entire protein changes shape to trigger a nerve signal.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.2 Å',
         organism: 'Bos taurus',
-        depositionDate: '2004-07-15' },
-    { id: '1V9E', title: 'Crystal Structure Analysis of Bovine Carbonic Anhydrase II', category: 'Structural', description: 'mass organelle.', details: 'The largest non-icosahedral particle in the cell. Its function is still mysterious, but it may be involved in nuclear transport or drug resistance.',
+        depositionDate: '2004-07-15'
+    },
+    {
+        id: '1V9E', title: 'Crystal Structure Analysis of Bovine Carbonic Anhydrase II', category: 'Structural', description: 'mass organelle.', details: 'The largest non-icosahedral particle in the cell. Its function is still mysterious, but it may be involved in nuclear transport or drug resistance.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.95 Å',
         organism: 'Bos taurus',
-        depositionDate: '2004-01-26' },
-    { id: '1W0E', title: 'Crystal structure of human cytochrome P450 3A4', category: 'Enzymes', description: 'H2O2 breakdown.', details: 'One of the fastest enzymes known. A single catalase molecule can break down millions of hydrogen peroxide molecules per second to protect the cell.',
+        depositionDate: '2004-01-26'
+    },
+    {
+        id: '1W0E', title: 'Crystal structure of human cytochrome P450 3A4', category: 'Enzymes', description: 'H2O2 breakdown.', details: 'One of the fastest enzymes known. A single catalase molecule can break down millions of hydrogen peroxide molecules per second to protect the cell.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.8 Å',
         organism: 'HOMO SAPIENS',
-        depositionDate: '2004-06-03' },
-    { id: '1XMB', title: 'X-ray structure of IAA-aminoacid hydrolase from Arabidopsis thaliana gene AT5G56660', category: 'Structural', description: 'Muscle motor.', details: 'The molecular motor driven by ATP. Myosin "heads" walk along actin filaments to pull them, causing muscle contraction.',
+        depositionDate: '2004-06-03'
+    },
+    {
+        id: '1XMB', title: 'X-ray structure of IAA-aminoacid hydrolase from Arabidopsis thaliana gene AT5G56660', category: 'Structural', description: 'Muscle motor.', details: 'The molecular motor driven by ATP. Myosin "heads" walk along actin filaments to pull them, causing muscle contraction.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2 Å',
         organism: 'Arabidopsis thaliana',
-        depositionDate: '2004-10-01' },
-    { id: '1Y12', title: 'Structure of a hemolysin-coregulated protein from Pseudomonas aeruginosa', category: 'Structural', description: 'Amyloid.', details: 'A protein that can switch to an infectious, self-propagating shape. It offers insight into diseases like Mad Cow and Alzheimer\'s.',
+        depositionDate: '2004-10-01'
+    },
+    {
+        id: '1Y12', title: 'Structure of a hemolysin-coregulated protein from Pseudomonas aeruginosa', category: 'Structural', description: 'Amyloid.', details: 'A protein that can switch to an infectious, self-propagating shape. It offers insight into diseases like Mad Cow and Alzheimer\'s.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.95 Å',
         organism: 'Pseudomonas aeruginosa PAO1',
-        depositionDate: '2004-11-16' },
-    { id: '1ZAA', title: 'ZINC FINGER-DNA RECOGNITION: CRYSTAL STRUCTURE OF A ZIF268-DNA COMPLEX AT 2.1 ANGSTROMS', category: 'DNA/RNA', description: 'DNA binding motif.', details: 'A small protein motif that uses a zinc ion to stabilize its fold. It is the most common DNA-binding motif in the human genome.',
+        depositionDate: '2004-11-16'
+    },
+    {
+        id: '1ZAA', title: 'ZINC FINGER-DNA RECOGNITION: CRYSTAL STRUCTURE OF A ZIF268-DNA COMPLEX AT 2.1 ANGSTROMS', category: 'DNA/RNA', description: 'DNA binding motif.', details: 'A small protein motif that uses a zinc ion to stabilize its fold. It is the most common DNA-binding motif in the human genome.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.1 Å',
         organism: 'Mus musculus',
-        depositionDate: '1992-09-17' },
-    { id: '2A3D', title: 'SOLUTION STRUCTURE OF A DE NOVO DESIGNED SINGLE CHAIN THREE-HELIX BUNDLE (A3D)', category: 'Enzymes', description: 'Krebs cycle.', details: 'An enzyme with a dual life. It normally functions in the Krebs cycle, but when iron is low, it loses its iron-sulfur cluster and becomes an RNA-binding regulator.',
+        depositionDate: '1992-09-17'
+    },
+    {
+        id: '2A3D', title: 'SOLUTION STRUCTURE OF A DE NOVO DESIGNED SINGLE CHAIN THREE-HELIX BUNDLE (A3D)', category: 'Enzymes', description: 'Krebs cycle.', details: 'An enzyme with a dual life. It normally functions in the Krebs cycle, but when iron is low, it loses its iron-sulfur cluster and becomes an RNA-binding regulator.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'synthetic construct',
-        depositionDate: '1999-04-01' },
-    { id: '2B4C', title: 'Crystal structure of HIV-1 JR-FL gp120 core protein containing the third variable region (V3) complexed with CD4 and the X5 antibody', category: 'Energy', description: 'Electron transport.', details: 'A small heme protein loosely associated with the inner mitochondrial membrane. It shuttles electrons but also triggers apoptosis if released into the cell.',
+        depositionDate: '1999-04-01'
+    },
+    {
+        id: '2B4C', title: 'Crystal structure of HIV-1 JR-FL gp120 core protein containing the third variable region (V3) complexed with CD4 and the X5 antibody', category: 'Energy', description: 'Electron transport.', details: 'A small heme protein loosely associated with the inner mitochondrial membrane. It shuttles electrons but also triggers apoptosis if released into the cell.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.3 Å',
-        organism: 'Homo sapiens',
-        depositionDate: '2005-09-23' } as any,
-    { id: '2C7D', title: 'Fitted coordinates for GroEL-ADP7-GroES Cryo-EM complex (EMD-1181)', category: 'Toxins', description: 'Bacterial toxin.', details: 'This toxin hijacks cellular signaling. It locks G-proteins in the "ON" state, causing massive water loss from intestinal cells (diarrhea).',
+        organism: 'Human immunodeficiency virus 1',
+        depositionDate: '2005-09-23'
+    } as any,
+    {
+        id: '2C7D', title: 'Fitted coordinates for GroEL-ADP7-GroES Cryo-EM complex (EMD-1181)', category: 'Toxins', description: 'Bacterial toxin.', details: 'This toxin hijacks cellular signaling. It locks G-proteins in the "ON" state, causing massive water loss from intestinal cells (diarrhea).',
         method: 'ELECTRON MICROSCOPY',
         resolution: '8.7 Å',
         organism: 'ESCHERICHIA COLI',
-        depositionDate: '2005-11-22' },
-    { id: '2D1S', title: 'Crystal structure of the thermostable Japanese Firefly Luciferase complexed with High-energy intermediate analogue', category: 'Structural', description: 'Muscle anchor.', details: 'Dystrophin connects the muscle cytoskeleton to the membrane. Mutations in this massive protein cause Muscular Dystrophy.',
+        depositionDate: '2005-11-22'
+    },
+    {
+        id: '2D1S', title: 'Crystal structure of the thermostable Japanese Firefly Luciferase complexed with High-energy intermediate analogue', category: 'Structural', description: 'Muscle anchor.', details: 'Dystrophin connects the muscle cytoskeleton to the membrane. Mutations in this massive protein cause Muscular Dystrophy.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.3 Å',
         organism: 'Luciola cruciata',
-        depositionDate: '2005-08-31' },
-    { id: '2E1B', title: 'Crystal structure of the AlaX-M trans-editing enzyme from Pyrococcus horikoshii', category: 'Signaling', description: 'Nuclear receptor.', details: 'A transcription factor activated by the hormone estrogen. It is a key driver in many breast cancers and target of Tamoxifen.',
+        depositionDate: '2005-08-31'
+    },
+    {
+        id: '2E1B', title: 'Crystal structure of the AlaX-M trans-editing enzyme from Pyrococcus horikoshii', category: 'Signaling', description: 'Nuclear receptor.', details: 'A transcription factor activated by the hormone estrogen. It is a key driver in many breast cancers and target of Tamoxifen.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.7 Å',
         organism: 'Pyrococcus horikoshii',
-        depositionDate: '2006-10-20' },
-    { id: '2F1M', title: 'Conformational flexibility in the multidrug efflux system protein AcrA', category: 'Structural', description: 'Filamentous actin.', details: 'The backbone of the cell skeleton. This structure shows how individual actin monomers stack to form helical filaments.',
+        depositionDate: '2006-10-20'
+    },
+    {
+        id: '2F1M', title: 'Conformational flexibility in the multidrug efflux system protein AcrA', category: 'Structural', description: 'Filamentous actin.', details: 'The backbone of the cell skeleton. This structure shows how individual actin monomers stack to form helical filaments.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.71 Å',
         organism: 'Escherichia coli',
-        depositionDate: '2005-11-14' },
-    { id: '2G66', title: 'Crystal structure of a collagen-like peptide with 3(S)Hyp in the Xaa position', category: 'Enzymes', description: 'Ammonia metabolism.', details: 'A massive dodecameric enzyme (12 subunits) that plays a central role in nitrogen metabolism by detoxifying ammonia.',
+        depositionDate: '2005-11-14'
+    },
+    {
+        id: '2G66', title: 'Crystal structure of a collagen-like peptide with 3(S)Hyp in the Xaa position', category: 'Enzymes', description: 'Ammonia metabolism.', details: 'A massive dodecameric enzyme (12 subunits) that plays a central role in nitrogen metabolism by detoxifying ammonia.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.8 Å',
         organism: 'Unknown source',
-        depositionDate: '2006-02-24' },
+        depositionDate: '2006-02-24'
+    },
     { id: '2H7L', title: 'Hemagglutinin', category: 'Viral', description: 'Flu virus surface.', details: 'The surface spike of the Influenza virus. It binds to sialic acid on host cells to initiate infection. It is the "H" in H1N1.' },
-    { id: '2I0L', title: 'X-ray crystal structure of Sap97 PDZ2 bound to the C-terminal peptide of HPV18 E6.', category: 'Immune', description: 'Cytokine.', details: 'A potent pro-inflammatory cytokine. It is produced by macrophages and signals the body to fight infection (causing fever).',
+    {
+        id: '2I0L', title: 'X-ray crystal structure of Sap97 PDZ2 bound to the C-terminal peptide of HPV18 E6.', category: 'Immune', description: 'Cytokine.', details: 'A potent pro-inflammatory cytokine. It is produced by macrophages and signals the body to fight infection (causing fever).',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.31 Å',
-        organism: 'Unknown source',
-        depositionDate: '2006-08-10' },
-    { id: '2J0D', title: 'Crystal structure of human P450 3A4 in complex with erythromycin', category: 'Structural', description: 'Enhanced GFP.', details: 'A mutant of GFP engineered for higher stability and brightness. It revolutionized live-cell imaging.',
+        organism: 'Rattus norvegicus',
+        depositionDate: '2006-08-10'
+    },
+    {
+        id: '2J0D', title: 'Crystal structure of human P450 3A4 in complex with erythromycin', category: 'Structural', description: 'Enhanced GFP.', details: 'A mutant of GFP engineered for higher stability and brightness. It revolutionized live-cell imaging.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.75 Å',
         organism: 'HOMO SAPIENS',
-        depositionDate: '2006-08-02' },
-    { id: '2K3A', title: 'NMR solution structure of Staphylococcus saprophyticus CHAP (cysteine, histidine-dependent amidohydrolases/peptidases) domain protein. Northeast Structural Genomics Consortium target SyR11', category: 'Structural', description: 'Molecular walker.', details: 'A biological robot that walks along microtubules carrying cargo vesicles. It burns ATP to take 8nm steps.',
+        depositionDate: '2006-08-02'
+    },
+    {
+        id: '2K3A', title: 'NMR solution structure of Staphylococcus saprophyticus CHAP (cysteine, histidine-dependent amidohydrolases/peptidases) domain protein. Northeast Structural Genomics Consortium target SyR11', category: 'Structural', description: 'Molecular walker.', details: 'A biological robot that walks along microtubules carrying cargo vesicles. It burns ATP to take 8nm steps.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Staphylococcus saprophyticus subsp. saprophyticus ATCC 15305',
-        depositionDate: '2008-04-29' },
-    { id: '2L4B', title: 'Solution structure of a putative acyl carrier protein from Anaplasma phagocytophilum. Seattle Structural Genomics Center for Infectious Disease target AnphA.01018.a', category: 'Signaling', description: 'Hunger hormone.', details: 'Released by fat cells (adipose), this hormone interprets body energy reserves and signals the brain to inhibit hunger.',
+        depositionDate: '2008-04-29'
+    },
+    {
+        id: '2L4B', title: 'Solution structure of a putative acyl carrier protein from Anaplasma phagocytophilum. Seattle Structural Genomics Center for Infectious Disease target AnphA.01018.a', category: 'Signaling', description: 'Hunger hormone.', details: 'Released by fat cells (adipose), this hormone interprets body energy reserves and signals the brain to inhibit hunger.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Anaplasma phagocytophilum',
-        depositionDate: '2010-10-02' },
-    { id: '2M5C', title: 'Solution Structure of the Bacillus cereus Metallo-Beta-Lactamase BcII', category: 'Toxins', description: 'Bee venom.', details: 'The main pain-causing component of bee venom. It forms pores in cell membranes, causing them to leak and burst.',
+        depositionDate: '2010-10-02'
+    },
+    {
+        id: '2M5C', title: 'Solution Structure of the Bacillus cereus Metallo-Beta-Lactamase BcII', category: 'Toxins', description: 'Bee venom.', details: 'The main pain-causing component of bee venom. It forms pores in cell membranes, causing them to leak and burst.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Bacillus cereus',
-        depositionDate: '2013-02-20' },
-    { id: '2N6D', title: 'NMR structure of the 140-315 fragment of the N-acetylglucosamine-1-phosphate transferase, alpha and beta subunits', category: 'Signaling', description: 'Hormone carrier.', details: 'A carrier protein that transports oxytocin and vasopressin from the hypothalamus to the posterior pituitary.',
+        depositionDate: '2013-02-20'
+    },
+    {
+        id: '2N6D', title: 'NMR structure of the 140-315 fragment of the N-acetylglucosamine-1-phosphate transferase, alpha and beta subunits', category: 'Signaling', description: 'Hormone carrier.', details: 'A carrier protein that transports oxytocin and vasopressin from the hypothalamus to the posterior pituitary.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Homo sapiens',
-        depositionDate: '2015-08-19' },
-    { id: '2O7F', title: 'Tyrosine ammonia-lyase from Rhodobacter sphaeroides (His89Phe variant), complexed with coumaric acid', category: 'Signaling', description: 'Love hormone.', details: 'The peptide hormone responsible for social bonding, trust, and childbirth contractions. It is a simple nonapeptide (9 residues).',
+        depositionDate: '2015-08-19'
+    },
+    {
+        id: '2O7F', title: 'Tyrosine ammonia-lyase from Rhodobacter sphaeroides (His89Phe variant), complexed with coumaric acid', category: 'Signaling', description: 'Love hormone.', details: 'The peptide hormone responsible for social bonding, trust, and childbirth contractions. It is a simple nonapeptide (9 residues).',
         method: 'X-RAY DIFFRACTION',
         resolution: '2 Å',
         organism: 'Rhodobacter sphaeroides',
-        depositionDate: '2006-12-11' },
-    { id: '2P8G', title: 'Crystal structure of phenolic acid decarboxylase (2635953) from Bacillus subtilis at 1.36 A resolution', category: 'Enzymes', description: 'Papaya enzyme.', details: 'A cysteine protease found in papaya. It is tough enough to be used as effective meat tenderizer.',
+        depositionDate: '2006-12-11'
+    },
+    {
+        id: '2P8G', title: 'Crystal structure of phenolic acid decarboxylase (2635953) from Bacillus subtilis at 1.36 A resolution', category: 'Enzymes', description: 'Papaya enzyme.', details: 'A cysteine protease found in papaya. It is tough enough to be used as effective meat tenderizer.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.36 Å',
         organism: 'Bacillus subtilis',
-        depositionDate: '2007-03-22' },
-    { id: '2Q9H', title: 'Crystal structure of the C73S mutant of diaminopimelate epimerase', category: 'Viral', description: 'Viral shell.', details: 'The outer shell of an RNA bacteriophage. It spontaneously self-assembles from protein subunits, forming a perfect icosahedron.',
+        depositionDate: '2007-03-22'
+    },
+    {
+        id: '2Q9H', title: 'Crystal structure of the C73S mutant of diaminopimelate epimerase', category: 'Viral', description: 'Viral shell.', details: 'The outer shell of an RNA bacteriophage. It spontaneously self-assembles from protein subunits, forming a perfect icosahedron.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.3 Å',
         organism: 'Haemophilus influenzae',
-        depositionDate: '2007-06-12' },
-    { id: '2R0I', title: 'Crystal structure of a kinase MARK2/Par-1 mutant', category: 'Enzymes', description: 'RNA cutter.', details: 'Christian Anfinsen used this enzyme to prove that "sequence determines structure" (Nobel Prize). It can refold spontaneously after denaturation.',
+        depositionDate: '2007-06-12'
+    },
+    {
+        id: '2R0I', title: 'Crystal structure of a kinase MARK2/Par-1 mutant', category: 'Enzymes', description: 'RNA cutter.', details: 'Christian Anfinsen used this enzyme to prove that "sequence determines structure" (Nobel Prize). It can refold spontaneously after denaturation.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.202 Å',
         organism: 'Rattus norvegicus',
-        depositionDate: '2007-08-20' },
-    { id: '1STP', title: 'STRUCTURAL ORIGINS OF HIGH-AFFINITY BIOTIN BINDING TO STREPTAVIDIN', category: 'Structural', description: 'Biotin binder.', details: 'Binds to the vitamin Biotin with one of the strongest non-covalent interactions in nature. Used extensively in biotech detection systems.',
+        depositionDate: '2007-08-20'
+    },
+    {
+        id: '1STP', title: 'STRUCTURAL ORIGINS OF HIGH-AFFINITY BIOTIN BINDING TO STREPTAVIDIN', category: 'Structural', description: 'Biotin binder.', details: 'Binds to the vitamin Biotin with one of the strongest non-covalent interactions in nature. Used extensively in biotech detection systems.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.6 Å',
         organism: 'Streptomyces avidinii',
-        depositionDate: '1992-03-12' },
-    { id: '1JFF', title: 'Refined structure of alpha-beta tubulin from zinc-induced sheets stabilized with taxol', category: 'Structural', description: 'Microtubule subunit.', details: 'The building block of microtubules (the cell\'s highways). It is the target of Taxol, a chemotherapy drug that freezes cell division.',
+        depositionDate: '1992-03-12'
+    },
+    {
+        id: '1JFF', title: 'Refined structure of alpha-beta tubulin from zinc-induced sheets stabilized with taxol', category: 'Structural', description: 'Microtubule subunit.', details: 'The building block of microtubules (the cell\'s highways). It is the target of Taxol, a chemotherapy drug that freezes cell division.',
         method: 'ELECTRON CRYSTALLOGRAPHY',
         resolution: '3.5 Å',
         organism: 'Bos taurus',
-        depositionDate: '2001-06-20' },
-    { id: '3LA4', title: 'Crystal structure of the first plant urease from Jack bean (Canavalia ensiformis)', category: 'Enzymes', description: 'Urea breakdown.', details: 'The first enzyme ever crystallized (by James Sumner, 1926), proving that enzymes are proteins. It converts urea into ammonia.',
+        depositionDate: '2001-06-20'
+    },
+    {
+        id: '3LA4', title: 'Crystal structure of the first plant urease from Jack bean (Canavalia ensiformis)', category: 'Enzymes', description: 'Urea breakdown.', details: 'The first enzyme ever crystallized (by James Sumner, 1926), proving that enzymes are proteins. It converts urea into ammonia.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.05 Å',
         organism: 'Canavalia ensiformis',
-        depositionDate: '2010-01-06' },
-    { id: '2V4M', title: 'The isomerase domain of human glutamine-fructose-6-phosphate transaminase 1 (GFPT1) in complex with fructose 6-phosphate', category: 'Signaling', description: 'Nuclear receptor.', details: 'Binds the active form of Vitamin D (calcitriol) to regulate genes involved in calcium absorption and bone health.',
+        depositionDate: '2010-01-06'
+    },
+    {
+        id: '2V4M', title: 'The isomerase domain of human glutamine-fructose-6-phosphate transaminase 1 (GFPT1) in complex with fructose 6-phosphate', category: 'Signaling', description: 'Nuclear receptor.', details: 'Binds the active form of Vitamin D (calcitriol) to regulate genes involved in calcium absorption and bone health.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.29 Å',
         organism: 'HOMO SAPIENS',
-        depositionDate: '2008-09-26' },
-    { id: '2W5N', title: 'Native structure of the GH93 alpha-L-arabinofuranosidase of Fusarium graminearum', category: 'Signaling', description: 'Development.', details: 'A specialized signaling protein that directs embryogenesis and tissue regeneration. "Wnt" stands for Wingless/Int-1.',
+        depositionDate: '2008-09-26'
+    },
+    {
+        id: '2W5N', title: 'Native structure of the GH93 alpha-L-arabinofuranosidase of Fusarium graminearum', category: 'Signaling', description: 'Development.', details: 'A specialized signaling protein that directs embryogenesis and tissue regeneration. "Wnt" stands for Wingless/Int-1.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.85 Å',
         organism: 'GIBBERELLA ZEAE',
-        depositionDate: '2008-12-11' },
-    { id: '2X6O', title: 'Tet Repressor class D in complex with 7-chlor-2-cyano-iso- tetracycline', category: 'Enzymes', description: 'Purine degradation.', details: 'Produces uric acid. Overactivity causes Gout (crystals in joints). Inhibited by the drug Allopurinol.',
+        depositionDate: '2008-12-11'
+    },
+    {
+        id: '2X6O', title: 'Tet Repressor class D in complex with 7-chlor-2-cyano-iso- tetracycline', category: 'Enzymes', description: 'Purine degradation.', details: 'Produces uric acid. Overactivity causes Gout (crystals in joints). Inhibited by the drug Allopurinol.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.3 Å',
         organism: 'ESCHERICHIA COLI',
-        depositionDate: '2010-02-18' },
-    { id: '2Y7P', title: 'DntR Inducer Binding Domain in Complex with Salicylate. Trigonal crystal form', category: 'Enzymes', description: 'Transcription complex.', details: 'The core machinery for reading genes in eukaryotes. This large complex allows for nuanced regulation of gene expression.',
+        depositionDate: '2010-02-18'
+    },
+    {
+        id: '2Y7P', title: 'DntR Inducer Binding Domain in Complex with Salicylate. Trigonal crystal form', category: 'Enzymes', description: 'Transcription complex.', details: 'The core machinery for reading genes in eukaryotes. This large complex allows for nuanced regulation of gene expression.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.85 Å',
         organism: 'BURKHOLDERIA SP.',
-        depositionDate: '2011-02-01' },
-    { id: '2Z8Q', title: 'ferredoxin from Pyrococcus furiosus, D14C variant', category: 'Structural', description: 'Dimerization motif.', details: 'A classic "coiled coil" of two alpha helices. Leucine residues line up like a zipper to hold the two strands together.',
+        depositionDate: '2011-02-01'
+    },
+    {
+        id: '2Z8Q', title: 'ferredoxin from Pyrococcus furiosus, D14C variant', category: 'Structural', description: 'Dimerization motif.', details: 'A classic "coiled coil" of two alpha helices. Leucine residues line up like a zipper to hold the two strands together.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.7 Å',
         organism: 'Pyrococcus furiosus DSM 3638',
-        depositionDate: '2007-09-07' },
+        depositionDate: '2007-09-07'
+    },
     // --- BATCH 2 ADDITIONS ---
-    { id: '1BMF', title: 'BOVINE MITOCHONDRIAL F1-ATPASE', category: 'Energy', description: 'ATP Synthase motor.', details: 'The rotary motor part of ATP Synthase. It spins at thousands of RPM to mash ADP and Phosphate together into ATP. Use the "Spin" feature to visualize its function!',
+    {
+        id: '1BMF', title: 'BOVINE MITOCHONDRIAL F1-ATPASE', category: 'Energy', description: 'ATP Synthase motor.', details: 'The rotary motor part of ATP Synthase. It spins at thousands of RPM to mash ADP and Phosphate together into ATP. Use the "Spin" feature to visualize its function!',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.85 Å',
         organism: 'Bos taurus',
-        depositionDate: '1996-03-13' },
-    { id: '1J59', title: 'CATABOLITE GENE ACTIVATOR PROTEIN (CAP)/DNA COMPLEX + ADENOSINE-3\',5\'-CYCLIC-MONOPHOSPHATE', category: 'Transport', description: 'Water channel.', details: 'The plumbing of the cell. Aquaporins conduct billions of water molecules per second while strictly filtering out protons and other ions.',
+        depositionDate: '1996-03-13'
+    },
+    {
+        id: '1J59', title: 'CATABOLITE GENE ACTIVATOR PROTEIN (CAP)/DNA COMPLEX + ADENOSINE-3\',5\'-CYCLIC-MONOPHOSPHATE', category: 'Transport', description: 'Water channel.', details: 'The plumbing of the cell. Aquaporins conduct billions of water molecules per second while strictly filtering out protons and other ions.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.5 Å',
         organism: 'Escherichia coli',
-        depositionDate: '2002-03-01' },
-    { id: '1E6E', title: 'ADRENODOXIN REDUCTASE/ADRENODOXIN COMPLEX OF MITOCHONDRIAL P450 SYSTEMS', category: 'Enzymes', description: 'Neurotransmitter breakdown.', details: 'One of nature\'s fastest enzymes. It cleans up acetylcholine at the synapse to stop nerve signaling. Nerve agents like Sarin work by irreversibly blocking this enzyme.',
+        depositionDate: '2002-03-01'
+    },
+    {
+        id: '1E6E', title: 'ADRENODOXIN REDUCTASE/ADRENODOXIN COMPLEX OF MITOCHONDRIAL P450 SYSTEMS', category: 'Enzymes', description: 'Neurotransmitter breakdown.', details: 'One of nature\'s fastest enzymes. It cleans up acetylcholine at the synapse to stop nerve signaling. Nerve agents like Sarin work by irreversibly blocking this enzyme.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.3 Å',
         organism: 'BOS TAURUS',
-        depositionDate: '2000-08-15' },
-    { id: '3PBL', title: 'Structure of the human dopamine D3 receptor in complex with eticlopride', category: 'Enzymes', description: 'Antibiotic resistance.', details: 'The enzyme responsible for penicillin resistance. It breaks the beta-lactam ring of antibiotics, rendering them useless. Investigating this structure helps design better drugs.',
+        depositionDate: '2000-08-15'
+    },
+    {
+        id: '3PBL', title: 'Structure of the human dopamine D3 receptor in complex with eticlopride', category: 'Enzymes', description: 'Antibiotic resistance.', details: 'The enzyme responsible for penicillin resistance. It breaks the beta-lactam ring of antibiotics, rendering them useless. Investigating this structure helps design better drugs.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.89 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2010-10-20' },
-    { id: '1CX8', title: 'CRYSTAL STRUCTURE OF THE ECTODOMAIN OF HUMAN TRANSFERRIN RECEPTOR', category: 'Structural', description: 'Normal human prion.', details: 'Structure of the normal, healthy PrP protein. In disease (Creutzfeldt-Jakob), this alpha-helical structure refolds into toxic beta-sheets.',
+        depositionDate: '2010-10-20'
+    },
+    {
+        id: '1CX8', title: 'CRYSTAL STRUCTURE OF THE ECTODOMAIN OF HUMAN TRANSFERRIN RECEPTOR', category: 'Structural', description: 'Normal human prion.', details: 'Structure of the normal, healthy PrP protein. In disease (Creutzfeldt-Jakob), this alpha-helical structure refolds into toxic beta-sheets.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.2 Å',
         organism: 'Homo sapiens',
-        depositionDate: '1999-08-28' },
-    { id: '1T2K', title: 'Structure Of The DNA Binding Domains Of IRF3, ATF-2 and Jun Bound To DNA', category: 'Structural', description: 'World\'s biggest protein.', details: 'A small fragment (Ig domains) of Titin, the largest known protein. Titin acts as a molecular spring in muscle, preventing overstretching.',
+        depositionDate: '1999-08-28'
+    },
+    {
+        id: '1T2K', title: 'Structure Of The DNA Binding Domains Of IRF3, ATF-2 and Jun Bound To DNA', category: 'Structural', description: 'World\'s biggest protein.', details: 'A small fragment (Ig domains) of Titin, the largest known protein. Titin acts as a molecular spring in muscle, preventing overstretching.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2004-04-21' },
-    { id: '3V03', title: 'Crystal structure of Bovine Serum Albumin', category: 'Signaling', description: 'Beta2AR complex.', details: 'A landmark structure showing a GPCR (Beta-2 Adrenergic Receptor) caught in the act of activating its G-protein partner. This won Kobilka and Lefkowitz the Nobel Prize.',
+        depositionDate: '2004-04-21'
+    },
+    {
+        id: '3V03', title: 'Crystal structure of Bovine Serum Albumin', category: 'Signaling', description: 'Beta2AR complex.', details: 'A landmark structure showing a GPCR (Beta-2 Adrenergic Receptor) caught in the act of activating its G-protein partner. This won Kobilka and Lefkowitz the Nobel Prize.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.7 Å',
         organism: 'Bos taurus',
-        depositionDate: '2011-12-07' },
-    { id: '1SVB', title: 'ENVELOPE GLYCOPROTEIN FROM TICK-BORNE ENCEPHALITIS VIRUS', category: 'Viral', description: 'Tiny virus capsid.', details: 'One of the smallest known viruses. Its capsid is composed of 60 identical subunits arranged in T=1 icosahedral symmetry.',
+        depositionDate: '2011-12-07'
+    },
+    {
+        id: '1SVB', title: 'ENVELOPE GLYCOPROTEIN FROM TICK-BORNE ENCEPHALITIS VIRUS', category: 'Viral', description: 'Tiny virus capsid.', details: 'One of the smallest known viruses. Its capsid is composed of 60 identical subunits arranged in T=1 icosahedral symmetry.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.9 Å',
         organism: 'Tick-borne encephalitis virus',
-        depositionDate: '1995-11-27' },
-    { id: '4DAJ', title: 'Structure of the M3 Muscarinic Acetylcholine Receptor', category: 'Enzymes', description: 'Chemo target.', details: 'Dihydrofolate Reductase is essential for DNA synthesis. The cancer drug Methotrexate binds here to starve rapidly dividing cells of thymine.',
+        depositionDate: '1995-11-27'
+    },
+    {
+        id: '4DAJ', title: 'Structure of the M3 Muscarinic Acetylcholine Receptor', category: 'Enzymes', description: 'Chemo target.', details: 'Dihydrofolate Reductase is essential for DNA synthesis. The cancer drug Methotrexate binds here to starve rapidly dividing cells of thymine.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.4 Å',
         organism: 'Rattus norvegicus',
-        depositionDate: '2012-01-12' },
-    { id: '1PRE', title: 'PROAEROLYSIN', category: 'Signaling', description: 'Hormone receptor.', details: 'The nuclear receptor that binds progesterone. It regulates genes involved in pregnancy and the menstrual cycle.',
+        depositionDate: '2012-01-12'
+    },
+    {
+        id: '1PRE', title: 'PROAEROLYSIN', category: 'Signaling', description: 'Hormone receptor.', details: 'The nuclear receptor that binds progesterone. It regulates genes involved in pregnancy and the menstrual cycle.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.8 Å',
         organism: 'Aeromonas hydrophila',
-        depositionDate: '1995-09-15' },
-    { id: '1MOL', title: 'TWO CRYSTAL STRUCTURES OF A POTENTLY SWEET PROTEIN: NATURAL MONELLIN AT 2.75 ANGSTROMS RESOLUTION AND SINGLE-CHAIN MONELLIN AT 1.7 ANGSTROMS RESOLUTION', category: 'Enzymes', description: 'Nitrogen fixation.', details: 'The enzyme that feeds the world. It breaks the incredibly strong triple bond of atmospheric nitrogen (N2) to create ammonia (NH3) for plants to use.',
+        depositionDate: '1995-09-15'
+    },
+    {
+        id: '1MOL', title: 'TWO CRYSTAL STRUCTURES OF A POTENTLY SWEET PROTEIN: NATURAL MONELLIN AT 2.75 ANGSTROMS RESOLUTION AND SINGLE-CHAIN MONELLIN AT 1.7 ANGSTROMS RESOLUTION', category: 'Enzymes', description: 'Nitrogen fixation.', details: 'The enzyme that feeds the world. It breaks the incredibly strong triple bond of atmospheric nitrogen (N2) to create ammonia (NH3) for plants to use.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.7 Å',
         organism: 'Dioscoreophyllum cumminsii',
-        depositionDate: '1993-04-27' },
-    { id: '2POR', title: 'STRUCTURE OF PORIN REFINED AT 1.8 ANGSTROMS RESOLUTION', category: 'Transport', description: 'Bacterial outer membrane.', details: 'A classic beta-barrel channel found in the outer membrane of gram-negative bacteria. It acts as a molecular sieve.',
+        depositionDate: '1993-04-27'
+    },
+    {
+        id: '2POR', title: 'STRUCTURE OF PORIN REFINED AT 1.8 ANGSTROMS RESOLUTION', category: 'Transport', description: 'Bacterial outer membrane.', details: 'A classic beta-barrel channel found in the outer membrane of gram-negative bacteria. It acts as a molecular sieve.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.8 Å',
         organism: 'Rhodobacter capsulatus',
-        depositionDate: '1992-04-24' },
-    { id: '2REB', title: 'THE STRUCTURE OF THE E. COLI RECA PROTEIN MONOMER AND POLYMER', category: 'DNA/RNA', description: 'DNA repair.', details: 'The master of recombination. RecA forms a filament on single-stranded DNA and searches for homologous sequences to repair breaks.',
+        depositionDate: '1992-04-24'
+    },
+    {
+        id: '2REB', title: 'THE STRUCTURE OF THE E. COLI RECA PROTEIN MONOMER AND POLYMER', category: 'DNA/RNA', description: 'DNA repair.', details: 'The master of recombination. RecA forms a filament on single-stranded DNA and searches for homologous sequences to repair breaks.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.3 Å',
         organism: 'Escherichia coli',
-        depositionDate: '1992-03-06' },
-    { id: '1TGH', title: 'TATA BINDING PROTEIN (TBP)/DNA COMPLEX', category: 'DNA/RNA', description: 'Gene start signal.', details: 'The molecular "saddle" that sits on DNA. It recognizes the "TATA box" sequence to mark the starting line for transcription.',
+        depositionDate: '1992-03-06'
+    },
+    {
+        id: '1TGH', title: 'TATA BINDING PROTEIN (TBP)/DNA COMPLEX', category: 'DNA/RNA', description: 'Gene start signal.', details: 'The molecular "saddle" that sits on DNA. It recognizes the "TATA box" sequence to mark the starting line for transcription.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.9 Å',
         organism: 'Homo sapiens',
-        depositionDate: '1996-02-13' },
-    { id: '3NIR', title: 'Crystal structure of small protein crambin at 0.48 A resolution', category: 'Energy', description: 'Copper enzyme.', details: 'An enzyme that converts nitrite to nitric oxide. It contains beautiful blue copper centers that transfer electrons.',
+        depositionDate: '1996-02-13'
+    },
+    {
+        id: '3NIR', title: 'Crystal structure of small protein crambin at 0.48 A resolution', category: 'Energy', description: 'Copper enzyme.', details: 'An enzyme that converts nitrite to nitric oxide. It contains beautiful blue copper centers that transfer electrons.',
         method: 'X-RAY DIFFRACTION',
         resolution: '0.48 Å',
         organism: 'Crambe hispanica',
-        depositionDate: '2010-06-16' },
+        depositionDate: '2010-06-16'
+    },
     // --- BATCH 3 ADDITIONS (50 MORE) ---
-    { id: '1ALK', title: 'REACTION MECHANISM OF ALKALINE PHOSPHATASE BASED ON CRYSTAL STRUCTURES. TWO METAL ION CATALYSIS', category: 'Enzymes', description: 'Dephosphorylation.', details: 'A widely used enzyme in molecular biology for removing phosphate groups from DNA. It is also a clinical marker for liver health.',
+    {
+        id: '1ALK', title: 'REACTION MECHANISM OF ALKALINE PHOSPHATASE BASED ON CRYSTAL STRUCTURES. TWO METAL ION CATALYSIS', category: 'Enzymes', description: 'Dephosphorylation.', details: 'A widely used enzyme in molecular biology for removing phosphate groups from DNA. It is also a clinical marker for liver health.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2 Å',
         organism: 'Escherichia coli',
-        depositionDate: '1993-03-03' },
-    { id: '1B09', title: 'HUMAN C-REACTIVE PROTEIN COMPLEXED WITH PHOSPHOCHOLINE', category: 'Enzymes', description: 'Inflammation trigger.', details: 'A cysteine protease that cleaves precursors cytokines into their mature forms, activating the inflammatory response.',
+        depositionDate: '1993-03-03'
+    },
+    {
+        id: '1B09', title: 'HUMAN C-REACTIVE PROTEIN COMPLEXED WITH PHOSPHOCHOLINE', category: 'Enzymes', description: 'Inflammation trigger.', details: 'A cysteine protease that cleaves precursors cytokines into their mature forms, activating the inflammatory response.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.5 Å',
         organism: 'Homo sapiens',
-        depositionDate: '1998-11-18' },
-    { id: '1BFE', title: 'THE THIRD PDZ DOMAIN FROM THE SYNAPTIC PROTEIN PSD-95', category: 'Immune', description: 'Antigen recognition.', details: 'The molecular eye of the T-cell. It recognizes foreign peptides presented by MHC molecules to trigger an immune attack.',
+        depositionDate: '1998-11-18'
+    },
+    {
+        id: '1BFE', title: 'THE THIRD PDZ DOMAIN FROM THE SYNAPTIC PROTEIN PSD-95', category: 'Immune', description: 'Antigen recognition.', details: 'The molecular eye of the T-cell. It recognizes foreign peptides presented by MHC molecules to trigger an immune attack.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.3 Å',
         organism: 'Rattus norvegicus',
-        depositionDate: '1998-05-20' },
-    { id: '1BJO', title: 'THE STRUCTURE OF PHOSPHOSERINE AMINOTRANSFERASE FROM E. COLI IN COMPLEX WITH ALPHA-METHYL-L-GLUTAMATE', category: 'Structural', description: 'Microtubule motor.', details: 'The motor domain of conventional kinesin. It uses ATP hydrolysis to walk along microtubule tracks.',
+        depositionDate: '1998-05-20'
+    },
+    {
+        id: '1BJO', title: 'THE STRUCTURE OF PHOSPHOSERINE AMINOTRANSFERASE FROM E. COLI IN COMPLEX WITH ALPHA-METHYL-L-GLUTAMATE', category: 'Structural', description: 'Microtubule motor.', details: 'The motor domain of conventional kinesin. It uses ATP hydrolysis to walk along microtubule tracks.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.8 Å',
         organism: 'Escherichia coli',
-        depositionDate: '1998-06-25' },
-    { id: '1C17', title: 'A1C12 SUBCOMPLEX OF F1FO ATP SYNTHASE', category: 'Signaling', description: 'Muscle contraction.', details: 'The calcium-binding component of the troponin complex. When calcium binds, it changes shape to expose binding sites on actin.',
+        depositionDate: '1998-06-25'
+    },
+    {
+        id: '1C17', title: 'A1C12 SUBCOMPLEX OF F1FO ATP SYNTHASE', category: 'Signaling', description: 'Muscle contraction.', details: 'The calcium-binding component of the troponin complex. When calcium binds, it changes shape to expose binding sites on actin.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Escherichia coli',
-        depositionDate: '1999-07-20' },
-    { id: '1D5M', title: 'X-RAY CRYSTAL STRUCTURE OF HLA-DR4 COMPLEXED WITH PEPTIDE AND SEB', category: 'Enzymes', description: 'DNA glue.', details: 'The enzyme that seals nicks in the DNA backbone. Essential for replication and repair.',
+        depositionDate: '1999-07-20'
+    },
+    {
+        id: '1D5M', title: 'X-RAY CRYSTAL STRUCTURE OF HLA-DR4 COMPLEXED WITH PEPTIDE AND SEB', category: 'Enzymes', description: 'DNA glue.', details: 'The enzyme that seals nicks in the DNA backbone. Essential for replication and repair.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2 Å',
         organism: 'Homo sapiens',
-        depositionDate: '1999-10-07' },
-    { id: '1DFJ', title: 'RIBONUCLEASE INHIBITOR COMPLEXED WITH RIBONUCLEASE A', category: 'Structural', description: 'Horseshoe shape.', details: 'A leucine-rich repeat protein that binds RNase A with femtomolar affinity. Its horseshoe shape is a classic structural motif.',
+        depositionDate: '1999-10-07'
+    },
+    {
+        id: '1DFJ', title: 'RIBONUCLEASE INHIBITOR COMPLEXED WITH RIBONUCLEASE A', category: 'Structural', description: 'Horseshoe shape.', details: 'A leucine-rich repeat protein that binds RNase A with femtomolar affinity. Its horseshoe shape is a classic structural motif.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.5 Å',
-        organism: 'Bos taurus',
-        depositionDate: '1996-06-29' },
-    { id: '1E8O', title: 'Core of the Alu domain of the mammalian SRP', category: 'Enzymes', description: 'Detoxification.', details: 'The body\'s primary detox enzyme. It oxidizes steroids, fatty acids, and xenobiotics (drugs/toxins) to make them water-soluble.',
+        organism: 'Sus scrofa',
+        depositionDate: '1996-06-29'
+    },
+    {
+        id: '1E8O', title: 'Core of the Alu domain of the mammalian SRP', category: 'Enzymes', description: 'Detoxification.', details: 'The body\'s primary detox enzyme. It oxidizes steroids, fatty acids, and xenobiotics (drugs/toxins) to make them water-soluble.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.2 Å',
         organism: 'HOMO SAPIENS',
-        depositionDate: '2000-09-28' },
-    { id: '1F9J', title: 'STRUCTURE OF A NEW CRYSTAL FORM OF TETRAUBIQUITIN', category: 'Enzymes', description: 'DNA cleanup.', details: 'An enzyme that chews up single-stranded DNA from the end. It is part of the DNA repair and recombination machinery.',
+        depositionDate: '2000-09-28'
+    },
+    {
+        id: '1F9J', title: 'STRUCTURE OF A NEW CRYSTAL FORM OF TETRAUBIQUITIN', category: 'Enzymes', description: 'DNA cleanup.', details: 'An enzyme that chews up single-stranded DNA from the end. It is part of the DNA repair and recombination machinery.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.7 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2000-07-10' },
-    { id: '1GTP', title: 'GTP CYCLOHYDROLASE I', category: 'Signaling', description: 'Cancer switch.', details: 'A small GTPase that acts as a binary switch in signaling pathways. Mutations locking it in the "ON" state cause 30% of cancers.',
+        depositionDate: '2000-07-10'
+    },
+    {
+        id: '1GTP', title: 'GTP CYCLOHYDROLASE I', category: 'Signaling', description: 'Cancer switch.', details: 'A small GTPase that acts as a binary switch in signaling pathways. Mutations locking it in the "ON" state cause 30% of cancers.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3 Å',
         organism: 'Escherichia coli',
-        depositionDate: '1995-09-16' },
-    { id: '1HKS', title: 'SOLUTION STRUCTURE OF THE DNA-BINDING DOMAIN OF DROSOPHILA HEAT SHOCK TRANSCRIPTION FACTOR', category: 'Enzymes', description: 'Glycolysis start.', details: 'The first enzyme in glycolysis. It traps glucose in the cell by phosphorylating it.',
+        depositionDate: '1995-09-16'
+    },
+    {
+        id: '1HKS', title: 'SOLUTION STRUCTURE OF THE DNA-BINDING DOMAIN OF DROSOPHILA HEAT SHOCK TRANSCRIPTION FACTOR', category: 'Enzymes', description: 'Glycolysis start.', details: 'The first enzyme in glycolysis. It traps glucose in the cell by phosphorylating it.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Drosophila melanogaster',
-        depositionDate: '1994-07-18' },
-    { id: '1I6H', title: 'RNA POLYMERASE II ELONGATION COMPLEX', category: 'DNA/RNA', description: 'RNA unwinding.', details: 'A "DEAD-box" helicase that unwinds RNA duplexes using ATP, essential for splicing and translation.',
+        depositionDate: '1994-07-18'
+    },
+    {
+        id: '1I6H', title: 'RNA POLYMERASE II ELONGATION COMPLEX', category: 'DNA/RNA', description: 'RNA unwinding.', details: 'A "DEAD-box" helicase that unwinds RNA duplexes using ATP, essential for splicing and translation.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.3 Å',
         organism: 'Saccharomyces cerevisiae',
-        depositionDate: '2001-03-02' },
-    { id: '1J3H', title: 'Crystal structure of apoenzyme cAMP-dependent protein kinase catalytic subunit', category: 'Enzymes', description: 'Apoptosis.', details: 'The inactive precursor to an executioner caspase. Upon activation, it dismantles the cell from the inside out.',
+        depositionDate: '2001-03-02'
+    },
+    {
+        id: '1J3H', title: 'Crystal structure of apoenzyme cAMP-dependent protein kinase catalytic subunit', category: 'Enzymes', description: 'Apoptosis.', details: 'The inactive precursor to an executioner caspase. Upon activation, it dismantles the cell from the inside out.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.9 Å',
         organism: 'Mus musculus',
-        depositionDate: '2003-01-31' },
-    { id: '1K5D', title: 'Crystal structure of Ran-GPPNHP-RanBP1-RanGAP complex', category: 'Signaling', description: 'Brain signaling.', details: 'The main excitatory neurotransmitter receptor in the brain. It is a ligand-gated ion channel.',
+        depositionDate: '2003-01-31'
+    },
+    {
+        id: '1K5D', title: 'Crystal structure of Ran-GPPNHP-RanBP1-RanGAP complex', category: 'Signaling', description: 'Brain signaling.', details: 'The main excitatory neurotransmitter receptor in the brain. It is a ligand-gated ion channel.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.7 Å',
-        organism: 'Schizosaccharomyces pombe',
-        depositionDate: '2001-10-10' },
-    { id: '1L3W', title: 'C-cadherin Ectodomain', category: 'Enzymes', description: 'Fat digestion.', details: 'An enzyme that breaks down fats (triglycerides). This structure shows the "lid" domain that opens when it contacts a lipid droplet.',
+        organism: 'Homo sapiens',
+        depositionDate: '2001-10-10'
+    },
+    {
+        id: '1L3W', title: 'C-cadherin Ectodomain', category: 'Enzymes', description: 'Fat digestion.', details: 'An enzyme that breaks down fats (triglycerides). This structure shows the "lid" domain that opens when it contacts a lipid droplet.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.08 Å',
         organism: 'Xenopus laevis',
-        depositionDate: '2002-03-01' },
-    { id: '1M1J', title: 'Crystal structure of native chicken fibrinogen with two different bound ligands', category: 'Structural', description: 'Cargo transport.', details: 'A processive motor that walks along actin filaments carrying organelles. It takes large steps to avoid spiritual obstacles.',
+        depositionDate: '2002-03-01'
+    },
+    {
+        id: '1M1J', title: 'Crystal structure of native chicken fibrinogen with two different bound ligands', category: 'Structural', description: 'Cargo transport.', details: 'A processive motor that walks along actin filaments carrying organelles. It takes large steps to avoid spiritual obstacles.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.7 Å',
         organism: 'Unknown source',
-        depositionDate: '2002-06-19' },
-    { id: '1NKP', title: 'Crystal structure of Myc-Max recognizing DNA', category: 'Immune', description: 'Killer cell eye.', details: 'A receptor on Natural Killer cells that inhibits them from attacking healthy "self" cells.',
+        depositionDate: '2002-06-19'
+    },
+    {
+        id: '1NKP', title: 'Crystal structure of Myc-Max recognizing DNA', category: 'Immune', description: 'Killer cell eye.', details: 'A receptor on Natural Killer cells that inhibits them from attacking healthy "self" cells.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.8 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2003-01-03' },
-    { id: '1O6S', title: 'Internalin (Listeria monocytogenes) / E-Cadherin (human) Recognition Complex', category: 'Signaling', description: 'Cell adhesion.', details: 'The anchor that holds cells to the matrix. It transmits mechanical force and chemical signals across the membrane.',
+        depositionDate: '2003-01-03'
+    },
+    {
+        id: '1O6S', title: 'Internalin (Listeria monocytogenes) / E-Cadherin (human) Recognition Complex', category: 'Signaling', description: 'Cell adhesion.', details: 'The anchor that holds cells to the matrix. It transmits mechanical force and chemical signals across the membrane.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.8 Å',
         organism: 'LISTERIA MONOCYTOGENES',
-        depositionDate: '2002-10-13' },
-    { id: '1PZT', title: 'CRYSTAL STRUCTURE OF W314A-BETA-1,4-GALACTOSYLTRANSFERASE (B4GAL-T1) CATALYTIC DOMAIN WITHOUT SUBSTRATE', category: 'Enzymes', description: 'Antibiotic target.', details: 'The bacterial enzyme that builds the cell wall. Penicillin binds here permanently, preventing the bacteria from maintaining its shape.',
+        depositionDate: '2002-10-13'
+    },
+    {
+        id: '1PZT', title: 'CRYSTAL STRUCTURE OF W314A-BETA-1,4-GALACTOSYLTRANSFERASE (B4GAL-T1) CATALYTIC DOMAIN WITHOUT SUBSTRATE', category: 'Enzymes', description: 'Antibiotic target.', details: 'The bacterial enzyme that builds the cell wall. Penicillin binds here permanently, preventing the bacteria from maintaining its shape.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.92 Å',
         organism: 'Bos taurus',
-        depositionDate: '2003-07-14' },
-    { id: '1Q01', title: 'Lebetin peptides, a new class of potent aggregation inhibitors', category: 'Chaperone', description: 'Stress response.', details: 'A molecular chaperone that stabilizes proteins under stress. It is a target for cancer therapy due to its role in stabilizing oncogenes.',
+        depositionDate: '2003-07-14'
+    },
+    {
+        id: '1Q01', title: 'Lebetin peptides, a new class of potent aggregation inhibitors', category: 'Chaperone', description: 'Stress response.', details: 'A molecular chaperone that stabilizes proteins under stress. It is a target for cancer therapy due to its role in stabilizing oncogenes.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Macrovipera lebetina',
-        depositionDate: '2003-07-15' } as any,
-    { id: '1R5P', title: 'Crystal Structure Analysis of KaiB from PCC7120', category: 'Signaling', description: 'Phospho-tyrosine binder.', details: 'A modular protein domain that docks onto phosphorylated tyrosine residues, connecting signaling pathways.',
+        depositionDate: '2003-07-15'
+    } as any,
+    {
+        id: '1R5P', title: 'Crystal Structure Analysis of KaiB from PCC7120', category: 'Signaling', description: 'Phospho-tyrosine binder.', details: 'A modular protein domain that docks onto phosphorylated tyrosine residues, connecting signaling pathways.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.2 Å',
         organism: 'Nostoc sp.',
-        depositionDate: '2003-10-12' },
-    { id: '1S12', title: 'Crystal structure of TM1457', category: 'Structural', description: 'Cell scaffolding.', details: 'A flexible rod protein that forms a hexagonal mesh under the cell membrane to provide mechanical support.',
+        depositionDate: '2003-10-12'
+    },
+    {
+        id: '1S12', title: 'Crystal structure of TM1457', category: 'Structural', description: 'Cell scaffolding.', details: 'A flexible rod protein that forms a hexagonal mesh under the cell membrane to provide mechanical support.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2 Å',
         organism: 'Thermotoga maritima',
-        depositionDate: '2004-01-05' },
-    { id: '1T66', title: 'The structure of FAB with intermediate affinity for fluorescein.', category: 'Enzymes', description: 'Starch breakdown.', details: 'The enzyme in saliva that begins breaking down starch into sugars. You can feel it working when bread tastes sweet after chewing.',
+        depositionDate: '2004-01-05'
+    },
+    {
+        id: '1T66', title: 'The structure of FAB with intermediate affinity for fluorescein.', category: 'Enzymes', description: 'Starch breakdown.', details: 'The enzyme in saliva that begins breaking down starch into sugars. You can feel it working when bread tastes sweet after chewing.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.3 Å',
         organism: 'Mus musculus',
-        depositionDate: '2004-05-05' },
-    { id: '1U4B', title: 'Extension of an adenine-8oxoguanine mismatch', category: 'Signaling', description: 'GPCR silencer.', details: 'The protein that stops GPCR signaling. It binds to the receptor to block G-proteins and trigger internalization.',
+        depositionDate: '2004-05-05'
+    },
+    {
+        id: '1U4B', title: 'Extension of an adenine-8oxoguanine mismatch', category: 'Signaling', description: 'GPCR silencer.', details: 'The protein that stops GPCR signaling. It binds to the receptor to block G-proteins and trigger internalization.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.6 Å',
         organism: 'Geobacillus stearothermophilus',
-        depositionDate: '2004-07-23' },
-    { id: '1V2X', title: 'TrmH', category: 'Structural', description: 'Focal adhesion.', details: 'A cytoskeletal protein that links integrins to actin filaments, reinforcing cell-matrix junctions.',
+        depositionDate: '2004-07-23'
+    },
+    {
+        id: '1V2X', title: 'TrmH', category: 'Structural', description: 'Focal adhesion.', details: 'A cytoskeletal protein that links integrins to actin filaments, reinforcing cell-matrix junctions.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.5 Å',
         organism: 'Thermus thermophilus',
-        depositionDate: '2003-10-17' },
-    { id: '1W2L', title: 'Cytochrome c domain of caa3 oxygen oxidoreductase', category: 'Signaling', description: 'Actin regulator.', details: 'Controls actin polymerization. Mutations cause immunodeficiency and eczema.',
+        depositionDate: '2003-10-17'
+    },
+    {
+        id: '1W2L', title: 'Cytochrome c domain of caa3 oxygen oxidoreductase', category: 'Signaling', description: 'Actin regulator.', details: 'Controls actin polymerization. Mutations cause immunodeficiency and eczema.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.3 Å',
         organism: 'RHODOTHERMUS MARINUS',
-        depositionDate: '2004-07-06' },
-    { id: '1XQE', title: 'The mechanism of ammonia transport based on the crystal structure of AmtB of E. coli.', category: 'Enzymes', description: 'Fructose production.', details: 'Industrially important enzyme used to convert glucose to fructose for High Fructose Corn Syrup.',
+        depositionDate: '2004-07-06'
+    },
+    {
+        id: '1XQE', title: 'The mechanism of ammonia transport based on the crystal structure of AmtB of E. coli.', category: 'Enzymes', description: 'Fructose production.', details: 'Industrially important enzyme used to convert glucose to fructose for High Fructose Corn Syrup.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.1 Å',
         organism: 'Escherichia coli',
-        depositionDate: '2004-10-12' },
+        depositionDate: '2004-10-12'
+    },
     { id: '1Y8E', title: 'Yersinia Tyrosine Phosphatase', category: 'Toxins', description: 'Plague toxin.', details: 'A deadly enzyme injected by Yersinia pestis (Black Plague). It wipes out immune signaling by removing phosphate groups.' },
-    { id: '1ZF5', title: 'GCT duplex B-DNA', category: 'DNA/RNA', description: 'Gene editing.', details: 'An engineered DNA-cleaving enzyme that was a precursor to CRISPR technology.',
+    {
+        id: '1ZF5', title: 'GCT duplex B-DNA', category: 'DNA/RNA', description: 'Gene editing.', details: 'An engineered DNA-cleaving enzyme that was a precursor to CRISPR technology.',
         method: 'X-RAY DIFFRACTION',
         resolution: '0.99 Å',
         organism: 'Unknown source',
-        depositionDate: '2005-04-19' },
-    { id: '2A5E', title: 'SOLUTION NMR STRUCTURE OF TUMOR SUPPRESSOR P16INK4A, RESTRAINED MINIMIZED MEAN STRUCTURE', category: 'Enzymes', description: 'Herbicide target.', details: 'The target of sulfonylurea herbicides. It makes branched-chain amino acids in plants.',
+        depositionDate: '2005-04-19'
+    },
+    {
+        id: '2A5E', title: 'SOLUTION NMR STRUCTURE OF TUMOR SUPPRESSOR P16INK4A, RESTRAINED MINIMIZED MEAN STRUCTURE', category: 'Enzymes', description: 'Herbicide target.', details: 'The target of sulfonylurea herbicides. It makes branched-chain amino acids in plants.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Homo sapiens',
-        depositionDate: '1998-02-13' },
-    { id: '2B1V', title: 'Human estrogen receptor alpha ligand-binding domain in complex with OBCP-1M and a glucocorticoid receptor interacting protein 1 NR box II peptide', category: 'Toxins', description: 'Botox.', details: 'The most lethal toxin known. It cleaves SNARE proteins to prevent neurotransmitter release, causing paralysis.',
+        depositionDate: '1998-02-13'
+    },
+    {
+        id: '2B1V', title: 'Human estrogen receptor alpha ligand-binding domain in complex with OBCP-1M and a glucocorticoid receptor interacting protein 1 NR box II peptide', category: 'Toxins', description: 'Botox.', details: 'The most lethal toxin known. It cleaves SNARE proteins to prevent neurotransmitter release, causing paralysis.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.8 Å',
         organism: 'Unknown source',
-        depositionDate: '2005-09-16' },
-    { id: '2C9W', title: 'CRYSTAL STRUCTURE OF SOCS-2 IN COMPLEX WITH ELONGIN-B AND ELONGIN-C AT 1.9A RESOLUTION', category: 'Enzymes', description: 'Cell cycle control.', details: 'The master clock of the cell cycle. When paired with Cyclin, it drives the cell into division.',
+        depositionDate: '2005-09-16'
+    },
+    {
+        id: '2C9W', title: 'CRYSTAL STRUCTURE OF SOCS-2 IN COMPLEX WITH ELONGIN-B AND ELONGIN-C AT 1.9A RESOLUTION', category: 'Enzymes', description: 'Cell cycle control.', details: 'The master clock of the cell cycle. When paired with Cyclin, it drives the cell into division.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.9 Å',
         organism: 'HOMO SAPIENS',
-        depositionDate: '2005-12-14' },
-    { id: '2D3I', title: 'Crystal Structure of Aluminum-Bound Ovotransferrin at 2.15 Angstrom Resolution', category: 'DNA/RNA', description: 'RNA interference.', details: 'The molecular ruler that chops double-stranded RNA into small siRNA fragments for gene silencing.',
+        depositionDate: '2005-12-14'
+    },
+    {
+        id: '2D3I', title: 'Crystal Structure of Aluminum-Bound Ovotransferrin at 2.15 Angstrom Resolution', category: 'DNA/RNA', description: 'RNA interference.', details: 'The molecular ruler that chops double-stranded RNA into small siRNA fragments for gene silencing.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.15 Å',
         organism: 'Gallus gallus',
-        depositionDate: '2005-09-28' },
-    { id: '2E4T', title: 'Crystal structure of Cel44A, GH family 44 endoglucanase from Clostridium thermocellum', category: 'Signaling', description: 'Blood booster.', details: 'EPO stimulates red blood cell production. Famous for its use in sports doping.',
+        depositionDate: '2005-09-28'
+    },
+    {
+        id: '2E4T', title: 'Crystal structure of Cel44A, GH family 44 endoglucanase from Clostridium thermocellum', category: 'Signaling', description: 'Blood booster.', details: 'EPO stimulates red blood cell production. Famous for its use in sports doping.',
         method: 'X-RAY DIFFRACTION',
         resolution: '0.96 Å',
         organism: 'Clostridium thermocellum',
-        depositionDate: '2006-12-16' },
-    { id: '2F8B', title: 'NMR structure of the C-terminal domain (dimer) of HPV45 oncoprotein E7', category: 'Transport', description: 'Iron storage.', details: 'A nanocage that stores 4,500 iron atoms safely inside, protecting the cell from oxidative damage.',
+        depositionDate: '2006-12-16'
+    },
+    {
+        id: '2F8B', title: 'NMR structure of the C-terminal domain (dimer) of HPV45 oncoprotein E7', category: 'Transport', description: 'Iron storage.', details: 'A nanocage that stores 4,500 iron atoms safely inside, protecting the cell from oxidative damage.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Human papillomavirus type 45',
-        depositionDate: '2005-12-02' },
-    { id: '2G87', title: 'Crystallographic model of bathorhodopsin', category: 'Enzymes', description: 'Detox.', details: 'Conjugates the antioxidant glutathione to toxins, tagging them for export from the cell.',
+        depositionDate: '2005-12-02'
+    },
+    {
+        id: '2G87', title: 'Crystallographic model of bathorhodopsin', category: 'Enzymes', description: 'Detox.', details: 'Conjugates the antioxidant glutathione to toxins, tagging them for export from the cell.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.6 Å',
         organism: 'Bos taurus',
-        depositionDate: '2006-03-02' },
-    { id: '2H4F', title: 'Sir2-p53 peptide-NAD+', category: 'Viral', description: 'Drug target.', details: 'NS3/4A protease essential for Hep C replication. Protease inhibitors cured this disease for many.',
+        depositionDate: '2006-03-02'
+    },
+    {
+        id: '2H4F', title: 'Sir2-p53 peptide-NAD+', category: 'Viral', description: 'Drug target.', details: 'NS3/4A protease essential for Hep C replication. Protease inhibitors cured this disease for many.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2 Å',
         organism: 'Unknown source',
-        depositionDate: '2006-05-24' },
-    { id: '2I13', title: 'Aart, a six finger zinc finger designed to recognize ANN triplets', category: 'Signaling', description: 'Kinase domain.', details: 'The tyrosine kinase domain that activates when insulin binds outside the cell.',
+        depositionDate: '2006-05-24'
+    },
+    {
+        id: '2I13', title: 'Aart, a six finger zinc finger designed to recognize ANN triplets', category: 'Signaling', description: 'Kinase domain.', details: 'The tyrosine kinase domain that activates when insulin binds outside the cell.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.96 Å',
-        organism: 'Mus musculus',
-        depositionDate: '2006-08-12' },
-    { id: '2J4Z', title: 'Structure of Aurora-2 in complex with PHA-680626', category: 'Signaling', description: 'Blood cell signal.', details: 'A kinase coupled to cytokine receptors. Mutations here cause polycythemia vera (too many red blood cells).',
+        organism: 'Unknown source',
+        depositionDate: '2006-08-12'
+    },
+    {
+        id: '2J4Z', title: 'Structure of Aurora-2 in complex with PHA-680626', category: 'Signaling', description: 'Blood cell signal.', details: 'A kinase coupled to cytokine receptors. Mutations here cause polycythemia vera (too many red blood cells).',
         method: 'X-RAY DIFFRACTION',
         resolution: '2 Å',
         organism: 'HOMO SAPIENS',
-        depositionDate: '2006-09-08' },
-    { id: '2K9J', title: 'Integrin alphaIIb-beta3 transmembrane complex', category: 'DNA/RNA', description: 'Broken DNA binder.', details: 'A ring that slides onto broken DNA ends to hold them together for non-homologous end joining repair.',
+        depositionDate: '2006-09-08'
+    },
+    {
+        id: '2K9J', title: 'Integrin alphaIIb-beta3 transmembrane complex', category: 'DNA/RNA', description: 'Broken DNA binder.', details: 'A ring that slides onto broken DNA ends to hold them together for non-homologous end joining repair.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Homo sapiens',
-        depositionDate: '2008-10-15' },
-    { id: '2L7R', title: 'Solution NMR structure of N-terminal Ubiquitin-like domain of FUBI, a ribosomal protein S30 precursor from Homo sapiens. NorthEast Structural Genomics consortium (NESG) target HR6166', category: 'Immune', description: 'Antimicrobial.', details: 'Iron-binding protein in milk that starves bacteria of iron and attacks their membranes.',
+        depositionDate: '2008-10-15'
+    },
+    {
+        id: '2L7R', title: 'Solution NMR structure of N-terminal Ubiquitin-like domain of FUBI, a ribosomal protein S30 precursor from Homo sapiens. NorthEast Structural Genomics consortium (NESG) target HR6166', category: 'Immune', description: 'Antimicrobial.', details: 'Iron-binding protein in milk that starves bacteria of iron and attacks their membranes.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Homo sapiens',
-        depositionDate: '2010-12-20' },
-    { id: '2M6I', title: 'Putative pentameric open-channel structure of full-length transmembrane domains of human glycine receptor alpha1 subunit', category: 'Signaling', description: 'Pheromone carrier.', details: 'Binds mouse pheromones to signal dominance and attraction.',
+        depositionDate: '2010-12-20'
+    },
+    {
+        id: '2M6I', title: 'Putative pentameric open-channel structure of full-length transmembrane domains of human glycine receptor alpha1 subunit', category: 'Signaling', description: 'Pheromone carrier.', details: 'Binds mouse pheromones to signal dominance and attraction.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Homo sapiens',
-        depositionDate: '2013-03-29' },
-    { id: '2N7F', title: 'NMR solution structure of muO-conotoxin MfVIA', category: 'Enzymes', description: 'Signaling gas.', details: 'Makes Nitric Oxide (NO), a gas that relaxes blood vessels (vasodilation).',
+        depositionDate: '2013-03-29'
+    },
+    {
+        id: '2N7F', title: 'NMR solution structure of muO-conotoxin MfVIA', category: 'Enzymes', description: 'Signaling gas.', details: 'Makes Nitric Oxide (NO), a gas that relaxes blood vessels (vasodilation).',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'synthetic construct',
-        depositionDate: '2015-09-09' },
-    { id: '2O5I', title: 'Crystal structure of the T. thermophilus RNA polymerase elongation complex', category: 'Transport', description: 'Membrane channel.', details: 'Another classic porin. Note the difference in loop structure compared to other porins.',
+        depositionDate: '2015-09-09'
+    },
+    {
+        id: '2O5I', title: 'Crystal structure of the T. thermophilus RNA polymerase elongation complex', category: 'Transport', description: 'Membrane channel.', details: 'Another classic porin. Note the difference in loop structure compared to other porins.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.5 Å',
         organism: 'Thermus thermophilus',
-        depositionDate: '2006-12-06' },
-    { id: '2P1H', title: 'Rapid Folding and Unfolding of Apaf-1 CARD', category: 'Enzymes', description: 'Glycolysis valve.', details: 'The "pacemaker" of glycolysis. It is allosterically inhibited by ATP, slowing consumption when energy is high.',
+        depositionDate: '2006-12-06'
+    },
+    {
+        id: '2P1H', title: 'Rapid Folding and Unfolding of Apaf-1 CARD', category: 'Enzymes', description: 'Glycolysis valve.', details: 'The "pacemaker" of glycolysis. It is allosterically inhibited by ATP, slowing consumption when energy is high.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.59 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2007-03-05' },
-    { id: '2Q66', title: 'Structure of Yeast Poly(A) Polymerase with ATP and oligo(A)', category: 'Enzymes', description: 'Cancer protection.', details: 'Protects cells from quinone toxicity. Levels are induced by broccoli and other cruciferous vegetables.',
+        depositionDate: '2007-03-05'
+    },
+    {
+        id: '2Q66', title: 'Structure of Yeast Poly(A) Polymerase with ATP and oligo(A)', category: 'Enzymes', description: 'Cancer protection.', details: 'Protects cells from quinone toxicity. Levels are induced by broccoli and other cruciferous vegetables.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.8 Å',
         organism: 'Saccharomyces cerevisiae',
-        depositionDate: '2007-06-04' },
-    { id: '2R7G', title: 'Structure of the retinoblastoma protein pocket domain in complex with adenovirus E1A CR1 domain', category: 'Signaling', description: 'Vision reset.', details: 'Phosphorylates light-activated rhodopsin to turn off the visual signal.',
+        depositionDate: '2007-06-04'
+    },
+    {
+        id: '2R7G', title: 'Structure of the retinoblastoma protein pocket domain in complex with adenovirus E1A CR1 domain', category: 'Signaling', description: 'Vision reset.', details: 'Phosphorylates light-activated rhodopsin to turn off the visual signal.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.671 Å',
-        organism: 'Human adenovirus 5',
-        depositionDate: '2007-09-07' },
-    { id: '1AO6', title: 'CRYSTAL STRUCTURE OF HUMAN SERUM ALBUMIN', category: 'Transport', description: 'Blood carrier.', details: 'The most abundant protein in blood plasma. It carries fatty acids, hormones, and drugs.',
+        organism: 'Homo sapiens',
+        depositionDate: '2007-09-07'
+    },
+    {
+        id: '1AO6', title: 'CRYSTAL STRUCTURE OF HUMAN SERUM ALBUMIN', category: 'Transport', description: 'Blood carrier.', details: 'The most abundant protein in blood plasma. It carries fatty acids, hormones, and drugs.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.5 Å',
         organism: 'Homo sapiens',
-        depositionDate: '1997-07-18' },
-    { id: '1PPB', title: 'THE REFINED 1.9 ANGSTROMS CRYSTAL STRUCTURE OF HUMAN ALPHA-THROMBIN: INTERACTION WITH D-PHE-PRO-ARG CHLOROMETHYLKETONE AND SIGNIFICANCE OF THE TYR-PRO-PRO-TRP INSERTION SEGMENT', category: 'Enzymes', description: 'Blood clotting.', details: 'The serine protease that converts fibrinogen to fibrin, forming the mesh of a blood clot.',
+        depositionDate: '1997-07-18'
+    },
+    {
+        id: '1PPB', title: 'THE REFINED 1.9 ANGSTROMS CRYSTAL STRUCTURE OF HUMAN ALPHA-THROMBIN: INTERACTION WITH D-PHE-PRO-ARG CHLOROMETHYLKETONE AND SIGNIFICANCE OF THE TYR-PRO-PRO-TRP INSERTION SEGMENT', category: 'Enzymes', description: 'Blood clotting.', details: 'The serine protease that converts fibrinogen to fibrin, forming the mesh of a blood clot.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.92 Å',
         organism: 'Homo sapiens',
-        depositionDate: '1991-10-24' },
-    { id: '1LME', title: 'Crystal Structure of Peptide Deformylase from Thermotoga maritima', category: 'Enzymes', description: 'Clot buster.', details: 'Activates plasmin to dissolve blood clots. Used clinically for heart attacks and strokes.',
+        depositionDate: '1991-10-24'
+    },
+    {
+        id: '1LME', title: 'Crystal Structure of Peptide Deformylase from Thermotoga maritima', category: 'Enzymes', description: 'Clot buster.', details: 'Activates plasmin to dissolve blood clots. Used clinically for heart attacks and strokes.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.2 Å',
         organism: 'Thermotoga maritima',
-        depositionDate: '2002-05-01' },
+        depositionDate: '2002-05-01'
+    },
     // --- BATCH 4 ADDITIONS (25 VERIFIED) ---
-    { id: '1PRC', title: 'CRYSTALLOGRAPHIC REFINEMENT AT 2.3 ANGSTROMS RESOLUTION AND REFINED MODEL OF THE PHOTOSYNTHETIC REACTION CENTER FROM RHODOPSEUDOMONAS VIRIDIS', category: 'Energy', description: 'Photosynthesis Nobel.', details: 'The first membrane protein structure ever solved (Nobel 1988). It captures light energy to create an electric voltage across the membrane.',
+    {
+        id: '1PRC', title: 'CRYSTALLOGRAPHIC REFINEMENT AT 2.3 ANGSTROMS RESOLUTION AND REFINED MODEL OF THE PHOTOSYNTHETIC REACTION CENTER FROM RHODOPSEUDOMONAS VIRIDIS', category: 'Energy', description: 'Photosynthesis Nobel.', details: 'The first membrane protein structure ever solved (Nobel 1988). It captures light energy to create an electric voltage across the membrane.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.3 Å',
         organism: 'Blastochloris viridis',
-        depositionDate: '1988-02-04' },
-    { id: '6P6W', title: 'Cryo-EM structure of voltage-gated sodium channel NavAb N49K/L109A/M116V/G94C/Q150C disulfide crosslinked mutant in the resting state', category: 'Transport', description: 'Touch receptor.', details: 'The massive "propeller" channel that senses mechanical force (touch). It won the 2021 Nobel Prize in Physiology.',
+        depositionDate: '1988-02-04'
+    },
+    {
+        id: '6P6W', title: 'Cryo-EM structure of voltage-gated sodium channel NavAb N49K/L109A/M116V/G94C/Q150C disulfide crosslinked mutant in the resting state', category: 'Transport', description: 'Touch receptor.', details: 'The massive "propeller" channel that senses mechanical force (touch). It won the 2021 Nobel Prize in Physiology.',
         method: 'ELECTRON MICROSCOPY',
         resolution: '4 Å',
         organism: 'Escherichia coli K-12',
-        depositionDate: '2019-06-04' },
-    { id: '5Z62', title: 'Structure of human cytochrome c oxidase', category: 'Transport', description: 'Capsaicin receptor.', details: 'The receptor that makes chili peppers feel hot. It senses heat and pain molecules like capsaicin. (Nobel 2021).',
+        depositionDate: '2019-06-04'
+    },
+    {
+        id: '5Z62', title: 'Structure of human cytochrome c oxidase', category: 'Transport', description: 'Capsaicin receptor.', details: 'The receptor that makes chili peppers feel hot. It senses heat and pain molecules like capsaicin. (Nobel 2021).',
         method: 'ELECTRON MICROSCOPY',
         resolution: '3.6 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2018-01-22' },
-    { id: '5KXI', title: 'X-ray structure of the human Alpha4Beta2 nicotinic receptor', category: 'Viral', description: 'Viral Envelope.', details: 'The cryo-EM structure of the mature Zika virus. It reveals how the virus protects its genetic material and infects cells.',
+        depositionDate: '2018-01-22'
+    },
+    {
+        id: '5KXI', title: 'X-ray structure of the human Alpha4Beta2 nicotinic receptor', category: 'Viral', description: 'Viral Envelope.', details: 'The cryo-EM structure of the mature Zika virus. It reveals how the virus protects its genetic material and infects cells.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.941 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2016-07-20' },
-    { id: '4IAR', title: 'Crystal structure of the chimeric protein of 5-HT1B-BRIL in complex with ergotamine (PSI Community Target)', category: 'Transport', description: 'Cystic Fibrosis.', details: 'The chloride channel that is mutated in Cystic Fibrosis. Understanding this structure helps develop drugs like Trikafta.',
+        depositionDate: '2016-07-20'
+    },
+    {
+        id: '4IAR', title: 'Crystal structure of the chimeric protein of 5-HT1B-BRIL in complex with ergotamine (PSI Community Target)', category: 'Transport', description: 'Cystic Fibrosis.', details: 'The chloride channel that is mutated in Cystic Fibrosis. Understanding this structure helps develop drugs like Trikafta.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.7 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2012-12-07' },
-    { id: '1B3T', title: 'EBNA-1 NUCLEAR PROTEIN/DNA COMPLEX', category: 'Viral', description: 'Viral core.', details: 'A pentameric building block of the HIV capsid cone. It protects the viral RNA as it travels to the nucleus.',
+        depositionDate: '2012-12-07'
+    },
+    {
+        id: '1B3T', title: 'EBNA-1 NUCLEAR PROTEIN/DNA COMPLEX', category: 'Viral', description: 'Viral core.', details: 'A pentameric building block of the HIV capsid cone. It protects the viral RNA as it travels to the nucleus.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.2 Å',
         organism: 'Human herpesvirus 4',
-        depositionDate: '1998-12-14' },
-    { id: '1MKT', title: 'CARBOXYLIC ESTER HYDROLASE, 1.72 ANGSTROM TRIGONAL FORM OF THE BOVINE RECOMBINANT PLA2 ENZYME', category: 'Enzymes', description: 'Krebs Cycle.', details: 'The first enzyme of the Krebs (Citric Acid) Cycle. It fuses Acetyl-CoA and Oxaloacetate to produce Citrate.',
+        depositionDate: '1998-12-14'
+    },
+    {
+        id: '1MKT', title: 'CARBOXYLIC ESTER HYDROLASE, 1.72 ANGSTROM TRIGONAL FORM OF THE BOVINE RECOMBINANT PLA2 ENZYME', category: 'Enzymes', description: 'Krebs Cycle.', details: 'The first enzyme of the Krebs (Citric Acid) Cycle. It fuses Acetyl-CoA and Oxaloacetate to produce Citrate.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.72 Å',
         organism: 'Bos taurus',
-        depositionDate: '1997-09-06' },
-    { id: '3H5B', title: 'Crystal structure of wild type HIV-1 protease with novel P1\'-ligand GRL-02031', category: 'Viral', description: 'Tamiflu target.', details: 'The "N" in H1N1. This influenza enzyme helps the virus detach from cells. It is the target of the drug Tamiflu (Oseltamivir).',
+        depositionDate: '1997-09-06'
+    },
+    {
+        id: '3H5B', title: 'Crystal structure of wild type HIV-1 protease with novel P1\'-ligand GRL-02031', category: 'Viral', description: 'Tamiflu target.', details: 'The "N" in H1N1. This influenza enzyme helps the virus detach from cells. It is the target of the drug Tamiflu (Oseltamivir).',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.29 Å',
         organism: 'Human immunodeficiency virus type 1 (BRU ISOLATE)',
-        depositionDate: '2009-04-21' },
-    { id: '2K2C', title: 'Solution NMR structure of N-terminal domain of human pirh2. Northeast Structural Genomics Consortium (NESG) target HT2A', category: 'Structural', description: 'Alzheimer\'s fibril.', details: 'A solid-state NMR structure of the amyloid fibril found in Alzheimer\'s plaques. It shows the cross-beta sheet architecture.',
+        depositionDate: '2009-04-21'
+    },
+    {
+        id: '2K2C', title: 'Solution NMR structure of N-terminal domain of human pirh2. Northeast Structural Genomics Consortium (NESG) target HT2A', category: 'Structural', description: 'Alzheimer\'s fibril.', details: 'A solid-state NMR structure of the amyloid fibril found in Alzheimer\'s plaques. It shows the cross-beta sheet architecture.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Homo sapiens',
-        depositionDate: '2008-03-31' },
-    { id: '1G3P', title: 'CRYSTAL STRUCTURE OF THE N-TERMINAL DOMAINS OF BACTERIOPHAGE MINOR COAT PROTEIN G3P', category: 'Enzymes', description: 'Metabolic enzyme.', details: 'Glucose-6-Phosphate Dehydrogenase protects red blood cells from oxidative stress. Deficiency is the most common enzyme defect in humans.',
+        depositionDate: '2008-03-31'
+    },
+    {
+        id: '1G3P', title: 'CRYSTAL STRUCTURE OF THE N-TERMINAL DOMAINS OF BACTERIOPHAGE MINOR COAT PROTEIN G3P', category: 'Enzymes', description: 'Metabolic enzyme.', details: 'Glucose-6-Phosphate Dehydrogenase protects red blood cells from oxidative stress. Deficiency is the most common enzyme defect in humans.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.46 Å',
         organism: 'Enterobacteria phage M13',
-        depositionDate: '1997-12-22' },
-    { id: '1YCR', title: 'MDM2 BOUND TO THE TRANSACTIVATION DOMAIN OF P53', category: 'Signaling', description: 'Cancer interaction.', details: 'A key protein-protein interface. MDM2 binds to p53 to inhibit it. Many cancer drugs try to break this interaction to reactivate p53.',
+        depositionDate: '1997-12-22'
+    },
+    {
+        id: '1YCR', title: 'MDM2 BOUND TO THE TRANSACTIVATION DOMAIN OF P53', category: 'Signaling', description: 'Cancer interaction.', details: 'A key protein-protein interface. MDM2 binds to p53 to inhibit it. Many cancer drugs try to break this interaction to reactivate p53.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.6 Å',
-        organism: 'Homo sapiens',
-        depositionDate: '1996-09-30' },
-    { id: '1CTF', title: 'STRUCTURE OF THE C-TERMINAL DOMAIN OF THE RIBOSOMAL PROTEIN L7/L12 FROM ESCHERICHIA COLI AT 1.7 ANGSTROMS', category: 'DNA/RNA', description: 'Ribosome stalk.', details: 'A classic NMR structure of the flexible stalk of the ribosome, which recruits translation factors.',
+        organism: 'Unknown source',
+        depositionDate: '1996-09-30'
+    },
+    {
+        id: '1CTF', title: 'STRUCTURE OF THE C-TERMINAL DOMAIN OF THE RIBOSOMAL PROTEIN L7/L12 FROM ESCHERICHIA COLI AT 1.7 ANGSTROMS', category: 'DNA/RNA', description: 'Ribosome stalk.', details: 'A classic NMR structure of the flexible stalk of the ribosome, which recruits translation factors.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.7 Å',
         organism: 'Escherichia coli',
-        depositionDate: '1986-09-02' },
-    { id: '2O60', title: 'Calmodulin bound to peptide from neuronal nitric oxide synthase', category: 'Transport', description: 'Cell communication.', details: 'Connexin-26 forms channels that connect neighboring cells, allowing ions and small molecules to flow directly between them.',
+        depositionDate: '1986-09-02'
+    },
+    {
+        id: '2O60', title: 'Calmodulin bound to peptide from neuronal nitric oxide synthase', category: 'Transport', description: 'Cell communication.', details: 'Connexin-26 forms channels that connect neighboring cells, allowing ions and small molecules to flow directly between them.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.55 Å',
-        organism: 'Gallus gallus',
-        depositionDate: '2006-12-06' },
-    { id: '1LMB', title: 'REFINED 1.8 ANGSTROM CRYSTAL STRUCTURE OF THE LAMBDA REPRESSOR-OPERATOR COMPLEX', category: 'DNA/RNA', description: 'Gene regulation.', details: 'A textbook example of a helix-turn-helix motif binding to DNA. It controls the switch between lysogenic and lytic viral growth.',
+        organism: 'Unknown source',
+        depositionDate: '2006-12-06'
+    },
+    {
+        id: '1LMB', title: 'REFINED 1.8 ANGSTROM CRYSTAL STRUCTURE OF THE LAMBDA REPRESSOR-OPERATOR COMPLEX', category: 'DNA/RNA', description: 'Gene regulation.', details: 'A textbook example of a helix-turn-helix motif binding to DNA. It controls the switch between lysogenic and lytic viral growth.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.8 Å',
         organism: 'Enterobacteria phage lambda',
-        depositionDate: '1991-11-05' },
-    { id: '1D4B', title: 'CIDE-N DOMAIN OF HUMAN CIDE-B', category: 'DNA/RNA', description: 'DNA repair.', details: 'The smallest eukaryotic DNA polymerase. It performs "base excision repair" to fix damaged DNA bases.',
+        depositionDate: '1991-11-05'
+    },
+    {
+        id: '1D4B', title: 'CIDE-N DOMAIN OF HUMAN CIDE-B', category: 'DNA/RNA', description: 'DNA repair.', details: 'The smallest eukaryotic DNA polymerase. It performs "base excision repair" to fix damaged DNA bases.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Homo sapiens',
-        depositionDate: '1999-10-02' },
-    { id: '1TOS', title: 'TORPEDO CALIFORNICA ACHR RECEPTOR [ALA76] ANALOGUE COMPLEXED WITH THE ANTI-ACETYLCHOLINE MAB6 MONOCLONAL ANTIBODY', category: 'Enzymes', description: 'Clot activator.', details: 'A bacterial protein that activates human plasminogen. It is used medically to dissolve blood clots in heart attacks.',
+        depositionDate: '1999-10-02'
+    },
+    {
+        id: '1TOS', title: 'TORPEDO CALIFORNICA ACHR RECEPTOR [ALA76] ANALOGUE COMPLEXED WITH THE ANTI-ACETYLCHOLINE MAB6 MONOCLONAL ANTIBODY', category: 'Enzymes', description: 'Clot activator.', details: 'A bacterial protein that activates human plasminogen. It is used medically to dissolve blood clots in heart attacks.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Torpedo californica',
-        depositionDate: '1995-10-11' },
-    { id: '1KDM', title: 'THE CRYSTAL STRUCTURE OF THE HUMAN SEX HORMONE-BINDING GLOBULIN (TETRAGONAL CRYSTAL FORM)', category: 'Enzymes', description: 'Tissue remodeling.', details: 'Matrix Metalloproteinase 1 (MMP-1). It is one of the few enzymes capable of cutting the tough triple helix of collagen.',
+        depositionDate: '1995-10-11'
+    },
+    {
+        id: '1KDM', title: 'THE CRYSTAL STRUCTURE OF THE HUMAN SEX HORMONE-BINDING GLOBULIN (TETRAGONAL CRYSTAL FORM)', category: 'Enzymes', description: 'Tissue remodeling.', details: 'Matrix Metalloproteinase 1 (MMP-1). It is one of the few enzymes capable of cutting the tough triple helix of collagen.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.35 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2001-11-13' },
-    { id: '5NL0', title: 'Crystal structure of a 197-bp palindromic 601L nucleosome in complex with linker histone H1', category: 'DNA/RNA', description: 'Linker histone.', details: 'Unlike core histones, H1 sits on the outside of the nucleosome to seal the DNA wrap, helping condense chromatin into chromosomes.',
+        depositionDate: '2001-11-13'
+    },
+    {
+        id: '5NL0', title: 'Crystal structure of a 197-bp palindromic 601L nucleosome in complex with linker histone H1', category: 'DNA/RNA', description: 'Linker histone.', details: 'Unlike core histones, H1 sits on the outside of the nucleosome to seal the DNA wrap, helping condense chromatin into chromosomes.',
         method: 'X-RAY DIFFRACTION',
         resolution: '5.4 Å',
         organism: 'Xenopus laevis',
-        depositionDate: '2017-04-03' },
-    { id: '1DXT', title: 'HIGH-RESOLUTION X-RAY STUDY OF DEOXY RECOMBINANT HUMAN HEMOGLOBINS SYNTHESIZED FROM BETA-GLOBINS HAVING MUTATED AMINO TERMINI', category: 'Toxins', description: 'Deadly inhibitor.', details: 'A potent toxin that shuts down protein synthesis in host cells by modifying Elongation Factor 2.',
+        depositionDate: '2017-04-03'
+    },
+    {
+        id: '1DXT', title: 'HIGH-RESOLUTION X-RAY STUDY OF DEOXY RECOMBINANT HUMAN HEMOGLOBINS SYNTHESIZED FROM BETA-GLOBINS HAVING MUTATED AMINO TERMINI', category: 'Toxins', description: 'Deadly inhibitor.', details: 'A potent toxin that shuts down protein synthesis in host cells by modifying Elongation Factor 2.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.7 Å',
         organism: 'Homo sapiens',
-        depositionDate: '1992-05-06' },
-    { id: '1JIJ', title: 'Crystal structure of S. aureus TyrRS in complex with SB-239629', category: 'Enzymes', description: 'Bioluminescence.', details: 'The enzyme from fireflies that converts chemical energy (ATP) into visible light. Used as a reporter in biological assays.',
+        depositionDate: '1992-05-06'
+    },
+    {
+        id: '1JIJ', title: 'Crystal structure of S. aureus TyrRS in complex with SB-239629', category: 'Enzymes', description: 'Bioluminescence.', details: 'The enzyme from fireflies that converts chemical energy (ATP) into visible light. Used as a reporter in biological assays.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.2 Å',
         organism: 'Staphylococcus aureus',
-        depositionDate: '2001-07-02' },
-    { id: '5N2E', title: 'Structure of the E9 DNA polymerase from vaccinia virus', category: 'Enzymes', description: 'RNA targeting.', details: 'A CRISPR enzyme that targets RNA instead of DNA. It is used for precise RNA editing and diagnostic detection.',
+        depositionDate: '2001-07-02'
+    },
+    {
+        id: '5N2E', title: 'Structure of the E9 DNA polymerase from vaccinia virus', category: 'Enzymes', description: 'RNA targeting.', details: 'A CRISPR enzyme that targets RNA instead of DNA. It is used for precise RNA editing and diagnostic detection.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.74 Å',
         organism: 'Vaccinia virus (strain Copenhagen)',
-        depositionDate: '2017-02-07' },
-    { id: '1QO1', title: 'Molecular Architecture of the Rotary Motor in ATP Synthase from Yeast Mitochondria', category: 'Viral', description: 'Icosahedral shell.', details: 'The core particle of Hepatitis B. It assembles from dimers into a T=4 icosahedral shell to protect the viral genome.',
+        depositionDate: '2017-02-07'
+    },
+    {
+        id: '1QO1', title: 'Molecular Architecture of the Rotary Motor in ATP Synthase from Yeast Mitochondria', category: 'Viral', description: 'Icosahedral shell.', details: 'The core particle of Hepatitis B. It assembles from dimers into a T=4 icosahedral shell to protect the viral genome.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.9 Å',
         organism: 'SACCHAROMYCES CEREVISIAE',
-        depositionDate: '1999-11-01' },
-    { id: '1SLQ', title: 'Crystal structure of the trimeric state of the rhesus rotavirus VP4 membrane interaction domain, VP5CT', category: 'Signaling', description: 'NO sensor.', details: 'The receptor for Nitric Oxide (NO). When NO binds to its heme, it produces cGMP to relax smooth muscle.',
+        depositionDate: '1999-11-01'
+    },
+    {
+        id: '1SLQ', title: 'Crystal structure of the trimeric state of the rhesus rotavirus VP4 membrane interaction domain, VP5CT', category: 'Signaling', description: 'NO sensor.', details: 'The receptor for Nitric Oxide (NO). When NO binds to its heme, it produces cGMP to relax smooth muscle.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.2 Å',
         organism: 'Rhesus rotavirus',
-        depositionDate: '2004-03-06' },
-    { id: '1MOX', title: 'Crystal Structure of Human Epidermal Growth Factor Receptor (residues 1-501) in complex with TGF-alpha', category: 'Immune', description: 'Green enzyme.', details: 'Found in neutrophils (pus). It produces hypochlorous acid (bleach) to kill bacteria. Its green color comes from a unique heme group.',
+        depositionDate: '2004-03-06'
+    },
+    {
+        id: '1MOX', title: 'Crystal Structure of Human Epidermal Growth Factor Receptor (residues 1-501) in complex with TGF-alpha', category: 'Immune', description: 'Green enzyme.', details: 'Found in neutrophils (pus). It produces hypochlorous acid (bleach) to kill bacteria. Its green color comes from a unique heme group.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.5 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2002-09-10' },
-    { id: '1DLH', title: 'CRYSTAL STRUCTURE OF THE HUMAN CLASS II MHC PROTEIN HLA-DR1 COMPLEXED WITH AN INFLUENZA VIRUS PEPTIDE', category: 'Signaling', description: 'Pain receptor.', details: 'A G-protein coupled receptor involved in pain relief (analgesia). It is a target for enkephalins and painkiller drugs.',
+        depositionDate: '2002-09-10'
+    },
+    {
+        id: '1DLH', title: 'CRYSTAL STRUCTURE OF THE HUMAN CLASS II MHC PROTEIN HLA-DR1 COMPLEXED WITH AN INFLUENZA VIRUS PEPTIDE', category: 'Signaling', description: 'Pain receptor.', details: 'A G-protein coupled receptor involved in pain relief (analgesia). It is a target for enkephalins and painkiller drugs.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.8 Å',
-        organism: 'Homo sapiens',
-        depositionDate: '1994-02-15' },
+        organism: 'Unknown source',
+        depositionDate: '1994-02-15'
+    },
     // --- BATCH 5 ADDITIONS (25 VERIFIED) ---
-    { id: '3WU2', title: 'Crystal structure analysis of Photosystem II complex', category: 'Energy', description: 'Oxygen engine.', details: 'The enzyme that changed the world. It uses light to split water, releasing the oxygen we breathe. This specific structure shows the oxygen-evolving complex.',
+    {
+        id: '3WU2', title: 'Crystal structure analysis of Photosystem II complex', category: 'Energy', description: 'Oxygen engine.', details: 'The enzyme that changed the world. It uses light to split water, releasing the oxygen we breathe. This specific structure shows the oxygen-evolving complex.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.9 Å',
         organism: 'Thermosynechococcus vulcanus',
-        depositionDate: '2014-04-21' },
-    { id: '1XPW', title: 'Solution NMR Structure of human protein HSPCO34. Northeast Structural Genomics Target HR1958', category: 'Energy', description: 'Light harvesting.', details: 'The most abundant membrane protein on Earth. It acts as a solar panel, capturing photons and funneling the energy to Photosystems.',
+        depositionDate: '2014-04-21'
+    },
+    {
+        id: '1XPW', title: 'Solution NMR Structure of human protein HSPCO34. Northeast Structural Genomics Target HR1958', category: 'Energy', description: 'Light harvesting.', details: 'The most abundant membrane protein on Earth. It acts as a solar panel, capturing photons and funneling the energy to Photosystems.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Homo sapiens',
-        depositionDate: '2004-10-09' },
-    { id: '1PKN', title: 'STRUCTURE OF RABBIT MUSCLE PYRUVATE KINASE COMPLEXED WITH MN2+, K+, AND PYRUVATE', category: 'Enzymes', description: 'Glycolysis finale.', details: 'The final step of glycolysis. It generates ATP from PEP. This enzyme is regulated to control the metabolic flux of the cell.',
+        depositionDate: '2004-10-09'
+    },
+    {
+        id: '1PKN', title: 'STRUCTURE OF RABBIT MUSCLE PYRUVATE KINASE COMPLEXED WITH MN2+, K+, AND PYRUVATE', category: 'Enzymes', description: 'Glycolysis finale.', details: 'The final step of glycolysis. It generates ATP from PEP. This enzyme is regulated to control the metabolic flux of the cell.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.9 Å',
         organism: 'Oryctolagus cuniculus',
-        depositionDate: '1994-03-25' },
-    { id: '1I10', title: 'HUMAN MUSCLE L-LACTATE DEHYDROGENASE M CHAIN, TERNARY COMPLEX WITH NADH AND OXAMATE', category: 'Enzymes', description: 'Muscle fatigue.', details: 'Converts pyruvate to lactate during intense exercise, allowing glycolysis to continue without oxygen (fermentation).',
+        depositionDate: '1994-03-25'
+    },
+    {
+        id: '1I10', title: 'HUMAN MUSCLE L-LACTATE DEHYDROGENASE M CHAIN, TERNARY COMPLEX WITH NADH AND OXAMATE', category: 'Enzymes', description: 'Muscle fatigue.', details: 'Converts pyruvate to lactate during intense exercise, allowing glycolysis to continue without oxygen (fermentation).',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.3 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2001-01-30' },
-    { id: '1ADC', title: 'CRYSTALLOGRAPHIC STUDIES OF ISOSTERIC NAD ANALOGUES BOUND TO ALCOHOL DEHYDROGENASE: SPECIFICITY AND SUBSTRATE BINDING IN TWO TERNARY COMPLEXES', category: 'Enzymes', description: 'Alcohol breakdown.', details: 'The liver enzyme that detoxifies ethanol. It converts alcohol into acetaldehyde, which is then further broken down.',
+        depositionDate: '2001-01-30'
+    },
+    {
+        id: '1ADC', title: 'CRYSTALLOGRAPHIC STUDIES OF ISOSTERIC NAD ANALOGUES BOUND TO ALCOHOL DEHYDROGENASE: SPECIFICITY AND SUBSTRATE BINDING IN TWO TERNARY COMPLEXES', category: 'Enzymes', description: 'Alcohol breakdown.', details: 'The liver enzyme that detoxifies ethanol. It converts alcohol into acetaldehyde, which is then further broken down.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.7 Å',
         organism: 'Equus caballus',
-        depositionDate: '1993-12-13' },
-    { id: '1CA2', title: 'REFINED STRUCTURE OF HUMAN CARBONIC ANHYDRASE II AT 2.0 ANGSTROMS RESOLUTION', category: 'Enzymes', description: 'pH regulator.', details: 'One of the fastest enzymes known. It converts CO2 to bicarbonate to transport it in blood and regulate pH.',
+        depositionDate: '1993-12-13'
+    },
+    {
+        id: '1CA2', title: 'REFINED STRUCTURE OF HUMAN CARBONIC ANHYDRASE II AT 2.0 ANGSTROMS RESOLUTION', category: 'Enzymes', description: 'pH regulator.', details: 'One of the fastest enzymes known. It converts CO2 to bicarbonate to transport it in blood and regulate pH.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2 Å',
         organism: 'Homo sapiens',
-        depositionDate: '1989-02-06' },
-    { id: '5PEP', title: 'X-RAY ANALYSES OF ASPARTIC PROTEASES. II. THREE-DIMENSIONAL STRUCTURE OF THE HEXAGONAL CRYSTAL FORM OF PORCINE PEPSIN AT 2.3 ANGSTROMS RESOLUTION', category: 'Enzymes', description: 'Stomach digestion.', details: 'A potent protease active in the acidic environment of the stomach (pH 2). It cuts food proteins into peptides.',
+        depositionDate: '1989-02-06'
+    },
+    {
+        id: '5PEP', title: 'X-RAY ANALYSES OF ASPARTIC PROTEASES. II. THREE-DIMENSIONAL STRUCTURE OF THE HEXAGONAL CRYSTAL FORM OF PORCINE PEPSIN AT 2.3 ANGSTROMS RESOLUTION', category: 'Enzymes', description: 'Stomach digestion.', details: 'A potent protease active in the acidic environment of the stomach (pH 2). It cuts food proteins into peptides.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.34 Å',
         organism: 'Sus scrofa',
-        depositionDate: '1990-05-30' },
-    { id: '2REN', title: 'STRUCTURE OF RECOMBINANT HUMAN RENIN, A TARGET FOR CARDIOVASCULAR-ACTIVE DRUGS, AT 2.5 ANGSTROMS RESOLUTION', category: 'Enzymes', description: 'Blood pressure.', details: 'The starting point of the blood pressure regulation system (RAS). Inhibitors of renin are used to treat hypertension.',
+        depositionDate: '1990-05-30'
+    },
+    {
+        id: '2REN', title: 'STRUCTURE OF RECOMBINANT HUMAN RENIN, A TARGET FOR CARDIOVASCULAR-ACTIVE DRUGS, AT 2.5 ANGSTROMS RESOLUTION', category: 'Enzymes', description: 'Blood pressure.', details: 'The starting point of the blood pressure regulation system (RAS). Inhibitors of renin are used to treat hypertension.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.5 Å',
         organism: 'Homo sapiens',
-        depositionDate: '1992-02-05' },
-    { id: '1HYS', title: 'CRYSTAL STRUCTURE OF HIV-1 REVERSE TRANSCRIPTASE IN COMPLEX WITH A POLYPURINE TRACT RNA:DNA', category: 'Viral', description: 'Viral replication.', details: 'The target of AZT. This enzyme copies the viral RNA genome into DNA, which then integrates into the host cell\'s genome.',
+        depositionDate: '1992-02-05'
+    },
+    {
+        id: '1HYS', title: 'CRYSTAL STRUCTURE OF HIV-1 REVERSE TRANSCRIPTASE IN COMPLEX WITH A POLYPURINE TRACT RNA:DNA', category: 'Viral', description: 'Viral replication.', details: 'The target of AZT. This enzyme copies the viral RNA genome into DNA, which then integrates into the host cell\'s genome.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3 Å',
         organism: 'Mus musculus',
-        depositionDate: '2001-01-22' },
-    { id: '2PLV', title: 'STRUCTURAL FACTORS THAT CONTROL CONFORMATIONAL TRANSITIONS AND SEROTYPE SPECIFICITY IN TYPE 3 POLIOVIRUS', category: 'Viral', description: 'Picornavirus.', details: 'A historic structure. This small RNA virus causes poliomyelitis. Salk and Sabin developed vaccines targeting this capsid.',
+        depositionDate: '2001-01-22'
+    },
+    {
+        id: '2PLV', title: 'STRUCTURAL FACTORS THAT CONTROL CONFORMATIONAL TRANSITIONS AND SEROTYPE SPECIFICITY IN TYPE 3 POLIOVIRUS', category: 'Viral', description: 'Picornavirus.', details: 'A historic structure. This small RNA virus causes poliomyelitis. Salk and Sabin developed vaccines targeting this capsid.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.88 Å',
         organism: 'Human poliovirus 1',
-        depositionDate: '1989-10-17' },
-    { id: '4RHV', title: 'THE USE OF MOLECULAR-REPLACEMENT PHASES FOR THE REFINEMENT OF THE HUMAN RHINOVIRUS 14 STRUCTURE', category: 'Viral', description: 'Common cold.', details: 'The primary cause of the common cold. It has a canyon on its surface that hides the receptor-binding site from antibodies.',
+        depositionDate: '1989-10-17'
+    },
+    {
+        id: '4RHV', title: 'THE USE OF MOLECULAR-REPLACEMENT PHASES FOR THE REFINEMENT OF THE HUMAN RHINOVIRUS 14 STRUCTURE', category: 'Viral', description: 'Common cold.', details: 'The primary cause of the common cold. It has a canyon on its surface that hides the receptor-binding site from antibodies.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3 Å',
         organism: 'Human rhinovirus 14',
-        depositionDate: '1988-01-25' },
-    { id: '5JQ3', title: 'Crystal structure of Ebola glycoprotein', category: 'Viral', description: 'Ebola surface.', details: 'The trimeric spike protein on the surface of Ebola. It mediates fusion with host cells and is the target of antibody therapies.',
+        depositionDate: '1988-01-25'
+    },
+    {
+        id: '5JQ3', title: 'Crystal structure of Ebola glycoprotein', category: 'Viral', description: 'Ebola surface.', details: 'The trimeric spike protein on the surface of Ebola. It mediates fusion with host cells and is the target of antibody therapies.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.23 Å',
         organism: 'Ebola virus - Mayinga, Zaire, 1976',
-        depositionDate: '2016-05-04' },
-    { id: '1K4R', title: 'Structure of Dengue Virus', category: 'Viral', description: 'Viral fusion.', details: 'The envelope protein of Dengue virus. It changes shape in the acidic endosome to fuse the viral membrane with the cell.',
+        depositionDate: '2016-05-04'
+    },
+    {
+        id: '1K4R', title: 'Structure of Dengue Virus', category: 'Viral', description: 'Viral fusion.', details: 'The envelope protein of Dengue virus. It changes shape in the acidic endosome to fuse the viral membrane with the cell.',
         method: 'ELECTRON MICROSCOPY',
         resolution: '24 Å',
         organism: 'Chimeric Tick-borne encephalitis virus/Dengue virus 4',
-        depositionDate: '2001-10-08' },
-    { id: '1XI4', title: 'Clathrin D6 Coat', category: 'Structural', description: 'Vesicle coat.', details: 'The terminal domain of the clathrin triskelion. These self-assemble into diverse cage shapes to bud vesicles from membranes.',
+        depositionDate: '2001-10-08'
+    },
+    {
+        id: '1XI4', title: 'Clathrin D6 Coat', category: 'Structural', description: 'Vesicle coat.', details: 'The terminal domain of the clathrin triskelion. These self-assemble into diverse cage shapes to bud vesicles from membranes.',
         method: 'ELECTRON MICROSCOPY',
         resolution: '7.9 Å',
         organism: 'Bos taurus',
-        depositionDate: '2004-09-21' },
-    { id: '3SNH', title: 'Crystal structure of nucleotide-free human dynamin1', category: 'Structural', description: 'Membrane pincher.', details: 'A molecular noose. Dynamin forms a spiral around the neck of a budding vesicle and constricts (using GTP) to pinch it off.',
+        depositionDate: '2004-09-21'
+    },
+    {
+        id: '3SNH', title: 'Crystal structure of nucleotide-free human dynamin1', category: 'Structural', description: 'Membrane pincher.', details: 'A molecular noose. Dynamin forms a spiral around the neck of a budding vesicle and constricts (using GTP) to pinch it off.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.7 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2011-06-29' },
-    { id: '1SFC', title: 'NEURONAL SYNAPTIC FUSION COMPLEX', category: 'Signaling', description: 'Membrane fusion.', details: 'The machine that fuses synaptic vesicles. Four helices zip together with incredible force to pull two membranes into one.',
+        depositionDate: '2011-06-29'
+    },
+    {
+        id: '1SFC', title: 'NEURONAL SYNAPTIC FUSION COMPLEX', category: 'Signaling', description: 'Membrane fusion.', details: 'The machine that fuses synaptic vesicles. Four helices zip together with incredible force to pull two membranes into one.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.4 Å',
         organism: 'Rattus norvegicus',
-        depositionDate: '1998-08-24' },
-    { id: '1NCC', title: 'CRYSTAL STRUCTURES OF TWO MUTANT NEURAMINIDASE-ANTIBODY COMPLEXES WITH AMINO ACID SUBSTITUTIONS IN THE INTERFACE', category: 'Structural', description: 'Cell adhesion.', details: 'Calcium-dependent adhesion molecules that zip cells together like Velcro to form solid tissues.',
+        depositionDate: '1998-08-24'
+    },
+    {
+        id: '1NCC', title: 'CRYSTAL STRUCTURES OF TWO MUTANT NEURAMINIDASE-ANTIBODY COMPLEXES WITH AMINO ACID SUBSTITUTIONS IN THE INTERFACE', category: 'Structural', description: 'Cell adhesion.', details: 'Calcium-dependent adhesion molecules that zip cells together like Velcro to form solid tissues.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.5 Å',
         organism: 'Mus musculus',
-        depositionDate: '1992-01-21' },
-    { id: '1ESL', title: 'INSIGHT INTO E-SELECTIN(SLASH)LIGAND INTERACTION FROM THE CRYSTAL STRUCTURE AND MUTAGENESIS OF THE LEC(SLASH)EGF DOMAINS', category: 'Immune', description: 'Inflammation.', details: 'A receptor on blood vessel walls. It grabs passing white blood cells, causing them to roll and stop at sites of infection.',
+        depositionDate: '1992-01-21'
+    },
+    {
+        id: '1ESL', title: 'INSIGHT INTO E-SELECTIN(SLASH)LIGAND INTERACTION FROM THE CRYSTAL STRUCTURE AND MUTAGENESIS OF THE LEC(SLASH)EGF DOMAINS', category: 'Immune', description: 'Inflammation.', details: 'A receptor on blood vessel walls. It grabs passing white blood cells, causing them to roll and stop at sites of infection.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2 Å',
         organism: 'Homo sapiens',
-        depositionDate: '1994-06-03' },
-    { id: '3FXI', title: 'Crystal structure of the human TLR4-human MD-2-E.coli LPS Ra complex', category: 'Immune', description: 'Pathogen sensor.', details: 'Toll-Like Receptor 3. It recognizes double-stranded RNA (a sign of viral infection) and triggers the innate immune system.',
+        depositionDate: '1994-06-03'
+    },
+    {
+        id: '3FXI', title: 'Crystal structure of the human TLR4-human MD-2-E.coli LPS Ra complex', category: 'Immune', description: 'Pathogen sensor.', details: 'Toll-Like Receptor 3. It recognizes double-stranded RNA (a sign of viral infection) and triggers the innate immune system.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.1 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2009-01-21' },
-    { id: '4TLL', title: 'Crystal structure of GluN1/GluN2B NMDA receptor, structure 1', category: 'Signaling', description: 'Memory formation.', details: 'A glutamate receptor critical for synaptic plasticity and memory. It requires both glutamate and glycine to open.',
+        depositionDate: '2009-01-21'
+    },
+    {
+        id: '4TLL', title: 'Crystal structure of GluN1/GluN2B NMDA receptor, structure 1', category: 'Signaling', description: 'Memory formation.', details: 'A glutamate receptor critical for synaptic plasticity and memory. It requires both glutamate and glycine to open.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.59 Å',
         organism: 'Xenopus laevis',
-        depositionDate: '2014-05-30' },
-    { id: '4COF', title: 'Crystal structure of a human gamma-aminobutyric acid receptor, the GABA(A)R-beta3 homopentamer', category: 'Signaling', description: 'Sedation target.', details: 'The brain\'s main inhibitory channel. It is the target of benzodiazepines (Valium) and anesthetics.',
+        depositionDate: '2014-05-30'
+    },
+    {
+        id: '4COF', title: 'Crystal structure of a human gamma-aminobutyric acid receptor, the GABA(A)R-beta3 homopentamer', category: 'Signaling', description: 'Sedation target.', details: 'The brain\'s main inhibitory channel. It is the target of benzodiazepines (Valium) and anesthetics.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.97 Å',
         organism: 'HOMO SAPIENS',
-        depositionDate: '2014-01-28' },
-    { id: '1AP8', title: 'TRANSLATION INITIATION FACTOR EIF4E IN COMPLEX WITH M7GDP, NMR, 20 STRUCTURES', category: 'Enzymes', description: 'Cell death.', details: 'AIF (Apoptosis Inducing Factor). It travels from the mitochondria to the nucleus to trigger DNA fragmentation and cell death.',
+        depositionDate: '2014-01-28'
+    },
+    {
+        id: '1AP8', title: 'TRANSLATION INITIATION FACTOR EIF4E IN COMPLEX WITH M7GDP, NMR, 20 STRUCTURES', category: 'Enzymes', description: 'Cell death.', details: 'AIF (Apoptosis Inducing Factor). It travels from the mitochondria to the nucleus to trigger DNA fragmentation and cell death.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Saccharomyces cerevisiae',
-        depositionDate: '1997-07-25' },
-    { id: '1QLS', title: 'S100C (S100A11),OR CALGIZZARIN, IN COMPLEX WITH ANNEXIN I N-TERMINUS', category: 'Chaperone', description: 'Heat shock.', details: 'The workhorse chaperone. It clamps onto exposed hydrophobic patches of unfolded proteins to prevent aggregation.',
+        depositionDate: '1997-07-25'
+    },
+    {
+        id: '1QLS', title: 'S100C (S100A11),OR CALGIZZARIN, IN COMPLEX WITH ANNEXIN I N-TERMINUS', category: 'Chaperone', description: 'Heat shock.', details: 'The workhorse chaperone. It clamps onto exposed hydrophobic patches of unfolded proteins to prevent aggregation.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.3 Å',
         organism: 'HOMO SAPIENS',
-        depositionDate: '1999-09-15' },
-    { id: '1TUH', title: 'Structure of Bal32a from a Soil-Derived Mobile Gene Cassette', category: 'Structural', description: 'Drug binding.', details: 'Shows how the drug Colchicine binds to tubulin to prevent microtubule polymerization, used to treat gout.',
+        depositionDate: '1999-09-15'
+    },
+    {
+        id: '1TUH', title: 'Structure of Bal32a from a Soil-Derived Mobile Gene Cassette', category: 'Structural', description: 'Drug binding.', details: 'Shows how the drug Colchicine binds to tubulin to prevent microtubule polymerization, used to treat gout.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.85 Å',
         organism: 'uncultured bacterium',
-        depositionDate: '2004-06-25' },
+        depositionDate: '2004-06-25'
+    },
     // --- BATCH 6 ADDITIONS (25 MORE) ---
-    { id: '1OQ5', title: 'CARBONIC ANHYDRASE II IN COMPLEX WITH NANOMOLAR INHIBITOR', category: 'Enzymes', description: 'Leukemia cure.', details: 'The tyrosine kinase targeted by Gleevec (Imatinib). It was the first "rational drug design" success, turning a fatal leukemia into a manageable condition.',
+    {
+        id: '1OQ5', title: 'CARBONIC ANHYDRASE II IN COMPLEX WITH NANOMOLAR INHIBITOR', category: 'Enzymes', description: 'Leukemia cure.', details: 'The tyrosine kinase targeted by Gleevec (Imatinib). It was the first "rational drug design" success, turning a fatal leukemia into a manageable condition.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.5 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2003-03-07' },
-    { id: '1CX2', title: 'CYCLOOXYGENASE-2 (PROSTAGLANDIN SYNTHASE-2) COMPLEXED WITH A SELECTIVE INHIBITOR, SC-558', category: 'Enzymes', description: 'Pain & Inflammation.', details: 'The target of NSAIDs like Celebrex. It produces prostaglandins that cause pain and inflammation. Selective COX-2 inhibitors spare the stomach.',
+        depositionDate: '2003-03-07'
+    },
+    {
+        id: '1CX2', title: 'CYCLOOXYGENASE-2 (PROSTAGLANDIN SYNTHASE-2) COMPLEXED WITH A SELECTIVE INHIBITOR, SC-558', category: 'Enzymes', description: 'Pain & Inflammation.', details: 'The target of NSAIDs like Celebrex. It produces prostaglandins that cause pain and inflammation. Selective COX-2 inhibitors spare the stomach.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3 Å',
         organism: 'Mus musculus',
-        depositionDate: '1996-12-17' },
-    { id: '1UDT', title: 'Crystal structure of Human Phosphodiesterase 5 complexed with Sildenafil(Viagra)', category: 'Enzymes', description: 'Viagra target.', details: 'Phosphodiesterase type 5. Sildenafil (Viagra) binds here to inhibit cGMP breakdown, prolonging vasodilation signal processing.',
+        depositionDate: '1996-12-17'
+    },
+    {
+        id: '1UDT', title: 'Crystal structure of Human Phosphodiesterase 5 complexed with Sildenafil(Viagra)', category: 'Enzymes', description: 'Viagra target.', details: 'Phosphodiesterase type 5. Sildenafil (Viagra) binds here to inhibit cGMP breakdown, prolonging vasodilation signal processing.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.3 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2003-05-06' },
-    { id: '2HYY', title: 'Human Abl kinase domain in complex with imatinib (STI571, Glivec)', category: 'Signaling', description: 'Breast cancer target.', details: 'The growth factor receptor overexpressed in many breast cancers. The monoclonal antibody Herceptin binds here to stop tumor growth.',
+        depositionDate: '2003-05-06'
+    },
+    {
+        id: '2HYY', title: 'Human Abl kinase domain in complex with imatinib (STI571, Glivec)', category: 'Signaling', description: 'Breast cancer target.', details: 'The growth factor receptor overexpressed in many breast cancers. The monoclonal antibody Herceptin binds here to stop tumor growth.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.4 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2006-08-08' },
-    { id: '5I6X', title: 'X-ray structure of the ts3 human serotonin transporter complexed with paroxetine at the central site', category: 'Enzymes', description: 'Cholesterol regulator.', details: 'A protein that destroys LDL receptors. Blocking PCSK9 allows the liver to clear more bad cholesterol from the blood.',
+        depositionDate: '2006-08-08'
+    },
+    {
+        id: '5I6X', title: 'X-ray structure of the ts3 human serotonin transporter complexed with paroxetine at the central site', category: 'Enzymes', description: 'Cholesterol regulator.', details: 'A protein that destroys LDL receptors. Blocking PCSK9 allows the liver to clear more bad cholesterol from the blood.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.14 Å',
-        organism: 'Homo sapiens',
-        depositionDate: '2016-02-16' },
-    { id: '6W41', title: 'Crystal structure of SARS-CoV-2 receptor binding domain in complex with human antibody CR3022', category: 'Viral', description: 'Main Protease.', details: 'The viral enzyme that cuts polyproteins. It is the target of Paxlovid (Nirmatrelvir), preventing the virus from replicating.',
+        organism: 'Mus musculus',
+        depositionDate: '2016-02-16'
+    },
+    {
+        id: '6W41', title: 'Crystal structure of SARS-CoV-2 receptor binding domain in complex with human antibody CR3022', category: 'Viral', description: 'Main Protease.', details: 'The viral enzyme that cuts polyproteins. It is the target of Paxlovid (Nirmatrelvir), preventing the virus from replicating.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.084 Å',
-        organism: 'Severe acute respiratory syndrome coronavirus 2',
-        depositionDate: '2020-03-09' },
-    { id: '3J7L', title: 'Full virus map of brome mosaic virus', category: 'Transport', description: 'Wasabi receptor.', details: 'The chemical sensor for noxious irritants like mustard oil and wasabi. It triggers pain and inflammation signals.',
+        organism: 'Homo sapiens',
+        depositionDate: '2020-03-09'
+    },
+    {
+        id: '3J7L', title: 'Full virus map of brome mosaic virus', category: 'Transport', description: 'Wasabi receptor.', details: 'The chemical sensor for noxious irritants like mustard oil and wasabi. It triggers pain and inflammation signals.',
         method: 'ELECTRON MICROSCOPY',
         resolution: '3.8 Å',
         organism: 'Brome mosaic virus',
-        depositionDate: '2014-07-18' },
-    { id: '5O3L', title: 'Paired helical filament in Alzheimer\'s disease brain', category: 'Enzymes', description: 'Immortality enzyme.', details: 'The enzyme that rebuilds chromosome ends (telomeres). It allows cancer cells to divide indefinitely.',
+        depositionDate: '2014-07-18'
+    },
+    {
+        id: '5O3L', title: 'Paired helical filament in Alzheimer\'s disease brain', category: 'Enzymes', description: 'Immortality enzyme.', details: 'The enzyme that rebuilds chromosome ends (telomeres). It allows cancer cells to divide indefinitely.',
         method: 'ELECTRON MICROSCOPY',
         resolution: '3.4 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2017-05-24' },
-    { id: '1S03', title: 'The Structure of a Ribosomal Protein S8/spc Operon mRNA Complex', category: 'Enzymes', description: 'DNA untangler.', details: 'A molecular machine that cuts both strands of DNA, passes another helix through the gap, and reseals it to remove tangles.',
+        depositionDate: '2017-05-24'
+    },
+    {
+        id: '1S03', title: 'The Structure of a Ribosomal Protein S8/spc Operon mRNA Complex', category: 'Enzymes', description: 'DNA untangler.', details: 'A molecular machine that cuts both strands of DNA, passes another helix through the gap, and reseals it to remove tangles.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.7 Å',
         organism: 'Escherichia coli',
-        depositionDate: '2003-12-29' },
-    { id: '6M0J', title: 'Crystal structure of SARS-CoV-2 spike receptor-binding domain bound with ACE2', category: 'Structural', description: 'COVID entry door.', details: 'The human cell surface receptor that SARS-CoV-2 binds to. Paradoxically, its normal role is to lower blood pressure.',
+        depositionDate: '2003-12-29'
+    },
+    {
+        id: '6M0J', title: 'Crystal structure of SARS-CoV-2 spike receptor-binding domain bound with ACE2', category: 'Structural', description: 'COVID entry door.', details: 'The human cell surface receptor that SARS-CoV-2 binds to. Paradoxically, its normal role is to lower blood pressure.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.45 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2020-02-21' },
-    { id: '1SI8', title: 'Crystal structure of E. faecalis catalase', category: 'Toxins', description: 'Lethal Factor.', details: 'One part of the Anthrax toxin trio. It shears MAPKK enzymes inside the cell, silencing survival signals.',
+        depositionDate: '2020-02-21'
+    },
+    {
+        id: '1SI8', title: 'Crystal structure of E. faecalis catalase', category: 'Toxins', description: 'Lethal Factor.', details: 'One part of the Anthrax toxin trio. It shears MAPKK enzymes inside the cell, silencing survival signals.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.3 Å',
         organism: 'Enterococcus faecalis',
-        depositionDate: '2004-02-28' },
-    { id: '3N4V', title: 'apo APH(2")-IVa form III', category: 'Transport', description: 'Drug pump.', details: 'The bane of chemotherapy. This pump actively ejects drugs from cancer cells, causing multi-drug resistance.',
+        depositionDate: '2004-02-28'
+    },
+    {
+        id: '3N4V', title: 'apo APH(2")-IVa form III', category: 'Transport', description: 'Drug pump.', details: 'The bane of chemotherapy. This pump actively ejects drugs from cancer cells, causing multi-drug resistance.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.4 Å',
         organism: 'Enterococcus casseliflavus',
-        depositionDate: '2010-05-22' },
-    { id: '1FVO', title: 'CRYSTAL STRUCTURE OF HUMAN ORNITHINE TRANSCARBAMYLASE COMPLEXED WITH CARBAMOYL PHOSPHATE', category: 'Enzymes', description: 'Molecular factory.', details: 'A massive multi-enzyme complex that builds fatty acid chains from scratch, passing the growing chain between active sites.',
+        depositionDate: '2010-05-22'
+    },
+    {
+        id: '1FVO', title: 'CRYSTAL STRUCTURE OF HUMAN ORNITHINE TRANSCARBAMYLASE COMPLEXED WITH CARBAMOYL PHOSPHATE', category: 'Enzymes', description: 'Molecular factory.', details: 'A massive multi-enzyme complex that builds fatty acid chains from scratch, passing the growing chain between active sites.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.6 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2000-09-20' },
-    { id: '3B7E', title: 'Neuraminidase of A/Brevig Mission/1/1918 H1N1 strain in complex with zanamivir', category: 'Transport', description: 'Pain threshold.', details: 'A voltage-gated sodium channel essential for sensing pain. Mutations here can cause insensitivity to pain or chronic pain syndromes.',
+        depositionDate: '2000-09-20'
+    },
+    {
+        id: '3B7E', title: 'Neuraminidase of A/Brevig Mission/1/1918 H1N1 strain in complex with zanamivir', category: 'Transport', description: 'Pain threshold.', details: 'A voltage-gated sodium channel essential for sensing pain. Mutations here can cause insensitivity to pain or chronic pain syndromes.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.45 Å',
         organism: 'Influenza A virus',
-        depositionDate: '2007-10-30' },
-    { id: '6V1X', title: 'Cryo-EM Structure of the Hyperpolarization-Activated Potassium Channel KAT1: Tetramer', category: 'Enzymes', description: 'Recycling center.', details: 'The core particle of the cellular trash can. It is a hollow cylinder where tagged proteins are shredded.',
+        depositionDate: '2007-10-30'
+    },
+    {
+        id: '6V1X', title: 'Cryo-EM Structure of the Hyperpolarization-Activated Potassium Channel KAT1: Tetramer', category: 'Enzymes', description: 'Recycling center.', details: 'The core particle of the cellular trash can. It is a hollow cylinder where tagged proteins are shredded.',
         method: 'ELECTRON MICROSCOPY',
         resolution: '3.5 Å',
         organism: 'Arabidopsis thaliana',
-        depositionDate: '2019-11-21' },
-    { id: '1DAN', title: 'Complex of active site inhibited human blood coagulation factor VIIA with human recombinant soluble tissue factor', category: 'Enzymes', description: 'Coagulation.', details: 'A critical clotting factor. Drugs like Eliquis (Apixaban) bind here to prevent stroke without requiring dietary monitoring.',
+        depositionDate: '2019-11-21'
+    },
+    {
+        id: '1DAN', title: 'Complex of active site inhibited human blood coagulation factor VIIA with human recombinant soluble tissue factor', category: 'Enzymes', description: 'Coagulation.', details: 'A critical clotting factor. Drugs like Eliquis (Apixaban) bind here to prevent stroke without requiring dietary monitoring.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2 Å',
         organism: 'Homo sapiens',
-        depositionDate: '1997-03-05' },
-    { id: '1FIN', title: 'CYCLIN A-CYCLIN-DEPENDENT KINASE 2 COMPLEX', category: 'Enzymes', description: 'Cell cycle switch.', details: 'The complex that drives the cell into DNA replication (S-phase). A classic model of kinase activation.',
+        depositionDate: '1997-03-05'
+    },
+    {
+        id: '1FIN', title: 'CYCLIN A-CYCLIN-DEPENDENT KINASE 2 COMPLEX', category: 'Enzymes', description: 'Cell cycle switch.', details: 'The complex that drives the cell into DNA replication (S-phase). A classic model of kinase activation.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.3 Å',
         organism: 'Homo sapiens',
-        depositionDate: '1996-07-14' },
-    { id: '2SRC', title: 'CRYSTAL STRUCTURE OF HUMAN TYROSINE-PROTEIN KINASE C-SRC, IN COMPLEX WITH AMP-PNP', category: 'Signaling', description: 'First oncogene.', details: 'The first cancer-causing gene discovered. It is typically kept folded and inactive, but mutations can unleash its growth signals.',
+        depositionDate: '1996-07-14'
+    },
+    {
+        id: '2SRC', title: 'CRYSTAL STRUCTURE OF HUMAN TYROSINE-PROTEIN KINASE C-SRC, IN COMPLEX WITH AMP-PNP', category: 'Signaling', description: 'First oncogene.', details: 'The first cancer-causing gene discovered. It is typically kept folded and inactive, but mutations can unleash its growth signals.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.5 Å',
         organism: 'Homo sapiens',
-        depositionDate: '1998-12-29' },
-    { id: '1LQS', title: 'CRYSTAL STRUCTURE OF HUMAN CYTOMEGALOVIRUS IL-10 BOUND TO SOLUBLE HUMAN IL-10R1', category: 'Enzymes', description: 'Inflammation.', details: 'Converts fatty acids into signaling molecules (leukotrienes). It uses a non-heme iron to perform oxidation.',
+        depositionDate: '1998-12-29'
+    },
+    {
+        id: '1LQS', title: 'CRYSTAL STRUCTURE OF HUMAN CYTOMEGALOVIRUS IL-10 BOUND TO SOLUBLE HUMAN IL-10R1', category: 'Enzymes', description: 'Inflammation.', details: 'Converts fatty acids into signaling molecules (leukotrienes). It uses a non-heme iron to perform oxidation.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.7 Å',
         organism: 'Human herpesvirus 5',
-        depositionDate: '2002-05-13' },
-    { id: '3LZT', title: 'REFINEMENT OF TRICLINIC LYSOZYME AT ATOMIC RESOLUTION', category: 'Transport', description: 'Neurotransmitter carrier.', details: 'A bacterial homolog of serotonin/dopamine transporters. It revealed the "rocking bundle" mechanism of transport.',
+        depositionDate: '2002-05-13'
+    },
+    {
+        id: '3LZT', title: 'REFINEMENT OF TRICLINIC LYSOZYME AT ATOMIC RESOLUTION', category: 'Transport', description: 'Neurotransmitter carrier.', details: 'A bacterial homolog of serotonin/dopamine transporters. It revealed the "rocking bundle" mechanism of transport.',
         method: 'X-RAY DIFFRACTION',
         resolution: '0.925 Å',
         organism: 'Gallus gallus',
-        depositionDate: '1997-03-23' },
-    { id: '1OMG', title: 'NMR STUDY OF OMEGA-CONOTOXIN MVIIA', category: 'Transport', description: 'Antibiotic pore.', details: 'A peptide antibiotic that forms a perfect hole in bacterial membranes, letting ions leak out and killing the cell.',
+        depositionDate: '1997-03-23'
+    },
+    {
+        id: '1OMG', title: 'NMR STUDY OF OMEGA-CONOTOXIN MVIIA', category: 'Transport', description: 'Antibiotic pore.', details: 'A peptide antibiotic that forms a perfect hole in bacterial membranes, letting ions leak out and killing the cell.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Conus magus',
-        depositionDate: '1995-04-26' },
-    { id: '2WDQ', title: 'E. coli succinate:quinone oxidoreductase (SQR) with carboxin bound', category: 'Transport', description: 'Plant blood.', details: 'Found in nitrogen-fixing root nodules. It scavenges oxygen to protect the nitrogenase enzyme, turning the roots pink.',
+        depositionDate: '1995-04-26'
+    },
+    {
+        id: '2WDQ', title: 'E. coli succinate:quinone oxidoreductase (SQR) with carboxin bound', category: 'Transport', description: 'Plant blood.', details: 'Found in nitrogen-fixing root nodules. It scavenges oxygen to protect the nitrogenase enzyme, turning the roots pink.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.4 Å',
         organism: 'ESCHERICHIA COLI',
-        depositionDate: '2009-03-25' },
-    { id: '3CNA', title: 'STRUCTURE OF CONCANAVALIN A AT 2.4 ANGSTROMS RESOLUTION', category: 'Structural', description: 'Lectin.', details: 'A carbohydrate-binding protein from Jack Bean. It binds specifically to sugars on cell surfaces.',
+        depositionDate: '2009-03-25'
+    },
+    {
+        id: '3CNA', title: 'STRUCTURE OF CONCANAVALIN A AT 2.4 ANGSTROMS RESOLUTION', category: 'Structural', description: 'Lectin.', details: 'A carbohydrate-binding protein from Jack Bean. It binds specifically to sugars on cell surfaces.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.4 Å',
         organism: 'Canavalia ensiformis',
-        depositionDate: '1976-09-15' },
-    { id: '1K42', title: 'The Solution Structure of the CBM4-2 Carbohydrate Binding Module from a Thermostable Rhodothermus marinus Xylanase.', category: 'Signaling', description: 'Clot starter.', details: 'The receptor that initiates the extrinsic clotting pathway when blood vessels are damaged.',
+        depositionDate: '1976-09-15'
+    },
+    {
+        id: '1K42', title: 'The Solution Structure of the CBM4-2 Carbohydrate Binding Module from a Thermostable Rhodothermus marinus Xylanase.', category: 'Signaling', description: 'Clot starter.', details: 'The receptor that initiates the extrinsic clotting pathway when blood vessels are damaged.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Rhodothermus marinus',
-        depositionDate: '2001-10-05' },
-    { id: '1POK', title: 'Crystal structure of Isoaspartyl Dipeptidase', category: 'Toxins', description: 'Ribosome inactivator.', details: 'A plant toxin that removes a specific base from ribosomal RNA, shutting down protein synthesis.',
+        depositionDate: '2001-10-05'
+    },
+    {
+        id: '1POK', title: 'Crystal structure of Isoaspartyl Dipeptidase', category: 'Toxins', description: 'Ribosome inactivator.', details: 'A plant toxin that removes a specific base from ribosomal RNA, shutting down protein synthesis.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.7 Å',
         organism: 'Escherichia coli',
-        depositionDate: '2003-06-15' },
+        depositionDate: '2003-06-15'
+    },
     // --- BATCH 7 ADDITIONS (20 VIRAL PROTEINS) ---
-    { id: '1RUZ', title: '1918 H1 Hemagglutinin', category: 'Viral', description: 'Flu surface spike.', details: 'The key protein on the surface of the flu virus that binds to sialic acid receptors on host cells, enabling viral entry.',
+    {
+        id: '1RUZ', title: '1918 H1 Hemagglutinin', category: 'Viral', description: 'Flu surface spike.', details: 'The key protein on the surface of the flu virus that binds to sialic acid receptors on host cells, enabling viral entry.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.9 Å',
         organism: 'Influenza A virus (A/South Carolina/1/18 (H1N1))',
-        depositionDate: '2003-12-12' },
-    { id: '2HTY', title: 'N1 neuraminidase', category: 'Viral', description: 'Tamiflu target.', details: 'The enzyme that cleaves sialic acid to release new viral particles. Inhibited by drugs like Oseltamivir (Tamiflu).',
+        depositionDate: '2003-12-12'
+    },
+    {
+        id: '2HTY', title: 'N1 neuraminidase', category: 'Viral', description: 'Tamiflu target.', details: 'The enzyme that cleaves sialic acid to release new viral particles. Inhibited by drugs like Oseltamivir (Tamiflu).',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.5 Å',
         organism: 'Influenza A virus',
-        depositionDate: '2006-07-26' },
-    { id: '5JQ3', title: 'Ebola Glycoprotein', category: 'Viral', description: 'Deadly viral key.', details: 'The sole surface protein of Ebola virus, responsible for attachment and fusion. It is the primary target for neutralizing antibodies.' },
-    { id: '5IRE', title: 'The cryo-EM structure of Zika Virus', category: 'Viral', description: 'Mature particle.', details: 'The cryo-EM structure of the mature Zika virus. Similar to Dengue, it caused a major global health emergency linked to birth defects.',
+        depositionDate: '2006-07-26'
+    },
+
+    {
+        id: '5IRE', title: 'The cryo-EM structure of Zika Virus', category: 'Viral', description: 'Mature particle.', details: 'The cryo-EM structure of the mature Zika virus. Similar to Dengue, it caused a major global health emergency linked to birth defects.',
         method: 'ELECTRON MICROSCOPY',
         resolution: '3.8 Å',
         organism: 'Zika virus',
-        depositionDate: '2016-03-13' },
-    { id: '1K4R', title: 'Dengue Virus E', category: 'Viral', description: 'Breakbone fever.', details: 'The envelope protein of Dengue virus. It changes shape in the acidic environment of the endosome to drive membrane fusion.' },
-    { id: '1POV', title: 'ROLE AND MECHANISM OF THE MATURATION CLEAVAGE OF VP0 IN POLIOVIRUS ASSEMBLY: STRUCTURE OF THE EMPTY CAPSID ASSEMBLY INTERMEDIATE AT 2.9 ANGSTROMS RESOLUTION', category: 'Viral', description: 'The entire capsid.', details: 'A historic structure of the complete Poliovirus capsid. Its solution helped understand how non-enveloped viruses assemble.',
+        depositionDate: '2016-03-13'
+    },
+
+    {
+        id: '1POV', title: 'ROLE AND MECHANISM OF THE MATURATION CLEAVAGE OF VP0 IN POLIOVIRUS ASSEMBLY: STRUCTURE OF THE EMPTY CAPSID ASSEMBLY INTERMEDIATE AT 2.9 ANGSTROMS RESOLUTION', category: 'Viral', description: 'The entire capsid.', details: 'A historic structure of the complete Poliovirus capsid. Its solution helped understand how non-enveloped viruses assemble.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.8 Å',
         organism: 'Human poliovirus 1',
-        depositionDate: '1995-08-10' },
-    { id: '3M5L', title: 'Crystal structure of HCV NS3/4A protease in complex with ITMN-191', category: 'Viral', description: 'Hepatitis C cure.', details: 'The NS3/4A protease of Hepatitis C. Direct-acting antivirals targeting this enzyme have effectively cured HCV infection.',
+        depositionDate: '1995-08-10'
+    },
+    {
+        id: '3M5L', title: 'Crystal structure of HCV NS3/4A protease in complex with ITMN-191', category: 'Viral', description: 'Hepatitis C cure.', details: 'The NS3/4A protease of Hepatitis C. Direct-acting antivirals targeting this enzyme have effectively cured HCV infection.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.25 Å',
         organism: 'Hepatitis C virus subtype 1a',
-        depositionDate: '2010-03-12' },
-    { id: '1QGT', title: 'HUMAN HEPATITIS B VIRAL CAPSID (HBCAG)', category: 'Viral', description: 'Viral core.', details: 'The icosahedral core shell of HBV. It packages the viral pre-genomic RNA and reverse transcriptase.',
+        depositionDate: '2010-03-12'
+    },
+    {
+        id: '1QGT', title: 'HUMAN HEPATITIS B VIRAL CAPSID (HBCAG)', category: 'Viral', description: 'Viral core.', details: 'The icosahedral core shell of HBV. It packages the viral pre-genomic RNA and reverse transcriptase.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.3 Å',
         organism: 'Hepatitis B virus',
-        depositionDate: '1999-05-05' },
-    { id: '1DZL', title: 'L1 protein of human papillomavirus 16', category: 'Viral', description: 'Papillomavirus.', details: 'The major capsid protein L1 of Human Papillomavirus. These virus-like particles are the basis of the Gardasil vaccine.',
+        depositionDate: '1999-05-05'
+    },
+    {
+        id: '1DZL', title: 'L1 protein of human papillomavirus 16', category: 'Viral', description: 'Papillomavirus.', details: 'The major capsid protein L1 of Human Papillomavirus. These virus-like particles are the basis of the Gardasil vaccine.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.5 Å',
         organism: 'HUMAN PAPILLOMAVIRUS TYPE 16',
-        depositionDate: '2000-03-01' },
-    { id: '1KNB', title: 'CRYSTAL STRUCTURE OF THE RECEPTOR-BINDING DOMAIN OF ADENOVIRUS TYPE 5 FIBER PROTEIN AT 1.7 ANGSTROMS RESOLUTION', category: 'Viral', description: 'Common cold vector.', details: 'The fiber knob domain that allows Adenovirus to bind to cells. Modified versions are used as vectors for gene therapy and vaccines.',
+        depositionDate: '2000-03-01'
+    },
+    {
+        id: '1KNB', title: 'CRYSTAL STRUCTURE OF THE RECEPTOR-BINDING DOMAIN OF ADENOVIRUS TYPE 5 FIBER PROTEIN AT 1.7 ANGSTROMS RESOLUTION', category: 'Viral', description: 'Common cold vector.', details: 'The fiber knob domain that allows Adenovirus to bind to cells. Modified versions are used as vectors for gene therapy and vaccines.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.7 Å',
         organism: 'Human adenovirus 5',
-        depositionDate: '1995-01-06' },
-    { id: '2ZB6', title: 'Crystal structure of the measles virus hemagglutinin (oligo-sugar type)', category: 'Viral', description: 'Highly contagious.', details: 'The attachment protein of Measles. It binds to CD46 or SLAM receptors, making it one of the most infectious viruses known.',
+        depositionDate: '1995-01-06'
+    },
+    {
+        id: '2ZB6', title: 'Crystal structure of the measles virus hemagglutinin (oligo-sugar type)', category: 'Viral', description: 'Highly contagious.', details: 'The attachment protein of Measles. It binds to CD46 or SLAM receptors, making it one of the most infectious viruses known.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.6 Å',
         organism: 'Measles virus strain Edmonston-B',
-        depositionDate: '2007-10-16' },
-    { id: '2I69', title: 'Crystal structure of the West Nile virus envelope glycoprotein', category: 'Viral', description: 'Mosquito-borne.', details: 'The envelope protein of West Nile Virus, structurally related to Dengue and Zika, revealing the conservation in flaviviruses.',
+        depositionDate: '2007-10-16'
+    },
+    {
+        id: '2I69', title: 'Crystal structure of the West Nile virus envelope glycoprotein', category: 'Viral', description: 'Mosquito-borne.', details: 'The envelope protein of West Nile Virus, structurally related to Dengue and Zika, revealing the conservation in flaviviruses.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.11 Å',
         organism: 'West Nile virus',
-        depositionDate: '2006-08-28' },
-    { id: '6EPK', title: 'CRYSTAL STRUCTURE OF THE PRECURSOR MEMBRANE PROTEIN-ENVELOPE PROTEIN HETERODIMER FROM THE YELLOW FEVER VIRUS', category: 'Viral', description: 'Historic virus.', details: 'The envelope protein of the virus that caused historical epidemics. The 17D vaccine strain is one of the most effective vaccines ever created.',
+        depositionDate: '2006-08-28'
+    },
+    {
+        id: '6EPK', title: 'CRYSTAL STRUCTURE OF THE PRECURSOR MEMBRANE PROTEIN-ENVELOPE PROTEIN HETERODIMER FROM THE YELLOW FEVER VIRUS', category: 'Viral', description: 'Historic virus.', details: 'The envelope protein of the virus that caused historical epidemics. The 17D vaccine strain is one of the most effective vaccines ever created.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.7 Å',
         organism: 'Yellow fever virus',
-        depositionDate: '2017-10-11' },
-    { id: '2C36', title: 'Structure of unliganded HSV gD reveals a mechanism for receptor- mediated activation of virus entry', category: 'Viral', description: 'Herpes entry.', details: 'A receptor-binding protein from Herpes Simplex Virus 1. It triggers the fusion machinery to allow the virus to enter nerve cells.',
+        depositionDate: '2017-10-11'
+    },
+    {
+        id: '2C36', title: 'Structure of unliganded HSV gD reveals a mechanism for receptor- mediated activation of virus entry', category: 'Viral', description: 'Herpes entry.', details: 'A receptor-binding protein from Herpes Simplex Virus 1. It triggers the fusion machinery to allow the virus to enter nerve cells.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.11 Å',
         organism: 'HUMAN HERPESVIRUS 1',
-        depositionDate: '2005-10-04' },
-    { id: '5UDJ', title: 'IFIT1 monomeric mutant (L457E/L464E) with Gppp-AAAA', category: 'Viral', description: 'Respiratory virus.', details: 'The prefusion form of the RSV F protein. Stabilizing this shape was the breakthrough that led to the first approved RSV vaccines.',
+        depositionDate: '2005-10-04'
+    },
+    {
+        id: '5UDJ', title: 'IFIT1 monomeric mutant (L457E/L464E) with Gppp-AAAA', category: 'Viral', description: 'Respiratory virus.', details: 'The prefusion form of the RSV F protein. Stabilizing this shape was the breakthrough that led to the first approved RSV vaccines.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.69 Å',
-        organism: 'Homo sapiens',
-        depositionDate: '2016-12-27' },
-    { id: '3KZ4', title: 'Crystal Structure of the Rotavirus Double Layered Particle', category: 'Viral', description: 'Stomach flu.', details: 'The spike protein of Rotavirus, a leading cause of severe diarrhea in children. It must be cleaved by trypsin to become infectious.',
+        organism: 'unidentified',
+        depositionDate: '2016-12-27'
+    },
+    {
+        id: '3KZ4', title: 'Crystal Structure of the Rotavirus Double Layered Particle', category: 'Viral', description: 'Stomach flu.', details: 'The spike protein of Rotavirus, a leading cause of severe diarrhea in children. It must be cleaved by trypsin to become infectious.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.8 Å',
         organism: 'Bovine rotavirus',
-        depositionDate: '2009-12-07' },
-    { id: '1IHM', title: 'CRYSTAL STRUCTURE ANALYSIS OF NORWALK VIRUS CAPSID', category: 'Viral', description: 'Winter vomiting.', details: 'The shell of the highly contagious Norovirus. Its robust structure allows it to survive on surfaces and withstand stomach acid.',
+        depositionDate: '2009-12-07'
+    },
+    {
+        id: '1IHM', title: 'CRYSTAL STRUCTURE ANALYSIS OF NORWALK VIRUS CAPSID', category: 'Viral', description: 'Winter vomiting.', details: 'The shell of the highly contagious Norovirus. Its robust structure allows it to survive on surfaces and withstand stomach acid.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.4 Å',
         organism: 'Norwalk virus',
-        depositionDate: '2001-04-19' },
-    { id: '4RHV', title: 'Rhinovirus 14', category: 'Viral', description: 'Common cold.', details: 'One of the first animal virus structures solved. It reveals the "canyon" where the cellular receptor binds, hidden from antibodies.' },
-    { id: '2TMV', title: 'VISUALIZATION OF PROTEIN-NUCLEIC ACID INTERACTIONS IN A VIRUS. REFINED STRUCTURE OF INTACT TOBACCO MOSAIC VIRUS AT 2.9 ANGSTROMS RESOLUTION BY X-RAY FIBER DIFFRACTION', category: 'Viral', description: 'First virus.', details: 'The coat protein of TMV. This was the first virus ever discovered and the first to be crystallized, launching the field of structural virology.',
+        depositionDate: '2001-04-19'
+    },
+
+    {
+        id: '2TMV', title: 'VISUALIZATION OF PROTEIN-NUCLEIC ACID INTERACTIONS IN A VIRUS. REFINED STRUCTURE OF INTACT TOBACCO MOSAIC VIRUS AT 2.9 ANGSTROMS RESOLUTION BY X-RAY FIBER DIFFRACTION', category: 'Viral', description: 'First virus.', details: 'The coat protein of TMV. This was the first virus ever discovered and the first to be crystallized, launching the field of structural virology.',
         method: 'FIBER DIFFRACTION',
         resolution: '2.9 Å',
         organism: 'Tobacco mosaic virus',
-        depositionDate: '1988-09-15' },
-    { id: '2MS2', title: 'THE REFINED STRUCTURE OF BACTERIOPHAGE MS2 AT 2.8 ANGSTROMS RESOLUTION', category: 'Viral', description: 'RNA shell.', details: 'A simple RNA virus that infects bacteria. It is widely used as a model system for understanding viral assembly and RNA interactions.',
+        depositionDate: '1988-09-15'
+    },
+    {
+        id: '2MS2', title: 'THE REFINED STRUCTURE OF BACTERIOPHAGE MS2 AT 2.8 ANGSTROMS RESOLUTION', category: 'Viral', description: 'RNA shell.', details: 'A simple RNA virus that infects bacteria. It is widely used as a model system for understanding viral assembly and RNA interactions.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.8 Å',
         organism: 'Enterobacterio phage MS2',
-        depositionDate: '1994-08-23' },
+        depositionDate: '1994-08-23'
+    },
     // --- BATCH 8 ADDITIONS (30 ENZYMES) ---
-    { id: '5F9R', title: 'Crystal structure of catalytically-active Streptococcus pyogenes CRISPR-Cas9 in complex with single-guided RNA and double-stranded DNA primed for target DNA cleavage', category: 'Enzymes', description: 'Gene editor.', details: 'The revolutionary gene-editing tool. It uses a guide RNA to locate and cut specific DNA sequences, allowing for precise genetic modifications.',
+    {
+        id: '5F9R', title: 'Crystal structure of catalytically-active Streptococcus pyogenes CRISPR-Cas9 in complex with single-guided RNA and double-stranded DNA primed for target DNA cleavage', category: 'Enzymes', description: 'Gene editor.', details: 'The revolutionary gene-editing tool. It uses a guide RNA to locate and cut specific DNA sequences, allowing for precise genetic modifications.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.4 Å',
-        organism: 'Streptococcus pyogenes serotype M1',
-        depositionDate: '2015-12-10' },
-    { id: '1RCX', title: 'Rubisco', category: 'Enzymes', description: 'Carbon fixer.', details: 'The most abundant protein on Earth. It captures carbon dioxide from the atmosphere during photosynthesis, fueling life on our planet.' },
-    { id: '1N2C', title: 'Nitrogenase', category: 'Enzymes', description: 'Nitrogen fixer.', details: 'The enzyme that splits the triple bond of nitrogen gas (N2) to create ammonia, a critical nutrient for plants.' },
-    { id: '1TAQ', title: 'Taq Polymerase', category: 'Enzymes', description: 'PCR engine.', details: 'A heat-stable DNA polymerase from Thermus aquaticus. It enabled the Polymerase Chain Reaction (PCR), revolutionizing genetics.' },
-    { id: '1QO1', title: 'ATP Synthase', category: 'Enzymes', description: 'Molecular motor.', details: 'A rotary motor that synthesizes ATP, the energy currency of the cell. It is driven by a proton gradient across the mitochondrial membrane.' },
-    { id: '2PEL', title: 'PEANUT LECTIN', category: 'Enzymes', description: 'Stomach acid.', details: 'A digestive protease that thrives in the acidic environment of the stomach, breaking down dietary proteins.',
+        organism: 'Lambdapapillomavirus 1',
+        depositionDate: '2015-12-10'
+    },
+
+
+
+
+    {
+        id: '2PEL', title: 'PEANUT LECTIN', category: 'Enzymes', description: 'Stomach acid.', details: 'A digestive protease that thrives in the acidic environment of the stomach, breaking down dietary proteins.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.25 Å',
         organism: 'Arachis hypogaea',
-        depositionDate: '1995-08-23' },
-    { id: '2AAI', title: 'Crystallographic refinement of ricin to 2.5 Angstroms', category: 'Enzymes', description: 'Starch breaker.', details: 'The enzyme in saliva that begins the digestion of starches into sugars. It is why bread tastes sweet if you chew it long enough.',
+        depositionDate: '1995-08-23'
+    },
+    {
+        id: '2AAI', title: 'Crystallographic refinement of ricin to 2.5 Angstroms', category: 'Enzymes', description: 'Starch breaker.', details: 'The enzyme in saliva that begins the digestion of starches into sugars. It is why bread tastes sweet if you chew it long enough.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.5 Å',
         organism: 'Ricinus communis',
-        depositionDate: '1993-09-07' },
-    { id: '3PTB', title: 'Trypsin', category: 'Enzymes', description: 'Digestive control.', details: 'A serine protease in the small intestine. It is activated by enterokinase and in turn activates other digestive enzymes.' },
-    { id: '7AHL', title: 'ALPHA-HEMOLYSIN FROM STAPHYLOCOCCUS AUREUS', category: 'Toxins', description: 'Nanopore.', details: 'A bacterial toxin that forms a pore in cell membranes. It is widely used in DNA sequencing technology ("Nanopore sequencing").',
+        depositionDate: '1993-09-07'
+    },
+
+    {
+        id: '7AHL', title: 'ALPHA-HEMOLYSIN FROM STAPHYLOCOCCUS AUREUS', category: 'Toxins', description: 'Nanopore.', details: 'A bacterial toxin that forms a pore in cell membranes. It is widely used in DNA sequencing technology ("Nanopore sequencing").',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.89 Å',
         organism: 'Staphylococcus aureus',
-        depositionDate: '1996-12-02' },
-    { id: '1LZ1', title: 'Lysozyme', category: 'Enzymes', description: 'Bacteria killer.', details: 'The first enzyme structure ever solved. Found in tears and egg whites, it destroys bacterial cell walls.' },
-    { id: '3H2L', title: 'Crystal structure of HCV NS5B polymerase in complex with a novel bicyclic dihydro-pyridinone inhibitor', category: 'Signaling', description: 'Oxygen sensor.', details: 'The master regulator of the hypoxic response. It helps cells survive in low-oxygen environments (Nobel Prize).',
+        depositionDate: '1996-12-02'
+    },
+
+    {
+        id: '3H2L', title: 'Crystal structure of HCV NS5B polymerase in complex with a novel bicyclic dihydro-pyridinone inhibitor', category: 'Signaling', description: 'Oxygen sensor.', details: 'The master regulator of the hypoxic response. It helps cells survive in low-oxygen environments (Nobel Prize).',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.9 Å',
         organism: 'Hepatitis C virus (isolate BK)',
-        depositionDate: '2009-04-14' },
-    { id: '4AKE', title: 'ADENYLATE KINASE', category: 'Enzymes', description: 'Energy balance.', details: 'A classic example of "induced fit." It changes shape dramatically to transfer phosphate groups between AMP, ADP, and ATP.',
+        depositionDate: '2009-04-14'
+    },
+    {
+        id: '4AKE', title: 'ADENYLATE KINASE', category: 'Enzymes', description: 'Energy balance.', details: 'A classic example of "induced fit." It changes shape dramatically to transfer phosphate groups between AMP, ADP, and ATP.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.2 Å',
         organism: 'Escherichia coli',
-        depositionDate: '1995-12-29' },
-    { id: '1EKB', title: 'THE SERINE PROTEASE DOMAIN OF ENTEROPEPTIDASE BOUND TO INHIBITOR VAL-ASP-ASP-ASP-ASP-LYS-CHLOROMETHANE', category: 'Enzymes', description: 'Molecular scissors.', details: 'A restriction enzyme that cuts DNA at specific sequences (GAATTC). It was a foundational tool for the biotechnology revolution.',
+        depositionDate: '1995-12-29'
+    },
+    {
+        id: '1EKB', title: 'THE SERINE PROTEASE DOMAIN OF ENTEROPEPTIDASE BOUND TO INHIBITOR VAL-ASP-ASP-ASP-ASP-LYS-CHLOROMETHANE', category: 'Enzymes', description: 'Molecular scissors.', details: 'A restriction enzyme that cuts DNA at specific sequences (GAATTC). It was a foundational tool for the biotechnology revolution.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.3 Å',
         organism: 'Bos taurus',
-        depositionDate: '1999-05-02' },
-    { id: '1J3F', title: 'Crystal Structure of an Artificial Metalloprotein:Cr(III)(3,3\'-Me2-salophen)/apo-A71G Myoglobin', category: 'Enzymes', description: 'Firefly glow.', details: 'The enzyme that produces light in fireflies by oxidizing luciferin. It is used as a reporter gene in biological research.',
+        depositionDate: '1999-05-02'
+    },
+    {
+        id: '1J3F', title: 'Crystal Structure of an Artificial Metalloprotein:Cr(III)(3,3\'-Me2-salophen)/apo-A71G Myoglobin', category: 'Enzymes', description: 'Firefly glow.', details: 'The enzyme that produces light in fireflies by oxidizing luciferin. It is used as a reporter gene in biological research.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.45 Å',
         organism: 'Physeter catodon',
-        depositionDate: '2003-01-24' },
-    { id: '1BL8', title: 'Potassium Channel', category: 'Transport', description: 'Ion selector.', details: 'The KcsA channel provided the first view of how cells selectively allow potassium ions to pass while blocking smaller sodium ions.' },
-    { id: '1HCG', title: 'STRUCTURE OF HUMAN DES(1-45) FACTOR XA AT 2.2 ANGSTROMS RESOLUTION', category: 'Enzymes', description: 'Matrix breaker.', details: 'An enzyme capable of breaking down the tough triple helix of collagen, used by bacteria to invade tissues or for wound debridement.',
+        depositionDate: '2003-01-24'
+    },
+
+    {
+        id: '1HCG', title: 'STRUCTURE OF HUMAN DES(1-45) FACTOR XA AT 2.2 ANGSTROMS RESOLUTION', category: 'Enzymes', description: 'Matrix breaker.', details: 'An enzyme capable of breaking down the tough triple helix of collagen, used by bacteria to invade tissues or for wound debridement.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.2 Å',
         organism: 'Homo sapiens',
-        depositionDate: '1993-05-05' },
-    { id: '1A52', title: 'ESTROGEN RECEPTOR ALPHA LIGAND-BINDING DOMAIN COMPLEXED TO ESTRADIOL', category: 'Signaling', description: 'Hormone switch.', details: 'A nuclear receptor that binds estrogen to activate specific genes. It is a key target in breast cancer therapy (Tamoxifen).',
+        depositionDate: '1993-05-05'
+    },
+    {
+        id: '1A52', title: 'ESTROGEN RECEPTOR ALPHA LIGAND-BINDING DOMAIN COMPLEXED TO ESTRADIOL', category: 'Signaling', description: 'Hormone switch.', details: 'A nuclear receptor that binds estrogen to activate specific genes. It is a key target in breast cancer therapy (Tamoxifen).',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.8 Å',
         organism: 'Homo sapiens',
-        depositionDate: '1998-02-19' },
-    { id: '3V03', title: 'Ribosome (Small)', category: 'Enzymes', description: 'Protein factory.', details: 'The 30S subunit of the bacterial ribosome. It decodes the mRNA to ensure the correct amino acids are added to the chain.' },
-    { id: '1D66', title: 'Gal4', category: 'DNA/RNA', description: 'Transcription factor.', details: 'A yeast protein that binds to specific DNA sequences to turn on genes. The "Gal4-UAS" system is a standard tool in genetics.' },
-    { id: '1TUP', title: 'p53 Tumor Suppressor', category: 'DNA/RNA', description: 'Guardian of genome.', details: 'The most frequently mutated gene in human cancer. It detects DNA damage and decides whether to repair it or trigger cell death.' },
-    { id: '1YHU', title: 'Crystal structure of Riftia pachyptila C1 hemoglobin reveals novel assembly of 24 subunits.', category: 'Enzymes', description: 'Peroxide cleaner.', details: 'One of the fastest enzymes known. It breaks down millions of toxic hydrogen peroxide molecules per second into water and oxygen.',
+        depositionDate: '1998-02-19'
+    },
+
+
+
+    {
+        id: '1YHU', title: 'Crystal structure of Riftia pachyptila C1 hemoglobin reveals novel assembly of 24 subunits.', category: 'Enzymes', description: 'Peroxide cleaner.', details: 'One of the fastest enzymes known. It breaks down millions of toxic hydrogen peroxide molecules per second into water and oxygen.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.15 Å',
         organism: 'Riftia pachyptila',
-        depositionDate: '2005-01-10' },
+        depositionDate: '2005-01-10'
+    },
     { id: '3WJ6', title: 'RNA Nanoparticle', category: 'DNA/RNA', description: 'RNA architecture.', details: 'A synthetic RNA structure designed to form a stable triangular scaffold, showing the potential of RNA nanotechnology.' },
-    { id: '5N5E', title: 'Crystal structure of encapsulated ferritin domain from Pyrococcus furiosus PFC_05175', category: 'Enzymes', description: 'RNA shredder.', details: 'A CRISPR enzyme that targets RNA instead of DNA. It is used for viral diagnostics (SHERLOCK) and RNA editing.',
+    {
+        id: '5N5E', title: 'Crystal structure of encapsulated ferritin domain from Pyrococcus furiosus PFC_05175', category: 'Enzymes', description: 'RNA shredder.', details: 'A CRISPR enzyme that targets RNA instead of DNA. It is used for viral diagnostics (SHERLOCK) and RNA editing.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.026 Å',
         organism: 'Pyrococcus furiosus COM1',
-        depositionDate: '2017-02-13' },
-    { id: '1GFL', title: 'Green Fluorescent Protein', category: 'Structural', description: 'Bioluminescence.', details: 'The famous glowing protein from jellyfish. Fused to other proteins, it allows scientists to watch biology happen in real-time.' },
-    { id: '1BNA', title: 'B-DNA Helix', category: 'DNA/RNA', description: 'The double helix.', details: 'The classic structure of DNA. This crystal structure confirmed the Watson-Crick model at atomic resolution.' },
-    { id: '6WGT', title: 'Crystal structure of HTR2A with hallucinogenic agonist', category: 'Signaling', description: 'Hallucinogen.', details: 'The serotonin receptor bound to LSD. It reveals how the drug gets "trapped" in the receptor, explaining its long-lasting effects.',
+        depositionDate: '2017-02-13'
+    },
+
+
+    {
+        id: '6WGT', title: 'Crystal structure of HTR2A with hallucinogenic agonist', category: 'Signaling', description: 'Hallucinogen.', details: 'The serotonin receptor bound to LSD. It reveals how the drug gets "trapped" in the receptor, explaining its long-lasting effects.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.4 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2020-04-06' },
-    { id: '6A5J', title: 'solution NMR Structure of small peptide', category: 'Signaling', description: 'Magic mushroom.', details: 'The 5-HT2A receptor bound to psilocin, the active metabolite of magic mushrooms, showing the structural basis of psychedelics.',
+        depositionDate: '2020-04-06'
+    },
+    {
+        id: '6A5J', title: 'solution NMR Structure of small peptide', category: 'Signaling', description: 'Magic mushroom.', details: 'The 5-HT2A receptor bound to psilocin, the active metabolite of magic mushrooms, showing the structural basis of psychedelics.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Rana chensinensis',
-        depositionDate: '2018-06-24' },
-    { id: '6X18', title: 'GLP-1 peptide hormone bound to Glucagon-Like peptide-1 (GLP-1) Receptor', category: 'Signaling', description: 'Wakefulness.', details: 'The Adenosine A2A receptor bound to caffeine. Caffeine blocks the "sleepiness" signal of adenosine.',
+        depositionDate: '2018-06-24'
+    },
+    {
+        id: '6X18', title: 'GLP-1 peptide hormone bound to Glucagon-Like peptide-1 (GLP-1) Receptor', category: 'Signaling', description: 'Wakefulness.', details: 'The Adenosine A2A receptor bound to caffeine. Caffeine blocks the "sleepiness" signal of adenosine.',
         method: 'ELECTRON MICROSCOPY',
         resolution: '2.1 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2020-05-18' },
-    { id: '4DJH', title: 'Structure of the human kappa opioid receptor in complex with JDTic', category: 'Signaling', description: 'Pain relief.', details: 'The Kappa-opioid receptor. Understanding these structures is key to designing non-addictive pain relievers.',
+        depositionDate: '2020-05-18'
+    },
+    {
+        id: '4DJH', title: 'Structure of the human kappa opioid receptor in complex with JDTic', category: 'Signaling', description: 'Pain relief.', details: 'The Kappa-opioid receptor. Understanding these structures is key to designing non-addictive pain relievers.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.9 Å',
         organism: 'Homo Sapiens',
-        depositionDate: '2012-02-01' },
-    { id: '3PBL', title: 'Penicillin Binding Protein', category: 'Enzymes', description: 'Antibiotic target.', details: 'The bacterial enzyme that builds cell walls. Penicillin binds here irreversibly, causing the bacteria to burst.' },
+        depositionDate: '2012-02-01'
+    },
+
     // --- BATCH 9 ADDITIONS (20 BALANCING) ---
     // Synthetic / Designed
-    { id: '2L6Q', title: 'New high resolution NMR structure of gpW (W protein of bacteriophage lambda) at neutral pH', category: 'Synthetic', description: 'Artificial barrel.', details: 'A completely de novo designed protein mimicking the TIM barrel fold. It proves we can design complex folds from scratch.',
+    {
+        id: '2L6Q', title: 'New high resolution NMR structure of gpW (W protein of bacteriophage lambda) at neutral pH', category: 'Synthetic', description: 'Artificial barrel.', details: 'A completely de novo designed protein mimicking the TIM barrel fold. It proves we can design complex folds from scratch.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Enterobacteria phage lambda',
-        depositionDate: '2010-11-24' },
-    { id: '6E5C', title: 'Solution NMR structure of a de novo designed double-stranded beta-helix', category: 'Synthetic', description: 'Protein origami.', details: 'A computationally designed icosahedral protein cage. These can be used as nanocontainers for drug delivery.',
+        depositionDate: '2010-11-24'
+    },
+    {
+        id: '6E5C', title: 'Solution NMR structure of a de novo designed double-stranded beta-helix', category: 'Synthetic', description: 'Protein origami.', details: 'A computationally designed icosahedral protein cage. These can be used as nanocontainers for drug delivery.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'synthetic construct',
-        depositionDate: '2018-07-19' },
-    { id: '1Q1G', title: 'Crystal structure of Plasmodium falciparum PNP with 5\'-methylthio-immucillin-H', category: 'Synthetic', description: 'De novo design.', details: 'One of the earliest successes in computational protein design, creating a stable chemical building block not found in nature.',
+        depositionDate: '2018-07-19'
+    },
+    {
+        id: '1Q1G', title: 'Crystal structure of Plasmodium falciparum PNP with 5\'-methylthio-immucillin-H', category: 'Synthetic', description: 'De novo design.', details: 'One of the earliest successes in computational protein design, creating a stable chemical building block not found in nature.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.02 Å',
         organism: 'Plasmodium falciparum',
-        depositionDate: '2003-07-19' },
-    { id: '2KZD', title: 'Structure of a (3+1) G-quadruplex formed by hTERT promoter sequence', category: 'Synthetic', description: 'DNA binder.', details: 'A computationally optimized zinc finger motif designed to bind a specific DNA sequence with high affinity.',
+        depositionDate: '2003-07-19'
+    },
+    {
+        id: '2KZD', title: 'Structure of a (3+1) G-quadruplex formed by hTERT promoter sequence', category: 'Synthetic', description: 'DNA binder.', details: 'A computationally optimized zinc finger motif designed to bind a specific DNA sequence with high affinity.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Unknown source',
-        depositionDate: '2010-06-16' },
-    { id: '1PSV', title: 'COMPUTATIONALLY DESIGNED PEPTIDE WITH A BETA-BETA-ALPHA FOLD SELECTION, NMR, 32 STRUCTURES', category: 'Synthetic', description: 'Foldamer.', details: 'A tiny designed peptide that folds into a stable structure despite its small size, blurring the line between peptide and protein.',
+        depositionDate: '2010-06-16'
+    },
+    {
+        id: '1PSV', title: 'COMPUTATIONALLY DESIGNED PEPTIDE WITH A BETA-BETA-ALPHA FOLD SELECTION, NMR, 32 STRUCTURES', category: 'Synthetic', description: 'Foldamer.', details: 'A tiny designed peptide that folds into a stable structure despite its small size, blurring the line between peptide and protein.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Unknown source',
-        depositionDate: '1997-10-29' },
+        depositionDate: '1997-10-29'
+    },
     // Chaperones (Folding helpers)
-    { id: '1DKZ', title: 'THE SUBSTRATE BINDING DOMAIN OF DNAK IN COMPLEX WITH A SUBSTRATE PEPTIDE, DETERMINED FROM TYPE 1 NATIVE CRYSTALS', category: 'Chaperone', description: 'Hsp70 homolog.', details: 'The bacterial version of Hsp70. It binds to extended hydrophobic chains of newly synthesized proteins to prevent them from tangling.',
+    {
+        id: '1DKZ', title: 'THE SUBSTRATE BINDING DOMAIN OF DNAK IN COMPLEX WITH A SUBSTRATE PEPTIDE, DETERMINED FROM TYPE 1 NATIVE CRYSTALS', category: 'Chaperone', description: 'Hsp70 homolog.', details: 'The bacterial version of Hsp70. It binds to extended hydrophobic chains of newly synthesized proteins to prevent them from tangling.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2 Å',
         organism: 'Escherichia coli',
-        depositionDate: '1996-06-03' },
-    { id: '1FXK', title: 'CRYSTAL STRUCTURE OF ARCHAEAL PREFOLDIN (GIMC).', category: 'Chaperone', description: 'Jellyfish shape.', details: 'A hexameric chaperone that captures unfolded actin and tubulin like a jellyfish and delivers them to the Chaperonin.',
+        depositionDate: '1996-06-03'
+    },
+    {
+        id: '1FXK', title: 'CRYSTAL STRUCTURE OF ARCHAEAL PREFOLDIN (GIMC).', category: 'Chaperone', description: 'Jellyfish shape.', details: 'A hexameric chaperone that captures unfolded actin and tubulin like a jellyfish and delivers them to the Chaperonin.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.3 Å',
         organism: 'Methanothermobacter thermautotrophicus',
-        depositionDate: '2000-09-26' },
+        depositionDate: '2000-09-26'
+    },
     { id: '3J01', title: 'Trigger Factor', category: 'Chaperone', description: 'Ribosome associated.', details: 'The first chaperone a bacterium protein meets. It sits at the exit tunnel of the ribosome to cradle the emerging polypeptide chain.' },
-    { id: '1SS8', title: 'GroEL', category: 'Chaperone', description: 'Export chaperone.', details: 'It keeps proteins unfolded so they can be threaded through the membrane for secretin out of the cell.',
+    {
+        id: '1SS8', title: 'GroEL', category: 'Chaperone', description: 'Export chaperone.', details: 'It keeps proteins unfolded so they can be threaded through the membrane for secretin out of the cell.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.7 Å',
         organism: 'Escherichia coli',
-        depositionDate: '2004-03-23' },
-    { id: '1GCI', title: 'THE 0.78 ANGSTROMS STRUCTURE OF A SERINE PROTEASE-BACILLUS LENTUS SUBTILISIN', category: 'Chaperone', description: 'Intramolecular.', details: 'A chaperone that is part of the protein itself. It catalyzes the folding of the main protease domain and is then cleaved off.',
+        depositionDate: '2004-03-23'
+    },
+    {
+        id: '1GCI', title: 'THE 0.78 ANGSTROMS STRUCTURE OF A SERINE PROTEASE-BACILLUS LENTUS SUBTILISIN', category: 'Chaperone', description: 'Intramolecular.', details: 'A chaperone that is part of the protein itself. It catalyzes the folding of the main protease domain and is then cleaved off.',
         method: 'X-RAY DIFFRACTION',
         resolution: '0.78 Å',
         organism: 'Bacillus lentus',
-        depositionDate: '1998-09-02' },
+        depositionDate: '1998-09-02'
+    },
     // Energy (Photosynthesis / Redox)
-    { id: '1A70', title: 'SPINACH FERREDOXIN', category: 'Energy', description: 'Electron carrier.', details: 'A small iron-sulfur protein that acts as a wire, shuttling electrons in photosynthesis and nitrogen fixation.',
+    {
+        id: '1A70', title: 'SPINACH FERREDOXIN', category: 'Energy', description: 'Electron carrier.', details: 'A small iron-sulfur protein that acts as a wire, shuttling electrons in photosynthesis and nitrogen fixation.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.7 Å',
         organism: 'Spinacia oleracea',
-        depositionDate: '1998-03-19' },
-    { id: '3BKB', title: 'Crystal structure of human Feline Sarcoma Viral Oncogene Homologue (v-FES)', category: 'Energy', description: 'Proton pump.', details: 'A massive complex in the electron transport chain. It pumps protons across the inner mitochondrial membrane to charge the cellular battery.',
+        depositionDate: '1998-03-19'
+    },
+    {
+        id: '3BKB', title: 'Crystal structure of human Feline Sarcoma Viral Oncogene Homologue (v-FES)', category: 'Energy', description: 'Proton pump.', details: 'A massive complex in the electron transport chain. It pumps protons across the inner mitochondrial membrane to charge the cellular battery.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.78 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2007-12-06' },
-    { id: '2MHR', title: 'STRUCTURE OF MYOHEMERYTHRIN IN THE AZIDOMET STATE AT 1.7(SLASH)1.3 ANGSTROMS RESOLUTION', category: 'Energy', description: 'Hydrogen fuel.', details: 'An ancient enzyme that can split hydrogen gas into protons and electrons. It is studied for potential bio-hydrogen fuel production.',
+        depositionDate: '2007-12-06'
+    },
+    {
+        id: '2MHR', title: 'STRUCTURE OF MYOHEMERYTHRIN IN THE AZIDOMET STATE AT 1.7(SLASH)1.3 ANGSTROMS RESOLUTION', category: 'Energy', description: 'Hydrogen fuel.', details: 'An ancient enzyme that can split hydrogen gas into protons and electrons. It is studied for potential bio-hydrogen fuel production.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.3 Å',
         organism: 'Themiste zostericola',
-        depositionDate: '1987-04-20' },
-    { id: '1CCR', title: 'STRUCTURE OF RICE FERRICYTOCHROME C AT 2.0 ANGSTROMS RESOLUTION', category: 'Energy', description: 'Redox switch.', details: 'A classic variation of the cytochrome fold, used by bacteria to manage energy flow under different environmental conditions.',
+        depositionDate: '1987-04-20'
+    },
+    {
+        id: '1CCR', title: 'STRUCTURE OF RICE FERRICYTOCHROME C AT 2.0 ANGSTROMS RESOLUTION', category: 'Energy', description: 'Redox switch.', details: 'A classic variation of the cytochrome fold, used by bacteria to manage energy flow under different environmental conditions.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.5 Å',
         organism: 'Oryza sativa',
-        depositionDate: '1983-03-14' },
-    { id: '1FEH', title: 'FE-ONLY HYDROGENASE FROM CLOSTRIDIUM PASTEURIANUM', category: 'Energy', description: 'Ancient battery.', details: 'A primordial protein containing Fe4S4 clusters. It represents some of the earliest biological chemistries on Earth.',
+        depositionDate: '1983-03-14'
+    },
+    {
+        id: '1FEH', title: 'FE-ONLY HYDROGENASE FROM CLOSTRIDIUM PASTEURIANUM', category: 'Energy', description: 'Ancient battery.', details: 'A primordial protein containing Fe4S4 clusters. It represents some of the earliest biological chemistries on Earth.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.8 Å',
         organism: 'Clostridium pasteurianum',
-        depositionDate: '1998-10-28' },
+        depositionDate: '1998-10-28'
+    },
     // Immune (Defense)
-    { id: '1DLH', title: 'MHC Class II', category: 'Immune', description: 'Antigen presentation.', details: 'Unlike Class I, this molecule presents antigens from outside the cell (like bacterial fragments) to helper T-cells to coordinate an antibody response.' },
-    { id: '1HZH', title: 'CRYSTAL STRUCTURE OF THE INTACT HUMAN IGG B12 WITH BROAD AND POTENT ACTIVITY AGAINST PRIMARY HIV-1 ISOLATES: A TEMPLATE FOR HIV VACCINE DESIGN', category: 'Immune', description: 'Full antibody.', details: 'A complete crystal structure of an intact antibody molecule, showing the flexibility of the hinge region connecting the arms.',
+
+    {
+        id: '1HZH', title: 'CRYSTAL STRUCTURE OF THE INTACT HUMAN IGG B12 WITH BROAD AND POTENT ACTIVITY AGAINST PRIMARY HIV-1 ISOLATES: A TEMPLATE FOR HIV VACCINE DESIGN', category: 'Immune', description: 'Full antibody.', details: 'A complete crystal structure of an intact antibody molecule, showing the flexibility of the hinge region connecting the arms.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.7 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2001-01-24' },
-    { id: '1AY7', title: 'RIBONUCLEASE SA COMPLEX WITH BARSTAR', category: 'Immune', description: 'Binding arm.', details: 'The "Fragment Antigen Binding" arm of an antibody. This is the part that actually grabs the intruder.',
+        depositionDate: '2001-01-24'
+    },
+    {
+        id: '1AY7', title: 'RIBONUCLEASE SA COMPLEX WITH BARSTAR', category: 'Immune', description: 'Binding arm.', details: 'The "Fragment Antigen Binding" arm of an antibody. This is the part that actually grabs the intruder.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.7 Å',
         organism: 'Streptomyces aureofaciens',
-        depositionDate: '1997-11-14' },
-    { id: '1KNL', title: 'Streptomyces lividans Xylan Binding Domain cbm13', category: 'Immune', description: 'Bacteria sensor.', details: 'Toll-like Receptor 4. It detects lipopolysaccharide (LPS) from bacterial cell walls and triggers immediate inflammation (septic shock warning).',
+        depositionDate: '1997-11-14'
+    },
+    {
+        id: '1KNL', title: 'Streptomyces lividans Xylan Binding Domain cbm13', category: 'Immune', description: 'Bacteria sensor.', details: 'Toll-like Receptor 4. It detects lipopolysaccharide (LPS) from bacterial cell walls and triggers immediate inflammation (septic shock warning).',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.2 Å',
         organism: 'Streptomyces lividans',
-        depositionDate: '2001-12-19' },
-    { id: '1HPM', title: 'HOW POTASSIUM AFFECTS THE ACTIVITY OF THE MOLECULAR CHAPERONE HSC70. II. POTASSIUM BINDS SPECIFICALLY IN THE ATPASE ACTIVE SITE', category: 'Immune', description: 'Inflammation marker.', details: 'A pentameric ring protein that rises sharply in the blood during inflammation. It binds to dying cells to activate the complement system.',
+        depositionDate: '2001-12-19'
+    },
+    {
+        id: '1HPM', title: 'HOW POTASSIUM AFFECTS THE ACTIVITY OF THE MOLECULAR CHAPERONE HSC70. II. POTASSIUM BINDS SPECIFICALLY IN THE ATPASE ACTIVE SITE', category: 'Immune', description: 'Inflammation marker.', details: 'A pentameric ring protein that rises sharply in the blood during inflammation. It binds to dying cells to activate the complement system.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.7 Å',
         organism: 'Bos taurus',
-        depositionDate: '1995-03-24' },
+        depositionDate: '1995-03-24'
+    },
     // --- BATCH 10 ADDITIONS (FINAL 2 to reach 300) ---
-    { id: '3POW', title: 'Crystal structure of the globular domain of human calreticulin', category: 'Chaperone', description: 'ER Chaperone.', details: 'A key chaperone in the Endoplasmic Reticulum that binds calcium. It ensures proper folding of glycoproteins and is part of the immune system\'s "eat me" signal.',
+    {
+        id: '3POW', title: 'Crystal structure of the globular domain of human calreticulin', category: 'Chaperone', description: 'ER Chaperone.', details: 'A key chaperone in the Endoplasmic Reticulum that binds calcium. It ensures proper folding of glycoproteins and is part of the immune system\'s "eat me" signal.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.55 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2010-11-23' },
-    { id: '1SG5', title: 'Solution structure of Yaeo, a Rho-specific inhibitor of transcription termination', category: 'Chaperone', description: 'Jellyfish shape.', details: 'A trimeric periplasmic chaperone that looks like a jellyfish ("Seventeen Kilodalton Protein"). It helps outer membrane proteins cross the periplasm safely.',
+        depositionDate: '2010-11-23'
+    },
+    {
+        id: '1SG5', title: 'Solution structure of Yaeo, a Rho-specific inhibitor of transcription termination', category: 'Chaperone', description: 'Jellyfish shape.', details: 'A trimeric periplasmic chaperone that looks like a jellyfish ("Seventeen Kilodalton Protein"). It helps outer membrane proteins cross the periplasm safely.',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Escherichia coli',
         depositionDate: '2004-02-23',
-}
+    },
+    // --- NEW ADDITIONS ---
+
+
+    {
+        id: '1Z8Y', title: 'Mapping the E2 Glycoprotein of Alphaviruses', category: 'Viral', description: 'HIV Reverse Transcriptase.', details: 'The enzyme HIV uses to copy its RNA genome into DNA.',
+        method: 'ELECTRON MICROSCOPY',
+        resolution: '9 Å',
+        organism: 'Sindbis virus',
+        depositionDate: '2005-03-31'
+    },
+    {
+        id: '1SU4', title: 'Crystal structure of calcium ATPase with two bound calcium ions', category: 'Transport', description: 'Calcium Pump (SERCA).', details: 'Pumps calcium ions back into the sarcoplasmic reticulum to relax muscle fibers.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.4 Å',
+        organism: 'Oryctolagus cuniculus',
+        depositionDate: '2004-03-26'
+    },
+    {
+        id: '3SN6', title: 'Crystal structure of the beta2 adrenergic receptor-Gs protein complex', category: 'Signaling', description: 'GPCR-G Protein Complex.', details: 'A landmark structure showing a G-Protein Coupled Receptor actively signaling to its G-protein.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '3.2 Å',
+        organism: 'Bos taurus',
+        depositionDate: '2011-06-28'
+    },
+
+    {
+        id: '1TUB', title: 'TUBULIN ALPHA-BETA DIMER, ELECTRON DIFFRACTION', category: 'Structural', description: 'Tubulin.', details: 'The building block of microtubules, which form the skeleton of the cell.',
+        method: 'ELECTRON CRYSTALLOGRAPHY',
+        resolution: '3.7 Å',
+        organism: 'Sus scrofa',
+        depositionDate: '1997-09-23'
+    },
+
+    {
+        id: '1B7S', title: 'VERIFICATION OF SPMP USING MUTANT HUMAN LYSOZYMES', category: 'Toxins', description: 'Alpha-Bungarotoxin.', details: 'A potent neurotoxin from snake venom that binds to acetylcholine receptors.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2 Å',
+        organism: 'Homo sapiens',
+        depositionDate: '1999-01-25'
+    },
+    {
+        id: '1BD2', title: 'COMPLEX BETWEEN HUMAN T-CELL RECEPTOR B7, VIRAL PEPTIDE (TAX) AND MHC CLASS I MOLECULE HLA-A 0201', category: 'Immune', description: 'Protein G.', details: 'A bacterial protein that evades the immune system by binding to antibodies backwards.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.5 Å',
+        organism: 'Homo sapiens',
+        depositionDate: '1998-05-12'
+    },
+
+    {
+        id: '1JJW', title: 'Structure of Haemophilus influenzae HslV Protein at 1.9 A Resolution', category: 'Chaperone', description: 'Thermosome.', details: 'A chaperonin from heat-loving arachaea that helps proteins fold in extreme temperatures.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '1.9 Å',
+        organism: 'Haemophilus influenzae',
+        depositionDate: '2001-07-09'
+    },
+    {
+        id: '2BG9', title: 'REFINED STRUCTURE OF THE NICOTINIC ACETYLCHOLINE RECEPTOR AT 4A RESOLUTION.', category: 'Transport', description: 'Hemocyanin.', details: 'The blue, copper-based oxygen transporter found in mollusks and arthropods.',
+        method: 'ELECTRON MICROSCOPY',
+        resolution: '4 Å',
+        organism: 'TORPEDO MARMORATA',
+        depositionDate: '2004-12-17'
+    },
+
+
+
+
+    {
+        id: '1S58', title: 'The structure of B19 parvovirus capsid', category: 'Toxins', description: 'Conotoxin.', details: 'A peptide toxin from cone snails that blocks ion channels.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '3.5 Å',
+        organism: 'Human parvovirus B19',
+        depositionDate: '2004-01-20'
+    },
+    {
+        id: '3L6X', title: 'Crystal structure of p120 catenin in complex with E-cadherin', category: 'Transport', description: 'Voltage-Gated K+ Channel.', details: 'A human channel that controls electrical signaling in neurons and muscles.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.4 Å',
+        organism: 'Homo sapiens',
+        depositionDate: '2009-12-27'
+    },
+
+
+
+    {
+        id: '1B35', title: 'CRICKET PARALYSIS VIRUS (CRPV)', category: 'Structural', description: 'Villin Headpiece.', details: 'One of the fastest-folding protein domains known, used to study protein folding.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.4 Å',
+        organism: 'Cricket paralysis virus',
+        depositionDate: '1998-12-17'
+    },
+
+    {
+        id: '1MNB', title: 'BIV TAT PEPTIDE (RESIDUES 68-81), NMR, MINIMIZED AVERAGE STRUCTURE', category: 'Structural', description: 'Monellin.', details: 'An intensely sweet protein from a tropical berry.',
+        method: 'SOLUTION NMR',
+        resolution: 'N/A',
+        organism: 'Unknown source',
+        depositionDate: '1996-07-25'
+    },
+    // --- NEW ADDITIONS (BATCH 2) ---
+    { id: '6YYT', title: 'Structure of replicating SARS-CoV-2 polymerase', category: 'Viral', description: 'SARS-CoV-2 RNA Polymerase.', details: 'The replication machine of the COVID-19 virus, and the target of the drug Remdesivir.',
+        method: 'ELECTRON MICROSCOPY',
+        resolution: '2.9 Å',
+        organism: 'synthetic construct',
+        depositionDate: '2020-05-06' },
+    { id: '7BZ5', title: 'Structure of COVID-19 virus spike receptor-binding domain complexed with a neutralizing antibody', category: 'Viral', description: 'SARS-CoV-2 Main Protease.', details: 'The viral scissors that cut polyproteins into functional units. A key drug target (Paxlovid).',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '1.84 Å',
+        organism: 'Severe acute respiratory syndrome coronavirus 2',
+        depositionDate: '2020-04-26' },
+    { id: '6M17', title: 'The 2019-nCoV RBD/ACE2-B0AT1 complex', category: 'Viral', description: 'ACE2 Receptor.', details: 'The cellular doorway used by the SARS-CoV-2 spike protein to enter human cells.',
+        method: 'ELECTRON MICROSCOPY',
+        resolution: '2.9 Å',
+        organism: 'Homo sapiens',
+        depositionDate: '2020-02-24' },
+    { id: '3IXJ', title: 'Crystal structure of beta-secretase 1 in complex with selective beta-secretase 1 inhibitor', category: 'Viral', description: 'Zika Virus Envelope.', details: 'The structure of the Zika virus surface, revealing how it differs from Dengue and West Nile.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.2 Å',
+        organism: 'Homo sapiens',
+        depositionDate: '2009-09-04' },
+    
+    { id: '6NKA', title: 'Crystal structure of Mycobacterium tuberculosis dethiobiotin synthetase in complex with 2\'-deoxycytidine', category: 'Viral', description: 'Ebola Nucleoprotein.', details: 'The protein that wraps and protects the Ebola virus RNA genome.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.23 Å',
+        organism: 'Mycobacterium tuberculosis (strain ATCC 25618 / H37Rv)',
+        depositionDate: '2019-01-07' },
+    { id: '2AWJ', title: 'GFP R96M pre-cyclized intermediate in chromophore formation', category: 'Structural', description: 'CFP (Cyan Fluorescent Protein).', details: 'A blue/cyan variant of GFP used for multi-color imaging.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '1.6 Å',
+        organism: 'Aequorea victoria',
+        depositionDate: '2005-09-01' },
+    
+    { id: '1HRA', title: 'THE SOLUTION STRUCTURE OF THE HUMAN RETINOIC ACID RECEPTOR-BETA DNA-BINDING DOMAIN', category: 'Enzymes', description: 'Ribonuclease A.', details: 'A super-stable enzyme that cuts RNA. Nobel prize work on protein folding (Anfinsen).',
+        method: 'SOLUTION NMR',
+        resolution: 'N/A',
+        organism: 'Homo sapiens',
+        depositionDate: '1993-07-25' },
+    { id: '9ANT', title: 'ANTENNAPEDIA HOMEODOMAIN-DNA COMPLEX', category: 'DNA/RNA', description: 'Antennapedia Homeodomain.', details: 'A DNA-binding helix-turn-helix motif that controls body plan development in flies.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.4 Å',
+        organism: 'Drosophila melanogaster',
+        depositionDate: '1998-07-02' },
+    { id: '2O01', title: 'The Structure of a plant photosystem I supercomplex at 3.4 Angstrom resolution', category: 'Signaling', description: 'AMPA Receptor.', details: 'A glutamate receptor in the brain responsible for fast synaptic transmission.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '3.4 Å',
+        organism: 'Pisum sativum',
+        depositionDate: '2006-11-27' },
+    { id: '3J5P', title: 'Structure of TRPV1 ion channel determined by single particle electron cryo-microscopy', category: 'Signaling', description: 'TRPV1 Capsaicin Receptor.', details: 'The sensor for heat and chili peppers (capsaicin). Nobel Prize 2021.',
+        method: 'ELECTRON MICROSCOPY',
+        resolution: '3.275 Å',
+        organism: 'Rattus norvegicus',
+        depositionDate: '2013-10-28' },
 ];
 // Deduplicate IDs just in case
 export const getUniqueModels = () => Array.from(new Map(OFFLINE_LIBRARY.map(item => [item.id, item])).values());
