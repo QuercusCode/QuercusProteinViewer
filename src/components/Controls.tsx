@@ -35,6 +35,7 @@ import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snap
 import { formatChemicalId } from '../utils/pdbUtils';
 import { findMotifs } from '../utils/searchUtils';
 import type { MotifMatch } from '../utils/searchUtils';
+import { MOTIF_LIBRARY } from '../data/motifLibrary';
 
 // Reusable Sidebar Section Component - Defined outside to prevent re-renders losing focus
 const SidebarSection = ({ title, icon: Icon, children, isOpen, onToggle, isLightMode }: { title: string, icon: any, children: React.ReactNode, isOpen: boolean, onToggle: () => void, isLightMode: boolean }) => (
@@ -983,6 +984,22 @@ export const Controls: React.FC<ControlsProps> = ({
                                     <button onClick={() => sessionInputRef.current?.click()} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
                                         <Upload className="w-3.5 h-3.5" /> Load
                                     </button>
+                                    <select
+                                        onChange={(e) => {
+                                            setSearchPattern(e.target.value);
+                                        }}
+                                        className={`w-full mb-2 bg-transparent border rounded px-2 py-1 text-xs outline-none focus:border-blue-500
+                                                ${isLightMode
+                                                ? 'border-neutral-300 text-black'
+                                                : 'border-white/20 text-white'}`}
+                                        defaultValue=""
+                                    >
+                                        {MOTIF_LIBRARY.map((m) => (
+                                            <option key={m.name} value={m.pattern} className={isLightMode ? 'text-black' : 'text-black'}>
+                                                {m.name}
+                                            </option>
+                                        ))}
+                                    </select>
                                     <input type="file" accept=".json" className="hidden" ref={sessionInputRef} onChange={(e) => e.target.files?.[0] && onLoadSession(e.target.files[0])} />
                                 </div>
                             </div>

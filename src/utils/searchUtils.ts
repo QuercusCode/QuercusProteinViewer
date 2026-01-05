@@ -33,31 +33,23 @@ export const findMotifs = (chains: ChainInfo[], pattern: string): MotifMatch[] =
     if (!pattern || pattern.trim().length === 0) return [];
 
     // 1. Clean and normalize the pattern
-    // Remove dashes and spaces, convert to upper case
-    // Replace '?' with 'X' for internal wildcard handling if needed, 
-    // but ultimately valid AA codes are A-Z. 
-    // We treat 'X' as the wildcard char for matching logic.
-    let cleanPattern = pattern.replace(/[\-\s]/g, '').toUpperCase();
+    // Remove whitespace
+    let cleanPattern = pattern.replace(/\s/g, '');
 
-    // Replace '?' with 'X'
-    cleanPattern = cleanPattern.replace(/\?/g, 'X');
-    cleanPattern = cleanPattern.replace(/\./g, 'X'); // Allow dot as wildcard too regex style
-
-    // Validate characters (only Allow A-Z)
-    if (!/^[A-Z]+$/.test(cleanPattern)) {
-        console.warn("Invalid characters in search pattern");
-        return [];
-    }
+    // Convert 'x' or 'X' or '?' to '.' for wildcards
+    // We replace x/X/? with . globablly
+    cleanPattern = cleanPattern.replace(/[xX\?]/g, '.');
 
     // Convert to Regex
-    // 'X' becomes '.', everything else is literal
-    const regexString = cleanPattern.split('').map(char => {
-        return (char === 'X') ? '.' : char;
-    }).join('');
-
-    // Use positive lookahead if we want overlapping? usually not for motifs.
-    // Standard regex
-    const regex = new RegExp(regexString, 'g');
+    // We trust valid regex input for complex patterns (e.g. {2,4})
+    // Validation is tricky for regex, so we wrap in try-catch
+    let regex: RegExp;
+    try {
+        regex = new RegExp(cleanPattern, 'gi'); // Case insensitive
+    } catch (e) {
+        console.warn("Invalid regex pattern:", cleanPattern);
+        return [];
+    }
 
     const matches: MotifMatch[] = [];
 
