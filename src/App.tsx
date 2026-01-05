@@ -12,6 +12,7 @@ import { ShareModal } from './components/ShareModal';
 import { SequenceTrack } from './components/SequenceTrack';
 import { DragDropOverlay } from './components/DragDropOverlay';
 import { CommandPalette, type CommandAction } from './components/CommandPalette';
+import { HUD } from './components/HUD';
 import { OFFLINE_LIBRARY } from './data/library';
 import { fetchPDBMetadata } from './utils/pdbUtils';
 import type { PDBMetadata } from './types';
@@ -587,6 +588,9 @@ function App() {
   // --- COMMAND PALETTE LOGIC ---
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
 
+  // --- HUD STATE ---
+  const [hoveredResidue, setHoveredResidue] = useState<ResidueInfo | null>(null);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -787,6 +791,12 @@ function App() {
         chains={chains}
         onAction={handleAIAction}
       />
+      <HUD
+        hoveredResidue={hoveredResidue}
+        stats={structureStats}
+        pdbMetadata={pdbMetadata}
+        isLightMode={isLightMode}
+      />
       <Controls
         pdbId={pdbId}
         setPdbId={handlePdbIdChange}
@@ -858,6 +868,18 @@ function App() {
 
         onAtomClick={handleAtomClick}
         isMeasurementMode={isMeasurementMode}
+        onHover={(info) => {
+          // Mapping ProteinViewer hover info to ResidueInfo format
+          if (info) {
+            setHoveredResidue({
+              chain: info.chain,
+              resNo: info.resNo,
+              resName: info.resName
+            });
+          } else {
+            setHoveredResidue(null);
+          }
+        }}
 
         backgroundColor={customBackgroundColor || (isLightMode ? 'white' : 'black')}
         showSurface={showSurface}

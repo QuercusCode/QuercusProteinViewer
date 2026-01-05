@@ -44,6 +44,7 @@ interface ProteinViewerProps {
     isMeasurementMode?: boolean;
     quality?: 'low' | 'medium' | 'high';
     enableAmbientOcclusion?: boolean;
+    onHover?: (info: { chain: string; resNo: number; resName: string; atomCount?: number } | null) => void;
 }
 
 export interface ProteinViewerRef {
@@ -90,7 +91,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     showSurface = false,
     showLigands = false,
     isSpinning = false,
-    isMeasurementMode = false
+    isMeasurementMode = false,
+    onHover
 }: ProteinViewerProps, ref: React.Ref<ProteinViewerRef>) => {
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -98,6 +100,12 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     const componentRef = useRef<any>(null);
     const highlightComponentRef = useRef<any>(null);
     const isMounted = useRef(true);
+    const onHoverRef = useRef(onHover);
+
+    // Update ref when prop changes
+    useEffect(() => {
+        onHoverRef.current = onHover;
+    }, [onHover]);
 
     const measurementsRef = useRef<MeasurementData[]>([]);
     const measurementRepsRef = useRef<any[]>([]); // Track NGL Representations for cleanup
@@ -1113,10 +1121,39 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         try {
             const stage = new window.NGL.Stage(containerRef.current, {
                 backgroundColor: backgroundColor,
-                tooltip: true,
+                tooltip: false, // Disable default NGL tooltip to use HUD
                 webglParams: { preserveDrawingBuffer: true }
             });
             stageRef.current = stage;
+
+            // --- MOUSE CONTROLS ---
+            stage.mouseControls.add("drag-left", window.NGL.MouseActions.rotateDrag);
+            stage.mouseControls.add("scroll", window.NGL.MouseActions.zoomScroll);
+            stage.mouseControls.add("drag-right", window.NGL.MouseActions.panDrag);
+
+            // --- HOVER HANDLING (HUD) ---
+            let hoveredAtomIndex = -1;
+            stage.signals.hovered.add((pickingProxy: any) => {
+                if (pickingProxy && (pickingProxy.atom || pickingProxy.bond)) {
+                    const atom = pickingProxy.atom || (pickingProxy.bond ? pickingProxy.bond.atom1 : null);
+
+                    if (atom && atom.index !== hoveredAtomIndex) {
+                        hoveredAtomIndex = atom.index;
+                        if (onHoverRef.current) {
+                            onHoverRef.current({
+                                chain: atom.chainname,
+                                resNo: atom.resno,
+                                resName: atom.resname
+                            });
+                        }
+                    }
+                } else {
+                    if (hoveredAtomIndex !== -1) {
+                        hoveredAtomIndex = -1;
+                        if (onHoverRef.current) onHoverRef.current(null);
+                    }
+                }
+            });
 
             const handleResize = () => stage.handleResize();
             window.addEventListener('resize', handleResize);
