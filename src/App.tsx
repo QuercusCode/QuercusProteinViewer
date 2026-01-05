@@ -793,8 +793,8 @@ function App() {
       />
       <HUD
         hoveredResidue={hoveredResidue}
-        stats={structureStats}
         pdbMetadata={pdbMetadata}
+        pdbId={pdbId}
         isLightMode={isLightMode}
       />
       <Controls
