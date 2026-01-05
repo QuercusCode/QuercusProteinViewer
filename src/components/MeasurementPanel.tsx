@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import { Ruler, Trash2, Download, Edit2, Check, X } from 'lucide-react';
-import type { Measurement } from '../types';
+import { Ruler, Trash2, Download, Edit2, Check, X, Type } from 'lucide-react';
+import type { Measurement, MeasurementTextColor } from '../types';
 
 interface MeasurementPanelProps {
     measurements: Measurement[];
@@ -11,8 +11,11 @@ interface MeasurementPanelProps {
     isOpen: boolean;
     onClose: () => void;
     isLightMode: boolean;
+    textColorMode: MeasurementTextColor;
+    onToggleTextColor: () => void;
 }
-export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements, onUpdate, onDelete, onClearAll, isOpen, onClose }) => {
+
+export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements, onUpdate, onDelete, onClearAll, isOpen, onClose, textColorMode, onToggleTextColor }) => {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editName, setEditName] = useState("");
     const [activeColorPickerId, setActiveColorPickerId] = useState<string | null>(null);
@@ -70,6 +73,13 @@ export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements
                     </span>
                 </div>
                 <div className="flex items-center gap-2">
+                    <button
+                        onClick={onToggleTextColor}
+                        className="p-1.5 hover:bg-white/10 rounded text-neutral-400 hover:text-white"
+                        title={`Text Color: ${textColorMode.charAt(0).toUpperCase() + textColorMode.slice(1)}`}
+                    >
+                        <Type className={`w-4 h-4 ${textColorMode === 'auto' ? 'opacity-50' : 'text-blue-400'}`} />
+                    </button>
                     <button
                         onClick={onClearAll}
                         disabled={measurements.length === 0}

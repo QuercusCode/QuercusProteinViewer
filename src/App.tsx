@@ -594,6 +594,7 @@ function App() {
   // --- MEASUREMENT STATE ---
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
   const [isMeasurementPanelOpen, setIsMeasurementPanelOpen] = useState(false);
+  const [measurementTextColorMode, setMeasurementTextColorMode] = useState<MeasurementTextColor>('auto');
 
   const handleAddMeasurement = (m: Measurement) => {
     setMeasurements(prev => [...prev, m]);
@@ -826,6 +827,14 @@ function App() {
             setMeasurements([]);
             viewerRef.current?.clearMeasurements();
           }}
+          textColorMode={measurementTextColorMode}
+          onToggleTextColor={() => {
+            setMeasurementTextColorMode((prev: MeasurementTextColor) => {
+              if (prev === 'auto') return 'black';
+              if (prev === 'black') return 'white';
+              return 'auto';
+            });
+          }}
           onClose={() => {
             setIsMeasurementMode(false);
             setIsMeasurementPanelOpen(false);
@@ -906,6 +915,7 @@ function App() {
         coloring={coloring}
         palette={colorPalette}
         backgroundColor={customBackgroundColor || (isLightMode ? 'white' : 'black')}
+        measurementTextColor={measurementTextColorMode}
 
         onStructureLoaded={handleStructureLoaded}
         onAtomClick={handleAtomClick}

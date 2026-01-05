@@ -8,7 +8,8 @@ import type {
     ColoringType,
     ResidueInfo,
     Measurement,
-    StructureInfo
+    StructureInfo,
+    MeasurementTextColor
 } from '../types';
 
 
@@ -41,6 +42,7 @@ export interface ProteinViewerProps {
     palette: ColorPalette;
     backgroundColor: string;
     customColors?: any[]; // Simplified type for now
+    measurementTextColor?: MeasurementTextColor; // Added prop
 
     // Quality
     quality?: 'low' | 'medium' | 'high';
@@ -1428,27 +1430,34 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             };
             const colorArr = hexToRgb(m.color);
 
-            // Determine text color based on background luminance
-            const getBrightness = (color: string) => {
-                let r, g, b;
-                if (color.startsWith('#')) {
-                    const hex = color.substring(1);
-                    r = parseInt(hex.substring(0, 2), 16);
-                    g = parseInt(hex.substring(2, 4), 16);
-                    b = parseInt(hex.substring(4, 6), 16);
-                } else if (color === 'white') {
-                    return 255;
-                } else if (color === 'black') {
-                    return 0;
-                } else {
-                    // Default to assumption based on mode if color is unknown
-                    return isLightMode ? 255 : 0;
-                }
-                return (r * 299 + g * 587 + b * 114) / 1000;
-            };
+            // Determine text color
+            let labelColor = [0, 0, 0];
+            if (measurementTextColor === 'black') {
+                labelColor = [0, 0, 0];
+            } else if (measurementTextColor === 'white') {
+                labelColor = [1.0, 0.8, 0.0]; // Keeping 'Gold' for manual 'white/dark mode' setting as it's the requested high contrast
+            } else {
+                // Auto mode
+                const getBrightness = (color: string) => {
+                    let r, g, b;
+                    if (color.startsWith('#')) {
+                        const hex = color.substring(1);
+                        r = parseInt(hex.substring(0, 2), 16);
+                        g = parseInt(hex.substring(2, 4), 16);
+                        b = parseInt(hex.substring(4, 6), 16);
+                    } else if (color === 'white') {
+                        return 255;
+                    } else if (color === 'black') {
+                        return 0;
+                    } else {
+                        return isLightMode ? 255 : 0;
+                    }
+                    return (r * 299 + g * 587 + b * 114) / 1000;
+                };
 
-            const bgBrightness = getBrightness(backgroundColor || (isLightMode ? 'white' : 'black'));
-            const labelColor = bgBrightness > 128 ? [0, 0, 0] : [1.0, 0.8, 0.0];
+                const bgBrightness = getBrightness(backgroundColor || (isLightMode ? 'white' : 'black'));
+                labelColor = bgBrightness > 128 ? [0, 0, 0] : [1.0, 0.8, 0.0];
+            }
 
             shape.addCylinder(p1, p2, colorArr, 0.1);
             shape.addSphere(p1, colorArr, 0.2);
@@ -1464,7 +1473,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             comp.addRepresentation("buffer", { depthTest: false });
         });
 
-    }, [measurements, isLightMode, backgroundColor]);
+    }, [measurements, isLightMode, backgroundColor, measurementTextColor]);
 
 
     useEffect(() => {
