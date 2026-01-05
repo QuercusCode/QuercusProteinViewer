@@ -371,7 +371,7 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '1B07', title: 'CRK SH3 DOMAIN COMPLEXED WITH PEPTOID INHIBITOR', category: 'Enzymes', description: 'Ribonuclease.', details: 'Barnase is a bacterial ribonuclease (RNase) that is lethal to cells because it degrades RNA. It is famously studied alongside its inhibitor, Barstar, as a model for extremely tight protein-protein interactions.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.5 Å',
-        organism: 'Mus musculus',
+        organism: 'Unknown source',
         depositionDate: '1998-11-17'
     },
     { id: '1brc', title: 'Bacteriorhodopsin', category: 'Transport', description: 'Light-driven proton pump.', details: 'Found in salt-loving archaea, this protein uses retinal (like the eye) to capture light energy. It pumps protons out of the cell to create a gradient for ATP synthesis.' },
@@ -449,7 +449,7 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '1M4H', title: 'Crystal Structure of Beta-secretase complexed with Inhibitor OM00-3', category: 'Immune', description: 'Antigen presentation.', details: 'This molecule displays peptide fragments from inside the cell to the immune system. If the fragment is viral, T-cells will destroy the infected cell.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.1 Å',
-        organism: 'Homo sapiens',
+        organism: 'synthetic construct',
         depositionDate: '2002-07-02'
     },
     {
@@ -872,7 +872,7 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '1DFJ', title: 'RIBONUCLEASE INHIBITOR COMPLEXED WITH RIBONUCLEASE A', category: 'Structural', description: 'Horseshoe shape.', details: 'A leucine-rich repeat protein that binds RNase A with femtomolar affinity. Its horseshoe shape is a classic structural motif.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.5 Å',
-        organism: 'Sus scrofa',
+        organism: 'Bos taurus',
         depositionDate: '1996-06-29'
     },
     {
@@ -935,7 +935,7 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '1M1J', title: 'Crystal structure of native chicken fibrinogen with two different bound ligands', category: 'Structural', description: 'Cargo transport.', details: 'A processive motor that walks along actin filaments carrying organelles. It takes large steps to avoid spiritual obstacles.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.7 Å',
-        organism: 'Unknown source',
+        organism: 'Gallus gallus',
         depositionDate: '2002-06-19'
     },
     {
@@ -949,7 +949,7 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '1O6S', title: 'Internalin (Listeria monocytogenes) / E-Cadherin (human) Recognition Complex', category: 'Signaling', description: 'Cell adhesion.', details: 'The anchor that holds cells to the matrix. It transmits mechanical force and chemical signals across the membrane.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.8 Å',
-        organism: 'LISTERIA MONOCYTOGENES',
+        organism: 'HOMO SAPIENS',
         depositionDate: '2002-10-13'
     },
     {
@@ -1034,7 +1034,7 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '2B1V', title: 'Human estrogen receptor alpha ligand-binding domain in complex with OBCP-1M and a glucocorticoid receptor interacting protein 1 NR box II peptide', category: 'Toxins', description: 'Botox.', details: 'The most lethal toxin known. It cleaves SNARE proteins to prevent neurotransmitter release, causing paralysis.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.8 Å',
-        organism: 'Unknown source',
+        organism: 'Homo sapiens',
         depositionDate: '2005-09-16'
     },
     {
@@ -1139,7 +1139,7 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '2Q66', title: 'Structure of Yeast Poly(A) Polymerase with ATP and oligo(A)', category: 'Enzymes', description: 'Cancer protection.', details: 'Protects cells from quinone toxicity. Levels are induced by broccoli and other cruciferous vegetables.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.8 Å',
-        organism: 'Saccharomyces cerevisiae',
+        organism: 'Unknown source',
         depositionDate: '2007-06-04'
     },
     {
@@ -1245,7 +1245,7 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '1YCR', title: 'MDM2 BOUND TO THE TRANSACTIVATION DOMAIN OF P53', category: 'Signaling', description: 'Cancer interaction.', details: 'A key protein-protein interface. MDM2 binds to p53 to inhibit it. Many cancer drugs try to break this interaction to reactivate p53.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.6 Å',
-        organism: 'Unknown source',
+        organism: 'Homo sapiens',
         depositionDate: '1996-09-30'
     },
     {
@@ -1259,7 +1259,7 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '2O60', title: 'Calmodulin bound to peptide from neuronal nitric oxide synthase', category: 'Transport', description: 'Cell communication.', details: 'Connexin-26 forms channels that connect neighboring cells, allowing ions and small molecules to flow directly between them.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.55 Å',
-        organism: 'Unknown source',
+        organism: 'Gallus gallus',
         depositionDate: '2006-12-06'
     },
     {
@@ -1343,7 +1343,7 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '1DLH', title: 'CRYSTAL STRUCTURE OF THE HUMAN CLASS II MHC PROTEIN HLA-DR1 COMPLEXED WITH AN INFLUENZA VIRUS PEPTIDE', category: 'Signaling', description: 'Pain receptor.', details: 'A G-protein coupled receptor involved in pain relief (analgesia). It is a target for enkephalins and painkiller drugs.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.8 Å',
-        organism: 'Unknown source',
+        organism: 'Homo sapiens',
         depositionDate: '1994-02-15'
     },
     // --- BATCH 5 ADDITIONS (25 VERIFIED) ---
@@ -1407,7 +1407,7 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '1HYS', title: 'CRYSTAL STRUCTURE OF HIV-1 REVERSE TRANSCRIPTASE IN COMPLEX WITH A POLYPURINE TRACT RNA:DNA', category: 'Viral', description: 'Viral replication.', details: 'The target of AZT. This enzyme copies the viral RNA genome into DNA, which then integrates into the host cell\'s genome.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3 Å',
-        organism: 'Mus musculus',
+        organism: 'Human immunodeficiency virus 1',
         depositionDate: '2001-01-22'
     },
     {
@@ -1463,7 +1463,7 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '1NCC', title: 'CRYSTAL STRUCTURES OF TWO MUTANT NEURAMINIDASE-ANTIBODY COMPLEXES WITH AMINO ACID SUBSTITUTIONS IN THE INTERFACE', category: 'Structural', description: 'Cell adhesion.', details: 'Calcium-dependent adhesion molecules that zip cells together like Velcro to form solid tissues.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.5 Å',
-        organism: 'Mus musculus',
+        organism: 'Influenza A virus',
         depositionDate: '1992-01-21'
     },
     {
@@ -1505,7 +1505,7 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '1QLS', title: 'S100C (S100A11),OR CALGIZZARIN, IN COMPLEX WITH ANNEXIN I N-TERMINUS', category: 'Chaperone', description: 'Heat shock.', details: 'The workhorse chaperone. It clamps onto exposed hydrophobic patches of unfolded proteins to prevent aggregation.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.3 Å',
-        organism: 'HOMO SAPIENS',
+        organism: 'SUS SCROFA',
         depositionDate: '1999-09-15'
     },
     {
@@ -1548,14 +1548,14 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '5I6X', title: 'X-ray structure of the ts3 human serotonin transporter complexed with paroxetine at the central site', category: 'Enzymes', description: 'Cholesterol regulator.', details: 'A protein that destroys LDL receptors. Blocking PCSK9 allows the liver to clear more bad cholesterol from the blood.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.14 Å',
-        organism: 'Mus musculus',
+        organism: 'Homo sapiens',
         depositionDate: '2016-02-16'
     },
     {
         id: '6W41', title: 'Crystal structure of SARS-CoV-2 receptor binding domain in complex with human antibody CR3022', category: 'Viral', description: 'Main Protease.', details: 'The viral enzyme that cuts polyproteins. It is the target of Paxlovid (Nirmatrelvir), preventing the virus from replicating.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.084 Å',
-        organism: 'Homo sapiens',
+        organism: 'Severe acute respiratory syndrome coronavirus 2',
         depositionDate: '2020-03-09'
     },
     {
@@ -1576,14 +1576,14 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '1S03', title: 'The Structure of a Ribosomal Protein S8/spc Operon mRNA Complex', category: 'Enzymes', description: 'DNA untangler.', details: 'A molecular machine that cuts both strands of DNA, passes another helix through the gap, and reseals it to remove tangles.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.7 Å',
-        organism: 'Escherichia coli',
+        organism: 'Unknown source',
         depositionDate: '2003-12-29'
     },
     {
         id: '6M0J', title: 'Crystal structure of SARS-CoV-2 spike receptor-binding domain bound with ACE2', category: 'Structural', description: 'COVID entry door.', details: 'The human cell surface receptor that SARS-CoV-2 binds to. Paradoxically, its normal role is to lower blood pressure.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.45 Å',
-        organism: 'Homo sapiens',
+        organism: 'Severe acute respiratory syndrome coronavirus 2',
         depositionDate: '2020-02-21'
     },
     {
@@ -1782,14 +1782,14 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '5UDJ', title: 'IFIT1 monomeric mutant (L457E/L464E) with Gppp-AAAA', category: 'Viral', description: 'Respiratory virus.', details: 'The prefusion form of the RSV F protein. Stabilizing this shape was the breakthrough that led to the first approved RSV vaccines.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.69 Å',
-        organism: 'unidentified',
+        organism: 'Homo sapiens',
         depositionDate: '2016-12-27'
     },
     {
         id: '3KZ4', title: 'Crystal Structure of the Rotavirus Double Layered Particle', category: 'Viral', description: 'Stomach flu.', details: 'The spike protein of Rotavirus, a leading cause of severe diarrhea in children. It must be cleaved by trypsin to become infectious.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.8 Å',
-        organism: 'Bovine rotavirus',
+        organism: 'Bovine Rotavirus',
         depositionDate: '2009-12-07'
     },
     {
@@ -1819,7 +1819,7 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '5F9R', title: 'Crystal structure of catalytically-active Streptococcus pyogenes CRISPR-Cas9 in complex with single-guided RNA and double-stranded DNA primed for target DNA cleavage', category: 'Enzymes', description: 'Gene editor.', details: 'The revolutionary gene-editing tool. It uses a guide RNA to locate and cut specific DNA sequences, allowing for precise genetic modifications.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.4 Å',
-        organism: 'Lambdapapillomavirus 1',
+        organism: 'Streptococcus pyogenes serotype M1',
         depositionDate: '2015-12-10'
     },
 
@@ -1837,7 +1837,7 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '2AAI', title: 'Crystallographic refinement of ricin to 2.5 Angstroms', category: 'Enzymes', description: 'Starch breaker.', details: 'The enzyme in saliva that begins the digestion of starches into sugars. It is why bread tastes sweet if you chew it long enough.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.5 Å',
-        organism: 'Ricinus communis',
+        organism: 'Unknown source',
         depositionDate: '1993-09-07'
     },
 
@@ -2057,7 +2057,7 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '1AY7', title: 'RIBONUCLEASE SA COMPLEX WITH BARSTAR', category: 'Immune', description: 'Binding arm.', details: 'The "Fragment Antigen Binding" arm of an antibody. This is the part that actually grabs the intruder.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.7 Å',
-        organism: 'Streptomyces aureofaciens',
+        organism: 'Bacillus amyloliquefaciens',
         depositionDate: '1997-11-14'
     },
     {
@@ -2166,7 +2166,7 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         id: '3L6X', title: 'Crystal structure of p120 catenin in complex with E-cadherin', category: 'Transport', description: 'Voltage-Gated K+ Channel.', details: 'A human channel that controls electrical signaling in neurons and muscles.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.4 Å',
-        organism: 'Homo sapiens',
+        organism: 'Unknown source',
         depositionDate: '2009-12-27'
     },
 
@@ -2188,58 +2188,159 @@ export const OFFLINE_LIBRARY: LibraryEntry[] = [
         depositionDate: '1996-07-25'
     },
     // --- NEW ADDITIONS (BATCH 2) ---
-    { id: '6YYT', title: 'Structure of replicating SARS-CoV-2 polymerase', category: 'Viral', description: 'SARS-CoV-2 RNA Polymerase.', details: 'The replication machine of the COVID-19 virus, and the target of the drug Remdesivir.',
+    {
+        id: '6YYT', title: 'Structure of replicating SARS-CoV-2 polymerase', category: 'Viral', description: 'SARS-CoV-2 RNA Polymerase.', details: 'The replication machine of the COVID-19 virus, and the target of the drug Remdesivir.',
         method: 'ELECTRON MICROSCOPY',
         resolution: '2.9 Å',
         organism: 'synthetic construct',
-        depositionDate: '2020-05-06' },
-    { id: '7BZ5', title: 'Structure of COVID-19 virus spike receptor-binding domain complexed with a neutralizing antibody', category: 'Viral', description: 'SARS-CoV-2 Main Protease.', details: 'The viral scissors that cut polyproteins into functional units. A key drug target (Paxlovid).',
+        depositionDate: '2020-05-06'
+    },
+    {
+        id: '7BZ5', title: 'Structure of COVID-19 virus spike receptor-binding domain complexed with a neutralizing antibody', category: 'Viral', description: 'SARS-CoV-2 Main Protease.', details: 'The viral scissors that cut polyproteins into functional units. A key drug target (Paxlovid).',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.84 Å',
-        organism: 'Severe acute respiratory syndrome coronavirus 2',
-        depositionDate: '2020-04-26' },
-    { id: '6M17', title: 'The 2019-nCoV RBD/ACE2-B0AT1 complex', category: 'Viral', description: 'ACE2 Receptor.', details: 'The cellular doorway used by the SARS-CoV-2 spike protein to enter human cells.',
+        organism: 'Homo sapiens',
+        depositionDate: '2020-04-26'
+    },
+    {
+        id: '6M17', title: 'The 2019-nCoV RBD/ACE2-B0AT1 complex', category: 'Viral', description: 'ACE2 Receptor.', details: 'The cellular doorway used by the SARS-CoV-2 spike protein to enter human cells.',
         method: 'ELECTRON MICROSCOPY',
         resolution: '2.9 Å',
-        organism: 'Homo sapiens',
-        depositionDate: '2020-02-24' },
-    { id: '3IXJ', title: 'Crystal structure of beta-secretase 1 in complex with selective beta-secretase 1 inhibitor', category: 'Viral', description: 'Zika Virus Envelope.', details: 'The structure of the Zika virus surface, revealing how it differs from Dengue and West Nile.',
+        organism: 'Severe acute respiratory syndrome coronavirus 2',
+        depositionDate: '2020-02-24'
+    },
+    {
+        id: '3IXJ', title: 'Crystal structure of beta-secretase 1 in complex with selective beta-secretase 1 inhibitor', category: 'Viral', description: 'Zika Virus Envelope.', details: 'The structure of the Zika virus surface, revealing how it differs from Dengue and West Nile.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.2 Å',
         organism: 'Homo sapiens',
-        depositionDate: '2009-09-04' },
-    
-    { id: '6NKA', title: 'Crystal structure of Mycobacterium tuberculosis dethiobiotin synthetase in complex with 2\'-deoxycytidine', category: 'Viral', description: 'Ebola Nucleoprotein.', details: 'The protein that wraps and protects the Ebola virus RNA genome.',
+        depositionDate: '2009-09-04'
+    },
+
+    {
+        id: '6NKA', title: 'Crystal structure of Mycobacterium tuberculosis dethiobiotin synthetase in complex with 2\'-deoxycytidine', category: 'Viral', description: 'Ebola Nucleoprotein.', details: 'The protein that wraps and protects the Ebola virus RNA genome.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.23 Å',
         organism: 'Mycobacterium tuberculosis (strain ATCC 25618 / H37Rv)',
-        depositionDate: '2019-01-07' },
-    { id: '2AWJ', title: 'GFP R96M pre-cyclized intermediate in chromophore formation', category: 'Structural', description: 'CFP (Cyan Fluorescent Protein).', details: 'A blue/cyan variant of GFP used for multi-color imaging.',
+        depositionDate: '2019-01-07'
+    },
+    {
+        id: '2AWJ', title: 'GFP R96M pre-cyclized intermediate in chromophore formation', category: 'Structural', description: 'CFP (Cyan Fluorescent Protein).', details: 'A blue/cyan variant of GFP used for multi-color imaging.',
         method: 'X-RAY DIFFRACTION',
         resolution: '1.6 Å',
         organism: 'Aequorea victoria',
-        depositionDate: '2005-09-01' },
-    
-    { id: '1HRA', title: 'THE SOLUTION STRUCTURE OF THE HUMAN RETINOIC ACID RECEPTOR-BETA DNA-BINDING DOMAIN', category: 'Enzymes', description: 'Ribonuclease A.', details: 'A super-stable enzyme that cuts RNA. Nobel prize work on protein folding (Anfinsen).',
+        depositionDate: '2005-09-01'
+    },
+
+    {
+        id: '1HRA', title: 'THE SOLUTION STRUCTURE OF THE HUMAN RETINOIC ACID RECEPTOR-BETA DNA-BINDING DOMAIN', category: 'Enzymes', description: 'Ribonuclease A.', details: 'A super-stable enzyme that cuts RNA. Nobel prize work on protein folding (Anfinsen).',
         method: 'SOLUTION NMR',
         resolution: 'N/A',
         organism: 'Homo sapiens',
-        depositionDate: '1993-07-25' },
-    { id: '9ANT', title: 'ANTENNAPEDIA HOMEODOMAIN-DNA COMPLEX', category: 'DNA/RNA', description: 'Antennapedia Homeodomain.', details: 'A DNA-binding helix-turn-helix motif that controls body plan development in flies.',
+        depositionDate: '1993-07-25'
+    },
+    {
+        id: '9ANT', title: 'ANTENNAPEDIA HOMEODOMAIN-DNA COMPLEX', category: 'DNA/RNA', description: 'Antennapedia Homeodomain.', details: 'A DNA-binding helix-turn-helix motif that controls body plan development in flies.',
         method: 'X-RAY DIFFRACTION',
         resolution: '2.4 Å',
         organism: 'Drosophila melanogaster',
-        depositionDate: '1998-07-02' },
-    { id: '2O01', title: 'The Structure of a plant photosystem I supercomplex at 3.4 Angstrom resolution', category: 'Signaling', description: 'AMPA Receptor.', details: 'A glutamate receptor in the brain responsible for fast synaptic transmission.',
+        depositionDate: '1998-07-02'
+    },
+    {
+        id: '2O01', title: 'The Structure of a plant photosystem I supercomplex at 3.4 Angstrom resolution', category: 'Signaling', description: 'AMPA Receptor.', details: 'A glutamate receptor in the brain responsible for fast synaptic transmission.',
         method: 'X-RAY DIFFRACTION',
         resolution: '3.4 Å',
         organism: 'Pisum sativum',
-        depositionDate: '2006-11-27' },
-    { id: '3J5P', title: 'Structure of TRPV1 ion channel determined by single particle electron cryo-microscopy', category: 'Signaling', description: 'TRPV1 Capsaicin Receptor.', details: 'The sensor for heat and chili peppers (capsaicin). Nobel Prize 2021.',
+        depositionDate: '2006-11-27'
+    },
+    {
+        id: '3J5P', title: 'Structure of TRPV1 ion channel determined by single particle electron cryo-microscopy', category: 'Signaling', description: 'TRPV1 Capsaicin Receptor.', details: 'The sensor for heat and chili peppers (capsaicin). Nobel Prize 2021.',
         method: 'ELECTRON MICROSCOPY',
         resolution: '3.275 Å',
         organism: 'Rattus norvegicus',
-        depositionDate: '2013-10-28' },
+        depositionDate: '2013-10-28'
+    },
+    // --- NEW ADDITIONS (BATCH 3) ---
+    { id: '3J3Q', title: 'Atomic-level structure of the entire HIV-1 capsid', category: 'Viral', description: 'HIV-1 Envelope Trimer.', details: 'The fully folded, native state of the HIV spike, the target for neutralizing antibodies.',
+        method: 'ELECTRON MICROSCOPY',
+        resolution: 'N/A',
+        organism: 'Human immunodeficiency virus 1',
+        depositionDate: '2013-04-12' },
+    { id: '5B0B', title: 'Polyketide cyclase OAC from Cannabis sativa, I7F mutant', category: 'Transport', description: 'Piezo1 Mechanosensitive Channel.', details: 'The massive propeller-shaped channel that senses touch and blood flow. Nobel Prize 2021.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.187 Å',
+        organism: 'Cannabis sativa',
+        depositionDate: '2015-10-28' },
+    { id: '6D9H', title: 'Cryo-EM structure of the human adenosine A1 receptor-Gi2-protein complex bound to its endogenous agonist', category: 'Enzymes', description: 'CRISPR Cas13a.', details: 'A CRISPR variant that targets RNA instead of DNA, used for viral detection.',
+        method: 'ELECTRON MICROSCOPY',
+        resolution: '3.6 Å',
+        organism: 'Homo sapiens',
+        depositionDate: '2018-04-29' },
+    { id: '6X29', title: 'SARS-CoV-2 rS2d Down State Spike Protein Trimer', category: 'Enzymes', description: 'CRISPR Cas12a.', details: 'A CRISPR enzyme with different cutting properties than Cas9, improving specificity.',
+        method: 'ELECTRON MICROSCOPY',
+        resolution: '2.7 Å',
+        organism: 'Severe acute respiratory syndrome coronavirus 2',
+        depositionDate: '2020-05-20' },
+    { id: '1Q4X', title: 'Crystal Structure of Human Thyroid Hormone Receptor beta LBD in complex with specific agonist GC-24', category: 'Signaling', description: 'Rhodopsin.', details: 'The light-sensing protein in our eyes. The first GPCR structure ever solved.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.8 Å',
+        organism: 'Homo sapiens',
+        depositionDate: '2003-08-04' },
+    { id: '4MBS', title: 'Crystal Structure of the CCR5 Chemokine Receptor', category: 'Transport', description: 'Serotonin Transporter (SERT).', details: 'The protein that recycles serotonin in the brain. It is the target of antidepressants like Prozac.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '2.71 Å',
+        organism: 'Homo sapiens',
+        depositionDate: '2013-08-19' },
+    { id: '5L7D', title: 'Structure of human Smoothened in complex with cholesterol', category: 'Signaling', description: 'Mu-Opioid Receptor.', details: 'The receptor responsible for the pain-relieving and addictive effects of morphine.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '3.2 Å',
+        organism: 'Homo sapiens',
+        depositionDate: '2016-06-03' },
+    { id: '5A22', title: 'Structure of the L protein of vesicular stomatitis virus from electron cryomicroscopy', category: 'DNA/RNA', description: 'Spliceosome.', details: 'The colossal molecular machine that edits messenger RNA before translation.',
+        method: 'ELECTRON MICROSCOPY',
+        resolution: '3.8 Å',
+        organism: 'VESICULAR STOMATITIS VIRUS',
+        depositionDate: '2015-05-06' },
+    { id: '2ZTA', title: 'X-RAY STRUCTURE OF THE GCN4 LEUCINE ZIPPER, A TWO-STRANDED, PARALLEL COILED COIL', category: 'Enzymes', description: 'Telomerase.', details: 'The enzyme that replenishes the ends of chromosomes (telomeres), linked to aging and cancer.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '1.8 Å',
+        organism: 'Saccharomyces cerevisiae',
+        depositionDate: '1991-07-05' },
+    
+    
+    { id: '7D4M', title: 'Crystal structure of Tmm from strain HTCC7211 soaked with DMS for 5 min', category: 'Energy', description: 'Photosystem I.', details: 'The other half of the photosynthesis machinery, using light to charge electrons for sugar production.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '1.786 Å',
+        organism: 'Candidatus Pelagibacter sp. HTCC7211',
+        depositionDate: '2020-09-24' },
+    
+    { id: '1Q0B', title: 'Crystal structure of the motor protein KSP in complex with ADP and monastrol', category: 'Transport', description: 'Dynein Motor Domain.', details: 'The massive motor protein that walks along microtubules to transport cargo.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '1.9 Å',
+        organism: 'Homo sapiens',
+        depositionDate: '2003-07-15' },
+    { id: '6B3R', title: 'Structure of the mechanosensitive channel Piezo1', category: 'Transport', description: 'Piezo2 Channel.', details: 'The sister channel to Piezo1, responsible for sensing gentle touch and proprioception.',
+        method: 'ELECTRON MICROSCOPY',
+        resolution: '3.8 Å',
+        organism: 'Mus musculus',
+        depositionDate: '2017-09-22' },
+    
+    { id: '3VKEY', title: 'Loading...', category: 'Structural', description: 'Cadherin.', details: 'The "glue" that holds cells together in tissues, depending on calcium.' },
+    { id: '1K6U', title: 'Crystal Structure of Cyclic Bovine Pancreatic Trypsin Inhibitor', category: 'Signaling', description: 'Integrin.', details: 'The transmembrane anchor that connects the cell\'s internal skeleton to the outside world.',
+        method: 'X-RAY DIFFRACTION',
+        resolution: '1 Å',
+        organism: 'Unknown source',
+        depositionDate: '2001-10-17' },
+    { id: '6CO8', title: 'Structure of Zika virus at a resolution of 3.1 Angstrom', category: 'Viral', description: 'Zika Virus Structure.', details: 'Detailed structure of the Zika virus particle.',
+        method: 'ELECTRON MICROSCOPY',
+        resolution: '3.1 Å',
+        organism: 'Zika virus ZIKV/H. sapiens/FrenchPolynesia/10087PF/2013',
+        depositionDate: '2018-03-12' },
+    { id: '6VSB', title: 'Prefusion 2019-nCoV spike glycoprotein with a single receptor-binding domain up', category: 'Viral', description: 'SARS-CoV-1 Spike.', details: 'The spike protein from the original 2003 SARS outbreak, for comparison with COVID-19.',
+        method: 'ELECTRON MICROSCOPY',
+        resolution: '3.46 Å',
+        organism: 'Severe acute respiratory syndrome coronavirus 2',
+        depositionDate: '2020-02-10' },
 ];
 // Deduplicate IDs just in case
 export const getUniqueModels = () => Array.from(new Map(OFFLINE_LIBRARY.map(item => [item.id, item])).values());
