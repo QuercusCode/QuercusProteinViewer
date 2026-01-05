@@ -44,5 +44,30 @@ export const MOTIF_LIBRARY: MotifEntry[] = [
         name: "EF-Hand (Calcium Binding)",
         pattern: "D.{1}D[DNS].{1}[GT].{1}[E].{2}[E]",
         description: "Calcium binding motif (Simplified)"
+    },
+    {
+        name: "DEAD Box (RNA Helicase)",
+        pattern: "DEAD",
+        description: "ATP-dependent RNA helicase core (Asp-Glu-Ala-Asp)"
+    },
+    {
+        name: "CaaX Box (Membrane Anchor)",
+        pattern: "C.{2}[LIMV]",
+        description: "Prenylation site (Cys-any-any-Leu/Ile/Met/Val)"
+    },
+    {
+        name: "Walker B (ATP Hydrolysis)",
+        pattern: "[LIVM]{4}D",
+        description: "Hydrophobic core + Aspartate (hhhhD)"
+    },
+    {
+        name: "Collagen Repeat",
+        pattern: "G.P",
+        description: "Triple helix structural motif (Gly-any-Pro)"
+    },
+    {
+        name: "Destruction Box (APC/C)",
+        pattern: "R..L.{4}N",
+        description: "Target for ubiquitination (R-x-x-L-x(4)-N)"
     }
 ];
