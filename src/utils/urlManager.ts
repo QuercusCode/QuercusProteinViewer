@@ -12,6 +12,7 @@ export interface AppState {
     customColors?: CustomColorRule[];
     measurements?: { atom1: any, atom2: any, distance: number }[];
     customBackgroundColor?: string | null;
+    dataSource?: 'pdb' | 'pubchem'; // Added for chemical structures
 }
 
 /**
@@ -25,6 +26,9 @@ export const getShareableURL = (state: AppState): string => {
     params.set('pdb', state.pdbId || '');
     params.set('rep', state.representation);
     params.set('color', state.coloring);
+    if (state.dataSource && state.dataSource !== 'pdb') {
+        params.set('src', state.dataSource); // Only set if non-default
+    }
 
     // 2. Boolean Flags (Compact: 1/0)
     if (state.isSpinning) params.set('spin', '1');
@@ -91,6 +95,11 @@ export const parseURLState = (): Partial<AppState> => {
 
     const color = params.get('color');
     if (color) state.coloring = color as ColoringType;
+
+    // Data Source (default to 'pdb' if not specified)
+    const src = params.get('src');
+    if (src === 'pubchem') state.dataSource = 'pubchem';
+    else state.dataSource = 'pdb';
 
     // 2. Boolean Flags
     if (params.get('spin') === '1') state.isSpinning = true;

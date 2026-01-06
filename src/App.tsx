@@ -29,7 +29,7 @@ function App() {
   const initialUrlState = parseURLState();
 
   const [pdbId, setPdbId] = useState(() => initialUrlState.pdbId || '2b3p');
-  const [dataSource, setDataSource] = useState<DataSource>('pdb'); // Default to PDB
+  const [dataSource, setDataSource] = useState<DataSource>(initialUrlState.dataSource || 'pdb');
   const [file, setFile] = useState<File | null>(null);
   const [, setIsLoading] = useState(false);
 
@@ -1125,6 +1125,7 @@ function App() {
           showSurface,
           customColors,
           customBackgroundColor,
+          dataSource,
           orientation: viewerRef.current?.getCameraOrientation()
         })}
         isLightMode={isLightMode}
