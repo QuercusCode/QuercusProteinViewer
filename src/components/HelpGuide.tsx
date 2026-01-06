@@ -59,6 +59,44 @@ export const HelpGuide: React.FC = () => {
                         {/* Content */}
                         <div className="p-6 space-y-6 overflow-y-auto">
 
+                            {/* Core Capabilities */}
+                            <div className="space-y-3">
+                                <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 flex items-center gap-2">
+                                    <Sparkles className="w-4 h-4" /> Core Capabilities
+                                </h3>
+                                <div className="grid grid-cols-1 gap-3">
+                                    <div className="bg-neutral-800/50 p-3 rounded-lg border border-neutral-800 space-y-2">
+                                        <div className="text-sm font-medium text-white flex items-center gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                                            Structure Sources
+                                        </div>
+                                        <div className="text-xs text-neutral-400 leading-relaxed">
+                                            Seamlessly load structures from <span className="text-blue-300">RCSB PDB</span>, predicted models from <span className="text-blue-300">AlphaFold DB</span>, or upload your own <span className="text-neutral-300">.pdb/.cif</span> files locally.
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-neutral-800/50 p-3 rounded-lg border border-neutral-800 space-y-2">
+                                        <div className="text-sm font-medium text-white flex items-center gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                                            Advanced Analysis
+                                        </div>
+                                        <div className="text-xs text-neutral-400 leading-relaxed">
+                                            Utilize the <span className="text-green-300">Sequence Bar</span> for residue-level inspection, <span className="text-green-300">Contact Maps</span> for identifying interactions, and geometric tools for precise <span className="text-neutral-300">measurements</span>.
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-neutral-800/50 p-3 rounded-lg border border-neutral-800 space-y-2">
+                                        <div className="text-sm font-medium text-white flex items-center gap-2">
+                                            <div className="w-2 h-2 rounded-full bg-purple-500"></div>
+                                            Publication Ready
+                                        </div>
+                                        <div className="text-xs text-neutral-400 leading-relaxed">
+                                            Export high-resolution <span className="text-purple-300">Transparent PNGs</span>, generate comprehensive <span className="text-purple-300">PDF Reports</span>, and create spin animations for presentations.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* New Features Highlight */}
                             <div className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/20 p-4 rounded-xl">
                                 <h3 className="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-2 mb-3">
