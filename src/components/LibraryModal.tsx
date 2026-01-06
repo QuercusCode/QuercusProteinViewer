@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, X, BookOpen, Database, FlaskConical, Dna, Activity, Zap, Shield, Grid, Archive, Anchor, Layers, ArrowLeft, Syringe, Hexagon, Magnet, Pill, Leaf, Sun, Brain, HeartPulse } from 'lucide-react';
+import { Search, X, BookOpen, Database, FlaskConical, Dna, Activity, Zap, Shield, Grid, Archive, Anchor, Layers, ArrowLeft, Syringe, Hexagon, Magnet, Pill, Leaf, Sun, Brain, HeartPulse, Puzzle } from 'lucide-react';
 import clsx from 'clsx';
 import { OFFLINE_LIBRARY } from '../data/library';
 import { CHEMICAL_LIBRARY } from '../data/chemicalLibrary';
@@ -41,6 +41,7 @@ const CHEMICAL_CATEGORY_CONFIG: Record<string, { icon: React.ReactNode, style: s
     'Calculated': { icon: <Database size={20} />, style: 'text-gray-400 border-gray-500/30 bg-gray-500/10 hover:bg-gray-500/20 active-color:bg-gray-500', description: 'Computational models.' },
     'Nutrients': { icon: <Leaf size={20} />, style: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 active-color:bg-emerald-500', description: 'Food components.' },
     'Natural Products': { icon: <Leaf size={20} />, style: 'text-lime-400 border-lime-500/30 bg-lime-500/10 hover:bg-lime-500/20 active-color:bg-lime-500', description: 'Compounds from nature.' },
+    'Amino Acids': { icon: <Puzzle size={20} />, style: 'text-indigo-400 border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 active-color:bg-indigo-500', description: 'Building blocks of proteins.' },
 };
 
 const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }) => {

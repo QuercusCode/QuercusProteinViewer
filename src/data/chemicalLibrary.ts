@@ -1,940 +1,204 @@
 export interface ChemicalLibraryEntry {
     id: string; // PubChem CID
     title: string;
-    category: 'Vitamins' | 'Drugs' | 'Neurotransmitters' | 'Toxins' | 'Metabolites' | 'Hormones' | 'Nutrients' | 'Natural Products';
+    category: 'Vitamins' | 'Drugs' | 'Neurotransmitters' | 'Toxins' | 'Metabolites' | 'Hormones' | 'Nutrients' | 'Natural Products' | 'Amino Acids';
     description: string;
     formula: string;
     molecularWeight: string;
 }
 
 export const CHEMICAL_LIBRARY: ChemicalLibraryEntry[] = [
-    // --- VITAMINS ---
-    {
-        id: '54670067',
-        title: 'Vitamin C (Ascorbic Acid)',
-        category: 'Vitamins',
-        description: 'Essential nutrient for tissue repair and enzyme function.',
-        formula: 'C6H8O6',
-        molecularWeight: '176.12 g/mol'
-    },
-    {
-        id: '5280453',
-        title: 'Vitamin D3 (Cholecalciferol)',
-        category: 'Vitamins',
-        description: 'Crucial for calcium absorption and bone health.',
-        formula: 'C27H44O',
-        molecularWeight: '384.6 g/mol'
-    },
-    {
-        id: '5311498',
-        title: 'Vitamin B12 (Cobalamin)',
-        category: 'Vitamins',
-        description: 'Complex coordination complex with Cobalt, vital for nerve function.',
-        formula: 'C63H88CoN14O14P',
-        molecularWeight: '1355.4 g/mol'
-    },
-    {
-        id: '445354',
-        title: 'Vitamin A (Retinol)',
-        category: 'Vitamins',
-        description: 'Essential for vision, immune system, and reproduction.',
-        formula: 'C20H30O',
-        molecularWeight: '286.5 g/mol'
-    },
-    {
-        id: '14985',
-        title: 'Vitamin E (Alpha-Tocopherol)',
-        category: 'Vitamins',
-        description: 'Antioxidant protecting cell membranes from damage.',
-        formula: 'C29H50O2',
-        molecularWeight: '430.7 g/mol'
-    },
-    {
-        id: '5280483',
-        title: 'Vitamin K1 (Phylloquinone)',
-        category: 'Vitamins',
-        description: 'Essential for blood clotting and bone metabolism.',
-        formula: 'C31H46O2',
-        molecularWeight: '450.7 g/mol'
-    },
-    {
-        id: '1132',
-        title: 'Vitamin B1 (Thiamine)',
-        category: 'Vitamins',
-        description: 'Enables body to use carbohydrates as energy.',
-        formula: 'C12H17ClN4OS',
-        molecularWeight: '300.8 g/mol'
-    },
-    {
-        id: '493570',
-        title: 'Vitamin B2 (Riboflavin)',
-        category: 'Vitamins',
-        description: 'Key component of cofactors FAD and FMN.',
-        formula: 'C17H20N4O6',
-        molecularWeight: '376.36 g/mol'
-    },
-    {
-        id: '938',
-        title: 'Vitamin B3 (Niacin)',
-        category: 'Vitamins',
-        description: 'Precursor to NAD and NADP, carrying metabolic energy.',
-        formula: 'C6H5NO2',
-        molecularWeight: '123.11 g/mol'
-    },
-    {
-        id: '988',
-        title: 'Vitamin B5 (Pantothenic Acid)',
-        category: 'Vitamins',
-        description: 'Precursor to Coenzyme A.',
-        formula: 'C9H17NO5',
-        molecularWeight: '219.23 g/mol'
-    },
-    {
-        id: '1054',
-        title: 'Vitamin B6 (Pyridoxine)',
-        category: 'Vitamins',
-        description: 'Coenzyme in amino acid metabolism.',
-        formula: 'C8H11NO3',
-        molecularWeight: '169.18 g/mol'
-    },
-    {
-        id: '171546',
-        title: 'Vitamin B7 (Biotin)',
-        category: 'Vitamins',
-        description: 'Cofactor for carboxylase enzymes.',
-        formula: 'C10H16N2O3S',
-        molecularWeight: '244.31 g/mol'
-    },
-    {
-        id: '135398658',
-        title: 'Vitamin B9 (Folic Acid)',
-        category: 'Vitamins',
-        description: 'Crucial for DNA synthesis and repair.',
-        formula: 'C19H19N7O6',
-        molecularWeight: '441.4 g/mol'
-    },
+    // --- VITAMINS (13) ---
+    { id: '54670067', title: 'Vitamin C (Ascorbic Acid)', category: 'Vitamins', description: 'Essential nutrient for tissue repair and enzyme function.', formula: 'C6H8O6', molecularWeight: '176.12 g/mol' },
+    { id: '5280453', title: 'Vitamin D3 (Cholecalciferol)', category: 'Vitamins', description: 'Crucial for calcium absorption and bone health.', formula: 'C27H44O', molecularWeight: '384.6 g/mol' },
+    { id: '5311498', title: 'Vitamin B12 (Cobalamin)', category: 'Vitamins', description: 'Complex coordination complex with Cobalt.', formula: 'C63H88CoN14O14P', molecularWeight: '1355.4 g/mol' },
+    { id: '445354', title: 'Vitamin A (Retinol)', category: 'Vitamins', description: 'Essential for vision, immune system.', formula: 'C20H30O', molecularWeight: '286.5 g/mol' },
+    { id: '14985', title: 'Vitamin E (Alpha-Tocopherol)', category: 'Vitamins', description: 'Antioxidant protecting cell membranes.', formula: 'C29H50O2', molecularWeight: '430.7 g/mol' },
+    { id: '5280483', title: 'Vitamin K1 (Phylloquinone)', category: 'Vitamins', description: 'Blood clotting and bone metabolism.', formula: 'C31H46O2', molecularWeight: '450.7 g/mol' },
+    { id: '1132', title: 'Vitamin B1 (Thiamine)', category: 'Vitamins', description: 'Enables carbohydrate energy use.', formula: 'C12H17ClN4OS', molecularWeight: '300.8 g/mol' },
+    { id: '493570', title: 'Vitamin B2 (Riboflavin)', category: 'Vitamins', description: 'Key component of FAD/FMN.', formula: 'C17H20N4O6', molecularWeight: '376.36 g/mol' },
+    { id: '938', title: 'Vitamin B3 (Niacin)', category: 'Vitamins', description: 'Precursor to NAD/NADP.', formula: 'C6H5NO2', molecularWeight: '123.11 g/mol' },
+    { id: '988', title: 'Vitamin B5 (Pantothenic Acid)', category: 'Vitamins', description: 'Precursor to Coenzyme A.', formula: 'C9H17NO5', molecularWeight: '219.23 g/mol' },
+    { id: '1054', title: 'Vitamin B6 (Pyridoxine)', category: 'Vitamins', description: 'Coenzyme in metabolism.', formula: 'C8H11NO3', molecularWeight: '169.18 g/mol' },
+    { id: '171546', title: 'Vitamin B7 (Biotin)', category: 'Vitamins', description: 'Cofactor for carboxylase enzymes.', formula: 'C10H16N2O3S', molecularWeight: '244.31 g/mol' },
+    { id: '135398658', title: 'Vitamin B9 (Folic Acid)', category: 'Vitamins', description: 'Crucial for DNA synthesis.', formula: 'C19H19N7O6', molecularWeight: '441.4 g/mol' },
 
-    // --- DRUGS ---
-    {
-        id: '2244',
-        title: 'Aspirin (Acetylsalicylic Acid)',
-        category: 'Drugs',
-        description: 'Common pain reliever and anti-inflammatory.',
-        formula: 'C9H8O4',
-        molecularWeight: '180.16 g/mol'
-    },
-    {
-        id: '3672',
-        title: 'Ibuprofen',
-        category: 'Drugs',
-        description: 'Nonsteroidal anti-inflammatory drug (NSAID).',
-        formula: 'C13H18O2',
-        molecularWeight: '206.28 g/mol'
-    },
-    {
-        id: '5959',
-        title: 'Penicillin G',
-        category: 'Drugs',
-        description: 'First antibiotic discovered by Alexander Fleming.',
-        formula: 'C16H18N2O4S',
-        molecularWeight: '334.4 g/mol'
-    },
-    {
-        id: '4946',
-        title: 'Propranolol',
-        category: 'Drugs',
-        description: 'Beta-blocker used to treat high blood pressure and anxiety.',
-        formula: 'C16H21NO2',
-        molecularWeight: '259.34 g/mol'
-    },
-    {
-        id: '1983',
-        title: 'Acetaminophen (Paracetamol)',
-        category: 'Drugs',
-        description: 'Pain reliever and fever reducer.',
-        formula: 'C8H9NO2',
-        molecularWeight: '151.16 g/mol'
-    },
-    {
-        id: '4091',
-        title: 'Metformin',
-        category: 'Drugs',
-        description: 'First-line medication for type 2 diabetes.',
-        formula: 'C4H11N5',
-        molecularWeight: '129.16 g/mol'
-    },
-    {
-        id: '60823',
-        title: 'Atorvastatin',
-        category: 'Drugs',
-        description: 'Statin medication used to prevent cardiovascular disease.',
-        formula: 'C33H35FN2O5',
-        molecularWeight: '558.6 g/mol'
-    },
-    {
-        id: '4875',
-        title: 'Omeprazole',
-        category: 'Drugs',
-        description: 'Proton pump inhibitor used to treat GERD.',
-        formula: 'C17H19N3O3S',
-        molecularWeight: '345.4 g/mol'
-    },
-    {
-        id: '3958',
-        title: 'Losartan',
-        category: 'Drugs',
-        description: 'Angiotensin II receptor antagonist for high blood pressure.',
-        formula: 'C22H23ClN6O',
-        molecularWeight: '422.9 g/mol'
-    },
-    {
-        id: '3676',
-        title: 'Lidocaine',
-        category: 'Drugs',
-        description: 'Local anesthetic and antiarrhythmic drug.',
-        formula: 'C14H22N2O',
-        molecularWeight: '234.34 g/mol'
-    },
-    {
-        id: '5288826',
-        title: 'Morphine',
-        category: 'Drugs',
-        description: 'Potent opiate pain medication isolated from poppy.',
-        formula: 'C17H19NO3',
-        molecularWeight: '285.34 g/mol'
-    },
-    {
-        id: '3016',
-        title: 'Diazepam (Valium)',
-        category: 'Drugs',
-        description: 'Benzodiazepine used for anxiety and seizures.',
-        formula: 'C16H13ClN2O',
-        molecularWeight: '284.7 g/mol'
-    },
-    {
-        id: '3386',
-        title: 'Fluoxetine (Prozac)',
-        category: 'Drugs',
-        description: 'SSRI antidepressant.',
-        formula: 'C17H18F3NO',
-        molecularWeight: '309.33 g/mol'
-    },
-    {
-        id: '33613',
-        title: 'Amoxicillin',
-        category: 'Drugs',
-        description: 'Beta-lactam antibiotic derived from penicillin.',
-        formula: 'C16H19N3O5S',
-        molecularWeight: '365.4 g/mol'
-    },
-    {
-        id: '2764',
-        title: 'Ciprofloxacin',
-        category: 'Drugs',
-        description: 'Broad-spectrum fluoroquinolone antibiotic.',
-        formula: 'C17H18FN3O3',
-        molecularWeight: '331.34 g/mol'
-    },
-    {
-        id: '31703',
-        title: 'Doxorubicin',
-        category: 'Drugs',
-        description: 'Anthracycline chemotherapy agent.',
-        formula: 'C27H29NO11',
-        molecularWeight: '543.5 g/mol'
-    },
-    {
-        id: '135398735',
-        title: 'Sildenafil (Viagra)',
-        category: 'Drugs',
-        description: 'Inhibitor of PDE5, used for erectile dysfunction.',
-        formula: 'C22H30N6O4S',
-        molecularWeight: '474.6 g/mol'
-    },
-    {
-        id: '36314',
-        title: 'Paclitaxel (Taxol)',
-        category: 'Drugs',
-        description: 'Chemotherapy medication originally from Pacific yew.',
-        formula: 'C47H51NO14',
-        molecularWeight: '853.9 g/mol'
-    },
-    {
-        id: '5584',
-        title: 'Warfarin',
-        category: 'Drugs',
-        description: 'Anticoagulant medication used to prevent blood clots.',
-        formula: 'C19H16O4',
-        molecularWeight: '308.33 g/mol'
-    },
-    {
-        id: '5090',
-        title: 'Ranitidine',
-        category: 'Drugs',
-        description: 'H2 blocker used to reduce stomach acid.',
-        formula: 'C13H22N4O3S',
-        molecularWeight: '314.40 g/mol'
-    },
-    {
-        id: '4112',
-        title: 'Methotrexate',
-        category: 'Drugs',
-        description: 'Chemotherapy and immune system suppressant.',
-        formula: 'C20H22N8O5',
-        molecularWeight: '454.44 g/mol'
-    },
-    {
-        id: '5479',
-        title: 'Salbutamol (Albuterol)',
-        category: 'Drugs',
-        description: 'Bronchodilator for asthma relief.',
-        formula: 'C13H21NO3',
-        molecularWeight: '239.31 g/mol'
-    },
-    {
-        id: '3345',
-        title: 'Fentanyl',
-        category: 'Drugs',
-        description: 'Potent synthetic opioid pain medication.',
-        formula: 'C22H28N2O',
-        molecularWeight: '336.5 g/mol'
-    },
-    {
-        id: '2708',
-        title: 'Chloroquine',
-        category: 'Drugs',
-        description: 'Medication used to prevent and treat malaria.',
-        formula: 'C18H26ClN3',
-        molecularWeight: '319.87 g/mol'
-    },
+    // --- DRUGS (50+) ---
+    { id: '2244', title: 'Aspirin', category: 'Drugs', description: 'Pain reliever and anti-inflammatory.', formula: 'C9H8O4', molecularWeight: '180.16 g/mol' },
+    { id: '3672', title: 'Ibuprofen', category: 'Drugs', description: 'NSAID pain reliever.', formula: 'C13H18O2', molecularWeight: '206.28 g/mol' },
+    { id: '5959', title: 'Penicillin G', category: 'Drugs', description: 'First antibiotic.', formula: 'C16H18N2O4S', molecularWeight: '334.4 g/mol' },
+    { id: '4946', title: 'Propranolol', category: 'Drugs', description: 'Beta-blocker.', formula: 'C16H21NO2', molecularWeight: '259.34 g/mol' },
+    { id: '1983', title: 'Acetaminophen', category: 'Drugs', description: 'Pain and fever reducer.', formula: 'C8H9NO2', molecularWeight: '151.16 g/mol' },
+    { id: '4091', title: 'Metformin', category: 'Drugs', description: 'Diabetes medication.', formula: 'C4H11N5', molecularWeight: '129.16 g/mol' },
+    { id: '60823', title: 'Atorvastatin', category: 'Drugs', description: 'Statin for cholesterol.', formula: 'C33H35FN2O5', molecularWeight: '558.6 g/mol' },
+    { id: '4875', title: 'Omeprazole', category: 'Drugs', description: 'Proton pump inhibitor.', formula: 'C17H19N3O3S', molecularWeight: '345.4 g/mol' },
+    { id: '3958', title: 'Losartan', category: 'Drugs', description: 'Blood pressure med.', formula: 'C22H23ClN6O', molecularWeight: '422.9 g/mol' },
+    { id: '3676', title: 'Lidocaine', category: 'Drugs', description: 'Local anesthetic.', formula: 'C14H22N2O', molecularWeight: '234.34 g/mol' },
+    { id: '5288826', title: 'Morphine', category: 'Drugs', description: 'Opiate pain medication.', formula: 'C17H19NO3', molecularWeight: '285.34 g/mol' },
+    { id: '3016', title: 'Diazepam', category: 'Drugs', description: 'Benzodiazepine.', formula: 'C16H13ClN2O', molecularWeight: '284.7 g/mol' },
+    { id: '3386', title: 'Fluoxetine', category: 'Drugs', description: 'SSRI Antidepressant.', formula: 'C17H18F3NO', molecularWeight: '309.33 g/mol' },
+    { id: '33613', title: 'Amoxicillin', category: 'Drugs', description: 'Antibiotic.', formula: 'C16H19N3O5S', molecularWeight: '365.4 g/mol' },
+    { id: '2764', title: 'Ciprofloxacin', category: 'Drugs', description: 'Fluoroquinolone antibiotic.', formula: 'C17H18FN3O3', molecularWeight: '331.34 g/mol' },
+    { id: '31703', title: 'Doxorubicin', category: 'Drugs', description: 'Chemotherapy agent.', formula: 'C27H29NO11', molecularWeight: '543.5 g/mol' },
+    { id: '135398735', title: 'Sildenafil', category: 'Drugs', description: 'PDE5 inhibitor.', formula: 'C22H30N6O4S', molecularWeight: '474.6 g/mol' },
+    { id: '36314', title: 'Paclitaxel', category: 'Drugs', description: 'Chemotherapy drug.', formula: 'C47H51NO14', molecularWeight: '853.9 g/mol' },
+    { id: '5584', title: 'Warfarin', category: 'Drugs', description: 'Anticoagulant.', formula: 'C19H16O4', molecularWeight: '308.33 g/mol' },
+    { id: '5090', title: 'Ranitidine', category: 'Drugs', description: 'Antacid.', formula: 'C13H22N4O3S', molecularWeight: '314.40 g/mol' },
+    { id: '4112', title: 'Methotrexate', category: 'Drugs', description: 'Chemotherapy.', formula: 'C20H22N8O5', molecularWeight: '454.44 g/mol' },
+    { id: '5479', title: 'Salbutamol', category: 'Drugs', description: 'Bronchodilator.', formula: 'C13H21NO3', molecularWeight: '239.31 g/mol' },
+    { id: '3345', title: 'Fentanyl', category: 'Drugs', description: 'Synthetic opioid.', formula: 'C22H28N2O', molecularWeight: '336.5 g/mol' },
+    { id: '2708', title: 'Chloroquine', category: 'Drugs', description: 'Antimalarial.', formula: 'C18H26ClN3', molecularWeight: '319.87 g/mol' },
+    // New Drugs
+    { id: '135398745', title: 'Acyclovir', category: 'Drugs', description: 'Antiviral drug.', formula: 'C8H11N5O3', molecularWeight: '225.21 g/mol' },
+    { id: '3008222', title: 'Ketamine', category: 'Drugs', description: 'Anesthetic and antidepressant.', formula: 'C13H16ClNO', molecularWeight: '237.72 g/mol' },
+    { id: '2157', title: 'Amiodarone', category: 'Drugs', description: 'Antiarrhythmic.', formula: 'C25H29I2NO3', molecularWeight: '645.3 g/mol' },
+    { id: '2520', title: 'Carbamazepine', category: 'Drugs', description: 'Anticonvulsant.', formula: 'C15H12N2O', molecularWeight: '236.27 g/mol' },
+    { id: '5360345', title: 'Cetirizine', category: 'Drugs', description: 'Antihistamine.', formula: 'C21H25ClN2O3', molecularWeight: '388.9 g/mol' },
+    { id: '2802', title: 'Clopidogrel', category: 'Drugs', description: 'Antiplatelet.', formula: 'C16H16ClNO2S', molecularWeight: '321.82 g/mol' },
+    { id: '3033', title: 'Diclofenac', category: 'Drugs', description: 'NSAID.', formula: 'C14H11Cl2NO2', molecularWeight: '296.14 g/mol' },
+    { id: '3152', title: 'Erythromycin', category: 'Drugs', description: 'Macrolide antibiotic.', formula: 'C37H67NO13', molecularWeight: '733.9 g/mol' },
+    { id: '3446', title: 'Gabapentin', category: 'Drugs', description: 'Anticonvulsant.', formula: 'C9H17NO2', molecularWeight: '171.24 g/mol' },
+    { id: '3604', title: 'Hydrochlorothiazide', category: 'Drugs', description: 'Diuretic.', formula: 'C7H8ClN3O4S2', molecularWeight: '297.74 g/mol' },
+    { id: '3715', title: 'Indomethacin', category: 'Drugs', description: 'NSAID.', formula: 'C19H16ClNO4', molecularWeight: '357.8 g/mol' },
+    { id: '3929', title: 'Levodopa', category: 'Drugs', description: 'Parkinson\'s treatment.', formula: 'C9H11NO4', molecularWeight: '197.19 g/mol' },
+    { id: '4063233', title: 'Loratadine', category: 'Drugs', description: 'Antihistamine.', formula: 'C22H23ClN2O2', molecularWeight: '382.9 g/mol' },
+    { id: '4184', title: 'Midazolam', category: 'Drugs', description: 'Sedative.', formula: 'C18H13ClFN3', molecularWeight: '325.8 g/mol' },
+    { id: '4486', title: 'Methadone', category: 'Drugs', description: 'Opioid.', formula: 'C21H27NO', molecularWeight: '309.4 g/mol' },
+    { id: '13342', title: 'Naloxone', category: 'Drugs', description: 'Opioid antagonist.', formula: 'C19H21NO4', molecularWeight: '327.4 g/mol' },
+    { id: '4499', title: 'Naproxen', category: 'Drugs', description: 'NSAID.', formula: 'C14H14O3', molecularWeight: '230.26 g/mol' },
+    { id: '4926', title: 'Prednisolone', category: 'Drugs', description: 'Steroid.', formula: 'C21H28O5', molecularWeight: '360.44 g/mol' },
+    { id: '4932', title: 'Probenecid', category: 'Drugs', description: 'Uricosuric.', formula: 'C13H19NO4S', molecularWeight: '285.36 g/mol' },
+    { id: '5203', title: 'Sertraline', category: 'Drugs', description: 'SSRI.', formula: 'C17H17Cl2N', molecularWeight: '306.2 g/mol' },
+    { id: '5403', title: 'Spironolactone', category: 'Drugs', description: 'Diuretic.', formula: 'C24H32O4S', molecularWeight: '416.6 g/mol' },
+    { id: '5564', title: 'Verapamil', category: 'Drugs', description: 'Calcium channel blocker.', formula: 'C27H38N2O4', molecularWeight: '454.6 g/mol' },
 
-    // --- NEUROTRANSMITTERS ---
-    {
-        id: '681',
-        title: 'Dopamine',
-        category: 'Neurotransmitters',
-        description: 'Plays a major role in reward-motivated behavior.',
-        formula: 'C8H11NO2',
-        molecularWeight: '153.18 g/mol'
-    },
-    {
-        id: '5202',
-        title: 'Serotonin',
-        category: 'Neurotransmitters',
-        description: 'Regulates mood, appetite, and sleep.',
-        formula: 'C10H12N2O',
-        molecularWeight: '176.21 g/mol'
-    },
-    {
-        id: '5816',
-        title: 'Epinephrine (Adrenaline)',
-        category: 'Neurotransmitters',
-        description: 'Trigger of the "fight-or-flight" response.',
-        formula: 'C9H13NO3',
-        molecularWeight: '183.20 g/mol'
-    },
-    {
-        id: '119',
-        title: 'GABA',
-        category: 'Neurotransmitters',
-        description: 'Primary inhibitory neurotransmitter in mammalian CNS.',
-        formula: 'C4H9NO2',
-        molecularWeight: '103.12 g/mol'
-    },
-    {
-        id: '187',
-        title: 'Acetylcholine',
-        category: 'Neurotransmitters',
-        description: 'Activates muscles and plays a role in attention.',
-        formula: 'C7H16NO2+',
-        molecularWeight: '146.21 g/mol'
-    },
-    {
-        id: '778',
-        title: 'Histamine',
-        category: 'Neurotransmitters',
-        description: 'Involved in immune response and sleep-wake regulation.',
-        formula: 'C5H9N3',
-        molecularWeight: '111.15 g/mol'
-    },
-    {
-        id: '896',
-        title: 'Melatonin',
-        category: 'Neurotransmitters',
-        description: 'Regulates the sleep-wake cycle.',
-        formula: 'C13H16N2O2',
-        molecularWeight: '232.28 g/mol'
-    },
-    {
-        id: '5994',
-        title: 'Adenosine',
-        category: 'Neurotransmitters',
-        description: 'Accumulates during wakefulness causing drowsiness.',
-        formula: 'C10H13N5O4',
-        molecularWeight: '267.24 g/mol'
-    },
-    {
-        id: '137',
-        title: 'Aspartate',
-        category: 'Neurotransmitters',
-        description: 'Excitatory neurotransmitter.',
-        formula: 'C4H7NO4',
-        molecularWeight: '133.10 g/mol'
-    },
-    {
-        id: '611',
-        title: 'Glycine',
-        category: 'Neurotransmitters',
-        description: 'Inhibitory neurotransmitter in the spinal cord.',
-        formula: 'C2H5NO2',
-        molecularWeight: '75.07 g/mol'
-    },
-
-    // --- PSYCHOACTIVES ---
-    {
-        id: '2519',
-        title: 'Caffeine',
-        category: 'Natural Products',
-        description: 'Adenosine antagonist and CNS stimulant.',
-        formula: 'C8H10N4O2',
-        molecularWeight: '194.19 g/mol'
-    },
-    {
-        id: '89594',
-        title: 'Nicotine',
-        category: 'Natural Products',
-        description: 'Stimulant alkaloid found in nightshade plants.',
-        formula: 'C10H14N2',
-        molecularWeight: '162.23 g/mol'
-    },
-    {
-        id: '16078',
-        title: 'THC (Tetrahydrocannabinol)',
-        category: 'Natural Products',
-        description: 'Principal psychoactive constituent of cannabis.',
-        formula: 'C21H30O2',
-        molecularWeight: '314.5 g/mol'
-    },
-    {
-        id: '5761',
-        title: 'LSD',
-        category: 'Neurotransmitters',
-        description: 'Potent psychedelic drug.',
-        formula: 'C20H25N3O',
-        molecularWeight: '323.4 g/mol'
-    },
-    {
-        id: '10624',
-        title: 'Psilocybin',
-        category: 'Natural Products',
-        description: 'Psychedelic pro-drug produced by fungi.',
-        formula: 'C12H17N2O4P',
-        molecularWeight: '284.25 g/mol'
-    },
-    {
-        id: '3033890',
-        title: 'MDMA (Ecstasy)',
-        category: 'Drugs',
-        description: 'Empathogen-entactogen psychoactive drug.',
-        formula: 'C11H15NO2',
-        molecularWeight: '193.25 g/mol'
-    },
-    {
-        id: '4485',
-        title: 'Methamphetamine',
-        category: 'Drugs',
-        description: 'Potent central nervous system stimulant.',
-        formula: 'C10H15N',
-        molecularWeight: '149.23 g/mol'
-    },
-    {
-        id: '2160',
-        title: 'Amphetamine',
-        category: 'Drugs',
-        description: 'CNS stimulant used to treat ADHD.',
-        formula: 'C9H13N',
-        molecularWeight: '135.21 g/mol'
-    },
-
-    // --- METABOLITES / ENERGY ---
-    {
-        id: '5957',
-        title: 'ATP (Adenosine Triphosphate)',
-        category: 'Metabolites',
-        description: 'The "molecular unit of currency" of intracellular energy.',
-        formula: 'C10H16N5O13P3',
-        molecularWeight: '507.18 g/mol'
-    },
-    {
-        id: '5793',
-        title: 'Glucose (D-Glucose)',
-        category: 'Metabolites',
-        description: 'Primary source of energy for living organisms.',
-        formula: 'C6H12O6',
-        molecularWeight: '180.16 g/mol'
-    },
-    {
-        id: '5991',
-        title: 'Cholesterol',
-        category: 'Metabolites',
-        description: 'Essential structural component of animal cell membranes.',
-        formula: 'C27H46O',
-        molecularWeight: '386.6 g/mol'
-    },
-    {
-        id: '784',
-        title: 'Heme B',
-        category: 'Metabolites',
-        description: 'Iron-containing cofactor in hemoglobin.',
-        formula: 'C34H32FeN4O4',
-        molecularWeight: '616.5 g/mol'
-    },
-    {
-        id: '1060',
-        title: 'Pyruvate',
-        category: 'Metabolites',
-        description: 'End product of glycolysis.',
-        formula: 'C3H4O3',
-        molecularWeight: '88.06 g/mol'
-    },
-    {
-        id: '612',
-        title: 'Lactate (Lactic Acid)',
-        category: 'Metabolites',
-        description: 'Produced in muscle during exertion.',
-        formula: 'C3H6O3',
-        molecularWeight: '90.08 g/mol'
-    },
-    {
-        id: '311',
-        title: 'Citrate (Citric Acid)',
-        category: 'Metabolites',
-        description: 'Intermediate in the Krebs cycle.',
-        formula: 'C6H8O7',
-        molecularWeight: '192.12 g/mol'
-    },
-    {
-        id: '586',
-        title: 'Creatine',
-        category: 'Metabolites',
-        description: 'Recycles ATP in brain and muscle tissue.',
-        formula: 'C4H9N3O2',
-        molecularWeight: '131.13 g/mol'
-    },
-    {
-        id: '1176',
-        title: 'Urea',
-        category: 'Metabolites',
-        description: 'Main nitrogen-containing substance in mammal urine.',
-        formula: 'CH4N2O',
-        molecularWeight: '60.06 g/mol'
-    },
+    // --- NEUROTRANSMITTERS (10+) ---
+    { id: '681', title: 'Dopamine', category: 'Neurotransmitters', description: 'Reward signal.', formula: 'C8H11NO2', molecularWeight: '153.18 g/mol' },
+    { id: '5202', title: 'Serotonin', category: 'Neurotransmitters', description: 'Mood regulator.', formula: 'C10H12N2O', molecularWeight: '176.21 g/mol' },
+    { id: '5816', title: 'Epinephrine', category: 'Neurotransmitters', description: 'Fight or flight.', formula: 'C9H13NO3', molecularWeight: '183.20 g/mol' },
+    { id: '119', title: 'GABA', category: 'Neurotransmitters', description: 'Inhibitory.', formula: 'C4H9NO2', molecularWeight: '103.12 g/mol' },
+    { id: '187', title: 'Acetylcholine', category: 'Neurotransmitters', description: 'Muscle activator.', formula: 'C7H16NO2+', molecularWeight: '146.21 g/mol' },
+    { id: '778', title: 'Histamine', category: 'Neurotransmitters', description: 'Immune/wake.', formula: 'C5H9N3', molecularWeight: '111.15 g/mol' },
+    { id: '896', title: 'Melatonin', category: 'Neurotransmitters', description: 'Sleep cycle.', formula: 'C13H16N2O2', molecularWeight: '232.28 g/mol' },
+    { id: '5994', title: 'Adenosine', category: 'Neurotransmitters', description: 'Sleep pressure.', formula: 'C10H13N5O4', molecularWeight: '267.24 g/mol' },
+    { id: '137', title: 'Aspartate', category: 'Neurotransmitters', description: 'Excitatory.', formula: 'C4H7NO4', molecularWeight: '133.10 g/mol' },
 
     // --- AMINO ACIDS (Standard 20) ---
-    {
-        id: '5960',
-        title: 'Glycine',
-        category: 'Metabolites',
-        description: 'Smallest amino acid, inhibitory neurotransmitter.',
-        formula: 'C2H5NO2',
-        molecularWeight: '75.07 g/mol'
-    },
-    {
-        id: '5950',
-        title: 'Alanine',
-        category: 'Metabolites',
-        description: 'Used in the biosynthesis of proteins.',
-        formula: 'C3H7NO2',
-        molecularWeight: '89.09 g/mol'
-    },
-    {
-        id: '6287',
-        title: 'Valine',
-        category: 'Metabolites',
-        description: 'Branched-chain amino acid.',
-        formula: 'C5H11NO2',
-        molecularWeight: '117.15 g/mol'
-    },
-    {
-        id: '6106',
-        title: 'Leucine',
-        category: 'Metabolites',
-        description: 'Essential branched-chain amino acid.',
-        formula: 'C6H13NO2',
-        molecularWeight: '131.17 g/mol'
-    },
-    {
-        id: '6306',
-        title: 'Isoleucine',
-        category: 'Metabolites',
-        description: 'Isomer of leucine.',
-        formula: 'C6H13NO2',
-        molecularWeight: '131.17 g/mol'
-    },
-    {
-        id: '6274',
-        title: 'Proline',
-        category: 'Metabolites',
-        description: 'Cyclic amino acid influencing protein structure.',
-        formula: 'C5H9NO2',
-        molecularWeight: '115.13 g/mol'
-    },
-    {
-        id: '994',
-        title: 'Phenylalanine',
-        category: 'Metabolites',
-        description: 'Precursor for tyrosine and neurotransmitters.',
-        formula: 'C9H11NO2',
-        molecularWeight: '165.19 g/mol'
-    },
-    {
-        id: '6057',
-        title: 'Tyrosine',
-        category: 'Metabolites',
-        description: 'Precursor for dopamine and epinephrine.',
-        formula: 'C9H11NO3',
-        molecularWeight: '181.19 g/mol'
-    },
-    {
-        id: '6305',
-        title: 'Tryptophan',
-        category: 'Metabolites',
-        description: 'Precursor for serotonin and melatonin.',
-        formula: 'C11H12N2O2',
-        molecularWeight: '204.23 g/mol'
-    },
-    {
-        id: '5951',
-        title: 'Serine',
-        category: 'Metabolites',
-        description: 'Key role in metabolism and signaling.',
-        formula: 'C3H7NO3',
-        molecularWeight: '105.09 g/mol'
-    },
-    {
-        id: '6288',
-        title: 'Threonine',
-        category: 'Metabolites',
-        description: 'Polar amino acid with a hydroxyl group.',
-        formula: 'C4H9NO3',
-        molecularWeight: '119.12 g/mol'
-    },
-    {
-        id: '5862',
-        title: 'Cysteine',
-        category: 'Metabolites',
-        description: 'Contains thiol group, forms disulfide bonds.',
-        formula: 'C3H7NO2S',
-        molecularWeight: '121.16 g/mol'
-    },
-    {
-        id: '6137',
-        title: 'Methionine',
-        category: 'Metabolites',
-        description: 'Initiator amino acid in protein synthesis.',
-        formula: 'C5H11NO2S',
-        molecularWeight: '149.21 g/mol'
-    },
-    {
-        id: '5961',
-        title: 'Histidine',
-        category: 'Metabolites',
-        description: 'Precursor to histamine.',
-        formula: 'C6H9N3O2',
-        molecularWeight: '155.15 g/mol'
-    },
-    {
-        id: '5962',
-        title: 'Lysine',
-        category: 'Metabolites',
-        description: 'Essential for growth and tissue repair.',
-        formula: 'C6H14N2O2',
-        molecularWeight: '146.19 g/mol'
-    },
-    {
-        id: '6267',
-        title: 'Arginine',
-        category: 'Metabolites',
-        description: 'Precursor for nitric oxide.',
-        formula: 'C6H14N4O2',
-        molecularWeight: '174.20 g/mol'
-    },
-    {
-        id: '5904',
-        title: 'Aspartic Acid',
-        category: 'Metabolites',
-        description: 'Carries excitatory signals.',
-        formula: 'C4H7NO4',
-        molecularWeight: '133.10 g/mol'
-    },
-    {
-        id: '33032',
-        title: 'Glutamic Acid',
-        category: 'Metabolites',
-        description: 'Key neurotransmitter and metabolic fuel.',
-        formula: 'C5H9NO4',
-        molecularWeight: '147.13 g/mol'
-    },
-    {
-        id: '5960',
-        title: 'Asparagine',
-        category: 'Metabolites',
-        description: 'First amino acid isolated.',
-        formula: 'C4H8N2O3',
-        molecularWeight: '132.12 g/mol'
-    },
-    {
-        id: '5961',
-        title: 'Glutamine',
-        category: 'Metabolites',
-        description: 'Most abundant amino acid in blood.',
-        formula: 'C5H10N2O3',
-        molecularWeight: '146.14 g/mol'
-    },
+    { id: '5960', title: 'Glycine', category: 'Amino Acids', description: 'Smallest amino acid, inhibitory neurotransmitter.', formula: 'C2H5NO2', molecularWeight: '75.07 g/mol' },
+    { id: '5950', title: 'Alanine', category: 'Amino Acids', description: 'Used in the biosynthesis of proteins.', formula: 'C3H7NO2', molecularWeight: '89.09 g/mol' },
+    { id: '6287', title: 'Valine', category: 'Amino Acids', description: 'Branched-chain amino acid.', formula: 'C5H11NO2', molecularWeight: '117.15 g/mol' },
+    { id: '6106', title: 'Leucine', category: 'Amino Acids', description: 'Essential branched-chain amino acid.', formula: 'C6H13NO2', molecularWeight: '131.17 g/mol' },
+    { id: '6306', title: 'Isoleucine', category: 'Amino Acids', description: 'Isomer of leucine.', formula: 'C6H13NO2', molecularWeight: '131.17 g/mol' },
+    { id: '6274', title: 'Proline', category: 'Amino Acids', description: 'Cyclic amino acid influencing protein structure.', formula: 'C5H9NO2', molecularWeight: '115.13 g/mol' },
+    { id: '994', title: 'Phenylalanine', category: 'Amino Acids', description: 'Precursor for tyrosine and neurotransmitters.', formula: 'C9H11NO2', molecularWeight: '165.19 g/mol' },
+    { id: '6057', title: 'Tyrosine', category: 'Amino Acids', description: 'Precursor for dopamine and epinephrine.', formula: 'C9H11NO3', molecularWeight: '181.19 g/mol' },
+    { id: '6305', title: 'Tryptophan', category: 'Amino Acids', description: 'Precursor for serotonin and melatonin.', formula: 'C11H12N2O2', molecularWeight: '204.23 g/mol' },
+    { id: '5951', title: 'Serine', category: 'Amino Acids', description: 'Key role in metabolism and signaling.', formula: 'C3H7NO3', molecularWeight: '105.09 g/mol' },
+    { id: '6288', title: 'Threonine', category: 'Amino Acids', description: 'Polar amino acid with a hydroxyl group.', formula: 'C4H9NO3', molecularWeight: '119.12 g/mol' },
+    { id: '5862', title: 'Cysteine', category: 'Amino Acids', description: 'Contains thiol group, forms disulfide bonds.', formula: 'C3H7NO2S', molecularWeight: '121.16 g/mol' },
+    { id: '6137', title: 'Methionine', category: 'Amino Acids', description: 'Initiator amino acid in protein synthesis.', formula: 'C5H11NO2S', molecularWeight: '149.21 g/mol' },
+    { id: '5961', title: 'Histidine', category: 'Amino Acids', description: 'Precursor to histamine.', formula: 'C6H9N3O2', molecularWeight: '155.15 g/mol' },
+    { id: '5962', title: 'Lysine', category: 'Amino Acids', description: 'Essential for growth and tissue repair.', formula: 'C6H14N2O2', molecularWeight: '146.19 g/mol' },
+    { id: '6267', title: 'Arginine', category: 'Amino Acids', description: 'Precursor for nitric oxide.', formula: 'C6H14N4O2', molecularWeight: '174.20 g/mol' },
+    { id: '5904', title: 'Aspartic Acid', category: 'Amino Acids', description: 'Carries excitatory signals.', formula: 'C4H7NO4', molecularWeight: '133.10 g/mol' },
+    { id: '33032', title: 'Glutamic Acid', category: 'Amino Acids', description: 'Key neurotransmitter and metabolic fuel.', formula: 'C5H9NO4', molecularWeight: '147.13 g/mol' },
+    { id: '5960', title: 'Asparagine', category: 'Amino Acids', description: 'First amino acid isolated.', formula: 'C4H8N2O3', molecularWeight: '132.12 g/mol' },
+    { id: '5961', title: 'Glutamine', category: 'Amino Acids', description: 'Most abundant amino acid in blood.', formula: 'C5H10N2O3', molecularWeight: '146.14 g/mol' },
 
-    // --- TOXINS ---
-    {
-        id: '6324668',
-        title: 'Tetrodotoxin',
-        category: 'Toxins',
-        description: 'Potent neurotoxin found in pufferfish.',
-        formula: 'C11H17N3O8',
-        molecularWeight: '319.27 g/mol'
-    },
-    {
-        id: '2907',
-        title: 'Aflatoxin B1',
-        category: 'Toxins',
-        description: 'Carcinogenic toxin produced by Aspergillus molds.',
-        formula: 'C17H12O6',
-        molecularWeight: '312.27 g/mol'
-    },
-    {
-        id: '4768',
-        title: 'Strychnine',
-        category: 'Toxins',
-        description: 'Highly toxic alkaloid used as a pesticide.',
-        formula: 'C21H22N2O2',
-        molecularWeight: '334.4 g/mol'
-    },
-    {
-        id: '5311053',
-        title: 'Batrachotoxin',
-        category: 'Toxins',
-        description: 'Potent cardiotoxic and neurotoxic alkaloid from poison dart frogs.',
-        formula: 'C31H42N2O6',
-        molecularWeight: '538.7 g/mol'
-    },
-    {
-        id: '768',
-        title: 'Cyanide (Hydrogen Cyanide)',
-        category: 'Toxins',
-        description: 'Fast-acting poison interfering with cellular respiration.',
-        formula: 'HCN',
-        molecularWeight: '27.03 g/mol'
-    },
-    {
-        id: '34755',
-        title: 'VX Nerve Agent',
-        category: 'Toxins',
-        description: 'Extremely toxic synthetic chemical weapon.',
-        formula: 'C11H26NO2PS',
-        molecularWeight: '267.37 g/mol'
-    },
-    {
-        id: '6220',
-        title: 'Solanine',
-        category: 'Toxins',
-        description: 'Poison found in nightshades like potatoes.',
-        formula: 'C45H73NO15',
-        molecularWeight: '868.0 g/mol'
-    },
-    {
-        id: '5353986',
-        title: 'Ricin',
-        category: 'Toxins',
-        description: 'Highly toxic protein produced in seeds of castor oil plant.',
-        formula: 'Protein',
-        molecularWeight: '~65 kDa'
-    },
-    {
-        id: '1049',
-        title: 'Paraquat',
-        category: 'Toxins',
-        description: 'Toxic herbicide.',
-        formula: 'C12H14N2',
-        molecularWeight: '186.25 g/mol'
-    },
-    {
-        id: '3039',
-        title: 'DDT',
-        category: 'Toxins',
-        description: 'Infamous organochlorine insecticide.',
-        formula: 'C14H9Cl5',
-        molecularWeight: '354.49 g/mol'
-    },
+    // Energy & Common Metabolites
+    { id: '5957', title: 'ATP', category: 'Metabolites', description: 'Energy currency.', formula: 'C10H16N5O13P3', molecularWeight: '507.18 g/mol' },
+    { id: '6022', title: 'ADP', category: 'Metabolites', description: 'Energy precursor.', formula: 'C10H15N5O10P2', molecularWeight: '427.20 g/mol' },
+    { id: '6083', title: 'AMP', category: 'Metabolites', description: 'Signaling.', formula: 'C10H14N5O7P', molecularWeight: '347.22 g/mol' },
+    { id: '5793', title: 'Glucose', category: 'Metabolites', description: 'Energy source.', formula: 'C6H12O6', molecularWeight: '180.16 g/mol' },
+    { id: '5991', title: 'Cholesterol', category: 'Metabolites', description: 'Membrane synthesis.', formula: 'C27H46O', molecularWeight: '386.6 g/mol' },
+    { id: '784', title: 'Heme B', category: 'Metabolites', description: 'O2 transport.', formula: 'C34H32FeN4O4', molecularWeight: '616.5 g/mol' },
+    { id: '1060', title: 'Pyruvate', category: 'Metabolites', description: 'Glycolysis endpoint.', formula: 'C3H4O3', molecularWeight: '88.06 g/mol' },
+    { id: '612', title: 'Lactate', category: 'Metabolites', description: 'Anaerobic metabolism.', formula: 'C3H6O3', molecularWeight: '90.08 g/mol' },
+    { id: '311', title: 'Citrate', category: 'Metabolites', description: 'Krebs cycle.', formula: 'C6H8O7', molecularWeight: '192.12 g/mol' },
+    { id: '586', title: 'Creatine', category: 'Metabolites', description: 'Muscle energy.', formula: 'C4H9N3O2', molecularWeight: '131.13 g/mol' },
+    { id: '1176', title: 'Urea', category: 'Metabolites', description: 'N waste.', formula: 'CH4N2O', molecularWeight: '60.06 g/mol' },
+    // Lipids & Fatty Acids
+    { id: '985', title: 'Palmitic Acid', category: 'Metabolites', description: 'Fatty acid.', formula: 'C16H32O2', molecularWeight: '256.42 g/mol' },
+    { id: '5281', title: 'Stearic Acid', category: 'Metabolites', description: 'Fatty acid.', formula: 'C18H36O2', molecularWeight: '284.48 g/mol' },
+    { id: '3931', title: 'Oleic Acid', category: 'Metabolites', description: 'Omega-9 fatty acid.', formula: 'C18H34O2', molecularWeight: '282.46 g/mol' },
+    { id: '5280450', title: 'Linoleic Acid', category: 'Metabolites', description: 'Omega-6 fatty acid.', formula: 'C18H32O2', molecularWeight: '280.45 g/mol' },
+    { id: '445639', title: 'Arachidonic Acid', category: 'Metabolites', description: 'Signaling lipid.', formula: 'C20H32O2', molecularWeight: '304.5 g/mol' },
+    // Sugars
+    { id: '5982', title: 'Fructose', category: 'Metabolites', description: 'Fruit sugar.', formula: 'C6H12O6', molecularWeight: '180.16 g/mol' },
+    { id: '6036', title: 'Galactose', category: 'Metabolites', description: 'Milk sugar component.', formula: 'C6H12O6', molecularWeight: '180.16 g/mol' },
+    { id: '5988', title: 'Sucrose', category: 'Metabolites', description: 'Table sugar.', formula: 'C12H22O11', molecularWeight: '342.30 g/mol' },
+    { id: '6134', title: 'Lactose', category: 'Metabolites', description: 'Milk sugar.', formula: 'C12H22O11', molecularWeight: '342.30 g/mol' },
+    // Nucleobases
+    { id: '190', title: 'Adenine', category: 'Metabolites', description: 'DNA base.', formula: 'C5H5N5', molecularWeight: '135.13 g/mol' },
+    { id: '727', title: 'Guanine', category: 'Metabolites', description: 'DNA base.', formula: 'C5H5N5O', molecularWeight: '151.13 g/mol' },
+    { id: '597', title: 'Cytosine', category: 'Metabolites', description: 'DNA base.', formula: 'C4H5N3O', molecularWeight: '111.10 g/mol' },
+    { id: '1135', title: 'Thymine', category: 'Metabolites', description: 'DNA base.', formula: 'C5H6N2O2', molecularWeight: '126.11 g/mol' },
+    { id: '1174', title: 'Uracil', category: 'Metabolites', description: 'RNA base.', formula: 'C4H4N2O2', molecularWeight: '112.09 g/mol' },
 
-    // --- HORMONES ---
-    {
-        id: '6013',
-        title: 'Testosterone',
-        category: 'Hormones',
-        description: 'Primary male sex hormone and anabolic steroid.',
-        formula: 'C19H28O2',
-        molecularWeight: '288.4 g/mol'
-    },
-    {
-        id: '5757',
-        title: 'Estradiol',
-        category: 'Hormones',
-        description: 'Major female sex hormone.',
-        formula: 'C18H24O2',
-        molecularWeight: '272.38 g/mol'
-    },
-    {
-        id: '5754',
-        title: 'Cortisol',
-        category: 'Hormones',
-        description: 'Steroid hormone produced in response to stress.',
-        formula: 'C21H30O5',
-        molecularWeight: '362.46 g/mol'
-    },
-    {
-        id: '5997',
-        title: 'Progesterone',
-        category: 'Hormones',
-        description: 'Endogenous steroid and progestogen sex hormone.',
-        formula: 'C21H30O2',
-        molecularWeight: '314.46 g/mol'
-    },
-    {
-        id: '5833',
-        title: 'Aldosterone',
-        category: 'Hormones',
-        description: 'Regulates blood pressure and electrolyte balance.',
-        formula: 'C21H28O5',
-        molecularWeight: '360.44 g/mol'
-    },
-    {
-        id: '5819',
-        title: 'Thyroxine (T4)',
-        category: 'Hormones',
-        description: 'Thyroid hormone responsible for metabolism regulation.',
-        formula: 'C15H11I4NO4',
-        molecularWeight: '776.87 g/mol'
-    },
-    {
-        id: '5743',
-        title: 'Dexamethasone',
-        category: 'Hormones',
-        description: 'Corticosteroid medication.',
-        formula: 'C22H29FO5',
-        molecularWeight: '392.46 g/mol'
-    },
-    {
-        id: '5753',
-        title: 'Prednisone',
-        category: 'Hormones',
-        description: 'Synthetic corticosteroid drug.',
-        formula: 'C21H26O5',
-        molecularWeight: '358.43 g/mol'
-    },
+    // --- HORMONES (15) ---
+    { id: '6013', title: 'Testosterone', category: 'Hormones', description: 'Androgen.', formula: 'C19H28O2', molecularWeight: '288.4 g/mol' },
+    { id: '5757', title: 'Estradiol', category: 'Hormones', description: 'Estrogen.', formula: 'C18H24O2', molecularWeight: '272.38 g/mol' },
+    { id: '5754', title: 'Cortisol', category: 'Hormones', description: 'Stress hormone.', formula: 'C21H30O5', molecularWeight: '362.46 g/mol' },
+    { id: '5997', title: 'Progesterone', category: 'Hormones', description: 'Progestogen.', formula: 'C21H30O2', molecularWeight: '314.46 g/mol' },
+    { id: '5833', title: 'Aldosterone', category: 'Hormones', description: 'Blood pressure.', formula: 'C21H28O5', molecularWeight: '360.44 g/mol' },
+    { id: '5819', title: 'Thyroxine (T4)', category: 'Hormones', description: 'Metabolism.', formula: 'C15H11I4NO4', molecularWeight: '776.87 g/mol' },
+    { id: '5943', title: 'Triiodothyronine (T3)', category: 'Hormones', description: 'Active thyroid hormone.', formula: 'C15H12I3NO4', molecularWeight: '650.97 g/mol' },
+    { id: '5743', title: 'Dexamethasone', category: 'Hormones', description: 'Synthetic steroid.', formula: 'C22H29FO5', molecularWeight: '392.46 g/mol' },
+    { id: '5753', title: 'Prednisone', category: 'Hormones', description: 'Anti-inflammatory.', formula: 'C21H26O5', molecularWeight: '358.43 g/mol' },
+    { id: '1113', title: 'Melatonin', category: 'Hormones', description: 'Circadian rhythm.', formula: 'C13H16N2O2', molecularWeight: '232.28 g/mol' },
 
-    // --- NATURAL PRODUCTS ---
-    {
-        id: '44259',
-        title: 'Theobromine',
-        category: 'Natural Products',
-        description: 'Bitter alkaloid of the cacao plant (chocolate).',
-        formula: 'C7H8N4O2',
-        molecularWeight: '180.16 g/mol'
-    },
-    {
-        id: '5280343',
-        title: 'Quercetin',
-        category: 'Natural Products',
-        description: 'Plant flavonol from the oak family.',
-        formula: 'C15H10O7',
-        molecularWeight: '302.24 g/mol'
-    },
-    {
-        id: '1548943',
-        title: 'Capsaicin',
-        category: 'Natural Products',
-        description: 'Active component of chili peppers.',
-        formula: 'C18H27NO3',
-        molecularWeight: '305.41 g/mol'
-    },
-    {
-        id: '969516',
-        title: 'Curcumin',
-        category: 'Natural Products',
-        description: 'Bright yellow chemical produced by turmeric.',
-        formula: 'C21H20O6',
-        molecularWeight: '368.38 g/mol'
-    },
-    {
-        id: '689043',
-        title: 'Artemisinin',
-        category: 'Natural Products',
-        description: 'Antimalarial isolated from sweet wormwood.',
-        formula: 'C15H22O5',
-        molecularWeight: '282.33 g/mol'
-    },
-    {
-        id: '445090',
-        title: 'Resveratrol',
-        category: 'Natural Products',
-        description: 'Phenol produced by grapes and berries.',
-        formula: 'C14H12O3',
-        molecularWeight: '228.25 g/mol'
-    },
-    {
-        id: '65064',
-        title: 'EGCG (Epigallocatechin gallate)',
-        category: 'Natural Products',
-        description: 'Major catechin in green tea.',
-        formula: 'C22H18O11',
-        molecularWeight: '458.37 g/mol'
-    },
-    {
-        id: '5284373',
-        title: 'Lycopene',
-        category: 'Natural Products',
-        description: 'Bright red carotene pigment in tomatoes.',
-        formula: 'C40H56',
-        molecularWeight: '536.87 g/mol'
-    },
-    {
-        id: '5281233',
-        title: 'Beta-Carotene',
-        category: 'Natural Products',
-        description: 'Red-orange pigment in plants and fruits.',
-        formula: 'C40H56',
-        molecularWeight: '536.87 g/mol'
-    },
-    {
-        id: '992',
-        title: 'Limonene',
-        category: 'Natural Products',
-        description: 'Major component of the oil of citrus fruit peels.',
-        formula: 'C10H16',
-        molecularWeight: '136.23 g/mol'
-    },
-    {
-        id: '6549',
-        title: 'Menthol',
-        category: 'Natural Products',
-        description: 'Waxy, crystalline substance from mint.',
-        formula: 'C10H20O',
-        molecularWeight: '156.27 g/mol'
-    },
-    {
-        id: '702',
-        title: 'Ethanol',
-        category: 'Natural Products',
-        description: 'Simple alcohol and psychoactive substance.',
-        formula: 'C2H6O',
-        molecularWeight: '46.07 g/mol'
-    }
+    // --- TOXINS & PESTICIDES (40+) ---
+    { id: '6324668', title: 'Tetrodotoxin', category: 'Toxins', description: 'Pufferfish poison.', formula: 'C11H17N3O8', molecularWeight: '319.27 g/mol' },
+    { id: '2907', title: 'Aflatoxin B1', category: 'Toxins', description: 'Fungal toxin.', formula: 'C17H12O6', molecularWeight: '312.27 g/mol' },
+    { id: '4768', title: 'Strychnine', category: 'Toxins', description: 'Pesticide.', formula: 'C21H22N2O2', molecularWeight: '334.4 g/mol' },
+    { id: '5311053', title: 'Batrachotoxin', category: 'Toxins', description: 'Frog poison.', formula: 'C31H42N2O6', molecularWeight: '538.7 g/mol' },
+    { id: '768', title: 'Cyanide', category: 'Toxins', description: 'Poison.', formula: 'HCN', molecularWeight: '27.03 g/mol' },
+    { id: '34755', title: 'VX', category: 'Toxins', description: 'Nerve agent.', formula: 'C11H26NO2PS', molecularWeight: '267.37 g/mol' },
+    { id: '6220', title: 'Solanine', category: 'Toxins', description: 'Potato toxin.', formula: 'C45H73NO15', molecularWeight: '868.0 g/mol' },
+    { id: '5353986', title: 'Ricin', category: 'Toxins', description: 'Castor bean toxin.', formula: 'Protein', molecularWeight: '~65 kDa' },
+    { id: '1049', title: 'Paraquat', category: 'Toxins', description: 'Herbicide.', formula: 'C12H14N2', molecularWeight: '186.25 g/mol' },
+    { id: '3039', title: 'DDT', category: 'Toxins', description: 'Insecticide.', formula: 'C14H9Cl5', molecularWeight: '354.49 g/mol' },
+    { id: '3479', title: 'Glyphosate', category: 'Toxins', description: 'Herbicide (Roundup).', formula: 'C3H8NO5P', molecularWeight: '169.07 g/mol' },
+    { id: '2256', title: 'Atrazine', category: 'Toxins', description: 'Herbicide.', formula: 'C8H14ClN5', molecularWeight: '215.68 g/mol' },
+    { id: '159', title: 'Formaldehyde', category: 'Toxins', description: 'Carcinogen/Preservative.', formula: 'CH2O', molecularWeight: '30.03 g/mol' },
+    { id: '1140', title: 'Toluene', category: 'Toxins', description: 'Solvent.', formula: 'C7H8', molecularWeight: '92.14 g/mol' },
+    { id: '241', title: 'Benzene', category: 'Toxins', description: 'Carcinogen.', formula: 'C6H6', molecularWeight: '78.11 g/mol' },
+    { id: '8370', title: 'Sarin', category: 'Toxins', description: 'Nerve agent.', formula: 'C4H10FO2P', molecularWeight: '140.09 g/mol' },
+    { id: '10417', title: 'Tabun', category: 'Toxins', description: 'Nerve agent.', formula: 'C5H11N2O2P', molecularWeight: '162.13 g/mol' },
+    { id: '6597', title: 'Phosgene', category: 'Toxins', description: 'Chemical weapon.', formula: 'CCl2O', molecularWeight: '98.92 g/mol' },
+    { id: '2138', title: 'Acrylamide', category: 'Toxins', description: 'Neurotoxin.', formula: 'C3H5NO', molecularWeight: '71.08 g/mol' },
+    { id: '5216', title: 'Bisphenol A (BPA)', category: 'Toxins', description: 'Endocrine disruptor.', formula: 'C15H16O2', molecularWeight: '228.29 g/mol' },
+
+    // --- NATURAL PRODUCTS & NUTRIENTS (40+) ---
+    { id: '44259', title: 'Theobromine', category: 'Natural Products', description: 'Cacao alkaloid.', formula: 'C7H8N4O2', molecularWeight: '180.16 g/mol' },
+    { id: '2519', title: 'Caffeine', category: 'Natural Products', description: 'Stimulant.', formula: 'C8H10N4O2', molecularWeight: '194.19 g/mol' },
+    { id: '89594', title: 'Nicotine', category: 'Natural Products', description: 'Nightshade alkaloid.', formula: 'C10H14N2', molecularWeight: '162.23 g/mol' },
+    { id: '5280343', title: 'Quercetin', category: 'Natural Products', description: 'Flavonoid.', formula: 'C15H10O7', molecularWeight: '302.24 g/mol' },
+    { id: '1548943', title: 'Capsaicin', category: 'Natural Products', description: 'Chili heat.', formula: 'C18H27NO3', molecularWeight: '305.41 g/mol' },
+    { id: '969516', title: 'Curcumin', category: 'Natural Products', description: 'Turmeric.', formula: 'C21H20O6', molecularWeight: '368.38 g/mol' },
+    { id: '689043', title: 'Artemisinin', category: 'Natural Products', description: 'Antimalarial.', formula: 'C15H22O5', molecularWeight: '282.33 g/mol' },
+    { id: '445090', title: 'Resveratrol', category: 'Natural Products', description: 'Grape phenol.', formula: 'C14H12O3', molecularWeight: '228.25 g/mol' },
+    { id: '65064', title: 'EGCG', category: 'Natural Products', description: 'Green tea.', formula: 'C22H18O11', molecularWeight: '458.37 g/mol' },
+    { id: '5284373', title: 'Lycopene', category: 'Natural Products', description: 'Tomato pigment.', formula: 'C40H56', molecularWeight: '536.87 g/mol' },
+    { id: '5281233', title: 'Beta-Carotene', category: 'Natural Products', description: 'Vitamin A precursor.', formula: 'C40H56', molecularWeight: '536.87 g/mol' },
+    { id: '992', title: 'Limonene', category: 'Natural Products', description: 'Citrus oil.', formula: 'C10H16', molecularWeight: '136.23 g/mol' },
+    { id: '6549', title: 'Menthol', category: 'Natural Products', description: 'Mint.', formula: 'C10H20O', molecularWeight: '156.27 g/mol' },
+    { id: '702', title: 'Ethanol', category: 'Natural Products', description: 'Alcohol.', formula: 'C2H6O', molecularWeight: '46.07 g/mol' },
+    { id: '1183', title: 'Vanillin', category: 'Natural Products', description: 'Vanilla flavor.', formula: 'C8H8O3', molecularWeight: '152.15 g/mol' },
+    { id: '637511', title: 'Cinnamaldehyde', category: 'Natural Products', description: 'Cinnamon flavor.', formula: 'C9H8O', molecularWeight: '132.16 g/mol' },
+    { id: '323', title: 'Coumarin', category: 'Natural Products', description: 'Fragrance.', formula: 'C9H6O2', molecularWeight: '146.14 g/mol' },
+    { id: '10624', title: 'Psilocybin', category: 'Natural Products', description: 'Mushroom alkaloid.', formula: 'C12H17N2O4P', molecularWeight: '284.25 g/mol' },
+    { id: '16078', title: 'THC', category: 'Natural Products', description: 'Cannabinoid.', formula: 'C21H30O2', molecularWeight: '314.5 g/mol' },
+    { id: '5284534', title: 'Cannabidiol (CBD)', category: 'Natural Products', description: 'Cannabinoid.', formula: 'C21H30O2', molecularWeight: '314.46 g/mol' },
+    { id: '7504', title: 'Geraniol', category: 'Natural Products', description: 'Rose oil.', formula: 'C10H18O', molecularWeight: '154.25 g/mol' },
+    { id: '2543', title: 'Camphor', category: 'Natural Products', description: 'Waxy solid.', formula: 'C10H16O', molecularWeight: '152.23 g/mol' },
+    { id: '1254', title: 'Eugenol', category: 'Natural Products', description: 'Clove oil.', formula: 'C10H12O2', molecularWeight: '164.20 g/mol' },
+    { id: '5903', title: 'Spermine', category: 'Natural Products', description: 'Polyamine.', formula: 'C10H26N4', molecularWeight: '202.34 g/mol' },
+    { id: '1102', title: 'Spermidine', category: 'Natural Products', description: 'Polyamine.', formula: 'C7H19N3', molecularWeight: '145.25 g/mol' },
+    // Nutrients / Food Additives
+    { id: '134601', title: 'Aspartame', category: 'Nutrients', description: 'Sweetener.', formula: 'C14H18N2O5', molecularWeight: '294.3 g/mol' },
+    { id: '71485', title: 'Sucralose', category: 'Nutrients', description: 'Sweetener.', formula: 'C12H19Cl3O8', molecularWeight: '397.6 g/mol' },
+    { id: '56841', title: 'Saccharin', category: 'Nutrients', description: 'Sweetener.', formula: 'C7H5NO3S', molecularWeight: '183.18 g/mol' },
+    { id: '791', title: 'Tartaric Acid', category: 'Nutrients', description: 'Acidifier.', formula: 'C4H6O6', molecularWeight: '150.09 g/mol' },
+    { id: '1110', title: 'Succinic Acid', category: 'Nutrients', description: 'Acidity regulator.', formula: 'C4H6O4', molecularWeight: '118.09 g/mol' }
 ];
