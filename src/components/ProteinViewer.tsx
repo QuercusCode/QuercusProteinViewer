@@ -1788,34 +1788,21 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     sele: 'not (ARG or LYS or HIS or ASP or GLU)',
                     name: 'charge_neutral'
                 });
-            } else if ((currentColoring as string) === 'sstruc') {
-                // SECONDARY STRUCTURE: Custom Scheme Approach
-                // Register a custom scheme ("quercus_sstruc") to force our exact colors
-                const sstrucSchemeId = "quercus_sstruc";
-
-                try {
-                    // Force SS calc
-                    component.structure.eachModel((m: any) => {
-                        if (m.calculateSecondaryStructure) m.calculateSecondaryStructure();
-                    });
-
-                    // Register scheme (safe to overwrite)
-                    NGL.ColormakerRegistry.addSelectionScheme([
-                        ["magenta", "helix"],
-                        ["gold", "sheet"],
-                        ["white", "*"]
-                    ], sstrucSchemeId);
-
-                } catch (e) { console.warn("SS Scheme setup failed", e); }
-
-                component.addRepresentation(repType, {
-                    colorScheme: sstrucSchemeId
-                });
             } else {
-                // Standard Coloring for other modes (element, residue, etc.) -> Robust Native NGL
-                // Use colorScheme instead of color to avoid ambiguity with color names
+                // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL
+                // REVERTED to use 'color' property as previously working.
+
+                // Safety: Ensure structure is calculated if mode is sstruc
+                if ((currentColoring as string) === 'sstruc') {
+                    try {
+                        component.structure.eachModel((m: any) => {
+                            if (m.calculateSecondaryStructure) m.calculateSecondaryStructure();
+                        });
+                    } catch (e) { }
+                }
+
                 component.addRepresentation(repType, {
-                    colorScheme: currentColoring
+                    color: currentColoring
                 });
             }
 
