@@ -437,5 +437,109 @@ export const CHEMICAL_LIBRARY: ChemicalLibraryEntry[] = [
     { id: '8223', title: 'Butyric Acid', category: 'Metabolites', description: 'Rancid butter smell.', formula: 'C4H8O2', molecularWeight: '88.11 g/mol' },
     { id: '8857', title: 'Valeric Acid', category: 'Metabolites', description: 'Valerian smell.', formula: 'C5H10O2', molecularWeight: '102.13 g/mol' },
     { id: '5282106', title: 'Cadaverine', category: 'Metabolites', description: 'Smell of death.', formula: 'C5H14N2', molecularWeight: '102.18 g/mol' },
-    { id: '10430', title: 'Putrescine', category: 'Metabolites', description: 'Smell of rotting.', formula: 'C4H12N2', molecularWeight: '88.15 g/mol' }
+    { id: '10430', title: 'Putrescine', category: 'Metabolites', description: 'Smell of rotting.', formula: 'C4H12N2', molecularWeight: '88.15 g/mol' },
+
+    // --- BATCH 7: EXPLOSIVES & HAZMAT (Toxins) ---
+    { id: '8376', title: 'TNT (Trinitrotoluene)', category: 'Toxins', description: 'Explosive.', formula: 'C7H5N3O6', molecularWeight: '227.13 g/mol' },
+    { id: '8490', title: 'RDX', category: 'Toxins', description: 'Plastic explosive component.', formula: 'C3H6N6O6', molecularWeight: '222.12 g/mol' },
+    { id: '10431', title: 'HMX', category: 'Toxins', description: 'High melting explosive.', formula: 'C4H8N8O8', molecularWeight: '296.16 g/mol' },
+    { id: '6518', title: 'PETN', category: 'Toxins', description: 'Plastic explosive component.', formula: 'C5H8N4O12', molecularWeight: '316.14 g/mol' },
+    { id: '6932', title: 'Picric Acid', category: 'Toxins', description: 'Historic explosive.', formula: 'C6H3N3O7', molecularWeight: '229.10 g/mol' },
+    { id: '6379', title: 'Nitromethane', category: 'Toxins', description: 'Fuel/Explosive.', formula: 'CH3NO2', molecularWeight: '61.04 g/mol' },
+
+    // --- BATCH 7: PFAS (FOREVER CHEMICALS) (Toxins) ---
+    { id: '9554', title: 'PFOA', category: 'Toxins', description: 'Perfluorooctanoic acid.', formula: 'C8HF15O2', molecularWeight: '414.07 g/mol' },
+    { id: '74483', title: 'PFOS', category: 'Toxins', description: 'Perfluorooctanesulfonic acid.', formula: 'C8HF17O3S', molecularWeight: '500.1 g/mol' },
+    { id: '169581', title: 'GenX', category: 'Toxins', description: 'PFAS replacement.', formula: 'C6H4F11NO3', molecularWeight: '343.12 g/mol' },
+
+    // --- BATCH 7: PIGMENTS & BIOLOGICAL STAINS (Natural Products/Other) ---
+    { id: '11057', title: 'Crystal Violet', category: 'Natural Products', description: 'Gram stain dye.', formula: 'C25H30ClN3', molecularWeight: '407.98 g/mol' },
+    { id: '2723812', title: 'Safranin O', category: 'Natural Products', description: 'Counterstain.', formula: 'C20H19ClN4', molecularWeight: '350.84 g/mol' },
+    { id: '11313', title: 'Congo Red', category: 'Natural Products', description: 'Amyloid stain.', formula: 'C32H22N6Na2O6S2', molecularWeight: '696.65 g/mol' },
+    { id: '5318', title: 'Indigo', category: 'Natural Products', description: 'Blue dye.', formula: 'C16H10N2O2', molecularWeight: '262.26 g/mol' },
+    { id: '6098', title: 'Malachite Green', category: 'Toxins', description: 'Dye and antifungal.', formula: 'C23H25ClN2', molecularWeight: '364.91 g/mol' },
+    { id: '6453', title: 'Sunset Yellow FCF', category: 'Nutrients', description: 'Food coloring (Yellow 6).', formula: 'C16H10N2Na2O7S2', molecularWeight: '452.37 g/mol' },
+    { id: '6093299', title: 'Allura Red AC', category: 'Nutrients', description: 'Food coloring (Red 40).', formula: 'C18H14N2Na2O8S2', molecularWeight: '496.42 g/mol' },
+    { id: '19700', title: 'Tartrazine', category: 'Nutrients', description: 'Food coloring (Yellow 5).', formula: 'C16H9N4Na3O9S2', molecularWeight: '534.36 g/mol' },
+    { id: '79143', title: 'Brilliant Blue FCF', category: 'Nutrients', description: 'Food coloring (Blue 1).', formula: 'C37H34N2Na2O9S3', molecularWeight: '792.85 g/mol' },
+
+    // --- BATCH 7: FOOD ADDITIVES & PRESERVATIVES (Nutrients) ---
+    { id: '517055', title: 'Sodium Benzoate', category: 'Nutrients', description: 'Preservative.', formula: 'C7H5NaO2', molecularWeight: '144.10 g/mol' },
+    { id: '23676745', title: 'Potassium Sorbate', category: 'Nutrients', description: 'Preservative.', formula: 'C6H7KO2', molecularWeight: '150.22 g/mol' },
+    { id: '31404', title: 'BHT', category: 'Nutrients', description: 'Antioxidant preservative.', formula: 'C15H24O', molecularWeight: '220.35 g/mol' },
+    { id: '24667', title: 'BHA', category: 'Nutrients', description: 'Antioxidant preservative.', formula: 'C11H16O2', molecularWeight: '180.24 g/mol' },
+    { id: '6321425', title: 'Sodium Nitrite', category: 'Toxins', description: 'Cured meat preservative.', formula: 'NaNO2', molecularWeight: '68.99 g/mol' },
+
+    // --- BATCH 7: RARE SUGARS & CARBOHYDRATES (Metabolites) ---
+    { id: '439195', title: 'Arabinose', category: 'Metabolites', description: 'Pentose sugar.', formula: 'C5H10O5', molecularWeight: '150.13 g/mol' },
+    { id: '5979', title: 'Lyxose', category: 'Metabolites', description: 'Pentose sugar.', formula: 'C5H10O5', molecularWeight: '150.13 g/mol' },
+    { id: '7427', title: 'Trehalose', category: 'Metabolites', description: 'Disaccharide.', formula: 'C12H22O11', molecularWeight: '342.30 g/mol' },
+    { id: '439242', title: 'Raffinose', category: 'Metabolites', description: 'Trisaccharide.', formula: 'C18H32O16', molecularWeight: '504.44 g/mol' },
+    { id: '439531', title: 'Stachyose', category: 'Metabolites', description: 'Tetrasaccharide.', formula: 'C24H42O21', molecularWeight: '666.58 g/mol' },
+    { id: '151134', title: 'Ribulose', category: 'Metabolites', description: 'Ketopentose.', formula: 'C5H10O5', molecularWeight: '150.13 g/mol' },
+    { id: '960', title: 'Sialic Acid (NANA)', category: 'Metabolites', description: 'Neuraminic acid.', formula: 'C11H19NO9', molecularWeight: '309.27 g/mol' },
+
+    // --- BATCH 7: ANTIBIOTICS & INFECTIOUS DISEASE (Drugs) ---
+    { id: '447043', title: 'Azithromycin', category: 'Drugs', description: 'Macrolide antibiotic.', formula: 'C38H72N2O12', molecularWeight: '749.0 g/mol' },
+    { id: '84029', title: 'Clarithromycin', category: 'Drugs', description: 'Macrolide antibiotic.', formula: 'C38H69NO13', molecularWeight: '748.0 g/mol' },
+    { id: '441401', title: 'Linezolid', category: 'Drugs', description: 'Synthetic antibiotic.', formula: 'C16H20FN3O4', molecularWeight: '337.35 g/mol' },
+    { id: '6918361', title: 'Artemether', category: 'Drugs', description: 'Antimalarial.', formula: 'C16H26O5', molecularWeight: '298.37 g/mol' },
+    { id: '6433227', title: 'Lumefantrine', category: 'Drugs', description: 'Antimalarial.', formula: 'C30H32Cl3NO', molecularWeight: '528.9 g/mol' },
+    { id: '4534139', title: 'Sofosbuvir', category: 'Drugs', description: 'Hepatitis C antiviral.', formula: 'C22H29FN3O9P', molecularWeight: '529.5 g/mol' },
+    { id: '64139', title: 'Efavirenz', category: 'Drugs', description: 'HIV antiviral.', formula: 'C14H9ClF3NO2', molecularWeight: '315.67 g/mol' },
+
+    // --- BATCH 7: PAIN MANAGEMENT & OPIOIDS (Drugs) ---
+    { id: '5284569', title: 'Hydrocodone', category: 'Drugs', description: 'Opioid pain medication.', formula: 'C18H21NO3', molecularWeight: '299.36 g/mol' },
+    { id: '5284603', title: 'Oxycodone', category: 'Drugs', description: 'Opioid pain medication.', formula: 'C18H21NO4', molecularWeight: '315.37 g/mol' },
+    { id: '5284570', title: 'Hydromorphone', category: 'Drugs', description: 'Potent opioid.', formula: 'C17H19NO3', molecularWeight: '285.34 g/mol' },
+    { id: '5460291', title: 'Oxymorphone', category: 'Drugs', description: 'Potent opioid.', formula: 'C17H19NO4', molecularWeight: '301.34 g/mol' },
+    { id: '644073', title: 'Buprenorphine', category: 'Drugs', description: 'Opioid functional agonist.', formula: 'C29H41NO4', molecularWeight: '467.6 g/mol' },
+    { id: '5284538', title: 'Codeine', category: 'Drugs', description: 'Opiate used for pain/cough.', formula: 'C18H21NO3', molecularWeight: '299.36 g/mol' },
+    { id: '5462328', title: 'Heroin (Diacetylmorphine)', category: 'Drugs', description: 'Opioid drug.', formula: 'C21H23NO5', molecularWeight: '369.41 g/mol' },
+    { id: '10182206', title: 'Fentanyl Citrate', category: 'Drugs', description: 'Potent synthetic opioid.', formula: 'C28H36N2O8', molecularWeight: '528.6 g/mol' },
+
+    // --- BATCH 7: BLOOD & CARDIOVASCULAR (Drugs) ---
+    { id: '9875401', title: 'Rivaroxaban', category: 'Drugs', description: 'Anticoagulant.', formula: 'C19H18ClN3O5S', molecularWeight: '435.9 g/mol' },
+    { id: '10182969', title: 'Apixaban', category: 'Drugs', description: 'Anticoagulant.', formula: 'C25H25N5O4', molecularWeight: '459.5 g/mol' },
+    { id: '4159', title: 'Metoprolol', category: 'Drugs', description: 'Beta-blocker.', formula: 'C15H25NO3', molecularWeight: '267.36 g/mol' },
+    { id: '2249', title: 'Atenolol', category: 'Drugs', description: 'Beta-blocker.', formula: 'C14H22N2O3', molecularWeight: '266.34 g/mol' },
+    { id: '2405', title: 'Bisoprolol', category: 'Drugs', description: 'Beta-blocker.', formula: 'C18H31NO4', molecularWeight: '309.4 g/mol' },
+
+    // --- BATCH 7: NEURO & HORMONES (Hormones/Neurotransmitters) ---
+    { id: '896', title: '5-HTP', category: 'Neurotransmitters', description: 'Serotonin precursor.', formula: 'C11H12N2O3', molecularWeight: '220.22 g/mol' },
+    { id: '5811', title: 'DHEA', category: 'Hormones', description: 'Steroid hormone.', formula: 'C19H28O2', molecularWeight: '288.42 g/mol' },
+    { id: '5998', title: 'Pregnenolone', category: 'Hormones', description: 'Steroid precursor.', formula: 'C21H32O2', molecularWeight: '316.5 g/mol' },
+    { id: '15406', title: 'Oxytocin', category: 'Hormones', description: 'Peptide hormone (Love hormone).', formula: 'C43H66N12O12S2', molecularWeight: '1007.2 g/mol' },
+    { id: '16132273', title: 'Vasopressin (ADH)', category: 'Hormones', description: 'Water retention hormone.', formula: 'C46H65N15O12S2', molecularWeight: '1084.2 g/mol' },
+
+    // --- BATCH 7: BIOLOGICAL REAGENTS (Metabolites) ---
+    { id: '6205', title: 'EGTA', category: 'Metabolites', description: 'Calcium chelator.', formula: 'C14H24N2O10', molecularWeight: '380.35 g/mol' },
+    { id: '12488', title: 'Glutathione (Reduced)', category: 'Metabolites', description: 'Antioxidant.', formula: 'C10H17N3O6S', molecularWeight: '307.32 g/mol' },
+    { id: '1353987', title: 'Glutathione (Oxidized)', category: 'Metabolites', description: 'GSSG.', formula: 'C20H32N6O12S2', molecularWeight: '612.6 g/mol' },
+    { id: '6114', title: 'N-Acetylcysteine (NAC)', category: 'Metabolites', description: 'Antioxidant precursor.', formula: 'C5H9NO3S', molecularWeight: '163.19 g/mol' },
+    { id: '23890', title: 'MOPS', category: 'Metabolites', description: 'Buffering agent.', formula: 'C7H15NO4S', molecularWeight: '209.26 g/mol' },
+    { id: '79027', title: 'PIPES', category: 'Metabolites', description: 'Buffering agent.', formula: 'C8H18N2O6S2', molecularWeight: '302.4 g/mol' },
+    { id: '702', title: 'Ethanolamine', category: 'Metabolites', description: 'Phospholipid precursor.', formula: 'C2H7NO', molecularWeight: '61.08 g/mol' },
+
+    // --- BATCH 7: NATURAL TOXINS (Toxins) ---
+    { id: '443229', title: 'Microcystin-LR', category: 'Toxins', description: 'Cyanobacterial toxin.', formula: 'C49H74N10O12', molecularWeight: '995.2 g/mol' },
+    { id: '3034293', title: 'Saxitoxin', category: 'Toxins', description: 'Shellfish poison.', formula: 'C10H17N7O4', molecularWeight: '299.29 g/mol' },
+    { id: '446303', title: 'Okadaic Acid', category: 'Toxins', description: 'Shellfish toxin.', formula: 'C44H68O13', molecularWeight: '805.0 g/mol' },
+    { id: '5281426', title: 'Amanitin (Alpha)', category: 'Toxins', description: 'Death cap mushroom toxin.', formula: 'C39H54N10O14S', molecularWeight: '919.0 g/mol' },
+
+    // --- BATCH 7: INDUSTRIAL SOLVENTS & CHEMICALS (Toxins) ---
+    { id: '6560', title: 'MEK (Methyl Ethyl Ketone)', category: 'Toxins', description: 'Solvent.', formula: 'C4H8O', molecularWeight: '72.10 g/mol' },
+    { id: '8028', title: 'THF (Tetrahydrofuran)', category: 'Toxins', description: 'Solvent.', formula: 'C4H8O', molecularWeight: '72.11 g/mol' },
+    { id: '8826', title: 'Ethyl Acetate', category: 'Toxins', description: 'Solvent.', formula: 'C4H8O2', molecularWeight: '88.11 g/mol' },
+    { id: '6344', title: 'Dichloromethane (DCM)', category: 'Toxins', description: 'Solvent.', formula: 'CH2Cl2', molecularWeight: '84.93 g/mol' },
+    { id: '176', title: 'Acetic Acid', category: 'Metabolites', description: 'Vinegar component.', formula: 'C2H4O2', molecularWeight: '60.05 g/mol' },
+    { id: '243', title: 'Benzoic Acid', category: 'Metabolites', description: 'Preservative precursor.', formula: 'C7H6O2', molecularWeight: '122.12 g/mol' },
+    { id: '944', title: 'Nitric Acid', category: 'Toxins', description: 'Strong mineral acid.', formula: 'HNO3', molecularWeight: '63.01 g/mol' },
+    { id: '1118', title: 'Sulfuric Acid', category: 'Toxins', description: 'Strong mineral acid.', formula: 'H2SO4', molecularWeight: '98.08 g/mol' },
+
+    // --- BATCH 7: PESTICIDES & REPELLENTS (Toxins) ---
+    { id: '40326', title: 'Permethrin', category: 'Toxins', description: 'Insecticide.', formula: 'C21H20Cl2O3', molecularWeight: '391.29 g/mol' },
+    { id: '4284', title: 'DEET', category: 'Toxins', description: 'Insect repellent.', formula: 'C12H17NO', molecularWeight: '191.27 g/mol' },
+    { id: '2684', title: 'Carbaryl', category: 'Toxins', description: 'Insecticide (Sevin).', formula: 'C12H11NO2', molecularWeight: '201.22 g/mol' },
+    { id: '2762', title: 'Fipronil', category: 'Toxins', description: 'Insecticide.', formula: 'C12H4Cl2F6N4OS', molecularWeight: '437.15 g/mol' }
 ];
