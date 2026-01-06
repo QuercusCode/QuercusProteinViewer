@@ -1718,55 +1718,59 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 // 2. Apply Highlights
                 if (activeFunctionalGroups.includes('aromatic')) {
                     component.addRepresentation('ball+stick', {
-                        sele: '(aromatic or ring) and not (water or ion)',
+                        sele: 'aromatic and not (_H)',
                         color: '#a855f7', // Purple-500
-                        radiusScale: 1.5,
+                        radiusScale: 1.2,
                         name: 'highlight_aromatic'
                     });
                 }
 
                 if (activeFunctionalGroups.includes('polar')) {
                     component.addRepresentation('ball+stick', {
-                        sele: '(element N or element O or element S or element P) and not (water or ion)',
+                        sele: '(_N or _O or _S or _P) and not (_H)',
                         color: 'element', // Keep element colors for specific ID
-                        radiusScale: 1.5,
+                        radiusScale: 1.2,
                         name: 'highlight_polar'
                     });
                 }
 
                 if (activeFunctionalGroups.includes('rings')) {
                     component.addRepresentation('ball+stick', {
-                        sele: 'ring and not (aromatic)', // Non-aromatic rings if aromatic is separate? Or just all rings?
-                        // Let's make 'rings' cover all rings if selected
+                        sele: 'ring', // Select ALL atoms in a ring (aromatic or not)
                         color: '#f97316', // Orange-500
-                        radiusScale: 1.5,
+                        radiusScale: 1.2,
                         name: 'highlight_rings'
                     });
                 }
 
                 if (activeFunctionalGroups.includes('halogens')) {
                     component.addRepresentation('ball+stick', {
-                        sele: '(element F or element Cl or element Br or element I) and not (water or ion)',
+                        sele: '(_F or _Cl or _Br or _I) and not (_H)',
                         color: '#10b981', // Emerald-500
-                        radiusScale: 1.5,
+                        radiusScale: 1.2,
                         name: 'highlight_halogens'
                     });
                 }
 
                 if (activeFunctionalGroups.includes('sulfur')) {
                     component.addRepresentation('ball+stick', {
-                        sele: 'element S and not (water or ion)',
+                        sele: '_S and not (_H)',
                         color: '#facc15', // Yellow-400
-                        radiusScale: 1.5,
+                        radiusScale: 1.2,
                         name: 'highlight_sulfur'
                     });
                 }
 
                 if (activeFunctionalGroups.includes('metals')) {
+                    // Common metals in biology/chemistry + transition metals
+                    // NGL 'ion' only catches formal ions. We need explicit elements for organometallics.
+                    const metalSele = '_Li or _Na or _K or _Mg or _Ca or _Sr or _Ba or ' +
+                        '_Zn or _Cu or _Fe or _Mn or _Co or _Ni or _Pt or _Au or _Ag or _Hg or _Cd or _Pb or _Al';
+
                     component.addRepresentation('ball+stick', {
-                        sele: '(metal or ion)',
+                        sele: `(${metalSele} or ion) and not (_H)`,
                         color: '#94a3b8', // Slate-400
-                        radiusScale: 1.5,
+                        radiusScale: 1.2,
                         name: 'highlight_metals'
                     });
                 }
