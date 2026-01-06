@@ -113,18 +113,26 @@ function App() {
   };
 
   const handleTourHighlight = (elementId: string) => {
+    console.log('Tour highlight:', elementId); // Debug log
+
+    // Close all and open only the target section
+    const newSections = {
+      'appearance': false,
+      'analysis': false,
+      'tools': false
+    };
+
     if (elementId === '#visualization-controls') {
-      setOpenSections(prev => ({ ...prev, 'appearance': true }));
+      newSections['appearance'] = true;
     } else if (elementId === '#analysis-tools') {
-      setOpenSections(prev => ({ ...prev, 'analysis': true }));
+      newSections['analysis'] = true;
     } else if (elementId === '#export-tools') {
-      setOpenSections(prev => ({ ...prev, 'tools': true }));
+      newSections['tools'] = true;
     } else if (elementId === '#sequence-viewer') {
-      // Ideally we might want to ensure Analysis is open if it's there, 
-      // but Sequence Viewer usually is in Analysis or own section. 
-      // In Controls.tsx it is inside 'analysis' section.
-      setOpenSections(prev => ({ ...prev, 'analysis': true }));
+      newSections['analysis'] = true;
     }
+
+    setOpenSections(newSections);
   };
 
   const handleStartTour = () => {
