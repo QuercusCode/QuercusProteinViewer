@@ -22,6 +22,7 @@ import {
   Settings, Zap, Activity, Grid3X3, Palette,
   Share2, Save, FolderOpen, Video
 } from 'lucide-react';
+import { startOnboardingTour } from './components/TourGuide';
 
 function App() {
   const viewerRef = useRef<ProteinViewerRef>(null);
@@ -50,7 +51,24 @@ function App() {
     if (initialUrlState.orientation) {
       (window as any).__pendingOrientation = initialUrlState.orientation;
     }
+
+    // Check for onboarding tour
+    const hasSeenTour = localStorage.getItem('hasSeenViewerTour');
+    if (!hasSeenTour) {
+      // Delay slightly to ensure UI is mounted
+      setTimeout(() => {
+        startOnboardingTour(() => {
+          localStorage.setItem('hasSeenViewerTour', 'true');
+        });
+      }, 1500);
+    }
   }, []);
+
+  const handleStartTour = () => {
+    startOnboardingTour(() => {
+      localStorage.setItem('hasSeenViewerTour', 'true');
+    });
+  };
 
   const [isLightMode, setIsLightMode] = useState(() => {
     return localStorage.getItem('theme') === 'light';
@@ -1069,6 +1087,7 @@ function App() {
             onHighlightRegion={(selection, label) => {
               viewerRef.current?.highlightRegion(selection, label);
             }}
+            onStartTour={handleStartTour}
           />
         );
       })()}

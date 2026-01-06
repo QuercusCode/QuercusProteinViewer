@@ -9,6 +9,7 @@ import {
     Menu,
     Minimize,
     Moon,
+    HelpCircle,
     Plus,
     RefreshCw,
     RotateCcw,
@@ -39,8 +40,8 @@ import type { MotifMatch } from '../utils/searchUtils';
 import { MOTIF_LIBRARY } from '../data/motifLibrary';
 
 // Reusable Sidebar Section Component - Defined outside to prevent re-renders losing focus
-const SidebarSection = ({ title, icon: Icon, children, isOpen, onToggle, isLightMode }: { title: string, icon: any, children: React.ReactNode, isOpen: boolean, onToggle: () => void, isLightMode: boolean }) => (
-    <div className={`rounded-xl overflow-hidden transition-colors ${isLightMode
+const SidebarSection = ({ title, icon: Icon, children, isOpen, onToggle, isLightMode, id }: { title: string, icon: any, children: React.ReactNode, isOpen: boolean, onToggle: () => void, isLightMode: boolean, id?: string }) => (
+    <div id={id} className={`rounded-xl overflow-hidden transition-colors ${isLightMode
         ? 'border border-neutral-900 bg-white'
         : 'border border-white/10 bg-black/20'
         }`}>
@@ -319,7 +320,7 @@ interface ControlsProps {
     onDownloadSequence: () => void;
     showIons?: boolean;
     setShowIons?: (show: boolean) => void;
-
+    onStartTour?: () => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -384,7 +385,8 @@ export const Controls: React.FC<ControlsProps> = ({
     setCustomBackgroundColor,
     onHighlightRegion,
     onDownloadPDB,
-    onDownloadSequence
+    onDownloadSequence,
+    onStartTour
 }) => {
     // Motif Search State
     const [searchPattern, setSearchPattern] = useState('');
@@ -596,6 +598,14 @@ export const Controls: React.FC<ControlsProps> = ({
                         <div className="flex items-center gap-2">
 
                             <button
+                                onClick={onStartTour}
+                                className={`hidden md:flex p-2 rounded-full transition-colors ${isLightMode ? 'bg-white border border-neutral-900 text-black hover:bg-neutral-100' : 'bg-neutral-800/80 text-neutral-400 hover:bg-neutral-700'}`}
+                                title="Start Interactive Tour"
+                                id="help-button"
+                            >
+                                <HelpCircle className="w-4 h-4" />
+                            </button>
+                            <button
                                 onClick={onToggleLibrary}
                                 className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-white border border-neutral-900 text-black hover:bg-neutral-100' : 'bg-neutral-800/80 text-neutral-400 hover:bg-neutral-700'}`}
                                 title="Open Offline Library"
@@ -617,7 +627,7 @@ export const Controls: React.FC<ControlsProps> = ({
                 <div className={`flex-1 overflow-y-auto scrollbar-thin p-3 space-y-3 ${isLightMode ? 'scrollbar-thumb-neutral-300' : 'scrollbar-thumb-neutral-700'}`}>
 
                     {/* 1. CORE INPUT (Always Visible) */}
-                    <div className="space-y-3 mb-2">
+                    <div className="space-y-3 mb-2" id="upload-section">
                         <form onSubmit={handleSubmit} className="flex flex-col gap-2">
                             {/* Datasource Selector */}
                             <select
@@ -816,6 +826,7 @@ export const Controls: React.FC<ControlsProps> = ({
                         isOpen={openSections['appearance']}
                         onToggle={() => toggleSection('appearance')}
                         isLightMode={isLightMode}
+                        id="visualization-controls"
                     >
                         <div className="space-y-3">
                             {/* Visual Style */}
@@ -1159,6 +1170,7 @@ export const Controls: React.FC<ControlsProps> = ({
                         isOpen={openSections['analysis']}
                         onToggle={() => toggleSection('analysis')}
                         isLightMode={isLightMode}
+                        id="analysis-tools"
                     >
 
                         {/* Ligands */}
@@ -1310,6 +1322,7 @@ export const Controls: React.FC<ControlsProps> = ({
                         isOpen={openSections['tools']}
                         onToggle={() => toggleSection('tools')}
                         isLightMode={isLightMode}
+                        id="export-tools"
                     >
                         <div className="space-y-3">
                             {/* Session Controls */}
