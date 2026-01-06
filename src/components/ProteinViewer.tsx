@@ -1836,6 +1836,14 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         aspectRatio: 2,          // Thinner
                         name: 'loops'
                     });
+
+                    // Catch-all for any protein residues not classified (prevents gaps)
+                    component.addRepresentation('cartoon', {
+                        sele: 'protein and not (helix or sheet or turn or coil)',
+                        color: currentColoring,
+                        aspectRatio: 2,
+                        name: 'unclassified'
+                    });
                 } else {
                     // Non-cartoon representations use standard approach
                     component.addRepresentation(repType, {
