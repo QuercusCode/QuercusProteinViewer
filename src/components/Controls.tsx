@@ -1219,14 +1219,22 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <span className="text-xs font-medium">Measure</span>
                                 <Ruler className="w-3.5 h-3.5" />
                             </button>
-                            {/* Contact Map - Only for Proteins */}
-                            {!isChemical && (
+                            {/* Contact Map - Only for Proteins; Snapshot - Only for Chemicals */}
+                            {!isChemical ? (
                                 <button
                                     onClick={onToggleContactMap}
                                     className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
                                 >
                                     <span className="text-xs font-medium">Contact Map</span>
                                     <Grid3X3 className="w-3.5 h-3.5" />
+                                </button>
+                            ) : (
+                                <button
+                                    onClick={onSnapshot}
+                                    className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80 hover:border-blue-500 hover:text-blue-500`}
+                                >
+                                    <span className="text-xs font-medium">Snapshot</span>
+                                    <Camera className="w-3.5 h-3.5" />
                                 </button>
                             )}
 
