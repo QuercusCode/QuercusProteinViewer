@@ -1811,12 +1811,13 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         });
                     } catch (e) { }
 
-                    // Unified cartoon with optimized parameters for arrows and helices
+                    // Unified cartoon tuned to match Mol* / PDB style
+                    // Mol* uses a flat ribbon profile for helices and sheets
                     component.addRepresentation('cartoon', {
                         color: currentColoring,
-                        aspectRatio: 5,          // Flat arrows for sheets
-                        subdiv: 12,              // Smooth curves
-                        radialSegments: 20,      // Smooth helix cylinders
+                        aspectRatio: 3.0,        // Matches Mol* flatness (Sheet arrows & Helix ribbons)
+                        subdiv: 18,              // High smoothness
+                        radialSegments: 24,      // Very round cross-sections for loops
                     });
                 } else {
                     // Non-cartoon representations
