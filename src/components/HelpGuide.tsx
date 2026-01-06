@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CircleHelp, X, MousePointer2, Keyboard } from 'lucide-react';
+import { CircleHelp, X, MousePointer2, Keyboard, Sparkles } from 'lucide-react';
 
 export const HelpGuide: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -31,7 +31,7 @@ export const HelpGuide: React.FC = () => {
             {/* Help Button */}
             <button
                 onClick={() => setIsOpen(true)}
-                className="absolute top-4 right-4 z-20 p-2 bg-neutral-900/80 text-neutral-400 hover:text-white rounded-full border border-white/10 shadow-lg backdrop-blur-md transition-all hover:scale-105"
+                className="fixed top-4 right-4 z-[60] p-2 bg-neutral-900/80 text-neutral-400 hover:text-white rounded-full border border-white/10 shadow-lg backdrop-blur-md transition-all hover:scale-105"
                 title="Viewer Controls & Help"
             >
                 <CircleHelp className="w-6 h-6" />
@@ -58,6 +58,29 @@ export const HelpGuide: React.FC = () => {
 
                         {/* Content */}
                         <div className="p-6 space-y-6 overflow-y-auto">
+
+                            {/* New Features Highlight */}
+                            <div className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/20 p-4 rounded-xl">
+                                <h3 className="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-2 mb-3">
+                                    <Sparkles className="w-4 h-4" /> New Interactive Features
+                                </h3>
+                                <div className="space-y-3 text-xs text-neutral-300">
+                                    <div className="flex gap-2">
+                                        <div className="min-w-[4px] bg-gradient-to-b from-yellow-400 to-purple-500 rounded-full" />
+                                        <div>
+                                            <strong className="text-white block mb-0.5">Scientific Color Palettes</strong>
+                                            Choose <span className="text-purple-300">Viridis, Magma, Cividis</span> for data-accurate visualization. Ideal for Hydrophobicity and B-Factor analysis.
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        <div className="min-w-[4px] bg-blue-500 rounded-full" />
+                                        <div>
+                                            <strong className="text-white block mb-0.5">Smart Sequence Bar</strong>
+                                            The sequence bar now syncs with your 3D view coloring. Click residues to focus.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             {/* Mouse Controls */}
                             <div className="space-y-3">
@@ -95,6 +118,7 @@ export const HelpGuide: React.FC = () => {
                                     <div className="flex justify-between text-neutral-300"><span>Command Palette</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">⌘K</kbd></div>
                                     <div className="flex justify-between text-neutral-300"><span>Full Screen</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">F</kbd></div>
                                     <div className="flex justify-between text-neutral-300"><span>Toggle Theme</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">T</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>Screenshot</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">S</kbd></div>
 
                                     <div className="col-span-2 pb-1 mb-1 mt-2 border-b border-neutral-800 font-bold text-neutral-400">Views</div>
                                     <div className="flex justify-between text-neutral-300"><span>Reset View</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">R</kbd></div>
@@ -116,7 +140,7 @@ export const HelpGuide: React.FC = () => {
                                     <div className="flex justify-between text-neutral-300"><span>By Chain</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">Q</kbd></div>
                                     <div className="flex justify-between text-neutral-300"><span>By Element</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">W</kbd></div>
                                     <div className="flex justify-between text-neutral-300"><span>Hydrophobicity</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">E</kbd></div>
-                                    <div className="flex justify-between text-neutral-300"><span>pLDDT Conf.</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">A</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>pLDDT / B-Factor</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">A</kbd></div>
                                     <div className="flex justify-between text-neutral-300"><span>Secondary</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">D</kbd></div>
                                     <div className="flex justify-between text-neutral-300"><span>Charge</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">Z</kbd></div>
                                     <div className="flex justify-between text-neutral-300"><span>Rainbow</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">X</kbd></div>
