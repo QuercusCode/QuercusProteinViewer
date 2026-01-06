@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CircleHelp, X, MousePointer2, Search } from 'lucide-react';
+import { CircleHelp, X, MousePointer2, Keyboard } from 'lucide-react';
 
 export const HelpGuide: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -8,6 +8,17 @@ export const HelpGuide: React.FC = () => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape' && isOpen) {
                 setIsOpen(false);
+            }
+            if (e.key === '?' && !isOpen) {
+                // Check if user is typing in an input
+                if (
+                    e.target instanceof HTMLInputElement ||
+                    e.target instanceof HTMLTextAreaElement ||
+                    e.target instanceof HTMLSelectElement
+                ) {
+                    return;
+                }
+                setIsOpen(true);
             }
         };
 
@@ -73,37 +84,36 @@ export const HelpGuide: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* Features Key */}
+                            {/* Keyboard Shortcuts */}
                             <div className="space-y-3">
                                 <h3 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 flex items-center gap-2">
-                                    <Search className="w-4 h-4" /> Features
+                                    <Keyboard className="w-4 h-4" /> Keyboard Shortcuts
                                 </h3>
-                                <ul className="space-y-2 text-sm text-neutral-300">
-                                    <li className="flex items-start gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400 mt-1.5 flex-shrink-0" />
-                                        <span><strong>Library Browser</strong>: Explore 300+ curated proteins with categories and search.</span>
-                                    </li>
-                                    <li className="flex items-start gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 flex-shrink-0" />
-                                        <span><strong>Custom Color Rules</strong>: Highlight specific chains or residues with any color.</span>
-                                    </li>
-                                    <li className="flex items-start gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-red-400 mt-1.5 flex-shrink-0" />
-                                        <span><strong>Measurement Tool</strong>: Measure distances with custom colors and clearer legibility.</span>
-                                    </li>
-                                    <li className="flex items-start gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
-                                        <span><strong>Publication Mode</strong>: Hide UI elements for clean, high-quality screenshots (Esc to exit).</span>
-                                    </li>
-                                    <li className="flex items-start gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-green-400 mt-1.5 flex-shrink-0" />
-                                        <span><strong>Save & Load Sessions</strong>: Persist your visualization settings and custom rules.</span>
-                                    </li>
-                                    <li className="flex items-start gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-pink-400 mt-1.5 flex-shrink-0" />
-                                        <span>Advanced Analysis: Use the <strong>Contact Map</strong> for structural insights.</span>
-                                    </li>
-                                </ul>
+                                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
+                                    <div className="col-span-2 pb-1 mb-1 border-b border-neutral-800 font-bold text-neutral-400">General</div>
+                                    <div className="flex justify-between text-neutral-300"><span>Help Guide</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">?</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>Command Palette</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">⌘K</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>Full Screen</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">F</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>Toggle Theme</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">T</kbd></div>
+
+                                    <div className="col-span-2 pb-1 mb-1 mt-2 border-b border-neutral-800 font-bold text-neutral-400">Views</div>
+                                    <div className="flex justify-between text-neutral-300"><span>Reset View</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">R</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>Toggle Spin</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">Space</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>Measurement</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">M</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>Contact Map</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">C</kbd></div>
+
+                                    <div className="col-span-2 pb-1 mb-1 mt-2 border-b border-neutral-800 font-bold text-neutral-400">Representations</div>
+                                    <div className="flex justify-between text-neutral-300"><span>Cartoon</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">1</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>Spacefill</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">2</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>Surface</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">3</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>Licorice</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">4</kbd></div>
+
+                                    <div className="col-span-2 pb-1 mb-1 mt-2 border-b border-neutral-800 font-bold text-neutral-400">Coloring</div>
+                                    <div className="flex justify-between text-neutral-300"><span>By Chain</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">Q</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>By Element</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">W</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>Hydrophobicity</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">E</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>pLDDT Conf.</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">A</kbd></div>
+                                </div>
                             </div>
 
                             {/* Attribution */}
