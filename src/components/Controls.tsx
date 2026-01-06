@@ -135,6 +135,98 @@ const StructureImageModal = ({ cid }: { cid: string }) => {
     );
 };
 
+// Chemical Properties Panel Component
+const ChemicalPropertiesPanel = ({ cid, isLightMode, cardBg, subtleText }: { cid: string; isLightMode: boolean; cardBg: string; subtleText: string }) => {
+    const [properties, setProperties] = useState<{
+        smiles?: string;
+        canonicalSmiles?: string;
+        inchi?: string;
+        inchiKey?: string;
+        heavyAtomCount?: number;
+        totalAtomCount?: number;
+    } | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    useEffect(() => {
+        const fetchProperties = async () => {
+            setLoading(true);
+            try {
+                const res = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property/CanonicalSMILES,IsomericSMILES,InChI,InChIKey,HeavyAtomCount/JSON`);
+                if (res.ok) {
+                    const data = await res.json();
+                    const props = data.PropertyTable?.Properties?.[0];
+                    if (props) {
+                        setProperties({
+                            canonicalSmiles: props.CanonicalSMILES,
+                            smiles: props.IsomericSMILES,
+                            inchi: props.InChI,
+                            inchiKey: props.InChIKey,
+                            heavyAtomCount: props.HeavyAtomCount,
+                        });
+                    }
+                }
+            } catch (e) {
+                console.warn('Failed to fetch chemical properties', e);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchProperties();
+    }, [cid]);
+
+    return (
+        <div className={`col-span-2 rounded-lg border ${cardBg} overflow-hidden`}>
+            <button
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="w-full flex items-center justify-between px-3 py-2 hover:opacity-80 transition-all"
+            >
+                <span className="text-xs font-medium">Chemical Properties</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+            </button>
+
+            {isExpanded && (
+                <div className="px-3 pb-3 space-y-2">
+                    {loading ? (
+                        <div className="flex items-center justify-center py-4">
+                            <Loader2 className="w-4 h-4 animate-spin text-neutral-400" />
+                        </div>
+                    ) : properties ? (
+                        <>
+                            {properties.smiles && (
+                                <div>
+                                    <div className={`text-[9px] font-bold uppercase tracking-wider ${subtleText}`}>SMILES</div>
+                                    <div className={`text-[10px] font-mono break-all ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                        {properties.smiles}
+                                    </div>
+                                </div>
+                            )}
+                            {properties.inchiKey && (
+                                <div>
+                                    <div className={`text-[9px] font-bold uppercase tracking-wider ${subtleText}`}>InChIKey</div>
+                                    <div className={`text-[10px] font-mono break-all ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                        {properties.inchiKey}
+                                    </div>
+                                </div>
+                            )}
+                            {properties.heavyAtomCount && (
+                                <div>
+                                    <div className={`text-[9px] font-bold uppercase tracking-wider ${subtleText}`}>Heavy Atoms</div>
+                                    <div className={`text-[10px] ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                        {properties.heavyAtomCount} atoms
+                                    </div>
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <div className={`text-[10px] italic ${subtleText}`}>No properties available</div>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+};
+
 interface ControlsProps {
     pdbId: string;
     setPdbId: (id: string) => void;
@@ -1102,13 +1194,21 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <span className="text-xs font-medium">Measure</span>
                                 <Ruler className="w-3.5 h-3.5" />
                             </button>
-                            <button
-                                onClick={onToggleContactMap}
-                                className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
-                            >
-                                <span className="text-xs font-medium">Contact Map</span>
-                                <Grid3X3 className="w-3.5 h-3.5" />
-                            </button>
+                            {/* Contact Map - Only for Proteins */}
+                            {!isChemical && (
+                                <button
+                                    onClick={onToggleContactMap}
+                                    className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
+                                >
+                                    <span className="text-xs font-medium">Contact Map</span>
+                                    <Grid3X3 className="w-3.5 h-3.5" />
+                                </button>
+                            )}
+
+                            {/* Chemical Properties - Only for Chemicals */}
+                            {isChemical && pdbMetadata?.cid && (
+                                <ChemicalPropertiesPanel cid={pdbMetadata.cid} isLightMode={isLightMode} cardBg={cardBg} subtleText={subtleText} />
+                            )}
                             {isMeasurementMode && (
                                 <button
                                     onClick={onClearMeasurements}
