@@ -62,10 +62,9 @@ export const startOnboardingTour = (onComplete?: () => void, onHighlight?: (elem
                 if (onComplete) onComplete();
             }
         },
-        onHighlightStarted: (element) => {
-            if (onHighlight && element) {
-                const id = element.id ? `#${element.id}` : '';
-                if (id) onHighlight(id);
+        onHighlightStarted: (_element, step) => {
+            if (onHighlight && step && typeof step.element === 'string') {
+                onHighlight(step.element);
             }
         }
     });
