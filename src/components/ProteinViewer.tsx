@@ -1790,8 +1790,9 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 });
             } else {
                 // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL Robust Native NGL
+                // Use colorScheme instead of color to avoid ambiguity with color names
                 component.addRepresentation(repType, {
-                    color: currentColoring
+                    colorScheme: currentColoring
                 });
             }
 
