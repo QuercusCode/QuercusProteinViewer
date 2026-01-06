@@ -42,6 +42,13 @@ export const startOnboardingTour = (onComplete?: () => void, onHighlight?: (elem
                 }
             },
             {
+                element: '#motif-search',
+                popover: {
+                    title: 'Motif Search',
+                    description: 'Search for specific amino acid patterns or motifs across the sequence (e.g., "RGD", "GxGxxG").'
+                }
+            },
+            {
                 element: '#export-tools',
                 popover: {
                     title: 'Export & Share',
