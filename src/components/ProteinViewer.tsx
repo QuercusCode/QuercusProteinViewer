@@ -1377,6 +1377,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                 let proteinCount = 0;
 
                                 const resMap: number[] = [];
+                                const bFactors: number[] = [];
+
                                 try {
                                     c.eachResidue((r: any) => {
                                         let resNo = r.resno;
@@ -1392,6 +1394,16 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                             // Fallback for weird cases
                                             resMap.push((maxSeq > -Infinity ? maxSeq : 0) + 1);
                                         }
+
+                                        // B-Factor Extraction (Average of atoms in residue)
+                                        let bSum = 0;
+                                        let bCount = 0;
+                                        r.eachAtom((a: any) => {
+                                            bSum += a.bfactor;
+                                            bCount++;
+                                        });
+                                        const avgB = bCount > 0 ? bSum / bCount : 0;
+                                        bFactors.push(avgB);
 
                                         // Determine Type
                                         if (r.isNucleic()) nucleicCount++;
@@ -1452,7 +1464,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                     sequence: seq,
                                     residueMap: resMap,
                                     type: chainType,
-                                    atoms: atomList.length > 0 ? atomList : undefined
+                                    atoms: atomList.length > 0 ? atomList : undefined,
+                                    bFactors: bFactors // Added
                                 });
                             });
 

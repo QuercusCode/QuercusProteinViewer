@@ -30,6 +30,7 @@ export interface ChainInfo {
     residueMap?: number[]; // Added: Maps sequence index to actual PDB residue number
     type?: 'protein' | 'nucleic' | 'unknown'; // Added: To distinguish polymer type
     atoms?: AtomInfo[]; // Added: For small chemicals, list atoms directly
+    bFactors?: number[]; // Added: Per-residue B-factor for coloring sync
 }
 
 export interface StructureInfo {
