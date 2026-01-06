@@ -64,11 +64,7 @@ function App() {
     }
   }, []);
 
-  const handleStartTour = () => {
-    startOnboardingTour(() => {
-      localStorage.setItem('hasSeenViewerTour', 'true');
-    });
-  };
+
 
   const [isLightMode, setIsLightMode] = useState(() => {
     return localStorage.getItem('theme') === 'light';
@@ -101,6 +97,41 @@ function App() {
       document.body.style.lineHeight = '';
     }
   }, [isDyslexicFont]);
+
+  // Sidebar Sections State (Lifted from Controls)
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    'appearance': true,
+    'analysis': false,
+    'tools': false
+  });
+
+  const handleToggleSection = (section: string) => {
+    setOpenSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
+  const handleTourHighlight = (elementId: string) => {
+    if (elementId === '#visualization-controls') {
+      setOpenSections(prev => ({ ...prev, 'appearance': true }));
+    } else if (elementId === '#analysis-tools') {
+      setOpenSections(prev => ({ ...prev, 'analysis': true }));
+    } else if (elementId === '#export-tools') {
+      setOpenSections(prev => ({ ...prev, 'tools': true }));
+    } else if (elementId === '#sequence-viewer') {
+      // Ideally we might want to ensure Analysis is open if it's there, 
+      // but Sequence Viewer usually is in Analysis or own section. 
+      // In Controls.tsx it is inside 'analysis' section.
+      setOpenSections(prev => ({ ...prev, 'analysis': true }));
+    }
+  };
+
+  const handleStartTour = () => {
+    startOnboardingTour(() => {
+      localStorage.setItem('hasSeenViewerTour', 'true');
+    }, handleTourHighlight);
+  };
 
   // Custom Colors need to be initialized too
   const [customColors, setCustomColors] = useState<CustomColorRule[]>(initialUrlState.customColors || []);
@@ -1088,6 +1119,8 @@ function App() {
               viewerRef.current?.highlightRegion(selection, label);
             }}
             onStartTour={handleStartTour}
+            openSections={openSections}
+            onToggleSection={handleToggleSection}
           />
         );
       })()}

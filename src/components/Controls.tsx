@@ -321,6 +321,10 @@ interface ControlsProps {
     showIons?: boolean;
     setShowIons?: (show: boolean) => void;
     onStartTour?: () => void;
+
+    // UI State Lifted Info
+    openSections?: Record<string, boolean>;
+    onToggleSection?: (section: string) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({

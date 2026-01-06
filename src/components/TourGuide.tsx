@@ -1,7 +1,7 @@
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 
-export const startOnboardingTour = (onComplete?: () => void) => {
+export const startOnboardingTour = (onComplete?: () => void, onHighlight?: (elementId: string) => void) => {
     const driverObj = driver({
         showProgress: true,
         animate: true,
@@ -35,6 +35,13 @@ export const startOnboardingTour = (onComplete?: () => void) => {
                 }
             },
             {
+                element: '#sequence-viewer',
+                popover: {
+                    title: 'Sequence Viewer',
+                    description: 'View the amino acid sequence, click residues to highlight them in 3D, and download FASTA files.'
+                }
+            },
+            {
                 element: '#export-tools',
                 popover: {
                     title: 'Export & Share',
@@ -55,6 +62,12 @@ export const startOnboardingTour = (onComplete?: () => void) => {
                 if (onComplete) onComplete();
             }
         },
+        onHighlightStarted: (element) => {
+            if (onHighlight && element) {
+                const id = element.id ? `#${element.id}` : '';
+                if (id) onHighlight(id);
+            }
+        }
     });
 
     driverObj.drive();
