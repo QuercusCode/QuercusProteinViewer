@@ -46,7 +46,7 @@ export interface ProteinViewerProps {
     backgroundColor: string;
     customColors?: any[]; // Simplified type for now
     measurementTextColor?: MeasurementTextColor; // Added prop
-    activeFunctionalGroups?: string[]; // Added: Functional Group Highlights
+    showHydrogenBonds?: boolean;
 
     // Quality
     quality?: 'low' | 'medium' | 'high';

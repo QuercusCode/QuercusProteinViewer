@@ -385,7 +385,9 @@ export const Controls: React.FC<ControlsProps> = ({
     setCustomBackgroundColor,
     onHighlightRegion,
     onDownloadPDB,
-    onDownloadSequence
+    onDownloadSequence,
+    showHydrogenBonds,
+    setShowHydrogenBonds
 }) => {
     // Motif Search State
     const [searchPattern, setSearchPattern] = useState('');
