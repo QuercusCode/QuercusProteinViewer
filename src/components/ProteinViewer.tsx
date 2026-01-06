@@ -1802,20 +1802,46 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 }
 
 
-                // Build representation parameters
-                const repParams: any = {
-                    color: currentColoring
-                };
-
-                // Add cartoon-specific parameters for proper arrows and helices
+                // Special handling for cartoon to show proper arrows and helices
                 if (repType === 'cartoon') {
-                    repParams.aspectRatio = 5;        // Makes arrows more pronounced
-                    repParams.subdiv = 10;            // Smooth curves
-                    repParams.radialSegments = 20;    // Smooth helices
-                    repParams.arrowSegments = 30;     // Detailed arrows tips
-                }
+                    // Force recalculation of secondary structure for proper helix/sheet detection
+                    try {
+                        component.structure.eachModel((m: any) => {
+                            if (m.calculateSecondaryStructure) m.calculateSecondaryStructure();
+                        });
+                    } catch (e) { }
 
-                component.addRepresentation(repType, repParams);
+                    // Render beta sheets as pronounced ARROWS
+                    component.addRepresentation('cartoon', {
+                        sele: 'sheet',
+                        color: currentColoring,
+                        aspectRatio: 8,          // Very flat/wide arrows
+                        subdiv: 15,              // Smooth
+                        name: 'sheet_arrows'
+                    });
+
+                    // Render alpha helices as SPIRAL CYLINDERS
+                    component.addRepresentation('cartoon', {
+                        sele: 'helix',
+                        color: currentColoring,
+                        subdiv: 15,
+                        radialSegments: 24,      // Very smooth cylinders
+                        name: 'helix_spirals'
+                    });
+
+                    // Render loops/turns as thin smooth tubes
+                    component.addRepresentation('cartoon', {
+                        sele: 'turn or coil',
+                        color: currentColoring,
+                        aspectRatio: 2,          // Thinner
+                        name: 'loops'
+                    });
+                } else {
+                    // Non-cartoon representations use standard approach
+                    component.addRepresentation(repType, {
+                        color: currentColoring
+                    });
+                }
             }
 
             // 2. Add Custom Representations (Overlay)
