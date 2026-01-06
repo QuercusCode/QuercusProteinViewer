@@ -107,12 +107,20 @@ export const HelpGuide: React.FC = () => {
                                     <div className="flex justify-between text-neutral-300"><span>Spacefill</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">2</kbd></div>
                                     <div className="flex justify-between text-neutral-300"><span>Surface</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">3</kbd></div>
                                     <div className="flex justify-between text-neutral-300"><span>Licorice</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">4</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>Backbone</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">5</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>Ribbon</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">6</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>Ball+Stick</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">7</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>Line</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">8</kbd></div>
 
                                     <div className="col-span-2 pb-1 mb-1 mt-2 border-b border-neutral-800 font-bold text-neutral-400">Coloring</div>
                                     <div className="flex justify-between text-neutral-300"><span>By Chain</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">Q</kbd></div>
                                     <div className="flex justify-between text-neutral-300"><span>By Element</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">W</kbd></div>
                                     <div className="flex justify-between text-neutral-300"><span>Hydrophobicity</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">E</kbd></div>
                                     <div className="flex justify-between text-neutral-300"><span>pLDDT Conf.</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">A</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>Secondary</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">D</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>Charge</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">Z</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>Rainbow</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">X</kbd></div>
+                                    <div className="flex justify-between text-neutral-300"><span>Residue Name</span> <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">V</kbd></div>
                                 </div>
                             </div>
 

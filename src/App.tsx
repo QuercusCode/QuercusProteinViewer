@@ -846,17 +846,25 @@ function App() {
           setShowContactMap(prev => !prev);
           break;
 
-        // Representations (1-4)
+        // Representations (1-8)
         case '1': setRepresentation('cartoon'); break;
         case '2': setRepresentation('spacefill'); break;
         case '3': setRepresentation('surface'); break;
         case '4': setRepresentation('licorice'); break;
+        case '5': setRepresentation('backbone'); break;
+        case '6': setRepresentation('ribbon'); break;
+        case '7': setRepresentation('ball+stick'); break;
+        case '8': setRepresentation('line'); break;
 
         // Coloring
         case 'q': setColoring('chainid'); break;
         case 'w': setColoring('element' as ColoringType); break;
         case 'e': setColoring('hydrophobicity'); break;
-        case 'a': setColoring('bfactor'); break; // pLDDT is usually bfactor
+        case 'a': setColoring('bfactor'); break; // pLDDT
+        case 'd': setColoring('secondary'); break;
+        case 'z': setColoring('charge'); break;
+        case 'x': setColoring('residueindex'); break; // Rainbow
+        case 'v': setColoring('residue'); break; // Residue Name
       }
     };
     window.addEventListener('keydown', handleKeyDown);
