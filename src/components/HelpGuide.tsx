@@ -231,11 +231,25 @@ export const HelpGuide: React.FC = () => {
                     <div className="flex justify-between text-neutral-300"><span>Measurement</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">M</kbd></div>
                     <div className="flex justify-between text-neutral-300"><span>Contact Map</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">C</kbd></div>
 
-                    <div className="col-span-2 pb-1 mb-1 mt-3 border-b border-neutral-800 font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Styling</div>
+                    <div className="col-span-2 pb-1 mb-1 mt-3 border-b border-neutral-800 font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Representations</div>
                     <div className="flex justify-between text-neutral-300"><span>Cartoon</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">1</kbd></div>
+                    <div className="flex justify-between text-neutral-300"><span>Spacefill</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">2</kbd></div>
                     <div className="flex justify-between text-neutral-300"><span>Surface</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">3</kbd></div>
-                    <div className="flex justify-between text-neutral-300"><span>Color Chain</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">Q</kbd></div>
+                    <div className="flex justify-between text-neutral-300"><span>Licorice</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">4</kbd></div>
+                    <div className="flex justify-between text-neutral-300"><span>Backbone</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">5</kbd></div>
+                    <div className="flex justify-between text-neutral-300"><span>Ribbon</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">6</kbd></div>
+                    <div className="flex justify-between text-neutral-300"><span>Ball+Stick</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">7</kbd></div>
+                    <div className="flex justify-between text-neutral-300"><span>Line</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">8</kbd></div>
+
+                    <div className="col-span-2 pb-1 mb-1 mt-3 border-b border-neutral-800 font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Coloring</div>
+                    <div className="flex justify-between text-neutral-300"><span>By Chain</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">Q</kbd></div>
+                    <div className="flex justify-between text-neutral-300"><span>By Element</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">W</kbd></div>
                     <div className="flex justify-between text-neutral-300"><span>Hydrophobicity</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">E</kbd></div>
+                    <div className="flex justify-between text-neutral-300"><span>B-Factor / pLDDT</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">A</kbd></div>
+                    <div className="flex justify-between text-neutral-300"><span>Secondary Structure</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">D</kbd></div>
+                    <div className="flex justify-between text-neutral-300"><span>Charge</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">Z</kbd></div>
+                    <div className="flex justify-between text-neutral-300"><span>Rainbow</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">X</kbd></div>
+                    <div className="flex justify-between text-neutral-300"><span>Residue Name</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">V</kbd></div>
                 </div>
             )
         }
