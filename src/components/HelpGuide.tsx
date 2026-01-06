@@ -148,7 +148,7 @@ export const HelpGuide: React.FC = () => {
                     <div className="bg-neutral-800/50 p-4 rounded-xl border border-neutral-700/50">
                         <h4 className="text-sm font-bold text-white mb-2">Sequence Bar</h4>
                         <p className="text-xs text-neutral-400 mb-3">
-                            The interactive sequence bar at the bottom syncs with your 3D view.
+                            The interactive sequence bar on the right syncs with your 3D view.
                         </p>
                         <div className="flex gap-2 text-[10px] text-neutral-500 uppercase tracking-wider font-bold">
                             <span className="bg-neutral-800 px-2 py-1 rounded">Syncs Colors</span>
