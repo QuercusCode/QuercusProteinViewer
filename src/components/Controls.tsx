@@ -319,8 +319,6 @@ interface ControlsProps {
     onDownloadSequence: () => void;
     showIons?: boolean;
     setShowIons?: (show: boolean) => void;
-    activeFunctionalGroups?: string[];
-    setActiveFunctionalGroups?: (groups: string[]) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -385,9 +383,7 @@ export const Controls: React.FC<ControlsProps> = ({
     setCustomBackgroundColor,
     onHighlightRegion,
     onDownloadPDB,
-    onDownloadSequence,
-    activeFunctionalGroups, // Destructured
-    setActiveFunctionalGroups
+    onDownloadSequence
 }) => {
     // Motif Search State
     const [searchPattern, setSearchPattern] = useState('');
@@ -1223,8 +1219,8 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <span className="text-xs font-medium">Measure</span>
                                 <Ruler className="w-3.5 h-3.5" />
                             </button>
-                            {/* Contact Map - Only for Proteins */}
-                            {!isChemical && (
+                            {/* Contact Map - Only for Proteins; Snapshot - Only for Chemicals */}
+                            {!isChemical ? (
                                 <button
                                     onClick={onToggleContactMap}
                                     className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
@@ -1232,120 +1228,14 @@ export const Controls: React.FC<ControlsProps> = ({
                                     <span className="text-xs font-medium">Contact Map</span>
                                     <Grid3X3 className="w-3.5 h-3.5" />
                                 </button>
-                            )}
-
-                            {/* Functional Group Highlighter (New Feature) */}
-                            {isChemical && (
-                                <div className={`col-span-2 mt-1 p-2 rounded-lg border flex flex-col gap-2 ${cardBg}`}>
-                                    <div className="flex items-center gap-2 mb-0.5">
-                                        <div className={`p-1 rounded bg-orange-500/10 text-orange-500`}>
-                                            <ScanSearch className="w-3 h-3" />
-                                        </div>
-                                        <span className={`text-[10px] font-bold uppercase tracking-wider ${subtleText}`}>Functional Groups</span>
-                                    </div>
-                                    <div className="grid grid-cols-3 gap-2">
-                                        {/* Row 1 */}
-                                        <button
-                                            onClick={() => {
-                                                const isActive = activeFunctionalGroups?.includes('aromatic');
-                                                const newGroups = isActive
-                                                    ? activeFunctionalGroups?.filter(g => g !== 'aromatic') || []
-                                                    : [...(activeFunctionalGroups || []), 'aromatic'];
-                                                setActiveFunctionalGroups && setActiveFunctionalGroups(newGroups);
-                                            }}
-                                            className={`py-1.5 px-2 rounded-md border text-[10px] font-medium transition-all ${activeFunctionalGroups?.includes('aromatic')
-                                                ? 'bg-purple-500 text-white border-purple-600 shadow-sm'
-                                                : `${isLightMode ? 'bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100' : 'bg-white/5 border-neutral-700 text-neutral-400 hover:bg-white/10'}`
-                                                }`}
-                                        >
-                                            Rings
-                                        </button>
-
-                                        <button
-                                            onClick={() => {
-                                                const isActive = activeFunctionalGroups?.includes('polar');
-                                                const newGroups = isActive
-                                                    ? activeFunctionalGroups?.filter(g => g !== 'polar') || []
-                                                    : [...(activeFunctionalGroups || []), 'polar'];
-                                                setActiveFunctionalGroups && setActiveFunctionalGroups(newGroups);
-                                            }}
-                                            className={`py-1.5 px-2 rounded-md border text-[10px] font-medium transition-all ${activeFunctionalGroups?.includes('polar')
-                                                ? 'bg-blue-500 text-white border-blue-600 shadow-sm'
-                                                : `${isLightMode ? 'bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100' : 'bg-white/5 border-neutral-700 text-neutral-400 hover:bg-white/10'}`
-                                                }`}
-                                        >
-                                            Polar
-                                        </button>
-
-                                        <button
-                                            onClick={() => {
-                                                const isActive = activeFunctionalGroups?.includes('halogens');
-                                                const newGroups = isActive
-                                                    ? activeFunctionalGroups?.filter(g => g !== 'halogens') || []
-                                                    : [...(activeFunctionalGroups || []), 'halogens'];
-                                                setActiveFunctionalGroups && setActiveFunctionalGroups(newGroups);
-                                            }}
-                                            className={`py-1.5 px-2 rounded-md border text-[10px] font-medium transition-all ${activeFunctionalGroups?.includes('halogens')
-                                                ? 'bg-emerald-500 text-white border-emerald-600 shadow-sm'
-                                                : `${isLightMode ? 'bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100' : 'bg-white/5 border-neutral-700 text-neutral-400 hover:bg-white/10'}`
-                                                }`}
-                                        >
-                                            Halogens
-                                        </button>
-
-                                        {/* Row 2 */}
-                                        <button
-                                            onClick={() => {
-                                                const isActive = activeFunctionalGroups?.includes('sulfur');
-                                                const newGroups = isActive
-                                                    ? activeFunctionalGroups?.filter(g => g !== 'sulfur') || []
-                                                    : [...(activeFunctionalGroups || []), 'sulfur'];
-                                                setActiveFunctionalGroups && setActiveFunctionalGroups(newGroups);
-                                            }}
-                                            className={`py-1.5 px-2 rounded-md border text-[10px] font-medium transition-all ${activeFunctionalGroups?.includes('sulfur')
-                                                ? 'bg-yellow-500 text-black border-yellow-600 shadow-sm'
-                                                : `${isLightMode ? 'bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100' : 'bg-white/5 border-neutral-700 text-neutral-400 hover:bg-white/10'}`
-                                                }`}
-                                        >
-                                            Sulfur
-                                        </button>
-
-                                        <button
-                                            onClick={() => {
-                                                const isActive = activeFunctionalGroups?.includes('metals');
-                                                const newGroups = isActive
-                                                    ? activeFunctionalGroups?.filter(g => g !== 'metals') || []
-                                                    : [...(activeFunctionalGroups || []), 'metals'];
-                                                setActiveFunctionalGroups && setActiveFunctionalGroups(newGroups);
-                                            }}
-                                            className={`py-1.5 px-2 rounded-md border text-[10px] font-medium transition-all ${activeFunctionalGroups?.includes('metals')
-                                                ? 'bg-slate-500 text-white border-slate-600 shadow-sm'
-                                                : `${isLightMode ? 'bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100' : 'bg-white/5 border-neutral-700 text-neutral-400 hover:bg-white/10'}`
-                                                }`}
-                                        >
-                                            Metals
-                                        </button>
-
-                                        <button
-                                            onClick={() => {
-                                                const isActive = activeFunctionalGroups?.includes('rings');
-                                                const newGroups = isActive
-                                                    ? activeFunctionalGroups?.filter(g => g !== 'rings') || []
-                                                    : [...(activeFunctionalGroups || []), 'rings'];
-                                                setActiveFunctionalGroups && setActiveFunctionalGroups(newGroups);
-                                            }}
-                                            className={`py-1.5 px-2 rounded-md border text-[10px] font-medium transition-all ${activeFunctionalGroups?.includes('rings')
-                                                ? 'bg-orange-500 text-white border-orange-600 shadow-sm'
-                                                : `${isLightMode ? 'bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100' : 'bg-white/5 border-neutral-700 text-neutral-400 hover:bg-white/10'}`
-                                                }`}
-                                        >
-                                            All Rings
-                                        </button>
-                                    </div>
-                                    <p className={`text-[9px] italic ${subtleText} opacity-70 leading-tight text-center`}>
-                                        Highlights reactive groups & fades skeleton
-                                    </p>
-                                </div>
+                            ) : (
+                                <button
+                                    onClick={onSnapshot}
+                                    className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80 hover:border-blue-500 hover:text-blue-500`}
+                                >
+                                    <span className="text-xs font-medium">Snapshot</span>
+                                    <Camera className="w-3.5 h-3.5" />
+                                </button>
                             )}
 
                             {/* Chemical Properties - Only for Chemicals */}

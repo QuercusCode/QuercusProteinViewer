@@ -1704,93 +1704,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             component.removeAllRepresentations();
             highlightComponentRef.current = null;
 
-            // --- FUNCTIONAL GROUP HIGHLIGHT MODE ---
-            if (activeFunctionalGroups && activeFunctionalGroups.length > 0) {
-                // 1. Base Skeleton (Faded)
-                // Use 'licorice' or 'ball+stick' depending on preference. Licorice is cleaner for skeleton.
-                component.addRepresentation('licorice', {
-                    color: '#e5e7eb', // Light Gray (Neutral-200)
-                    opacity: 0.3,
-                    sele: '*',
-                    name: 'skeleton_base'
-                });
 
-                // 2. Apply Highlights
-                if (activeFunctionalGroups.includes('aromatic')) {
-                    component.addRepresentation('ball+stick', {
-                        sele: 'aromatic and not (_H)',
-                        color: '#a855f7', // Purple-500
-                        radiusScale: 1.2,
-                        name: 'highlight_aromatic'
-                    });
-                }
-
-                if (activeFunctionalGroups.includes('polar')) {
-                    component.addRepresentation('ball+stick', {
-                        sele: '(_N or _O or _S or _P) and not (_H)',
-                        color: 'element', // Keep element colors for specific ID
-                        radiusScale: 1.2,
-                        name: 'highlight_polar'
-                    });
-                }
-
-                if (activeFunctionalGroups.includes('rings')) {
-                    component.addRepresentation('ball+stick', {
-                        sele: 'ring', // Select ALL atoms in a ring (aromatic or not)
-                        color: '#f97316', // Orange-500
-                        radiusScale: 1.2,
-                        name: 'highlight_rings'
-                    });
-                }
-
-                if (activeFunctionalGroups.includes('halogens')) {
-                    component.addRepresentation('ball+stick', {
-                        sele: '(_F or _Cl or _Br or _I) and not (_H)',
-                        color: '#10b981', // Emerald-500
-                        radiusScale: 1.2,
-                        name: 'highlight_halogens'
-                    });
-                }
-
-                if (activeFunctionalGroups.includes('sulfur')) {
-                    component.addRepresentation('ball+stick', {
-                        sele: '_S and not (_H)',
-                        color: '#facc15', // Yellow-400
-                        radiusScale: 1.2,
-                        name: 'highlight_sulfur'
-                    });
-                }
-
-                if (activeFunctionalGroups.includes('metals')) {
-                    // Common metals in biology/chemistry + transition metals
-                    // NGL 'ion' only catches formal ions. We need explicit elements for organometallics.
-                    const metalSele = '_Li or _Na or _K or _Mg or _Ca or _Sr or _Ba or ' +
-                        '_Zn or _Cu or _Fe or _Mn or _Co or _Ni or _Pt or _Au or _Ag or _Hg or _Cd or _Pb or _Al';
-
-                    component.addRepresentation('ball+stick', {
-                        sele: `(${metalSele} or ion) and not (_H)`,
-                        color: '#94a3b8', // Slate-400
-                        radiusScale: 1.2,
-                        name: 'highlight_metals'
-                    });
-                }
-
-                // Optional: Ghost Surface
-                if (showSurface) {
-                    component.addRepresentation('surface', {
-                        color: 'white',
-                        opacity: 0.1,
-                        depthWrite: false,
-                        side: 'front',
-                        name: 'ghost_surface'
-                    });
-                }
-
-                if (stageRef.current?.viewer) {
-                    stageRef.current.viewer.requestRender();
-                }
-                return; // EXIT STANDARD PIPELINE
-            }
 
 
             let repType = representation || 'cartoon';
@@ -1968,7 +1882,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     useEffect(() => {
         updateRepresentation();
-    }, [representation, coloring, customColors, showSurface, showLigands, showIons, colorPalette, activeFunctionalGroups]);
+    }, [representation, coloring, customColors, showSurface, showLigands, showIons, colorPalette]);
 
     useEffect(() => {
         if (stageRef.current) {

@@ -130,7 +130,7 @@ function App() {
   const [ligands, setLigands] = useState<string[]>([]);
 
   const [fileType, setFileType] = useState<'pdb' | 'mmcif'>('pdb');
-  const [activeFunctionalGroups, setActiveFunctionalGroups] = useState<string[]>([]);
+
 
 
   const handleResetView = () => {
@@ -1069,8 +1069,6 @@ function App() {
             onHighlightRegion={(selection, label) => {
               viewerRef.current?.highlightRegion(selection, label);
             }}
-            activeFunctionalGroups={activeFunctionalGroups}
-            setActiveFunctionalGroups={setActiveFunctionalGroups}
           />
         );
       })()}
@@ -1091,7 +1089,6 @@ function App() {
         palette={colorPalette}
         backgroundColor={customBackgroundColor || (isLightMode ? 'white' : 'black')}
         measurementTextColor={measurementTextColorMode}
-        activeFunctionalGroups={activeFunctionalGroups} // Passed state
 
         onStructureLoaded={handleStructureLoaded}
         onAtomClick={handleAtomClick}
