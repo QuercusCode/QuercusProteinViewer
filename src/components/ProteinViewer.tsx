@@ -1789,34 +1789,27 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     name: 'charge_neutral'
                 });
             } else if ((currentColoring as string) === 'sstruc') {
-                // SECONDARY STRUCTURE: Explicit Multi-representation approach
-                // Ensure Secondary Structure is computed (DSSP) if missing
+                // SECONDARY STRUCTURE: Custom Scheme Approach
+                // Register a custom scheme ("quercus_sstruc") to force our exact colors
+                const sstrucSchemeId = "quercus_sstruc";
+
                 try {
-                    // Force calculation if not present
+                    // Force SS calc
                     component.structure.eachModel((m: any) => {
                         if (m.calculateSecondaryStructure) m.calculateSecondaryStructure();
                     });
-                } catch (e) { }
 
-                // Helices -> Magenta
-                component.addRepresentation(repType, {
-                    color: '#FF00FF',
-                    sele: 'helix',
-                    name: 'structure_helix'
-                });
+                    // Register scheme (safe to overwrite)
+                    NGL.ColormakerRegistry.addSelectionScheme([
+                        ["magenta", "helix"],
+                        ["gold", "sheet"],
+                        ["white", "*"]
+                    ], sstrucSchemeId);
 
-                // Sheets -> Gold/Yellow
-                component.addRepresentation(repType, {
-                    color: '#FFD700',
-                    sele: 'sheet',
-                    name: 'structure_sheet'
-                });
+                } catch (e) { console.warn("SS Scheme setup failed", e); }
 
-                // Coils/Turns (Everything else) -> White
                 component.addRepresentation(repType, {
-                    color: '#FFFFFF',
-                    sele: 'not (helix or sheet)',
-                    name: 'structure_coil'
+                    colorScheme: sstrucSchemeId
                 });
             } else {
                 // Standard Coloring for other modes (element, residue, etc.) -> Robust Native NGL
