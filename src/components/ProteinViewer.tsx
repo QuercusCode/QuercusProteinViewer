@@ -552,7 +552,19 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     radius: 0.5
                 });
 
-                component.autoView(selection, 1000);
+                // component.autoView(selection, 1000);
+                // Manual Zoom to avoid being too close (inside the atom)
+                let atomCenter: any = null;
+                component.structure.eachAtom((a: any) => {
+                    atomCenter = new window.NGL.Vector3(a.x, a.y, a.z);
+                }, new window.NGL.Selection(selection));
+
+                if (atomCenter && stageRef.current) {
+                    // Zoom distance -20 ensuring we see the atom clearly but not too close
+                    stageRef.current.animationControls.zoomMove(atomCenter, -20, 1000);
+                } else {
+                    component.autoView(selection, 1000);
+                }
             } catch (e) { console.warn("Highlight atom failed:", e); }
         },
         focusLigands: () => {
