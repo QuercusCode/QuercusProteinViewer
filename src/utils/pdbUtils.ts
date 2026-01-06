@@ -76,7 +76,7 @@ export const getStructureUrl = (id: string, source: DataSource): string => {
     switch (source) {
         case 'cod': return `https://www.crystallography.net/cod/${id}.cif`;
         case 'pubchem': return `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${id}/record/SDF/?record_type=3d`;
-        case 'pdb': default: return `rcsb://${id}`; // NGL handles this protocol
+        case 'pdb': default: return `https://files.rcsb.org/download/${id}.pdb`; // Explicitly use PDB format
     }
 };
 
