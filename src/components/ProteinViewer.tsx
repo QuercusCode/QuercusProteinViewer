@@ -1819,8 +1819,19 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 try { component.addRepresentation(r, { color: c, sele: sele, ...params }); } catch (e) { }
             };
 
+            // Fix for "Licorice looks like Ball+Stick":
+            // If we are visualizing a chemical/small molecule (chainCount <= 1) AND using an atomic representation (licorice/spacefill),
+            // the Base Representation (which selects '*') already draws the ligands.
+            // We should NOT apply the "Ball+Stick" overlay on top, as it hides the style of the base rep.
+            const atomicReps = ['licorice', 'ball+stick', 'spacefill', 'line', 'point', 'hyperball'];
+            const isBaseRepAtomic = atomicReps.includes(repType);
+            const chainCount = component.structure ? component.structure.chainStore.count : 0;
+            const isSmallMoleculeOrSingleChain = chainCount <= 1 || dataSource === 'pubchem';
+
+            const skipLigandOverlay = isBaseRepAtomic && isSmallMoleculeOrSingleChain;
+
             if (showSurface) tryApply('surface', 'white', "*", { opacity: 0.4, depthWrite: false, side: 'front' });
-            if (showLigands) tryApply('ball+stick', 'element', 'ligand and not (water or ion)', { scale: 2.0 });
+            if (showLigands && !skipLigandOverlay) tryApply('ball+stick', 'element', 'ligand and not (water or ion)', { scale: 2.0 });
             if (showIons) tryApply('ball+stick', 'element', 'ion', { scale: 2.0 });
 
             if (stageRef.current?.viewer) {
