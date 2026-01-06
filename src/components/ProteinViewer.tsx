@@ -1788,8 +1788,32 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     sele: 'not (ARG or LYS or HIS or ASP or GLU)',
                     name: 'charge_neutral'
                 });
+            } else if ((currentColoring as string) === 'sstruc') {
+                // SECONDARY STRUCTURE: Explicit Multi-representation approach
+                // This ensures consistent colors (Magenta/Gold/White) regardless of NGL's internal scheme defaults.
+
+                // Helices -> Magenta
+                component.addRepresentation(repType, {
+                    color: 0xFF00FF,
+                    sele: 'helix',
+                    name: 'structure_helix'
+                });
+
+                // Sheets -> Gold/Yellow
+                component.addRepresentation(repType, {
+                    color: 0xFFD700,
+                    sele: 'sheet',
+                    name: 'structure_sheet'
+                });
+
+                // Coils/Turns (Everything else) -> White
+                component.addRepresentation(repType, {
+                    color: 0xFFFFFF,
+                    sele: 'not (helix or sheet)',
+                    name: 'structure_coil'
+                });
             } else {
-                // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL Robust Native NGL
+                // Standard Coloring for other modes (element, residue, etc.) -> Robust Native NGL
                 // Use colorScheme instead of color to avoid ambiguity with color names
                 component.addRepresentation(repType, {
                     colorScheme: currentColoring
