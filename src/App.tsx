@@ -782,24 +782,86 @@ function App() {
   // --- GLOBAL SHORTCUTS ---
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Command Palette Trigger
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setIsCommandPaletteOpen(prev => !prev);
+      // Ignore text inputs
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLSelectElement
+      ) {
         return;
       }
 
-      // Exit Publication Mode on Escape
+      // Toggle Command Palette
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen((prev) => !prev);
+        return;
+      }
+
+      // Exit modes on Escape
       if (e.key === 'Escape') {
         setIsPublicationMode(false);
-        setIsMeasurementMode(false); // Also good UX to exit measurement mode
-        setIsCommandPaletteOpen(false); // Close other overlays
+        setIsMeasurementMode(false);
+        setIsCommandPaletteOpen(false);
         setIsLibraryOpen(false);
+        setShowContactMap(false);
+        return;
+      }
+
+      // Only process below shortcuts if no modals are open
+      if (isLibraryOpen || isCommandPaletteOpen || showContactMap) return;
+
+      switch (e.key.toLowerCase()) {
+        // General
+        case 'f':
+          e.preventDefault();
+          if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch((err) => console.error(err));
+          } else {
+            document.exitFullscreen();
+          }
+          break;
+        case 't':
+          setIsLightMode(prev => !prev);
+          break;
+
+        // View Controls
+        case 'r':
+          viewerRef.current?.resetCamera();
+          break;
+        case ' ':
+          e.preventDefault(); // Prevent scroll
+          setIsSpinning(prev => !prev);
+          break;
+        case 's':
+          // Screenshot
+          viewerRef.current?.captureImage();
+          break;
+
+        // Tools
+        case 'm':
+          setIsMeasurementMode(prev => !prev);
+          break;
+        case 'c':
+          setShowContactMap(prev => !prev);
+          break;
+
+        // Representations (1-4)
+        case '1': setRepresentation('cartoon'); break;
+        case '2': setRepresentation('spacefill'); break;
+        case '3': setRepresentation('surface'); break;
+        case '4': setRepresentation('licorice'); break;
+
+        // Coloring
+        case 'q': setColoring('chainid'); break;
+        case 'w': setColoring('element' as ColoringType); break;
+        case 'e': setColoring('hydrophobicity'); break;
+        case 'a': setColoring('bfactor'); break; // pLDDT is usually bfactor
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [isLibraryOpen, isCommandPaletteOpen, showContactMap]);
 
   const commandActions: CommandAction[] = useMemo(() => [
     // --- FILES & LOADING ---
