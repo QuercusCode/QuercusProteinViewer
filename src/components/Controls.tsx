@@ -32,6 +32,7 @@ import {
     ScanSearch // Added Icon
 } from 'lucide-react';
 import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, PDBMetadata } from '../types';
+import type { DataSource } from '../utils/pdbUtils';
 import { formatChemicalId } from '../utils/pdbUtils';
 import { findMotifs } from '../utils/searchUtils';
 import type { MotifMatch } from '../utils/searchUtils';
@@ -69,6 +70,8 @@ const SidebarSection = ({ title, icon: Icon, children, isOpen, onToggle, isLight
 interface ControlsProps {
     pdbId: string;
     setPdbId: (id: string) => void;
+    dataSource: DataSource;
+    setDataSource: (source: DataSource) => void;
     onUpload: (file: File, isCif?: boolean) => void;
     representation: RepresentationType;
     setRepresentation: (type: RepresentationType) => void;
@@ -135,6 +138,8 @@ interface ControlsProps {
 export const Controls: React.FC<ControlsProps> = ({
     pdbId,
     setPdbId,
+    dataSource,
+    setDataSource,
     onUpload,
     representation,
     setRepresentation,
@@ -425,20 +430,40 @@ export const Controls: React.FC<ControlsProps> = ({
 
                     {/* 1. CORE INPUT (Always Visible) */}
                     <div className="space-y-3 mb-2">
-                        <form onSubmit={handleSubmit} className="flex gap-2">
-                            <div className="relative flex-1">
-                                <Search className={`absolute left-2.5 top-2.5 w-4 h-4 ${subtleText}`} />
-                                <input
-                                    type="text"
-                                    value={localPdbId}
-                                    onChange={(e) => setLocalPdbId(e.target.value)}
-                                    placeholder="Search PDB ID..."
-                                    className={`w-full rounded-lg pl-9 pr-3 py-2 border outline-none transition-all ${inputBg}`}
-                                />
+                        <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+                            {/* Datasource Selector */}
+                            <select
+                                value={dataSource}
+                                onChange={(e) => setDataSource(e.target.value as DataSource)}
+                                className={`w-full rounded-lg px-3 py-1.5 text-xs font-medium border outline-none transition-all appearance-none cursor-pointer ${isLightMode
+                                        ? 'bg-neutral-50 border-neutral-200 text-neutral-700 hover:border-neutral-300'
+                                        : 'bg-white/5 border-white/10 text-neutral-300 hover:border-white/20'
+                                    }`}
+                            >
+                                <option value="pdb">RCSB PDB (Protein/Macromolecules)</option>
+                                <option value="cod">COD (Crystal Structures)</option>
+                                <option value="pubchem">PubChem (Small Molecules)</option>
+                            </select>
+
+                            <div className="flex gap-2">
+                                <div className="relative flex-1">
+                                    <Search className={`absolute left-2.5 top-2.5 w-4 h-4 ${subtleText}`} />
+                                    <input
+                                        type="text"
+                                        value={localPdbId}
+                                        onChange={(e) => setLocalPdbId(e.target.value)}
+                                        placeholder={
+                                            dataSource === 'cod' ? "COD ID (e.g. 1000000)" :
+                                                dataSource === 'pubchem' ? "PubChem CID (e.g. 2244)" :
+                                                    "PDB ID (e.g. 1crn)"
+                                        }
+                                        className={`w-full rounded-lg pl-9 pr-3 py-2 border outline-none transition-all ${inputBg}`}
+                                    />
+                                </div>
+                                <button type="submit" className="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors font-medium">
+                                    Load
+                                </button>
                             </div>
-                            <button type="submit" className="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors font-medium">
-                                Load
-                            </button>
                         </form>
 
                         <div className="grid grid-cols-2 gap-2">

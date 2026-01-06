@@ -15,7 +15,7 @@ import { CommandPalette, type CommandAction } from './components/CommandPalette'
 import { HUD } from './components/HUD';
 import { MeasurementPanel } from './components/MeasurementPanel';
 import { OFFLINE_LIBRARY } from './data/library';
-import { fetchPDBMetadata } from './utils/pdbUtils';
+import { fetchPDBMetadata, type DataSource } from './utils/pdbUtils';
 import type { PDBMetadata, Measurement, MeasurementTextColor } from './types';
 import {
   Camera, RefreshCw, Upload,
@@ -29,6 +29,7 @@ function App() {
   const initialUrlState = parseURLState();
 
   const [pdbId, setPdbId] = useState(() => initialUrlState.pdbId || '2b3p');
+  const [dataSource, setDataSource] = useState<DataSource>('pdb'); // Default to PDB
   const [file, setFile] = useState<File | null>(null);
   const [, setIsLoading] = useState(false);
 
@@ -923,6 +924,8 @@ function App() {
       <Controls
         pdbId={pdbId}
         setPdbId={handlePdbIdChange}
+        dataSource={dataSource}
+        setDataSource={setDataSource}
         onUpload={handleUpload}
         representation={representation}
         setRepresentation={setRepresentation}
@@ -990,6 +993,7 @@ function App() {
       <ProteinViewer
         ref={viewerRef}
         pdbId={pdbId}
+        dataSource={dataSource}
         file={file || undefined}
         fileType={fileType}
         isLightMode={isLightMode}

@@ -11,6 +11,7 @@ import type {
     StructureInfo,
     MeasurementTextColor
 } from '../types';
+import { type DataSource, getStructureUrl } from '../utils/pdbUtils';
 
 
 declare global {
@@ -29,6 +30,7 @@ export interface MeasurementData {
 
 export interface ProteinViewerProps {
     pdbId: string;
+    dataSource?: DataSource; // Added source
     file?: File;
     fileType?: 'pdb' | 'mmcif';
 
@@ -97,6 +99,7 @@ export interface ProteinViewerRef {
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     pdbId,
+    dataSource = 'pdb',
     file,
     representation = 'cartoon',
     coloring = 'chainid',
@@ -1307,13 +1310,20 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         const cleanId = String(currentPdbId).trim().toLowerCase();
                         if (cleanId.length < 3) return null;
 
+                        let url = getStructureUrl(cleanId, dataSource);
+                        let loadParams: any = { defaultRepresentation: false };
+
+                        // Add extension hint for NGL if needed
+                        if (dataSource === 'pubchem') loadParams.ext = 'sdf';
+                        if (dataSource === 'cod') loadParams.ext = 'cif';
+
                         const AVAILABLE_LOCAL_PDBS = ['2b3p', '4hhb'];
-                        let url = `https://files.rcsb.org/download/${cleanId}.pdb`;
-                        if (AVAILABLE_LOCAL_PDBS.includes(cleanId)) {
+                        if (dataSource === 'pdb' && AVAILABLE_LOCAL_PDBS.includes(cleanId)) {
                             url = `./${cleanId}.pdb`;
                         }
+
                         console.log(`Fetching from: ${url}`);
-                        return await stage.loadFile(url, { defaultRepresentation: false });
+                        return await stage.loadFile(url, loadParams);
                     }
                     return null;
                 };
@@ -1497,7 +1507,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             if (stageRef.current) stageRef.current.removeAllComponents();
             componentRef.current = null;
         }
-    }, [pdbId, file, onStructureLoaded]);
+    }, [pdbId, dataSource, file, onStructureLoaded]);
 
 
 
