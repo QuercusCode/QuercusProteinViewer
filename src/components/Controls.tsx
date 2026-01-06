@@ -67,6 +67,74 @@ const SidebarSection = ({ title, icon: Icon, children, isOpen, onToggle, isLight
     </div>
 );
 
+// Clean Structure Image Modal Component
+const StructureImageModal = ({ cid }: { cid: string }) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    return (
+        <>
+            {/* Thumbnail */}
+            <div className="mt-1">
+                <div
+                    onClick={() => setIsModalOpen(true)}
+                    className="bg-white p-3 rounded-sm border border-neutral-200 hover:border-blue-400 cursor-pointer transition-all flex justify-center items-center min-h-[120px] group"
+                >
+                    <img
+                        src={`https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=${cid}&t=l`}
+                        alt="2D Structure"
+                        className="max-h-[100px] w-auto object-contain mix-blend-multiply"
+                    />
+                </div>
+                <div className="text-[8px] text-center text-neutral-400 mt-1">
+                    Click to enlarge
+                </div>
+            </div>
+
+            {/* Modal */}
+            {isModalOpen && (
+                <div
+                    className="fixed inset-0 bg-black/80 z-[9999] flex items-center justify-center p-4"
+                    onClick={() => setIsModalOpen(false)}
+                >
+                    <div
+                        className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-auto"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-sm font-bold">2D Chemical Structure</h3>
+                            <button
+                                onClick={() => setIsModalOpen(false)}
+                                className="text-neutral-500 hover:text-black transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="bg-white p-4 rounded border border-neutral-200 flex justify-center">
+                            <img
+                                src={`https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=${cid}&t=l`}
+                                alt="2D Structure (Large View)"
+                                className="max-w-full h-auto"
+                            />
+                        </div>
+
+                        <div className="mt-4 flex justify-center">
+                            <a
+                                href={`https://pubchem.ncbi.nlm.nih.gov/compound/${cid}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-blue-600 hover:text-blue-800 underline"
+                            >
+                                View on PubChem →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
+    );
+};
+
 interface ControlsProps {
     pdbId: string;
     setPdbId: (id: string) => void;
@@ -607,40 +675,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                             </span>
 
                                             {pdbMetadata.cid ? (
-                                                <div className="relative mt-1 group/structure">
-                                                    {/* Centered thumbnail */}
-                                                    <div className="bg-white p-3 rounded-sm border border-neutral-200 flex justify-center items-center min-h-[120px]">
-                                                        <img
-                                                            src={`https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=${pdbMetadata.cid}&t=l`}
-                                                            alt="2D Structure"
-                                                            className="max-h-[100px] w-auto object-contain mix-blend-multiply cursor-pointer"
-                                                        />
-                                                    </div>
-
-                                                    {/* Hover zoom overlay */}
-                                                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/structure:opacity-100 pointer-events-none group-hover/structure:pointer-events-auto transition-all duration-300 z-50 scale-0 group-hover/structure:scale-100">
-                                                        <div className="bg-white p-4 rounded-lg shadow-2xl border-2 border-blue-400 max-w-[400px]">
-                                                            <img
-                                                                src={`https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=${pdbMetadata.cid}&t=l`}
-                                                                alt="2D Structure (Enlarged)"
-                                                                className="w-full h-auto object-contain"
-                                                            />
-                                                            <div className="text-[10px] text-center text-neutral-600 mt-2 font-medium">
-                                                                Hover to zoom • Click to open PubChem
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Click to PubChem link */}
-                                                    <a
-                                                        href={`https://pubchem.ncbi.nlm.nih.gov/compound/${pdbMetadata.cid}`}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="block text-[8px] text-center text-neutral-400 hover:text-blue-500 mt-1 transition-colors"
-                                                    >
-                                                        Click to view on PubChem
-                                                    </a>
-                                                </div>
+                                                <StructureImageModal cid={pdbMetadata.cid} />
                                             ) : (
                                                 <span className={`text-[10px] font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
                                                     {pdbMetadata.title}
