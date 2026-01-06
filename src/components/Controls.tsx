@@ -1230,10 +1230,6 @@ export const Controls: React.FC<ControlsProps> = ({
                                 </button>
                             )}
 
-                            {/* Chemical Properties - Only for Chemicals */}
-                            {isChemical && pdbMetadata?.cid && (
-                                <ChemicalPropertiesPanel cid={pdbMetadata.cid} isLightMode={isLightMode} cardBg={cardBg} subtleText={subtleText} />
-                            )}
                             {isMeasurementMode && (
                                 <button
                                     onClick={onClearMeasurements}
@@ -1242,6 +1238,11 @@ export const Controls: React.FC<ControlsProps> = ({
                                     <Trash2 className="w-3.5 h-3.5" />
                                     <span className="text-xs font-medium">Clear Measurements</span>
                                 </button>
+                            )}
+
+                            {/* Chemical Properties - Only for Chemicals */}
+                            {isChemical && pdbMetadata?.cid && (
+                                <ChemicalPropertiesPanel cid={pdbMetadata.cid} isLightMode={isLightMode} cardBg={cardBg} subtleText={subtleText} />
                             )}
                         </div>
 
