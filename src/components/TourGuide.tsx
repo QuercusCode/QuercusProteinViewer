@@ -17,7 +17,7 @@ export const startOnboardingTour = (onComplete?: () => void, onHighlight?: (elem
                 element: '#upload-section',
                 popover: {
                     title: 'Load Structures',
-                    description: 'First select your database (PDB or PubChem), then fetch any protein or chemical structure you want. You can also upload a file or choose from the offline library.'
+                    description: 'First select your database (PDB or PubChem), then fetch any protein or chemical structure you want. You can also drag and drop your files, upload a file, or choose from the offline library.'
                 }
             },
             {
