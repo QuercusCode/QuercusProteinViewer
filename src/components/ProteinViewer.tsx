@@ -1801,9 +1801,21 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     } catch (e) { }
                 }
 
-                component.addRepresentation(repType, {
+
+                // Build representation parameters
+                const repParams: any = {
                     color: currentColoring
-                });
+                };
+
+                // Add cartoon-specific parameters for proper arrows and helices
+                if (repType === 'cartoon') {
+                    repParams.aspectRatio = 5;        // Makes arrows more pronounced
+                    repParams.subdiv = 10;            // Smooth curves
+                    repParams.radialSegments = 20;    // Smooth helices
+                    repParams.arrowSegments = 30;     // Detailed arrows tips
+                }
+
+                component.addRepresentation(repType, repParams);
             }
 
             // 2. Add Custom Representations (Overlay)
