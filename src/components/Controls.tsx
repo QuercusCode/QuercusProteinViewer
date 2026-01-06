@@ -390,7 +390,9 @@ export const Controls: React.FC<ControlsProps> = ({
     onHighlightRegion,
     onDownloadPDB,
     onDownloadSequence,
-    onStartTour
+    onStartTour,
+    openSections: propOpenSections,
+    onToggleSection
 }) => {
     // Motif Search State
     const [searchPattern, setSearchPattern] = useState('');
@@ -450,18 +452,17 @@ export const Controls: React.FC<ControlsProps> = ({
     const subtleText = isLightMode ? 'text-neutral-950 font-medium' : 'text-neutral-400';
     const inputBg = isLightMode ? 'bg-white border-neutral-900 text-black focus:ring-black' : 'bg-neutral-800 border-neutral-700 text-white focus:ring-blue-500';
 
-    // Accordion State
-    const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    // Accordion State - Use lifted state from props if available
+    const openSections = propOpenSections || {
         'appearance': true,
         'analysis': false,
         'tools': false
-    });
+    };
 
     const toggleSection = (section: string) => {
-        setOpenSections(prev => ({
-            ...prev,
-            [section]: !prev[section]
-        }));
+        if (onToggleSection) {
+            onToggleSection(section);
+        }
     };
 
     // Mobile Sidebar State
