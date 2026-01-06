@@ -1725,29 +1725,52 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             // This relies only on basic NGL primitives (addRepresentation with selection), which is 100% robust.
 
             if (currentColoring === 'chainid') {
-                const highContrastColors = [
-                    0xFF0000, // Red
-                    0x0000FF, // Blue
-                    0x00CC00, // Green 
-                    0xFFD700, // Gold
-                    0xFF00FF, // Magenta
-                    0x00FFFF, // Cyan
-                    0xFF8C00, // Orange
-                    0x8A2BE2, // Purple
-                    0xA52A2A, // Brown
-                    0x7FFF00, // Chartreuse
-                ];
+                // FALLBACK: If we have a chemical (single/no chain info) or source is pubchem, 'chainid' is meaningless.
+                // Force Element coloring to ensure visibility (e.g. Licorice needs atoms!).
+                const chainCount = component.structure.chainStore.count;
+                // If effective chain count is 0 or 1, or weird names, fallback to element.
+                // Or if user selected "chainid" but it's a chemical (implied by context or single chain).
 
-                let chainIdx = 0;
-                component.structure.eachChain((chain: any) => {
-                    const color = highContrastColors[chainIdx % highContrastColors.length];
+                let forceElement = false;
+                if (chainCount <= 1 || dataSource === 'pubchem') {
+                    forceElement = true;
+                }
+
+                if (forceElement) {
                     component.addRepresentation(repType, {
-                        color: color,
-                        sele: `:${chain.chainname}`,
-                        name: `chain_base_${chain.chainname}`
+                        color: 'element',
+                        sele: '*', // Select ALL
+                        name: 'base_chemical'
                     });
-                    chainIdx++;
-                });
+                } else {
+                    const highContrastColors = [
+                        0xFF0000, // Red
+                        0x0000FF, // Blue
+                        0x00CC00, // Green 
+                        0xFFD700, // Gold
+                        0xFF00FF, // Magenta
+                        0x00FFFF, // Cyan
+                        0xFF8C00, // Orange
+                        0x8A2BE2, // Purple
+                        0xA52A2A, // Brown
+                        0x7FFF00, // Chartreuse
+                    ];
+
+                    let chainIdx = 0;
+                    component.structure.eachChain((chain: any) => {
+                        const color = highContrastColors[chainIdx % highContrastColors.length];
+                        // Robust selector for empty chain names (common in MDF/SDF)
+                        const sele = chain.chainname ? `:${chain.chainname}` : '*';
+                        // If separate chains have empty names, they are indistinguishable by name selector.
+
+                        component.addRepresentation(repType, {
+                            color: color,
+                            sele: sele,
+                            name: `chain_base_${chain.chainname || 'unk'}`
+                        });
+                        chainIdx++;
+                    });
+                }
             } else if (currentColoring === 'charge') {
                 // CHARGE COLORING: Multi-representation approach
                 component.addRepresentation(repType, {
