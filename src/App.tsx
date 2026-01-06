@@ -90,7 +90,6 @@ function App() {
   const [showLigands, setShowLigands] = useState(initialUrlState.showLigands || false);
   const [showIons, setShowIons] = useState(false);
   const [showSurface, setShowSurface] = useState(initialUrlState.showSurface || false);
-  const [showInteractions, setShowInteractions] = useState(false);
 
   // ... (lines 53-343) ...
 
@@ -1001,8 +1000,6 @@ function App() {
             setShowLigands={setShowLigands}
             showIons={showIons}
             setShowIons={setShowIons}
-            showInteractions={showInteractions}
-            setShowInteractions={setShowInteractions}
             onFocusLigands={handleFocusLigands}
             onRecordMovie={handleRecordMovie}
             isRecording={isRecording}
@@ -1053,7 +1050,6 @@ function App() {
         showSurface={showSurface}
         showLigands={showLigands}
         showIons={showIons}
-        showInteractions={showInteractions}
         coloring={coloring}
         palette={colorPalette}
         backgroundColor={customBackgroundColor || (isLightMode ? 'white' : 'black')}

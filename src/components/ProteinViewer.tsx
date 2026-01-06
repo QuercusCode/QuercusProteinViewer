@@ -41,7 +41,6 @@ export interface ProteinViewerProps {
     showSurface: boolean;
     showLigands?: boolean;  // Optional, defaults to true
     showIons?: boolean;     // New prop
-    showInteractions?: boolean; // Show H-bonds and interactions
     coloring: ColoringType;
     palette: ColorPalette;
     backgroundColor: string;
@@ -119,7 +118,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     showSurface = false,
     showLigands = false,
     showIons = false,
-    showInteractions = false,
     isSpinning = false,
     isMeasurementMode = false,
     measurements,
@@ -1856,72 +1854,9 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         }
     };
 
-    // Update Interactions (H-bonds, Salt bridges, Disulfide bonds)
-    const updateInteractions = () => {
-        const component = componentRef.current;
-        if (!component || !showInteractions) {
-            // Remove existing interaction representations
-            if (component) {
-                component.removeRepresentation(component.reprList.filter((r: any) => r.name && r.name.startsWith('interaction_')));
-            }
-            return;
-        }
-
-        try {
-            // Remove old interaction reps
-            component.reprList.filter((r: any) => r.name && r.name.startsWith('interaction_')).forEach((r: any) => component.removeRepresentation(r));
-
-
-            // 1. Hydrogen Bonds (Backbone N-H...O=C)
-            // Using distance representation for atoms within H-bond distance
-            component.addRepresentation('distance', {
-                atomPair: [
-                    ['protein and .N', 'protein and .O'],
-                ],
-                labelVisible: false,
-                color: 'lightblue',
-                linewidth: 1,
-                opacity: 0.6,
-                name: 'interaction_hbond',
-                maxDistance: 3.5,  // Typical H-bond distance
-            });
-
-            // 2. Salt Bridges (Charged residues)
-            // Positive: ARG, LYS; Negative: ASP, GLU
-            component.addRepresentation('distance', {
-                atomPair: [
-                    ['( ARG or LYS ) and ( .NH* or .NZ )', '( ASP or GLU ) and ( .OD* or .OE* )'],
-                ],
-                labelVisible: false,
-                color: 'orange',
-                linewidth: 2,
-                opacity: 0.7,
-                name: 'interaction_saltbridge',
-                maxDistance: 4.0,  // Salt bridge cutoff
-            });
-
-            // 3. Disulfide Bonds (CYS SG-SG)
-            component.addRepresentation('distance', {
-                atomPair: [
-                    ['CYS and .SG', 'CYS and .SG'],
-                ],
-                labelVisible: false,
-                color: 'yellow',
-                linewidth: 3,
-                opacity: 0.9,
-                name: 'interaction_disulfide',
-                maxDistance: 2.5,  // Disulfide bond distance
-            });
-
-        } catch (e) {
-            console.warn("Error adding interactions:", e);
-        }
-    };
-
     useEffect(() => {
         updateRepresentation();
-        updateInteractions();
-    }, [representation, coloring, customColors, showSurface, showLigands, showIons, colorPalette, showInteractions]);
+    }, [representation, coloring, customColors, showSurface, showLigands, showIons, colorPalette]);
 
     useEffect(() => {
         if (stageRef.current) {
