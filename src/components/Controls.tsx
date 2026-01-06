@@ -607,13 +607,22 @@ export const Controls: React.FC<ControlsProps> = ({
                                             </span>
 
                                             {pdbMetadata.cid ? (
-                                                <div className="mt-1 bg-white p-1 rounded-sm flex justify-center border border-neutral-200">
+                                                <a
+                                                    href={`https://pubchem.ncbi.nlm.nih.gov/compound/${pdbMetadata.cid}`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="block mt-1 bg-white p-2 rounded-sm border border-neutral-200 hover:border-blue-400 hover:shadow-md transition-all duration-200 cursor-pointer group"
+                                                    title="Click to view on PubChem"
+                                                >
                                                     <img
                                                         src={`https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=${pdbMetadata.cid}&t=l`}
                                                         alt="2D Structure"
-                                                        className="h-20 w-auto object-contain mix-blend-multiply"
+                                                        className="w-full h-auto object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-200"
                                                     />
-                                                </div>
+                                                    <div className="text-[8px] text-center text-neutral-400 group-hover:text-blue-500 mt-1 transition-colors">
+                                                        Click to view on PubChem
+                                                    </div>
+                                                </a>
                                             ) : (
                                                 <span className={`text-[10px] font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
                                                     {pdbMetadata.title}
