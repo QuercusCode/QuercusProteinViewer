@@ -17,7 +17,14 @@ export const startOnboardingTour = (onComplete?: () => void, onHighlight?: (elem
                 element: '#upload-section',
                 popover: {
                     title: 'Load Structures',
-                    description: 'Enter a PDB ID, upload a file, or choose from the library.'
+                    description: 'Enter a PDB ID, upload a file from multiple databases (PDB, COD, PubChem), or choose from the offline library.'
+                }
+            },
+            {
+                element: '#metadata-box',
+                popover: {
+                    title: 'Structure Metadata',
+                    description: 'View key information about your structure including method, resolution, source organism, and deposition date.'
                 }
             },
             {
@@ -35,10 +42,12 @@ export const startOnboardingTour = (onComplete?: () => void, onHighlight?: (elem
                 }
             },
             {
-                element: '#sequence-viewer',
+                element: '#sequence-track',
                 popover: {
-                    title: 'Sequence Viewer',
-                    description: 'View the amino acid sequence, click residues to highlight them in 3D, and download FASTA files.'
+                    title: 'Sequence Track',
+                    description: 'View and interact with the amino acid sequence on the right side. Click residues to focus them in 3D.',
+                    side: 'left',
+                    align: 'center'
                 }
             },
             {

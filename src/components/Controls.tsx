@@ -700,7 +700,7 @@ export const Controls: React.FC<ControlsProps> = ({
 
                     {/* 2. STRUCTURE INFO (Always Visible if loaded) */}
                     {(proteinTitle || chains.length > 0) && (
-                        <div className={`p-3 rounded-xl border ${cardBg} shadow-sm`}>
+                        <div id="metadata-box" className={`p-3 rounded-xl border ${cardBg} shadow-sm`}>
                             {proteinTitle && (
                                 <div className="mb-2">
                                     <div className="flex items-center justify-between mb-0.5">

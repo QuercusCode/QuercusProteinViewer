@@ -1227,6 +1227,7 @@ function App() {
       />
 
       <SequenceTrack
+        id="sequence-track"
         chains={chains}
         highlightedResidue={highlightedResidue}
         onHoverResidue={() => { }} // Hover disabled per user request

@@ -5,6 +5,7 @@ import { Map, Atom } from 'lucide-react';
 import type { ChainInfo } from '../types';
 
 interface SequenceTrackProps {
+    id?: string;
     chains: ChainInfo[];
     highlightedResidue: { chain: string; resNo: number } | null;
     onHoverResidue: (chain: string, resNo: number) => void;
@@ -60,6 +61,7 @@ const getAtomColor = (element: string, isLight: boolean) => {
 };
 
 export const SequenceTrack: React.FC<SequenceTrackProps> = ({
+    id,
     chains,
     highlightedResidue,
     onHoverResidue,
@@ -113,7 +115,7 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
     const isAtomView = activeChain.atoms && activeChain.atoms.length > 0;
 
     return (
-        <div className={`hidden md:flex fixed top-16 right-4 bottom-4 w-24 rounded-xl z-40 transition-transform duration-300 transform translate-x-0
+        <div id={id} className={`hidden md:flex fixed top-16 right-4 bottom-4 w-24 rounded-xl z-40 transition-transform duration-300 transform translate-x-0
             ${isLightMode ? 'bg-white/90 border border-neutral-300 shadow-xl' : 'bg-black/60 border border-neutral-700 shadow-2xl'} 
             backdrop-blur-md flex-col overflow-hidden`}>
 
