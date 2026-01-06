@@ -1710,7 +1710,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 repType = 'licorice';
             }
 
-            if (coloring === 'structure' || (coloring as string) === 'sstruc') {
+            if (coloring === 'structure' || (coloring as string) === 'sstruc' || (coloring as string) === 'secondary-structure') {
                 currentColoring = 'sstruc' as ColoringType;
             }
 
