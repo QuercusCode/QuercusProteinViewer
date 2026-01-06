@@ -605,7 +605,7 @@ export const Controls: React.FC<ControlsProps> = ({
 
                             <button
                                 onClick={onStartTour}
-                                className={`hidden md:flex p-2 rounded-full transition-colors ${isLightMode ? 'bg-white border border-neutral-900 text-black hover:bg-neutral-100' : 'bg-neutral-800/80 text-neutral-400 hover:bg-neutral-700'}`}
+                                className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-white border border-neutral-900 text-black hover:bg-neutral-100' : 'bg-neutral-800/80 text-neutral-400 hover:bg-neutral-700'}`}
                                 title="Start Interactive Tour"
                                 id="help-button"
                             >
