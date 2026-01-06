@@ -718,5 +718,9 @@ export const CHEMICAL_LIBRARY: ChemicalLibraryEntry[] = [
     { id: '2520', title: 'Carisoprodol', category: 'Drugs', description: 'Muscle relaxant.', formula: 'C12H24N2O4', molecularWeight: '260.33 g/mol' },
     { id: '6918474', title: 'Ramelteon', category: 'Drugs', description: 'Sleep aid.', formula: 'C16H21NO2', molecularWeight: '259.34 g/mol' },
     { id: '4763', title: 'Phenobarbital', category: 'Drugs', description: 'Barbiturate.', formula: 'C12H12N2O3', molecularWeight: '232.24 g/mol' },
-    { id: '4737', title: 'Pentobarbital', category: 'Drugs', description: 'Barbiturate.', formula: 'C11H18N2O3', molecularWeight: '226.27 g/mol' }
+    { id: '4737', title: 'Pentobarbital', category: 'Drugs', description: 'Barbiturate.', formula: 'C11H18N2O3', molecularWeight: '226.27 g/mol' },
+
+    // --- FINAL ADDITIONS ---
+    { id: '10638', title: 'Luminol', category: 'Metabolites', description: 'Chemiluminescent forensic reagent.', formula: 'C8H7N3O2', molecularWeight: '177.16 g/mol' },
+    { id: '29746', title: 'Geosmin', category: 'Natural Products', description: 'Earthy smell of rain.', formula: 'C12H22O', molecularWeight: '182.31 g/mol' }
 ];
