@@ -1096,6 +1096,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                 isOpen={isMotifSearchOpen}
                                 onToggle={() => setIsMotifSearchOpen(!isMotifSearchOpen)}
                                 isLightMode={isLightMode}
+                                id="motif-search"
                             >
                                 <div className="space-y-3">
                                     <div className="space-y-1">
