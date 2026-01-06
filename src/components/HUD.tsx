@@ -19,6 +19,13 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode }: HUDProp
         return pdbId ? pdbId.toUpperCase() : "Loaded Model";
     }, [pdbMetadata, pdbId]);
 
+    // Standard residues list to filter out atom details for proteins/nucleic acids
+    const STANDARD_RESIDUES = new Set([
+        'ALA', 'ARG', 'ASN', 'ASP', 'CYS', 'GLN', 'GLU', 'GLY', 'HIS', 'ILE',
+        'LEU', 'LYS', 'MET', 'PHE', 'PRO', 'SER', 'THR', 'TRP', 'TYR', 'VAL',
+        'A', 'C', 'G', 'T', 'U', 'DA', 'DC', 'DG', 'DT'
+    ]);
+
     return (
         <div className={`absolute top-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none select-none transition-all duration-300 font-sans`}>
 
@@ -32,8 +39,8 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode }: HUDProp
                             {hoveredResidue.resName} <span className="opacity-70">{hoveredResidue.resNo}</span>
                         </span>
 
-                        {/* Atom Info (if available) - Separated by bullet */}
-                        {hoveredResidue.atomName && (
+                        {/* Atom Info (Only for non-standard residues / chemicals) */}
+                        {hoveredResidue.atomName && !STANDARD_RESIDUES.has(hoveredResidue.resName.toUpperCase()) && (
                             <>
                                 <span className={`opacity-40 ${textColor}`}>•</span>
                                 <span className={`font-mono text-sm opacity-90 ${textColor}`}>
