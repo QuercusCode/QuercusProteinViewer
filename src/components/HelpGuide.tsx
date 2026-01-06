@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     CircleHelp, X, MousePointer2, Keyboard, Sparkles,
-    BookOpen, Layers, Activity, Share2, FileUp
+    BookOpen, Layers, Activity, Share2, FileUp, ArrowLeft
 } from 'lucide-react';
 
 type FeatureSection = {
@@ -15,6 +15,7 @@ type FeatureSection = {
 export const HelpGuide: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('start');
+    const [showMobileList, setShowMobileList] = useState(true);
 
     React.useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -271,10 +272,10 @@ export const HelpGuide: React.FC = () => {
             {/* Modal Overlay */}
             {isOpen && (
                 <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="relative w-full max-w-5xl h-[85vh] flex bg-neutral-950 border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+                    <div className="relative w-full max-w-5xl h-[85vh] flex flex-col md:flex-row bg-neutral-950 border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
 
                         {/* Sidebar */}
-                        <div className="w-64 flex-shrink-0 border-r border-neutral-800 bg-neutral-900/50 flex flex-col">
+                        <div className={`w-full md:w-64 flex-shrink-0 border-b md:border-b-0 md:border-r border-neutral-800 bg-neutral-900/50 flex-col ${showMobileList ? 'flex' : 'hidden md:flex'}`}>
                             <div className="p-5 border-b border-neutral-800">
                                 <h2 className="text-lg font-bold text-white flex items-center gap-2">
                                     <CircleHelp className="w-5 h-5 text-blue-500" />
@@ -286,31 +287,49 @@ export const HelpGuide: React.FC = () => {
                                 {features.map(feature => (
                                     <button
                                         key={feature.id}
-                                        onClick={() => setActiveTab(feature.id)}
-                                        className={`w-full flex items-center gap-3 p-3 rounded-lg text-sm font-medium transition-all ${activeTab === feature.id
-                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
-                                            : 'text-neutral-400 hover:text-white hover:bg-white/5'
+                                        onClick={() => {
+                                            setActiveTab(feature.id);
+                                            setShowMobileList(false);
+                                        }}
+                                        className={`w-full flex items-center gap-3 p-3 rounded-lg text-sm font-medium transition-all ${activeTab === feature.id && !showMobileList // Highlight only if not looking at list (mobile) logic doesn't apply well, keep simple active state
+                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
+                                                : activeTab === feature.id
+                                                    ? 'bg-blue-600/10 text-blue-400 md:bg-blue-600 md:text-white md:shadow-lg'
+                                                    : 'text-neutral-400 hover:text-white hover:bg-white/5'
                                             }`}
                                     >
-                                        <feature.icon className={`w-4 h-4 ${activeTab === feature.id ? 'text-white' : 'text-neutral-500'}`} />
+                                        <feature.icon className={`w-4 h-4 ${activeTab === feature.id ? 'text-blue-400 md:text-white' : 'text-neutral-500'}`} />
                                         {feature.title}
+                                        <div className="flex-1" />
+                                        <div className="md:hidden text-neutral-600">→</div>
                                     </button>
                                 ))}
                             </div>
-                            <div className="p-4 border-t border-neutral-800 text-center">
-                                <p className="text-[10px] text-neutral-600">
+                            <div className="p-4 border-t border-neutral-800 text-center flex justify-between md:justify-center items-center">
+                                <button onClick={() => setIsOpen(false)} className="md:hidden text-xs text-neutral-400 flex items-center gap-1">
+                                    <X className="w-3 h-3" /> Close
+                                </button>
+                                <p className="text-[10px] text-neutral-600 hidden md:block">
                                     Press <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">Esc</kbd> to close
                                 </p>
                             </div>
                         </div>
 
                         {/* Content Area */}
-                        <div className="flex-1 flex flex-col min-w-0 bg-neutral-900/30">
+                        <div className={`flex-1 flex-col min-w-0 bg-neutral-900/30 ${showMobileList ? 'hidden md:flex' : 'flex'}`}>
                             {/* Header */}
-                            <div className="h-16 flex items-center justify-between px-8 border-b border-neutral-800 bg-neutral-900/50 backdrop-blur-xl">
-                                <div>
-                                    <h3 className="text-xl font-bold text-white">{activeFeature.title}</h3>
-                                    <p className="text-xs text-neutral-400">{activeFeature.description}</p>
+                            <div className="h-16 flex items-center justify-between px-4 md:px-8 border-b border-neutral-800 bg-neutral-900/50 backdrop-blur-xl shrink-0">
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        onClick={() => setShowMobileList(true)}
+                                        className="md:hidden p-1.5 -ml-2 text-neutral-400 hover:text-white rounded-lg hover:bg-white/5 active:scale-95 transition-all"
+                                    >
+                                        <ArrowLeft className="w-5 h-5" />
+                                    </button>
+                                    <div>
+                                        <h3 className="text-xl font-bold text-white">{activeFeature.title}</h3>
+                                        <p className="text-xs text-neutral-400 hidden sm:block">{activeFeature.description}</p>
+                                    </div>
                                 </div>
                                 <button
                                     onClick={() => setIsOpen(false)}
@@ -321,15 +340,18 @@ export const HelpGuide: React.FC = () => {
                             </div>
 
                             {/* Scrollable Body */}
-                            <div className="flex-1 overflow-y-auto p-8 scrollbar-thin scrollbar-thumb-neutral-700">
+                            <div className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-thin scrollbar-thumb-neutral-700">
                                 <div className="max-w-3xl mx-auto">
-                                    <div className="animate-in fade-in duration-300">
+                                    <p className="sm:hidden text-xs text-neutral-500 mb-6 pb-4 border-b border-neutral-800/50">
+                                        {activeFeature.description}
+                                    </p>
+                                    <div className="animate-in fade-in slide-in-from-right-4 duration-300">
                                         {activeFeature.content}
                                     </div>
                                 </div>
 
                                 {/* Shared Footer Attribution */}
-                                <div className="mt-12 pt-6 border-t border-neutral-800/50 flex justify-between items-center opacity-50 hover:opacity-100 transition-opacity">
+                                <div className="mt-12 pt-6 border-t border-neutral-800/50 flex flex-col sm:flex-row justify-between items-center opacity-50 hover:opacity-100 transition-opacity gap-4">
                                     <div className="flex gap-4 text-[10px] text-neutral-500">
                                         <a href="https://www.rcsb.org/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">RCSB PDB</a>
                                         <a href="http://nglviewer.org/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">NGL Viewer</a>
