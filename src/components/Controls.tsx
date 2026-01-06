@@ -945,12 +945,12 @@ export const Controls: React.FC<ControlsProps> = ({
                                                 onChange={(e) => setColoring(e.target.value as ColoringType)}
                                                 className={`w-full border rounded-lg px-2 py-2 text-xs outline-none ${inputBg}`}
                                             >
-                                                <option value="element">Element (CPK)</option>
-                                                <option value="uniform">Uniform</option>
                                                 {!isChemical && <option value="chainid">By Chain</option>}
                                                 {!isChemical && <option value="secondary-structure">Structure</option>}
                                                 {!isChemical && <option value="hydrophobicity">Hydrophobicity</option>}
                                                 <option value="bfactor">B-Factor</option>
+                                                <option value="uniform">Uniform</option>
+                                                <option value="element">Element (CPK)</option>
                                             </select>
                                         </div>
 
