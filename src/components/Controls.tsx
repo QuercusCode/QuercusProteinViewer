@@ -607,22 +607,40 @@ export const Controls: React.FC<ControlsProps> = ({
                                             </span>
 
                                             {pdbMetadata.cid ? (
-                                                <a
-                                                    href={`https://pubchem.ncbi.nlm.nih.gov/compound/${pdbMetadata.cid}`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="block mt-1 bg-white p-2 rounded-sm border border-neutral-200 hover:border-blue-400 hover:shadow-md transition-all duration-200 cursor-pointer group"
-                                                    title="Click to view on PubChem"
-                                                >
-                                                    <img
-                                                        src={`https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=${pdbMetadata.cid}&t=l`}
-                                                        alt="2D Structure"
-                                                        className="w-full h-auto object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-200"
-                                                    />
-                                                    <div className="text-[8px] text-center text-neutral-400 group-hover:text-blue-500 mt-1 transition-colors">
-                                                        Click to view on PubChem
+                                                <div className="relative mt-1 group/structure">
+                                                    {/* Centered thumbnail */}
+                                                    <div className="bg-white p-3 rounded-sm border border-neutral-200 flex justify-center items-center min-h-[120px]">
+                                                        <img
+                                                            src={`https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=${pdbMetadata.cid}&t=l`}
+                                                            alt="2D Structure"
+                                                            className="max-h-[100px] w-auto object-contain mix-blend-multiply cursor-pointer"
+                                                        />
                                                     </div>
-                                                </a>
+
+                                                    {/* Hover zoom overlay */}
+                                                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover/structure:opacity-100 pointer-events-none group-hover/structure:pointer-events-auto transition-all duration-300 z-50 scale-0 group-hover/structure:scale-100">
+                                                        <div className="bg-white p-4 rounded-lg shadow-2xl border-2 border-blue-400 max-w-[400px]">
+                                                            <img
+                                                                src={`https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=${pdbMetadata.cid}&t=l`}
+                                                                alt="2D Structure (Enlarged)"
+                                                                className="w-full h-auto object-contain"
+                                                            />
+                                                            <div className="text-[10px] text-center text-neutral-600 mt-2 font-medium">
+                                                                Hover to zoom • Click to open PubChem
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Click to PubChem link */}
+                                                    <a
+                                                        href={`https://pubchem.ncbi.nlm.nih.gov/compound/${pdbMetadata.cid}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="block text-[8px] text-center text-neutral-400 hover:text-blue-500 mt-1 transition-colors"
+                                                    >
+                                                        Click to view on PubChem
+                                                    </a>
+                                                </div>
                                             ) : (
                                                 <span className={`text-[10px] font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
                                                     {pdbMetadata.title}
