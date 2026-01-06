@@ -1120,57 +1120,60 @@ export const Controls: React.FC<ControlsProps> = ({
                             )}
                         </div>
 
-                        {/* Sequence Viewer Component */}
-                        <div className={`p-2 rounded-lg border flex flex-col ${cardBg}`}>
-                            <div className="flex items-center justify-between mb-2">
-                                <div className="flex items-center gap-2">
-                                    <span className={`text-xs font-bold ${subtleText}`}>Sequence</span>
-                                    <button
-                                        onClick={onDownloadSequence}
-                                        title="Download FASTA Sequence"
-                                        className={`p-1 rounded-md transition-colors ${isLightMode ? 'hover:bg-neutral-200 text-neutral-500 hover:text-black' : 'hover:bg-white/10 text-neutral-400 hover:text-white'}`}
+
+                        {/* Sequence Viewer Component - Only for Proteins */}
+                        {!isChemical && (
+                            <div className={`p-2 rounded-lg border flex flex-col ${cardBg}`}>
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center gap-2">
+                                        <span className={`text-xs font-bold ${subtleText}`}>Sequence</span>
+                                        <button
+                                            onClick={onDownloadSequence}
+                                            title="Download FASTA Sequence"
+                                            className={`p-1 rounded-md transition-colors ${isLightMode ? 'hover:bg-neutral-200 text-neutral-500 hover:text-black' : 'hover:bg-white/10 text-neutral-400 hover:text-white'}`}
+                                        >
+                                            <Download className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                    <select
+                                        value={viewSequenceChain}
+                                        onChange={(e) => setViewSequenceChain(e.target.value)}
+                                        className={`bg-transparent border-none text-[10px] outline-none cursor-pointer text-right ${subtleText}`}
                                     >
-                                        <Download className="w-3.5 h-3.5" />
-                                    </button>
+                                        <option value="">All Chains</option>
+                                        {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
+                                    </select>
                                 </div>
-                                <select
-                                    value={viewSequenceChain}
-                                    onChange={(e) => setViewSequenceChain(e.target.value)}
-                                    className={`bg-transparent border-none text-[10px] outline-none cursor-pointer text-right ${subtleText}`}
-                                >
-                                    <option value="">All Chains</option>
-                                    {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
-                                </select>
-                            </div>
-                            <div className={`h-24 p-1 overflow-y-auto scrollbar-thin ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-800'} rounded`} ref={sequenceContainerRef}>
-                                {chains.length === 0 ? <p className={`italic text-[10px] ${subtleText}`}>No sequence data</p> : (
-                                    chains.filter(c => viewSequenceChain ? c.name === viewSequenceChain : true).map(c => (
-                                        <div key={c.name} className="mb-3 relative">
-                                            <div className={`sticky top-0 z-10 py-1 px-1 mb-1 text-[10px] font-extrabold uppercase tracking-widest border-b shadow-sm ${isLightMode ? 'bg-neutral-100 border-neutral-200 text-neutral-800' : 'bg-neutral-800 border-neutral-700 text-white'}`}>
-                                                Chain {c.name}
+                                <div className={`h-24 p-1 overflow-y-auto scrollbar-thin ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-800'} rounded`} ref={sequenceContainerRef}>
+                                    {chains.length === 0 ? <p className={`italic text-[10px] ${subtleText}`}>No sequence data</p> : (
+                                        chains.filter(c => viewSequenceChain ? c.name === viewSequenceChain : true).map(c => (
+                                            <div key={c.name} className="mb-3 relative">
+                                                <div className={`sticky top-0 z-10 py-1 px-1 mb-1 text-[10px] font-extrabold uppercase tracking-widest border-b shadow-sm ${isLightMode ? 'bg-neutral-100 border-neutral-200 text-neutral-800' : 'bg-neutral-800 border-neutral-700 text-white'}`}>
+                                                    Chain {c.name}
+                                                </div>
+                                                <div className="flex flex-wrap text-[10px] font-mono leading-none break-all">
+                                                    {c.sequence.split('').map((char, idx) => {
+                                                        const resNo = c.min + idx;
+                                                        const isHighlighted = highlightedResidue?.chain === c.name && highlightedResidue.resNo === resNo;
+                                                        return (
+                                                            <span
+                                                                key={idx}
+                                                                ref={(el) => { if (el) residueRefs.current.set(`${c.name}-${resNo}`, el); }}
+                                                                onClick={() => onResidueClick(c.name, resNo, char)}
+                                                                className={`w-4 h-4 flex items-center justify-center cursor-pointer rounded-sm transition-colors ${isHighlighted ? 'bg-blue-600 text-white font-bold' : 'hover:bg-neutral-200 dark:hover:bg-neutral-600'}`}
+                                                                title={`${char}${resNo}`}
+                                                            >
+                                                                {char}
+                                                            </span>
+                                                        );
+                                                    })}
+                                                </div>
                                             </div>
-                                            <div className="flex flex-wrap text-[10px] font-mono leading-none break-all">
-                                                {c.sequence.split('').map((char, idx) => {
-                                                    const resNo = c.min + idx;
-                                                    const isHighlighted = highlightedResidue?.chain === c.name && highlightedResidue.resNo === resNo;
-                                                    return (
-                                                        <span
-                                                            key={idx}
-                                                            ref={(el) => { if (el) residueRefs.current.set(`${c.name}-${resNo}`, el); }}
-                                                            onClick={() => onResidueClick(c.name, resNo, char)}
-                                                            className={`w-4 h-4 flex items-center justify-center cursor-pointer rounded-sm transition-colors ${isHighlighted ? 'bg-blue-600 text-white font-bold' : 'hover:bg-neutral-200 dark:hover:bg-neutral-600'}`}
-                                                            title={`${char}${resNo}`}
-                                                        >
-                                                            {char}
-                                                        </span>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
+                                        ))
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </SidebarSection>
 
                     {/* ACCORDION 3: TOOLS */}
