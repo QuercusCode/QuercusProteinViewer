@@ -288,6 +288,8 @@ interface ControlsProps {
     setShowSurface: (show: boolean) => void;
     showLigands: boolean;
     setShowLigands: (show: boolean) => void;
+    showInteractions: boolean;
+    setShowInteractions: (show: boolean) => void;
     onFocusLigands: () => void;
     onRecordMovie: (duration: number) => void;
     isRecording: boolean;
@@ -354,6 +356,8 @@ export const Controls: React.FC<ControlsProps> = ({
     setShowLigands,
     showIons,
     setShowIons,
+    showInteractions,
+    setShowInteractions,
     onRecordMovie,
     isRecording,
     proteinTitle,
@@ -1195,6 +1199,20 @@ export const Controls: React.FC<ControlsProps> = ({
                                             <span className={`w-1.5 h-1.5 rounded-full ${showIons ? 'bg-purple-500' : 'bg-neutral-400'}`} />
                                             {showIons ? 'Ions On' : 'Ions Off'}
                                         </button>
+                                        {!isChemical && (
+                                            <button
+                                                onClick={() => setShowInteractions(!showInteractions)}
+                                                className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-md border text-[10px] font-medium transition-all
+                                                    ${showInteractions
+                                                        ? 'bg-green-500/10 border-green-500 text-green-600 dark:text-green-400'
+                                                        : `${isLightMode ? 'bg-white border-neutral-200 text-neutral-600 hover:bg-neutral-50' : 'bg-white/5 border-white/10 text-neutral-400 hover:bg-white/10'}`
+                                                    }`}
+                                                title="Show molecular interactions (H-bonds, salt bridges)"
+                                            >
+                                                <span className={`w-1.5 h-1.5 rounded-full ${showInteractions ? 'bg-green-500' : 'bg-neutral-400'}`} />
+                                                {showInteractions ? 'Interactions On' : 'Interactions Off'}
+                                            </button>
+                                        )}
                                     </div>
                                     <div className="flex flex-wrap gap-1">
                                         {ligands.map(lig => (
