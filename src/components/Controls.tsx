@@ -319,6 +319,8 @@ interface ControlsProps {
     onDownloadSequence: () => void;
     showIons?: boolean;
     setShowIons?: (show: boolean) => void;
+    showHydrogenBonds?: boolean;
+    setShowHydrogenBonds?: (show: boolean) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -1219,15 +1221,24 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <span className="text-xs font-medium">Measure</span>
                                 <Ruler className="w-3.5 h-3.5" />
                             </button>
-                            {/* Contact Map - Only for Proteins */}
+                            {/* Contact Map & H-Bonds - Only for Proteins */}
                             {!isChemical && (
-                                <button
-                                    onClick={onToggleContactMap}
-                                    className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
-                                >
-                                    <span className="text-xs font-medium">Contact Map</span>
-                                    <Grid3X3 className="w-3.5 h-3.5" />
-                                </button>
+                                <>
+                                    <button
+                                        onClick={onToggleContactMap}
+                                        className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
+                                    >
+                                        <span className="text-xs font-medium">Contact Map</span>
+                                        <Grid3X3 className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                        onClick={() => setShowHydrogenBonds?.(!showHydrogenBonds)}
+                                        className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${showHydrogenBonds ? 'bg-cyan-500/10 border-cyan-500 text-cyan-500' : `${cardBg} hover:opacity-80`}`}
+                                    >
+                                        <span className="text-xs font-medium">H-Bonds</span>
+                                        <Share2 className="w-3.5 h-3.5" /> {/* Using Share2 as placeholder for connections */}
+                                    </button>
+                                </>
                             )}
 
                             {isMeasurementMode && (

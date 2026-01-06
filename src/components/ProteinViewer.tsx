@@ -120,6 +120,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     showSurface = false,
     showLigands = false,
     showIons = false,
+    showHydrogenBonds = false,
     isSpinning = false,
     isMeasurementMode = false,
     measurements,
@@ -1870,6 +1871,21 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             if (showLigands && !skipLigandOverlay) tryApply('ball+stick', 'element', 'ligand and not (water or ion)', { scale: 2.0 });
             if (showIons) tryApply('ball+stick', 'element', 'ion', { scale: 2.0 });
 
+            // Hydrogen Bond Visualization
+            if (showHydrogenBonds) {
+                // Use NGL 'contact' representation which allows visualizing contacts (like H-bonds)
+                // Default contactType is 'hydrogen' unless specified otherwise.
+                tryApply('contact', '#00ff00', '*', {
+                    contactType: 'hydrogen',
+                    labelUnit: 'angstrom',
+                    labelColor: 'black',
+                    labelSize: 1.5,
+                    labelFixed: true,
+                    masterModelIndex: 0, // Ensure it applies to the main model
+                    radius: 0.1 // Thin lines
+                });
+            }
+
             if (stageRef.current?.viewer) {
                 stageRef.current.viewer.requestRender();
             }
@@ -1881,7 +1897,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     useEffect(() => {
         updateRepresentation();
-    }, [representation, coloring, customColors, showSurface, showLigands, showIons, colorPalette]);
+    }, [representation, coloring, customColors, showSurface, showLigands, showIons, showHydrogenBonds, colorPalette]);
 
     useEffect(() => {
         if (stageRef.current) {

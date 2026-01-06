@@ -128,6 +128,7 @@ function App() {
 
   const [chains, setChains] = useState<ChainInfo[]>([]);
   const [ligands, setLigands] = useState<string[]>([]);
+  const [showHydrogenBonds, setShowHydrogenBonds] = useState(false);
 
   const [fileType, setFileType] = useState<'pdb' | 'mmcif'>('pdb');
 
@@ -1050,6 +1051,8 @@ function App() {
             onDownloadPDB={handleDownloadPDB}
             onDownloadSequence={handleDownloadSequence}
             onToggleContactMap={() => setShowContactMap(!showContactMap)}
+            showHydrogenBonds={showHydrogenBonds}
+            setShowHydrogenBonds={setShowHydrogenBonds}
             movies={movies}
             onDownloadMovie={handleDownloadMovie}
             onDeleteMovie={handleDeleteMovie}
@@ -1085,6 +1088,7 @@ function App() {
         showSurface={showSurface}
         showLigands={showLigands}
         showIons={showIons}
+        showHydrogenBonds={showHydrogenBonds}
         coloring={coloring}
         palette={colorPalette}
         backgroundColor={customBackgroundColor || (isLightMode ? 'white' : 'black')}
