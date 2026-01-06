@@ -930,11 +930,11 @@ export const Controls: React.FC<ControlsProps> = ({
                                                 onChange={(e) => setRepresentation(e.target.value as RepresentationType)}
                                                 className={`w-full border rounded-lg px-2 py-2 text-xs outline-none ${inputBg}`}
                                             >
-                                                <option value="ball+stick">Ball & Stick</option>
-                                                <option value="spacefill">Spacefill</option>
-                                                <option value="licorice">Licorice</option>
                                                 {!isChemical && <option value="cartoon">Cartoon</option>}
+                                                <option value="ball+stick">Ball & Stick</option>
+                                                <option value="licorice">Licorice</option>
                                                 {!isChemical && <option value="backbone">Backbone</option>}
+                                                <option value="spacefill">Spacefill</option>
                                                 <option value="surface">Surface</option>
                                             </select>
                                         </div>
