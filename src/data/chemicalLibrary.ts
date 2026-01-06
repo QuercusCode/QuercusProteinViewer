@@ -541,5 +541,115 @@ export const CHEMICAL_LIBRARY: ChemicalLibraryEntry[] = [
     { id: '40326', title: 'Permethrin', category: 'Toxins', description: 'Insecticide.', formula: 'C21H20Cl2O3', molecularWeight: '391.29 g/mol' },
     { id: '4284', title: 'DEET', category: 'Toxins', description: 'Insect repellent.', formula: 'C12H17NO', molecularWeight: '191.27 g/mol' },
     { id: '2684', title: 'Carbaryl', category: 'Toxins', description: 'Insecticide (Sevin).', formula: 'C12H11NO2', molecularWeight: '201.22 g/mol' },
-    { id: '2762', title: 'Fipronil', category: 'Toxins', description: 'Insecticide.', formula: 'C12H4Cl2F6N4OS', molecularWeight: '437.15 g/mol' }
+    { id: '2762', title: 'Fipronil', category: 'Toxins', description: 'Insecticide.', formula: 'C12H4Cl2F6N4OS', molecularWeight: '437.15 g/mol' },
+
+    // --- BATCH 8: STEROIDS & HORMONES (Hormones/Drugs) ---
+    { id: '5753', title: 'Cortisol', category: 'Hormones', description: 'Stress hormone.', formula: 'C21H30O5', molecularWeight: '362.46 g/mol' },
+    { id: '5997', title: 'Progesterone', category: 'Hormones', description: 'Pregnancy hormone.', formula: 'C21H30O2', molecularWeight: '314.46 g/mol' },
+    { id: '5756', title: 'Estrone', category: 'Hormones', description: 'Estrogen.', formula: 'C18H22O2', molecularWeight: '270.37 g/mol' },
+    { id: '5755', title: 'Estriol', category: 'Hormones', description: 'Estrogen.', formula: 'C18H24O3', molecularWeight: '288.38 g/mol' },
+    { id: '9003', title: 'Aldosterone', category: 'Hormones', description: 'BP regulation.', formula: 'C21H28O5', molecularWeight: '360.44 g/mol' },
+    { id: '5865', title: 'Prednisone', category: 'Drugs', description: 'Corticosteroid.', formula: 'C21H26O5', molecularWeight: '358.43 g/mol' },
+    { id: '5743', title: 'Dexamethasone', category: 'Drugs', description: 'Potent corticosteroid.', formula: 'C22H29FO5', molecularWeight: '392.46 g/mol' },
+    { id: '6001', title: 'Betamethasone', category: 'Drugs', description: 'Corticosteroid.', formula: 'C22H29FO5', molecularWeight: '392.46 g/mol' },
+    { id: '5311063', title: 'Fluticasone Propionate', category: 'Drugs', description: 'Inhaled steroid.', formula: 'C25H31F3O5S', molecularWeight: '500.6 g/mol' },
+    { id: '5976', title: 'Hydrocortisone', category: 'Drugs', description: 'Corticosteroid.', formula: 'C21H30O5', molecularWeight: '362.46 g/mol' },
+
+    // --- BATCH 8: NSAIDs & PAIN (Drugs) ---
+    { id: '156391', title: 'Naproxen (Aleve)', category: 'Drugs', description: 'NSAID.', formula: 'C14H14O3', molecularWeight: '230.26 g/mol' },
+    { id: '3033', title: 'Diclofenac', category: 'Drugs', description: 'NSAID.', formula: 'C14H11Cl2NO2', molecularWeight: '296.15 g/mol' },
+    { id: '3715', title: 'Indomethacin', category: 'Drugs', description: 'Potent NSAID.', formula: 'C19H16ClNO4', molecularWeight: '357.79 g/mol' },
+    { id: '2662', title: 'Celecoxib', category: 'Drugs', description: 'COX-2 inhibitor.', formula: 'C17H14F3N3O2S', molecularWeight: '381.4 g/mol' },
+    { id: '4156', title: 'Meloxicam', category: 'Drugs', description: 'NSAID.', formula: 'C14H13N3O4S2', molecularWeight: '351.4 g/mol' },
+    { id: '3965', title: 'Ketorolac', category: 'Drugs', description: 'NSAID.', formula: 'C15H13NO3', molecularWeight: '255.27 g/mol' },
+    { id: '54680717', title: 'Etoricoxib', category: 'Drugs', description: 'COX-2 inhibitor.', formula: 'C18H15ClN2O2S', molecularWeight: '358.8 g/mol' },
+
+    // --- BATCH 8: ANTIBIOTICS (SULFAS & QUINOLONES) (Drugs) ---
+    { id: '5329', title: 'Sulfamethoxazole', category: 'Drugs', description: 'Sulfonamide antibiotic.', formula: 'C10H11N3O3S', molecularWeight: '253.28 g/mol' },
+    { id: '5586', title: 'Trimethoprim', category: 'Drugs', description: 'Antibiotic.', formula: 'C14H18N4O3', molecularWeight: '290.32 g/mol' },
+    { id: '2764', title: 'Ciprofloxacin', category: 'Drugs', description: 'Fluoroquinolone antibiotic.', formula: 'C17H18FN3O3', molecularWeight: '331.34 g/mol' },
+    { id: '3949', title: 'Levofloxacin', category: 'Drugs', description: 'Fluoroquinolone antibiotic.', formula: 'C18H20FN3O4', molecularWeight: '361.37 g/mol' },
+    { id: '4539', title: 'Ofloxacin', category: 'Drugs', description: 'Fluoroquinolone antibiotic.', formula: 'C18H20FN3O4', molecularWeight: '361.37 g/mol' },
+    { id: '41774', title: 'Moxifloxacin', category: 'Drugs', description: 'Fluoroquinolone antibiotic.', formula: 'C21H24FN3O4', molecularWeight: '401.4 g/mol' },
+    { id: '5284549', title: 'Dapsone', category: 'Drugs', description: 'Leprosy/antibiotic.', formula: 'C12H12N2O2S', molecularWeight: '248.30 g/mol' },
+
+    // --- BATCH 8: ANESTHETICS (LOCAL) (Drugs) ---
+    { id: '3676', title: 'Lidocaine', category: 'Drugs', description: 'Local anesthetic.', formula: 'C14H22N2O', molecularWeight: '234.34 g/mol' },
+    { id: '2333', title: 'Benzocaine', category: 'Drugs', description: 'Topical anesthetic.', formula: 'C9H11NO2', molecularWeight: '165.19 g/mol' },
+    { id: '4914', title: 'Procaine (Novocain)', category: 'Drugs', description: 'Dental anesthetic.', formula: 'C13H20N2O2', molecularWeight: '236.31 g/mol' },
+    { id: '2471', title: 'Bupivacaine', category: 'Drugs', description: 'Local anesthetic.', formula: 'C18H28N2O', molecularWeight: '288.43 g/mol' },
+    { id: '4915', title: 'Tetracaine', category: 'Drugs', description: 'Potent topical anesthetic.', formula: 'C15H24N2O2', molecularWeight: '264.36 g/mol' },
+    { id: '5630', title: 'Prilocaine', category: 'Drugs', description: 'Local anesthetic.', formula: 'C13H20N2O', molecularWeight: '220.31 g/mol' },
+
+    // --- BATCH 8: ENVIRONMENTAL POLLUTANTS (Toxins) ---
+    { id: '3036', title: 'DDT', category: 'Toxins', description: 'Banned pesticide.', formula: 'C14H9Cl5', molecularWeight: '354.49 g/mol' },
+    { id: '8370', title: 'PCB 153', category: 'Toxins', description: 'Polychlorinated biphenyl.', formula: 'C12H4Cl6', molecularWeight: '360.88 g/mol' },
+    { id: '3639', title: 'Heptachlor', category: 'Toxins', description: 'Insecticide (banned).', formula: 'C10H5Cl7', molecularWeight: '373.32 g/mol' },
+    { id: '2551', title: 'Chlordane', category: 'Toxins', description: 'Pesticide (banned).', formula: 'C10H6Cl8', molecularWeight: '409.8 g/mol' },
+    { id: '312', title: 'Carbon Tetrachloride', category: 'Toxins', description: 'Ozone depleting solvent.', formula: 'CCl4', molecularWeight: '153.82 g/mol' },
+    { id: '6574', title: 'Freon 12', category: 'Toxins', description: 'CFC refrigerant.', formula: 'CCl2F2', molecularWeight: '120.91 g/mol' },
+    { id: '6394', title: 'Freon 11', category: 'Toxins', description: 'CFC refrigerant.', formula: 'CCl3F', molecularWeight: '137.36 g/mol' },
+    { id: '240', title: 'Benzene', category: 'Toxins', description: 'Carcinogenic solvent.', formula: 'C6H6', molecularWeight: '78.11 g/mol' },
+    { id: '1133', title: 'Benzo[a]pyrene', category: 'Toxins', description: 'Carcinogen in smoke.', formula: 'C20H12', molecularWeight: '252.31 g/mol' },
+    { id: '24290', title: 'Paraquat', category: 'Toxins', description: 'Toxic herbicide.', formula: 'C12H14N2Cl2', molecularWeight: '257.16 g/mol' },
+    { id: '4777', title: 'Atrazine', category: 'Toxins', description: 'Common herbicide.', formula: 'C8H14ClN5', molecularWeight: '215.68 g/mol' },
+    { id: '3496', title: 'Glyphosate (Roundup)', category: 'Toxins', description: 'Broad-spectrum herbicide.', formula: 'C3H8NO5P', molecularWeight: '169.07 g/mol' },
+    { id: '712', title: 'Formaldehyde', category: 'Toxins', description: 'Preservative/Carcinogen.', formula: 'CH2O', molecularWeight: '30.03 g/mol' },
+
+    // --- BATCH 8: SIMPLE ORGANICS & GASES (Natural Products/Other) ---
+    { id: '297', title: 'Methane', category: 'Natural Products', description: 'Natural gas.', formula: 'CH4', molecularWeight: '16.04 g/mol' },
+    { id: '6324', title: 'Ethane', category: 'Natural Products', description: 'Alkane.', formula: 'C2H6', molecularWeight: '30.07 g/mol' },
+    { id: '6334', title: 'Propane', category: 'Natural Products', description: 'Fuel gas.', formula: 'C3H8', molecularWeight: '44.10 g/mol' },
+    { id: '7843', title: 'Butane', category: 'Natural Products', description: 'Lighter fluid.', formula: 'C4H10', molecularWeight: '58.12 g/mol' },
+    { id: '8003', title: 'Pentane', category: 'Natural Products', description: 'Solvent.', formula: 'C5H12', molecularWeight: '72.15 g/mol' },
+    { id: '6349', title: 'Ethylene Oxide', category: 'Toxins', description: 'Sterilizing gas.', formula: 'C2H4O', molecularWeight: '44.05 g/mol' },
+    { id: '280', title: 'Carbon Dioxide', category: 'Metabolites', description: 'Greenhouse gas.', formula: 'CO2', molecularWeight: '44.01 g/mol' },
+    { id: '767', title: 'Carbon Monoxide', category: 'Toxins', description: 'Toxic gas.', formula: 'CO', molecularWeight: '28.01 g/mol' },
+    { id: '24807', title: 'Nitrous Oxide', category: 'Drugs', description: 'Laughing gas.', formula: 'N2O', molecularWeight: '44.01 g/mol' },
+    { id: '783', title: 'Sulfur Hexafluoride', category: 'Toxins', description: 'Dense gas.', formula: 'SF6', molecularWeight: '146.06 g/mol' },
+    { id: '23968', title: 'Acetylene', category: 'Natural Products', description: 'Welding gas.', formula: 'C2H2', molecularWeight: '26.04 g/mol' },
+
+    // --- BATCH 8: VITAMINS & COFACTORS (Vitamins) ---
+    { id: '5280483', title: 'Vitamin K1 (Phylloquinone)', category: 'Vitamins', description: 'Blood clot.', formula: 'C31H46O2', molecularWeight: '450.7 g/mol' },
+    { id: '14985', title: 'Vitamin E (Alpha-Tocopherol)', category: 'Vitamins', description: 'Antioxidant.', formula: 'C29H50O2', molecularWeight: '430.71 g/mol' },
+    { id: '171546', title: 'Biotin (Vitamin B7)', category: 'Vitamins', description: 'Metabolism.', formula: 'C10H16N2O3S', molecularWeight: '244.31 g/mol' },
+    { id: '988', title: 'Pantothenic Acid (Vitamin B5)', category: 'Vitamins', description: 'CoA precursor.', formula: 'C9H17NO5', molecularWeight: '219.23 g/mol' },
+    { id: '668', title: 'Pyridoxal Phosphate (PLP)', category: 'Vitamins', description: 'Active B6.', formula: 'C8H10NO6P', molecularWeight: '247.14 g/mol' },
+    { id: '5282379', title: 'Menaquinone (Vitamin K2)', category: 'Vitamins', description: 'Bone health.', formula: 'C31H40O2', molecularWeight: '444.6 g/mol' },
+    { id: '5311498', title: 'Coenzyme Q10 (Ubiquinone)', category: 'Metabolites', description: 'Electron transport.', formula: 'C59H90O4', molecularWeight: '863.3 g/mol' },
+    { id: '644102', title: 'Lipoic Acid', category: 'Vitamins', description: 'Antioxidant.', formula: 'C8H14O2S2', molecularWeight: '206.33 g/mol' },
+    { id: '135398606', title: 'FMN (Flavin Mononucleotide)', category: 'Metabolites', description: 'Coenzyme.', formula: 'C17H21N4O9P', molecularWeight: '456.34 g/mol' },
+    { id: '493570', title: 'FAD (Flavin Adenine Dinucleotide)', category: 'Metabolites', description: 'Coenzyme.', formula: 'C27H33N9O15P2', molecularWeight: '785.6 g/mol' },
+
+    // --- BATCH 8: NATURAL ALKALOIDS & PHYTOCHEMICALS (Natural Products) ---
+    { id: '5429', title: 'Theobromine', category: 'Natural Products', description: 'Chocolate alkaloid.', formula: 'C7H8N4O2', molecularWeight: '180.16 g/mol' },
+    { id: '2153', title: 'Theophylline', category: 'Drugs', description: 'Tea/Asthma drug.', formula: 'C7H8N4O2', molecularWeight: '180.16 g/mol' },
+    { id: '15407', title: 'Quinine', category: 'Natural Products', description: 'Malaria/Tonic water.', formula: 'C20H24N2O2', molecularWeight: '324.42 g/mol' },
+    { id: '253903', title: 'Strychnine', category: 'Toxins', description: 'Pesticide/Poison.', formula: 'C21H22N2O2', molecularWeight: '334.41 g/mol' },
+    { id: '6051', title: 'Resveratrol', category: 'Natural Products', description: 'Red wine antioxidant.', formula: 'C14H12O3', molecularWeight: '228.24 g/mol' },
+    { id: '5280343', title: 'Quercetin', category: 'Natural Products', description: 'Flavonoid.', formula: 'C15H10O7', molecularWeight: '302.24 g/mol' },
+    { id: '5280445', title: 'Luteolin', category: 'Natural Products', description: 'Flavonoid.', formula: 'C15H10O6', molecularWeight: '286.24 g/mol' },
+    { id: '5280961', title: 'Genistein', category: 'Natural Products', description: 'Soy isoflavone.', formula: 'C15H10O5', molecularWeight: '270.24 g/mol' },
+    { id: '5280443', title: 'Apigenin', category: 'Natural Products', description: 'Chamomile flavonoid.', formula: 'C15H10O5', molecularWeight: '270.24 g/mol' },
+    { id: '5281605', title: 'Curcumin', category: 'Natural Products', description: 'Turmeric pigment.', formula: 'C21H20O6', molecularWeight: '368.38 g/mol' },
+    { id: '9064', title: 'Epicatechin', category: 'Natural Products', description: 'Tea flavonoid.', formula: 'C15H14O6', molecularWeight: '290.27 g/mol' },
+
+    // --- BATCH 8: ARTIFICIAL SWEETENERS & FOOD CHEMICALS (Nutrients) ---
+    { id: '134601', title: 'Aspartame', category: 'Nutrients', description: 'Artificial sweetener.', formula: 'C14H18N2O5', molecularWeight: '294.30 g/mol' },
+    { id: '115049', title: 'Acesulfame Potassium', category: 'Nutrients', description: 'Sweetener (Ace K).', formula: 'C4H4KNO4S', molecularWeight: '201.24 g/mol' },
+    { id: '56842065', title: 'Advantame', category: 'Nutrients', description: 'Ultra-potent sweetener.', formula: 'C24H30N2O7', molecularWeight: '458.5 g/mol' },
+    { id: '25332', title: 'Cinnamaldehyde', category: 'Natural Products', description: 'Cinnamon flavor.', formula: 'C9H8O', molecularWeight: '132.16 g/mol' },
+    { id: '7007', title: 'Vanillin', category: 'Natural Products', description: 'Vanilla flavor.', formula: 'C8H8O3', molecularWeight: '152.15 g/mol' },
+    { id: '1269614', title: 'Capsaicin', category: 'Natural Products', description: 'Chili heat.', formula: 'C18H27NO3', molecularWeight: '305.41 g/mol' },
+    { id: '915', title: 'Oxalic Acid', category: 'Toxins', description: 'In spinach/Anti-nutrient.', formula: 'C2H2O4', molecularWeight: '90.03 g/mol' },
+    { id: '1146', title: 'Phytic Acid', category: 'Metabolites', description: 'Phosphorus storage.', formula: 'C6H18O24P6', molecularWeight: '660.04 g/mol' },
+
+    // --- BATCH 8: MORE INDUSTRIAL CHEMICALS (Toxins) ---
+    { id: '1140', title: 'Toluene', category: 'Toxins', description: 'Solvent/Paint thinner.', formula: 'C7H8', molecularWeight: '92.14 g/mol' },
+    { id: '7237', title: 'p-Xylene', category: 'Toxins', description: 'Solvent.', formula: 'C8H10', molecularWeight: '106.17 g/mol' },
+    { id: '7929', title: 'm-Xylene', category: 'Toxins', description: 'Solvent.', formula: 'C8H10', molecularWeight: '106.17 g/mol' },
+    { id: '7238', title: 'o-Xylene', category: 'Toxins', description: 'Solvent.', formula: 'C8H10', molecularWeight: '106.17 g/mol' },
+    { id: '8091', title: 'Hexamine', category: 'Toxins', description: 'Solid fuel.', formula: 'C6H12N4', molecularWeight: '140.19 g/mol' },
+    { id: '7561', title: 'Cyclohexane', category: 'Toxins', description: 'Nonpolar solvent.', formula: 'C6H12', molecularWeight: '84.16 g/mol' },
+    { id: '8900', title: 'Methyl Methacrylate', category: 'Toxins', description: 'PMMA (Acrylic) monomer.', formula: 'C5H8O2', molecularWeight: '100.12 g/mol' }
 ];
