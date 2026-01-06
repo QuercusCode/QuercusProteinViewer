@@ -1811,36 +1811,12 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         });
                     } catch (e) { }
 
-
                     // Unified cartoon with optimized parameters for arrows and helices
-                    // We split into 3 parts to get distinct styles, using a "not" catch-all to prevent gaps
-
-                    // 1. Helices: Spiral Cylinders
                     component.addRepresentation('cartoon', {
-                        sele: 'helix',
                         color: currentColoring,
-                        radius: 0.25,            // Thicker
-                        subdiv: 15,              // Smooth
-                        radialSegments: 20,      // Smooth cylinders
-                        aspectRatio: 1.0,        // Cylindrical (1:1)
-                    });
-
-                    // 2. Beta Sheets: Flat Arrows
-                    component.addRepresentation('cartoon', {
-                        sele: 'sheet',
-                        color: currentColoring,
-                        aspectRatio: 10.0,       // Very flat/wide arrows
-                        subdiv: 15,              // Smooth
-                        arrowSegments: 15,       // Detailed arrowheads
-                    });
-
-                    // 3. Loops/Other: Thin Tubes (Catch-all to prevent gaps)
-                    component.addRepresentation('cartoon', {
-                        sele: 'not (helix or sheet)', // Mathematically complete coverage
-                        color: currentColoring,
-                        aspectRatio: 1.0,        // Round/Tubular
-                        radius: 0.15,            // Thinner than helices
-                        subdiv: 15,              // Smooth
+                        aspectRatio: 5,          // Flat arrows for sheets
+                        subdiv: 12,              // Smooth curves
+                        radialSegments: 20,      // Smooth helix cylinders
                     });
                 } else {
                     // Non-cartoon representations
