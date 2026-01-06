@@ -279,5 +279,83 @@ export const CHEMICAL_LIBRARY: ChemicalLibraryEntry[] = [
     { id: '174', title: 'Ethylene Glycol', category: 'Toxins', description: 'Antifreeze.', formula: 'C2H6O2', molecularWeight: '62.07 g/mol' },
     { id: '313', title: 'Hydrochloric Acid', category: 'Toxins', description: 'Stomach acid component.', formula: 'HCl', molecularWeight: '36.46 g/mol' },
     { id: '962', title: 'Water', category: 'Natural Products', description: 'Universal solvent.', formula: 'H2O', molecularWeight: '18.015 g/mol' },
-    { id: '5234', title: 'Sodium Chloride', category: 'Nutrients', description: 'Table salt.', formula: 'NaCl', molecularWeight: '58.44 g/mol' }
+    { id: '5234', title: 'Sodium Chloride', category: 'Nutrients', description: 'Table salt.', formula: 'NaCl', molecularWeight: '58.44 g/mol' },
+    // --- BATCH 5: LAB REAGENTS & BUFFERS (Metabolites/Other) ---
+    { id: '6503', title: 'Tris', category: 'Metabolites', description: 'Common buffer substance.', formula: 'C4H11NO3', molecularWeight: '121.14 g/mol' },
+    { id: '23831', title: 'HEPES', category: 'Metabolites', description: 'Zwitterionic organic chemical buffering agent.', formula: 'C8H18N2O4S', molecularWeight: '238.30 g/mol' },
+    { id: '6049', title: 'EDTA', category: 'Metabolites', description: 'Chelating agent.', formula: 'C10H16N2O8', molecularWeight: '292.24 g/mol' },
+    { id: '5754', title: 'SDS (Sodium Dodecyl Sulfate)', category: 'Metabolites', description: 'Detergent for denaturing proteins.', formula: 'C12H25NaO4S', molecularWeight: '288.38 g/mol' },
+    { id: '6506', title: 'Dithiothreitol (DTT)', category: 'Metabolites', description: 'Reducing agent.', formula: 'C4H10O2S2', molecularWeight: '154.25 g/mol' },
+    { id: '1127', title: 'Beta-Mercaptoethanol', category: 'Metabolites', description: 'Reducing agent.', formula: 'C2H6OS', molecularWeight: '78.13 g/mol' },
+    { id: '6209', title: 'Guanidine HCl', category: 'Metabolites', description: 'Protein denaturant.', formula: 'CH5N3', molecularWeight: '59.07 g/mol' },
+    { id: '5977', title: 'Imidazole', category: 'Metabolites', description: 'Buffer component/Histidine side chain.', formula: 'C3H4N2', molecularWeight: '68.08 g/mol' },
+
+    // --- BATCH 5: DYES & STAINS (Natural Products/Other) ---
+    { id: '6098', title: 'Methylene Blue', category: 'Natural Products', description: 'Medication and dye.', formula: 'C16H18ClN3S', molecularWeight: '319.85 g/mol' },
+    { id: '11068', title: 'Eosin Y', category: 'Natural Products', description: 'Red fluorescent dye.', formula: 'C20H6Br4Na2O5', molecularWeight: '691.85 g/mol' },
+    { id: '16212526', title: 'Coomassie Brilliant Blue G-250', category: 'Natural Products', description: 'Protein stain.', formula: 'C47H48N3NaO7S2', molecularWeight: '854.0 g/mol' },
+    { id: '14798', title: 'Ethidium Bromide', category: 'Toxins', description: 'Intercalating agent for DNA.', formula: 'C21H20BrN3', molecularWeight: '394.3 g/mol' },
+    { id: '2723872', title: 'DAPI', category: 'Natural Products', description: 'Fluorescent DNA stain.', formula: 'C16H15N5', molecularWeight: '277.32 g/mol' },
+    { id: '16850', title: 'Fluorescein', category: 'Natural Products', description: 'Synthetic organic compound/dye.', formula: 'C20H12O5', molecularWeight: '332.31 g/mol' },
+    { id: '6694', title: 'Rhodamine B', category: 'Natural Products', description: 'Fluorescent dye.', formula: 'C28H31ClN2O3', molecularWeight: '479.0 g/mol' },
+    { id: '5750', title: 'Phenol Red', category: 'Natural Products', description: 'pH indicator.', formula: 'C19H14O5S', molecularWeight: '354.38 g/mol' },
+
+    // --- BATCH 5: METABOLIC INTERMEDIATES (Metabolites) ---
+    { id: '978', title: 'Malic Acid', category: 'Metabolites', description: 'Krebs cycle intermediate.', formula: 'C4H6O5', molecularWeight: '134.09 g/mol' },
+    { id: '1064', title: 'Fumaric Acid', category: 'Metabolites', description: 'Krebs cycle intermediate.', formula: 'C4H4O4', molecularWeight: '116.07 g/mol' },
+    { id: '970', title: 'Oxaloacetic Acid', category: 'Metabolites', description: 'Krebs cycle intermediate.', formula: 'C4H4O5', molecularWeight: '132.07 g/mol' },
+    { id: '998', title: 'Alpha-Ketoglutaric Acid', category: 'Metabolites', description: 'Krebs cycle intermediate.', formula: 'C5H6NO5', molecularWeight: '146.11 g/mol' },
+    { id: '1005', title: 'Phosphoenolpyruvate (PEP)', category: 'Metabolites', description: 'Glycolysis high-energy phosphate.', formula: 'C3H5O6P', molecularWeight: '168.04 g/mol' },
+    { id: '728', title: 'Glyceraldehyde 3-Phosphate', category: 'Metabolites', description: 'Glycolysis intermediate.', formula: 'C3H7O6P', molecularWeight: '170.06 g/mol' },
+    { id: '657', title: 'NADH', category: 'Metabolites', description: 'Reduced coenzyme.', formula: 'C21H29N7O14P2', molecularWeight: '665.4 g/mol' },
+    { id: '979', title: 'NAD+', category: 'Metabolites', description: 'Oxidized coenzyme.', formula: 'C21H27N7O14P2', molecularWeight: '663.4 g/mol' },
+    { id: '654', title: 'Coenzyme A', category: 'Metabolites', description: 'Acyl group carrier.', formula: 'C21H36N7O16P3S', molecularWeight: '767.5 g/mol' },
+
+    // --- BATCH 5: ANTIBIOTICS & ANTIVIRALS (Drugs) ---
+    { id: '54675776', title: 'Tetracycline', category: 'Drugs', description: 'Broad-spectrum antibiotic.', formula: 'C22H24N2O8', molecularWeight: '444.4 g/mol' },
+    { id: '54671203', title: 'Doxycycline', category: 'Drugs', description: 'Tetracycline antibiotic.', formula: 'C22H24N2O8', molecularWeight: '444.4 g/mol' },
+    { id: '19649', title: 'Streptomycin', category: 'Drugs', description: 'Antibiotic for TB.', formula: 'C21H39N7O12', molecularWeight: '581.6 g/mol' },
+    { id: '5959', title: 'Chloramphenicol', category: 'Drugs', description: 'Antibiotic.', formula: 'C11H12Cl2N2O5', molecularWeight: '323.13 g/mol' },
+    { id: '14969', title: 'Vancomycin', category: 'Drugs', description: 'Glycopeptide antibiotic.', formula: 'C66H75Cl2N9O24', molecularWeight: '1449.3 g/mol' },
+    { id: '4634', title: 'Gentamicin', category: 'Drugs', description: 'Aminoglycoside antibiotic.', formula: 'Mixture', molecularWeight: '~470 g/mol' },
+    { id: '441203', title: 'Zidovudine (AZT)', category: 'Drugs', description: 'Antiretroviral.', formula: 'C10H13N5O4', molecularWeight: '267.24 g/mol' },
+    { id: '464205', title: 'Tenofovir', category: 'Drugs', description: 'Antiretroviral.', formula: 'C9H14N5O4P', molecularWeight: '287.21 g/mol' },
+    { id: '5562', title: 'Valacyclovir', category: 'Drugs', description: 'Antiviral.', formula: 'C13H20N6O4', molecularWeight: '324.34 g/mol' },
+
+    // --- BATCH 5: LIPIDS & SIGNALING (Metabolites) ---
+    { id: '5280360', title: 'Prostaglandin E2', category: 'Metabolites', description: 'Inflammatory mediator.', formula: 'C20H32O5', molecularWeight: '352.5 g/mol' },
+    { id: '5280644', title: 'Leukotriene B4', category: 'Metabolites', description: 'Inflammatory mediator.', formula: 'C20H32O4', molecularWeight: '336.5 g/mol' },
+    { id: '5311217', title: 'Thromboxane A2', category: 'Metabolites', description: 'Platelet aggregator.', formula: 'C20H32O5', molecularWeight: '352.5 g/mol' },
+    { id: '444899', title: 'Sphingosine', category: 'Metabolites', description: 'Membrane lipid backbone.', formula: 'C18H37NO2', molecularWeight: '299.5 g/mol' },
+    { id: '5282111', title: 'Ceramide', category: 'Metabolites', description: 'Waxy lipid molecule.', formula: 'R-group dependent', molecularWeight: 'Variable' },
+
+    // --- BATCH 5: TERPENES & PHYTOCHEMICALS (Natural Products) ---
+    { id: '6654', title: 'Alpha-Pinene', category: 'Natural Products', description: 'Pine scent.', formula: 'C10H16', molecularWeight: '136.23 g/mol' },
+    { id: '14896', title: 'Beta-Pinene', category: 'Natural Products', description: 'Pine scent.', formula: 'C10H16', molecularWeight: '136.23 g/mol' },
+    { id: '6549', title: 'Linalool', category: 'Natural Products', description: 'Lavender scent.', formula: 'C10H18O', molecularWeight: '154.25 g/mol' },
+    { id: '8842', title: 'Citral', category: 'Natural Products', description: 'Lemon scent.', formula: 'C10H16O', molecularWeight: '152.23 g/mol' },
+    { id: '637566', title: 'Caryophyllene', category: 'Natural Products', description: 'Spicy woody terpene.', formula: 'C15H24', molecularWeight: '204.35 g/mol' },
+    { id: '445070', title: 'Myrcene', category: 'Natural Products', description: 'Hops/Cannabis terpene.', formula: 'C10H16', molecularWeight: '136.23 g/mol' },
+    { id: '6164', title: 'Colchicine', category: 'Natural Products', description: 'Gout medication/toxic.', formula: 'C22H25NO6', molecularWeight: '399.4 g/mol' },
+    { id: '2353', title: 'Berberine', category: 'Natural Products', description: 'Alkaloid.', formula: 'C20H18NO4+', molecularWeight: '336.36 g/mol' },
+    { id: '638024', title: 'Piperine', category: 'Natural Products', description: 'Black pepper alkaloid.', formula: 'C17H19NO3', molecularWeight: '285.34 g/mol' },
+    { id: '25077', title: 'Capsorubin', category: 'Natural Products', description: 'Paprika pigment.', formula: 'C40H56O4', molecularWeight: '600.9 g/mol' },
+
+    // --- BATCH 5: SUGARS & CARBOHYDRATES (Metabolites) ---
+    { id: '5779', title: 'Ribose', category: 'Metabolites', description: 'RNA backbone.', formula: 'C5H10O5', molecularWeight: '150.13 g/mol' },
+    { id: '5460005', title: 'Deoxyribose', category: 'Metabolites', description: 'DNA backbone.', formula: 'C5H10O4', molecularWeight: '134.13 g/mol' },
+    { id: '18950', title: 'Mannose', category: 'Metabolites', description: 'Sugar monomer.', formula: 'C6H12O6', molecularWeight: '180.16 g/mol' },
+    { id: '135191', title: 'Xylose', category: 'Metabolites', description: 'Wood sugar.', formula: 'C5H10O5', molecularWeight: '150.13 g/mol' },
+    { id: '5984', title: 'Cellobiose', category: 'Metabolites', description: 'Glucose dimer.', formula: 'C12H22O11', molecularWeight: '342.30 g/mol' },
+
+    // --- BATCH 5: MISCELLANEOUS (Other) ---
+    { id: '15625', title: 'Dioxin (TCDD)', category: 'Toxins', description: 'Persistent organic pollutant.', formula: 'C12H4Cl4O2', molecularWeight: '321.96 g/mol' },
+    { id: '8372', title: 'Chlorpyrifos', category: 'Toxins', description: 'Organophosphate pesticide.', formula: 'C9H11Cl3NO3PS', molecularWeight: '350.59 g/mol' },
+    { id: '7144', title: 'Malathion', category: 'Toxins', description: 'Organophosphate insecticide.', formula: 'C10H19O6PS2', molecularWeight: '330.36 g/mol' },
+    { id: '86418', title: 'Imidacloprid', category: 'Toxins', description: 'Neonicotinoid insecticide.', formula: 'C9H10ClN5O2', molecularWeight: '255.66 g/mol' },
+    { id: '33032', title: 'MSG (Monosodium Glutamate)', category: 'Nutrients', description: 'Flavor enhancer.', formula: 'C5H8NO4Na', molecularWeight: '169.11 g/mol' },
+    { id: '6212', title: 'Chloroform', category: 'Toxins', description: 'Solvent/Anesthetic.', formula: 'CHCl3', molecularWeight: '119.38 g/mol' },
+    { id: '679', title: 'DMSO (Dimethyl Sulfoxide)', category: 'Metabolites', description: 'Polar aprotic solvent.', formula: 'C2H6OS', molecularWeight: '78.13 g/mol' },
+    { id: '6344', title: 'Acetonitrile', category: 'Toxins', description: 'Solvent.', formula: 'C2H3N', molecularWeight: '41.05 g/mol' },
+    { id: '8058', title: 'Hexane', category: 'Toxins', description: 'Nonpolar solvent.', formula: 'C6H14', molecularWeight: '86.18 g/mol' }
 ];
