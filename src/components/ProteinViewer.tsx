@@ -1805,8 +1805,21 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     } catch (e) { }
                 }
 
+                // Custom Color Scales for NGL
+                const PALETTES: Record<string, string[]> = {
+                    'viridis': ['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725'],
+                    'magma': ['#000004', '#51127c', '#b73779', '#fc8961', '#fcfdbf'],
+                    'cividis': ['#00204d', '#002051', '#7c7b78', '#fdea45', '#fdea45'], // NGL interpolates 
+                    'plasma': ['#0d0887', '#7e03a8', '#cc4778', '#f89540', '#f0f921'],
+                    'standard': [] // NGL default (Blue-Red usually)
+                };
 
-                // Special handling for cartoon to show proper arrows and helices
+                // Helper to get scale
+                const getColorScale = (p: string) => {
+                    return PALETTES[p] || undefined;
+                };
+
+                // Unified cartoon with optimized parameters for arrows and helices
                 if (repType === 'cartoon') {
                     // Force recalculation of secondary structure
                     try {
@@ -1815,15 +1828,16 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         });
                     } catch (e) { }
 
-                    // Unified cartoon with optimized parameters for arrows and helices
                     const params: any = {
                         color: currentColoring,
                         aspectRatio: 5,          // Flat arrows for sheets
                         subdiv: 12,              // Smooth curves
                         radialSegments: 20,      // Smooth helix cylinders
                     };
-                    if (colorPalette !== 'standard') {
-                        params.colorScale = colorPalette;
+
+                    const scale = getColorScale(colorPalette);
+                    if (scale && scale.length > 0) {
+                        params.colorScale = scale;
                     }
                     component.addRepresentation('cartoon', params);
                 } else {
@@ -1831,8 +1845,9 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     const params: any = {
                         color: currentColoring
                     };
-                    if (colorPalette !== 'standard') {
-                        params.colorScale = colorPalette;
+                    const scale = getColorScale(colorPalette);
+                    if (scale && scale.length > 0) {
+                        params.colorScale = scale;
                     }
                     component.addRepresentation(repType, params);
                 }
