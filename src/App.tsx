@@ -1304,6 +1304,8 @@ function App() {
         onClickResidue={(chain, resNo) => viewerRef.current?.focusResidue(chain, resNo)}
         onClickAtom={(serial) => viewerRef.current?.highlightAtom(serial)}
         isLightMode={isLightMode}
+        coloring={coloring}
+        colorPalette={colorPalette}
       />
 
       <HelpGuide />

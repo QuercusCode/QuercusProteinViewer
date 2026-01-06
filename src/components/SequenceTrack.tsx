@@ -1,8 +1,8 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { Map, Atom } from 'lucide-react';
-
-import type { ChainInfo } from '../types';
+import type { ChainInfo, ColoringType, ColorPalette } from '../types';
+import { getPaletteColor } from '../utils/colorUtils';
 
 interface SequenceTrackProps {
     id?: string;
@@ -12,7 +12,14 @@ interface SequenceTrackProps {
     onClickResidue: (chain: string, resNo: number) => void;
     onClickAtom?: (serial: number) => void; // Added for Atom Bar
     isLightMode: boolean;
+    coloring: ColoringType;
+    colorPalette: ColorPalette;
 }
+
+// Kyte-Doolittle Hydrophobicity Scale
+const HYDROPHOBICITY: Record<string, number> = {
+    I: 4.5, V: 4.2, L: 3.8, F: 2.8, C: 2.5, M: 1.9, A: 1.8, G: -0.4, T: -0.7, S: -0.8, W: -0.9, Y: -1.3, P: -1.6, H: -3.2, E: -3.5, Q: -3.5, D: -3.5, N: -3.5, K: -3.9, R: -4.5
+};
 
 const AMINO_ACID_COLORS: Record<string, string> = {
     // Hydrophobic (Red-ish)
@@ -46,8 +53,25 @@ const ATOM_COLORS: Record<string, string> = {
     I: '#7C3AED'   // Violet (Iodine)
 };
 
-const getResidueColor = (res: string, isLight: boolean, type: 'protein' | 'nucleic' | 'unknown' = 'protein') => {
+const getResidueColor = (
+    res: string,
+    isLight: boolean,
+    type: 'protein' | 'nucleic' | 'unknown' = 'protein',
+    coloring: ColoringType = 'chainid', // Default
+    palette: ColorPalette = 'standard' // Default
+) => {
     const char = res.toUpperCase();
+
+    // 1. Hydrophobicity Mode
+    if (coloring === 'hydrophobicity') {
+        const val = HYDROPHOBICITY[char];
+        if (val !== undefined) {
+            // Normalize -4.5 to 4.5 -> 0 to 1
+            const norm = (val + 4.5) / 9.0;
+            return getPaletteColor(norm, palette);
+        }
+    }
+
     if (type === 'nucleic') {
         return NUCLEIC_ACID_COLORS[char] || (isLight ? '#e5e5e5' : '#404040');
     }
@@ -67,12 +91,28 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
     onHoverResidue,
     onClickResidue,
     onClickAtom,
-    isLightMode
+    isLightMode,
+    coloring,
+    colorPalette
 }) => {
     const [activeChainIndex, setActiveChainIndex] = useState(0);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     const activeChain = chains[activeChainIndex];
+
+    // Pre-calculate B-Factor Range for current chain if needed
+    const bFactorRange = React.useMemo(() => {
+        if (!activeChain || !activeChain.bFactors || coloring !== 'bfactor') return { min: 0, max: 100 };
+        let min = Infinity;
+        let max = -Infinity;
+        activeChain.bFactors.forEach(b => {
+            if (b < min) min = b;
+            if (b > max) max = b;
+        });
+        // Avoid division by zero
+        if (max === min) max = min + 1;
+        return { min, max };
+    }, [activeChain, coloring]);
 
     // Auto-switch chain if highlighting a residue in a different chain (e.g. from 3D click)
     useEffect(() => {
@@ -185,11 +225,32 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
                             );
                         })
                     ) : (
-                        // Residue View (Standard)
+                        // Residue View (Updated)
                         activeChain.sequence.split('').map((res, idx) => {
                             const resNo = activeChain.residueMap ? activeChain.residueMap[idx] : idx + 1;
                             const isActive = highlightedResidue?.chain === activeChain.name && highlightedResidue.resNo === resNo;
-                            const color = getResidueColor(res, isLightMode, activeChain.type);
+
+                            // Determine Color
+                            let color = '#ccc';
+
+                            if (coloring === 'hydrophobicity') {
+                                const val = HYDROPHOBICITY[res.toUpperCase()];
+                                if (val !== undefined) {
+                                    // Normalize -4.5 to 4.5 -> 0-1
+                                    const norm = (val + 4.5) / 9.0;
+                                    color = getPaletteColor(norm, colorPalette);
+                                } else {
+                                    color = isLightMode ? '#e5e5e5' : '#404040';
+                                }
+                            } else if (coloring === 'bfactor' && activeChain.bFactors) {
+                                const val = activeChain.bFactors[idx] || 0;
+                                const range = bFactorRange.max - bFactorRange.min;
+                                const norm = range > 0 ? (val - bFactorRange.min) / range : 0;
+                                color = getPaletteColor(norm, colorPalette);
+                            } else {
+                                // Default / Residue Name coloring
+                                color = getResidueColor(res, isLightMode, activeChain.type, coloring, colorPalette);
+                            }
 
                             return (
                                 <button
