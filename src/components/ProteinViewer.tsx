@@ -1205,10 +1205,17 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     if (atom && atom.index !== hoveredAtomIndex) {
                         hoveredAtomIndex = atom.index;
                         if (onHoverRef.current) {
+                            let displayResName = atom.resname;
+                            // Use Structure Title/Filename for generic HET residues (chemicals)
+                            if (['HET', 'UNL', 'LIG', 'UNK'].includes(displayResName) && atom.structure && atom.structure.name) {
+                                const cleanName = atom.structure.name.split('.')[0];
+                                if (cleanName) displayResName = cleanName;
+                            }
+
                             onHoverRef.current({
                                 chain: atom.chainname,
                                 resNo: atom.resno,
-                                resName: atom.resname,
+                                resName: displayResName,
                                 atomIndex: atom.index,
                                 atomName: atom.atomname,
                                 atomSerial: atom.serial,
