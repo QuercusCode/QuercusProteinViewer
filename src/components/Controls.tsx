@@ -1182,57 +1182,58 @@ export const Controls: React.FC<ControlsProps> = ({
 
                         </div>
                     </SidebarSection>
+                </div>
+            </div>
 
-
-                    {/* Snapshot Preview Modal */}
-                    {
-                        previewSnapshot && (
-                            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setPreviewSnapshot(null)}>
-                                <div className="relative max-w-4xl max-h-[90vh] w-full rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
-                                    <button
-                                        onClick={() => setPreviewSnapshot(null)}
-                                        className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
-                                    >
-                                        <X className="w-6 h-6" />
-                                    </button>
-                                    <img src={previewSnapshot.url} alt="Preview" className="w-full h-full object-contain bg-neutral-900" />
-                                    <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-center gap-4">
-                                        <button
-                                            onClick={() => onDownloadSnapshot(previewSnapshot.id)}
-                                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
-                                        >
-                                            <Download className="w-4 h-4" /> Download
-                                        </button>
-                                    </div>
-                                </div>
+            {/* Snapshot Preview Modal */}
+            {
+                previewSnapshot && (
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setPreviewSnapshot(null)}>
+                        <div className="relative max-w-4xl max-h-[90vh] w-full rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+                            <button
+                                onClick={() => setPreviewSnapshot(null)}
+                                className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                            <img src={previewSnapshot.url} alt="Preview" className="w-full h-full object-contain bg-neutral-900" />
+                            <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-center gap-4">
+                                <button
+                                    onClick={() => onDownloadSnapshot(previewSnapshot.id)}
+                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
+                                >
+                                    <Download className="w-4 h-4" /> Download
+                                </button>
                             </div>
-                        )
-                    }
+                        </div>
+                    </div>
+                )
+            }
 
-                    {/* Movie Preview Modal */}
-                    {
-                        previewMovie && (
-                            <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setPreviewMovie(null)}>
-                                <div className="relative max-w-4xl max-h-[90vh] w-full rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 bg-black" onClick={e => e.stopPropagation()}>
-                                    <button
-                                        onClick={() => setPreviewMovie(null)}
-                                        className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
-                                    >
-                                        <X className="w-6 h-6" />
-                                    </button>
-                                    <video src={previewMovie.url} controls autoPlay className="w-full h-full object-contain bg-neutral-900 max-h-[80vh]" />
-                                    <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-center gap-4">
-                                        <button
-                                            onClick={() => onDownloadMovie(previewMovie.id)}
-                                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
-                                        >
-                                            <Download className="w-4 h-4" /> Download
-                                        </button>
-                                    </div>
-                                </div>
+            {/* Movie Preview Modal */}
+            {
+                previewMovie && (
+                    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setPreviewMovie(null)}>
+                        <div className="relative max-w-4xl max-h-[90vh] w-full rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 bg-black" onClick={e => e.stopPropagation()}>
+                            <button
+                                onClick={() => setPreviewMovie(null)}
+                                className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full hover:bg-black/70 transition-colors z-10"
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
+                            <video src={previewMovie.url} controls autoPlay className="w-full h-full object-contain bg-neutral-900 max-h-[80vh]" />
+                            <div className="absolute bottom-0 inset-x-0 p-4 bg-gradient-to-t from-black/80 to-transparent flex justify-center gap-4">
+                                <button
+                                    onClick={() => onDownloadMovie(previewMovie.id)}
+                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium transition-colors"
+                                >
+                                    <Download className="w-4 h-4" /> Download
+                                </button>
                             </div>
-                        )
-                    }
-                </>
-                );
+                        </div>
+                    </div>
+                )
+            }
+        </>
+    );
 };
