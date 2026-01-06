@@ -960,74 +960,83 @@ function App() {
         />
       )}
 
-      <Controls
-        pdbId={pdbId}
-        setPdbId={handlePdbIdChange}
-        dataSource={dataSource}
-        setDataSource={setDataSource}
-        onUpload={handleUpload}
-        representation={representation}
-        setRepresentation={setRepresentation}
-        coloring={coloring}
-        setColoring={setColoring}
-        onResetView={handleResetView}
-        chains={chains}
-        ligands={ligands}
-        customColors={customColors}
-        setCustomColors={setCustomColors}
-        isMeasurementMode={isMeasurementMode}
-        setIsMeasurementMode={setIsMeasurementMode}
-        isPublicationMode={isPublicationMode}
-        setIsPublicationMode={setIsPublicationMode}
-        onClearMeasurements={() => {
-          setMeasurements([]);
-          viewerRef.current?.clearMeasurements();
-        }}
-        isLightMode={isLightMode}
-        setIsLightMode={setIsLightMode}
-        highlightedResidue={highlightedResidue}
-        onResidueClick={handleSequenceResidueClick}
-        showSurface={showSurface}
-        setShowSurface={setShowSurface}
-        showLigands={showLigands}
-        setShowLigands={setShowLigands}
-        showIons={showIons}
-        setShowIons={setShowIons}
-        onFocusLigands={handleFocusLigands}
-        onRecordMovie={handleRecordMovie}
-        isRecording={isRecording}
-        proteinTitle={proteinTitle}
-        snapshots={snapshots}
-        onSnapshot={handleSnapshot}
-        onDownloadSnapshot={handleDownloadSnapshot}
-        onDeleteSnapshot={handleDeleteSnapshot}
-        isSpinning={isSpinning}
-        setIsSpinning={setIsSpinning}
-        onSaveSession={handleSaveSession}
-        onLoadSession={handleLoadSession}
-        onDownloadPDB={handleDownloadPDB}
-        onDownloadSequence={handleDownloadSequence}
-        onToggleContactMap={() => setShowContactMap(!showContactMap)}
-        movies={movies}
-        onDownloadMovie={handleDownloadMovie}
-        onDeleteMovie={handleDeleteMovie}
-        isCleanMode={isCleanMode}
-        setIsCleanMode={setIsCleanMode}
-        onShare={() => setShowShareModal(true)}
-        onToggleShare={() => setShowShareModal(true)}
-        onToggleLibrary={() => setIsLibraryOpen(!isLibraryOpen)}
-        onToggleMeasurement={() => setIsMeasurementMode(!isMeasurementMode)}
-        colorPalette={colorPalette}
-        setColorPalette={setColorPalette}
-        isDyslexicFont={isDyslexicFont}
-        setIsDyslexicFont={setIsDyslexicFont}
-        customBackgroundColor={customBackgroundColor}
-        setCustomBackgroundColor={setCustomBackgroundColor}
-        pdbMetadata={pdbMetadata}
-        onHighlightRegion={(selection, label) => {
-          viewerRef.current?.highlightRegion(selection, label);
-        }}
-      />
+      {/* Logic to determine if we are looking at a Chemical */}
+      {(() => {
+        const isChemical = dataSource === 'pubchem' ||
+          (file && /\.(sdf|mol|cif)$/i.test(file.name));
+
+        return (
+          <Controls
+            pdbId={pdbId}
+            setPdbId={handlePdbIdChange}
+            dataSource={dataSource}
+            setDataSource={setDataSource}
+            isChemical={!!isChemical}
+            onUpload={handleUpload}
+            representation={representation}
+            setRepresentation={setRepresentation}
+            coloring={coloring}
+            setColoring={setColoring}
+            onResetView={handleResetView}
+            chains={chains}
+            ligands={ligands}
+            customColors={customColors}
+            setCustomColors={setCustomColors}
+            isMeasurementMode={isMeasurementMode}
+            setIsMeasurementMode={setIsMeasurementMode}
+            isPublicationMode={isPublicationMode}
+            setIsPublicationMode={setIsPublicationMode}
+            onClearMeasurements={() => {
+              setMeasurements([]);
+              viewerRef.current?.clearMeasurements();
+            }}
+            isLightMode={isLightMode}
+            setIsLightMode={setIsLightMode}
+            highlightedResidue={highlightedResidue}
+            onResidueClick={handleSequenceResidueClick}
+            showSurface={showSurface}
+            setShowSurface={setShowSurface}
+            showLigands={showLigands}
+            setShowLigands={setShowLigands}
+            showIons={showIons}
+            setShowIons={setShowIons}
+            onFocusLigands={handleFocusLigands}
+            onRecordMovie={handleRecordMovie}
+            isRecording={isRecording}
+            proteinTitle={proteinTitle}
+            snapshots={snapshots}
+            onSnapshot={handleSnapshot}
+            onDownloadSnapshot={handleDownloadSnapshot}
+            onDeleteSnapshot={handleDeleteSnapshot}
+            isSpinning={isSpinning}
+            setIsSpinning={setIsSpinning}
+            onSaveSession={handleSaveSession}
+            onLoadSession={handleLoadSession}
+            onDownloadPDB={handleDownloadPDB}
+            onDownloadSequence={handleDownloadSequence}
+            onToggleContactMap={() => setShowContactMap(!showContactMap)}
+            movies={movies}
+            onDownloadMovie={handleDownloadMovie}
+            onDeleteMovie={handleDeleteMovie}
+            isCleanMode={isCleanMode}
+            setIsCleanMode={setIsCleanMode}
+            onShare={() => setShowShareModal(true)}
+            onToggleShare={() => setShowShareModal(true)}
+            onToggleLibrary={() => setIsLibraryOpen(!isLibraryOpen)}
+            onToggleMeasurement={() => setIsMeasurementMode(!isMeasurementMode)}
+            colorPalette={colorPalette}
+            setColorPalette={setColorPalette}
+            isDyslexicFont={isDyslexicFont}
+            setIsDyslexicFont={setIsDyslexicFont}
+            customBackgroundColor={customBackgroundColor}
+            setCustomBackgroundColor={setCustomBackgroundColor}
+            pdbMetadata={pdbMetadata}
+            onHighlightRegion={(selection, label) => {
+              viewerRef.current?.highlightRegion(selection, label);
+            }}
+          />
+        );
+      })()}
 
       <ProteinViewer
         ref={viewerRef}
