@@ -15,7 +15,7 @@ import { CommandPalette, type CommandAction } from './components/CommandPalette'
 import { HUD } from './components/HUD';
 import { MeasurementPanel } from './components/MeasurementPanel';
 import { OFFLINE_LIBRARY } from './data/library';
-import { fetchPDBMetadata, type DataSource } from './utils/pdbUtils';
+import { fetchStructureMetadata, type DataSource } from './utils/pdbUtils';
 import type { PDBMetadata, Measurement, MeasurementTextColor } from './types';
 import {
   Camera, RefreshCw, Upload,
@@ -152,7 +152,37 @@ function App() {
 
     setHighlightedResidue(null);
     // Auto-set title from filename (removing extension)
-    setProteinTitle(uploadedFile.name.replace(/\.[^/.]+$/, ""));
+    const filenameTitle = uploadedFile.name.replace(/\.[^/.]+$/, "");
+    setProteinTitle(filenameTitle);
+
+    // Attempt to extract IUPAC Name for chemicals (SDF/MOL)
+    const ext = uploadedFile.name.split('.').pop()?.toLowerCase();
+    if (ext === 'sdf' || ext === 'mol') {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        if (!content) return;
+
+        // 1. Look for <PUBCHEM_IUPAC_NAME> tag (Standard PubChem SDF)
+        // Format: > <PUBCHEM_IUPAC_NAME>\nName\n
+        const iupacMatch = content.match(/>\s*<PUBCHEM_IUPAC_NAME>\s*\n(.*?)\n/i);
+        if (iupacMatch && iupacMatch[1]) {
+          setProteinTitle(iupacMatch[1].trim());
+          return;
+        }
+
+        // 2. Fallback: First line of SDF is technically the molecule title
+        const lines = content.split('\n');
+        if (lines.length > 0) {
+          const firstLine = lines[0].trim();
+          // Check if it's a valid title (not empty, not too long, not just the CID if filename was CID)
+          if (firstLine.length > 0 && firstLine.length < 150) {
+            setProteinTitle(firstLine);
+          }
+        }
+      };
+      reader.readAsText(uploadedFile); // Read full text (usually small for chemicals)
+    }
   };
 
   const [isPublicationMode, setIsPublicationMode] = useState(false);
@@ -326,16 +356,25 @@ function App() {
           depositionDate: libraryEntry.depositionDate || 'Unknown',
           title: libraryEntry.title
         });
+        setProteinTitle(libraryEntry.title);
       } else if (!file) {
-        // Fallback to API fetch ONLY if no file
-        fetchPDBMetadata(pdbId).then(data => {
-          if (data) setPdbMetadata(data);
+        // Fallback to generic fetch (PDB or PubChem)
+        setIsLoading(true);
+        fetchStructureMetadata(pdbId, dataSource).then(data => {
+          if (data) {
+            setPdbMetadata(data);
+            if (data.title) setProteinTitle(data.title);
+          } else {
+            setPdbMetadata(null);
+            setProteinTitle(null);
+          }
+          setIsLoading(false);
         });
       }
     } else {
       setPdbMetadata(null); // Clear/Reset if file uploaded or no ID
     }
-  }, [pdbId, file]);
+  }, [pdbId, dataSource, file]);
 
   const [isRecording, setIsRecording] = useState(false);
 

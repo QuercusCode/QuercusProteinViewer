@@ -70,19 +70,19 @@ export const fetchPDBMetadata = async (pdbId: string): Promise<PDBMetadata | nul
  * Keeps 3+ letter codes (Molecules) as Uppercase (HEM -> HEM).
  */
 // ... existing imports
-export type DataSource = 'pdb' | 'cod' | 'pubchem';
+export type DataSource = 'pdb' | 'pubchem';
 
 export const getStructureUrl = (id: string, source: DataSource): string => {
     switch (source) {
-        case 'cod': return `https://www.crystallography.net/cod/${id}.cif`;
         case 'pubchem': return `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${id}/record/SDF/?record_type=3d`;
         case 'pdb': default: return `https://files.rcsb.org/download/${id}.pdb`; // Explicitly use PDB format
     }
 };
 
 export const fetchPubChemMetadata = async (cid: string): Promise<PDBMetadata | null> => {
+    // ... existing PubChem metadata logic
     try {
-        const res = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property/Title,MolecularWeight,MolecularFormula/JSON`);
+        const res = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property/Title,MolecularWeight,MolecularFormula,IUPACName/JSON`);
         if (!res.ok) return null;
         const json = await res.json();
         const props = json.PropertyTable?.Properties?.[0];
@@ -94,7 +94,7 @@ export const fetchPubChemMetadata = async (cid: string): Promise<PDBMetadata | n
             resolution: 'N/A',
             organism: 'Synthetic/Nature',
             depositionDate: 'N/A',
-            title: props.Title || `PubChem CID ${cid}`
+            title: props.IUPACName || props.Title || `PubChem CID ${cid}`
         };
     } catch (e) {
         console.warn("PubChem metadata fetch failed", e);
@@ -105,16 +105,6 @@ export const fetchPubChemMetadata = async (cid: string): Promise<PDBMetadata | n
 export const fetchStructureMetadata = async (id: string, source: DataSource): Promise<PDBMetadata | null> => {
     if (source === 'pdb') return fetchPDBMetadata(id);
     if (source === 'pubchem') return fetchPubChemMetadata(id);
-    if (source === 'cod') {
-        // COD doesn't have a simple JSON metadata API, return basic info
-        return {
-            method: 'X-Ray Diffraction',
-            resolution: 'N/A',
-            organism: 'Mineral/Crystal',
-            depositionDate: 'N/A',
-            title: `COD Entry ${id}`
-        };
-    }
     return null;
 };
 

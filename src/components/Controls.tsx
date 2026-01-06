@@ -436,12 +436,11 @@ export const Controls: React.FC<ControlsProps> = ({
                                 value={dataSource}
                                 onChange={(e) => setDataSource(e.target.value as DataSource)}
                                 className={`w-full rounded-lg px-3 py-1.5 text-xs font-medium border outline-none transition-all appearance-none cursor-pointer ${isLightMode
-                                        ? 'bg-neutral-50 border-neutral-200 text-neutral-700 hover:border-neutral-300'
-                                        : 'bg-white/5 border-white/10 text-neutral-300 hover:border-white/20'
+                                    ? 'bg-neutral-50 border-neutral-200 text-neutral-700 hover:border-neutral-300'
+                                    : 'bg-white/5 border-white/10 text-neutral-300 hover:border-white/20'
                                     }`}
                             >
                                 <option value="pdb">RCSB PDB (Protein/Macromolecules)</option>
-                                <option value="cod">COD (Crystal Structures)</option>
                                 <option value="pubchem">PubChem (Small Molecules)</option>
                             </select>
 
@@ -453,9 +452,8 @@ export const Controls: React.FC<ControlsProps> = ({
                                         value={localPdbId}
                                         onChange={(e) => setLocalPdbId(e.target.value)}
                                         placeholder={
-                                            dataSource === 'cod' ? "COD ID (e.g. 1000000)" :
-                                                dataSource === 'pubchem' ? "PubChem CID (e.g. 2244)" :
-                                                    "PDB ID (e.g. 1crn)"
+                                            dataSource === 'pubchem' ? "PubChem CID (e.g. 2244)" :
+                                                "PDB ID (e.g. 1crn)"
                                         }
                                         className={`w-full rounded-lg pl-9 pr-3 py-2 border outline-none transition-all ${inputBg}`}
                                     />

@@ -1315,7 +1315,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                         // Add extension hint for NGL if needed
                         if (dataSource === 'pubchem') loadParams.ext = 'sdf';
-                        if (dataSource === 'cod') loadParams.ext = 'cif';
 
                         const AVAILABLE_LOCAL_PDBS = ['2b3p', '4hhb'];
                         if (dataSource === 'pdb' && AVAILABLE_LOCAL_PDBS.includes(cleanId)) {
