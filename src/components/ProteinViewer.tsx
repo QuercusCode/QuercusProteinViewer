@@ -1804,48 +1804,22 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                 // Special handling for cartoon to show proper arrows and helices
                 if (repType === 'cartoon') {
-                    // Force recalculation of secondary structure for proper helix/sheet detection
+                    // Force recalculation of secondary structure
                     try {
                         component.structure.eachModel((m: any) => {
                             if (m.calculateSecondaryStructure) m.calculateSecondaryStructure();
                         });
                     } catch (e) { }
 
-                    // Render beta sheets as pronounced ARROWS
+                    // Unified cartoon with optimized parameters for arrows and helices
                     component.addRepresentation('cartoon', {
-                        sele: 'sheet',
                         color: currentColoring,
-                        aspectRatio: 8,          // Very flat/wide arrows
-                        subdiv: 15,              // Smooth
-                        name: 'sheet_arrows'
-                    });
-
-                    // Render alpha helices as SPIRAL CYLINDERS
-                    component.addRepresentation('cartoon', {
-                        sele: 'helix',
-                        color: currentColoring,
-                        subdiv: 15,
-                        radialSegments: 24,      // Very smooth cylinders
-                        name: 'helix_spirals'
-                    });
-
-                    // Render loops/turns as thin smooth tubes
-                    component.addRepresentation('cartoon', {
-                        sele: 'turn or coil',
-                        color: currentColoring,
-                        aspectRatio: 2,          // Thinner
-                        name: 'loops'
-                    });
-
-                    // Catch-all for any protein residues not classified (prevents gaps)
-                    component.addRepresentation('cartoon', {
-                        sele: 'protein and not (helix or sheet or turn or coil)',
-                        color: currentColoring,
-                        aspectRatio: 2,
-                        name: 'unclassified'
+                        aspectRatio: 5,          // Flat arrows for sheets
+                        subdiv: 12,              // Smooth curves
+                        radialSegments: 20,      // Smooth helix cylinders
                     });
                 } else {
-                    // Non-cartoon representations use standard approach
+                    // Non-cartoon representations
                     component.addRepresentation(repType, {
                         color: currentColoring
                     });
