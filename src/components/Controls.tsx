@@ -1334,7 +1334,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                         <button onClick={onResetView} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}>
                                             <RotateCcw className="w-3.5 h-3.5" /> <span className="text-xs">Reset</span>
                                         </button>
-                                        <button onClick={onSnapshot} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:text-blue-500 hover:border-blue-500/50`}>
+                                        <button onClick={onSnapshot} className={`flex-1 flex items-center justify-center gap-1 border py-2 rounded-lg transition-all ${cardBg} hover:text-blue-500 hover:border-blue-500/50`}>
                                             <Camera className="w-3.5 h-3.5" /> <span className="text-xs">Snapshot</span>
                                         </button>
                                         <button onClick={onToggleShare} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:text-green-500 hover:border-green-500/50`}>
