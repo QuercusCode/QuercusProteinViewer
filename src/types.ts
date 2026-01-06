@@ -65,6 +65,9 @@ export interface ResidueInfo {
     resNo: number;
     resName: string;
     atomIndex?: number;
+    atomName?: string;   // Added
+    atomSerial?: number; // Added
+    element?: string;    // Added
     position?: { x: number; y: number; z: number };
 }
 

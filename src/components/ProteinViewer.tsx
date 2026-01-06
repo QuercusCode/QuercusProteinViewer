@@ -1208,7 +1208,11 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             onHoverRef.current({
                                 chain: atom.chainname,
                                 resNo: atom.resno,
-                                resName: atom.resname
+                                resName: atom.resname,
+                                atomIndex: atom.index,
+                                atomName: atom.atomname,
+                                atomSerial: atom.serial,
+                                element: atom.element
                             });
                         }
                     }

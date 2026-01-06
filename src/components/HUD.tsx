@@ -27,9 +27,21 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode }: HUDProp
 
                 {hoveredResidue ? (
                     <div className="flex items-center gap-3 animate-in fade-in duration-200">
+                        {/* Residue Info */}
                         <span className={`font-semibold ${textColor}`}>
                             {hoveredResidue.resName} <span className="opacity-70">{hoveredResidue.resNo}</span>
                         </span>
+
+                        {/* Atom Info (if available) - Separated by bullet */}
+                        {hoveredResidue.atomName && (
+                            <>
+                                <span className={`opacity-40 ${textColor}`}>•</span>
+                                <span className={`font-mono text-sm opacity-90 ${textColor}`}>
+                                    {hoveredResidue.atomName} <span className="text-[10px] opacity-60">#{hoveredResidue.atomSerial}</span>
+                                </span>
+                            </>
+                        )}
+
                         <div className={`h-3 w-px ${isLightMode ? 'bg-black/10' : 'bg-white/20'}`} />
                         <span className={`text-xs uppercase tracking-wide opacity-60 ${textColor}`}>
                             Chain {hoveredResidue.chain}
