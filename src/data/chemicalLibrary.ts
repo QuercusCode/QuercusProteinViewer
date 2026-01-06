@@ -259,6 +259,54 @@ export const CHEMICAL_LIBRARY: ChemicalLibraryEntry[] = [
         formula: 'C47H51NO14',
         molecularWeight: '853.9 g/mol'
     },
+    {
+        id: '5584',
+        title: 'Warfarin',
+        category: 'Drugs',
+        description: 'Anticoagulant medication used to prevent blood clots.',
+        formula: 'C19H16O4',
+        molecularWeight: '308.33 g/mol'
+    },
+    {
+        id: '5090',
+        title: 'Ranitidine',
+        category: 'Drugs',
+        description: 'H2 blocker used to reduce stomach acid.',
+        formula: 'C13H22N4O3S',
+        molecularWeight: '314.40 g/mol'
+    },
+    {
+        id: '4112',
+        title: 'Methotrexate',
+        category: 'Drugs',
+        description: 'Chemotherapy and immune system suppressant.',
+        formula: 'C20H22N8O5',
+        molecularWeight: '454.44 g/mol'
+    },
+    {
+        id: '5479',
+        title: 'Salbutamol (Albuterol)',
+        category: 'Drugs',
+        description: 'Bronchodilator for asthma relief.',
+        formula: 'C13H21NO3',
+        molecularWeight: '239.31 g/mol'
+    },
+    {
+        id: '3345',
+        title: 'Fentanyl',
+        category: 'Drugs',
+        description: 'Potent synthetic opioid pain medication.',
+        formula: 'C22H28N2O',
+        molecularWeight: '336.5 g/mol'
+    },
+    {
+        id: '2708',
+        title: 'Chloroquine',
+        category: 'Drugs',
+        description: 'Medication used to prevent and treat malaria.',
+        formula: 'C18H26ClN3',
+        molecularWeight: '319.87 g/mol'
+    },
 
     // --- NEUROTRANSMITTERS ---
     {
@@ -325,8 +373,24 @@ export const CHEMICAL_LIBRARY: ChemicalLibraryEntry[] = [
         formula: 'C10H13N5O4',
         molecularWeight: '267.24 g/mol'
     },
+    {
+        id: '137',
+        title: 'Aspartate',
+        category: 'Neurotransmitters',
+        description: 'Excitatory neurotransmitter.',
+        formula: 'C4H7NO4',
+        molecularWeight: '133.10 g/mol'
+    },
+    {
+        id: '611',
+        title: 'Glycine',
+        category: 'Neurotransmitters',
+        description: 'Inhibitory neurotransmitter in the spinal cord.',
+        formula: 'C2H5NO2',
+        molecularWeight: '75.07 g/mol'
+    },
 
-    // --- PSYCHOACTIVES (Sub-category under Neurotransmitters/Natural for simplicity) ---
+    // --- PSYCHOACTIVES ---
     {
         id: '2519',
         title: 'Caffeine',
@@ -354,7 +418,7 @@ export const CHEMICAL_LIBRARY: ChemicalLibraryEntry[] = [
     {
         id: '5761',
         title: 'LSD',
-        category: 'Neurotransmitters', // Close enough for functional categorization
+        category: 'Neurotransmitters',
         description: 'Potent psychedelic drug.',
         formula: 'C20H25N3O',
         molecularWeight: '323.4 g/mol'
@@ -366,6 +430,30 @@ export const CHEMICAL_LIBRARY: ChemicalLibraryEntry[] = [
         description: 'Psychedelic pro-drug produced by fungi.',
         formula: 'C12H17N2O4P',
         molecularWeight: '284.25 g/mol'
+    },
+    {
+        id: '3033890',
+        title: 'MDMA (Ecstasy)',
+        category: 'Drugs',
+        description: 'Empathogen-entactogen psychoactive drug.',
+        formula: 'C11H15NO2',
+        molecularWeight: '193.25 g/mol'
+    },
+    {
+        id: '4485',
+        title: 'Methamphetamine',
+        category: 'Drugs',
+        description: 'Potent central nervous system stimulant.',
+        formula: 'C10H15N',
+        molecularWeight: '149.23 g/mol'
+    },
+    {
+        id: '2160',
+        title: 'Amphetamine',
+        category: 'Drugs',
+        description: 'CNS stimulant used to treat ADHD.',
+        formula: 'C9H13N',
+        molecularWeight: '135.21 g/mol'
     },
 
     // --- METABOLITES / ENERGY ---
@@ -442,6 +530,168 @@ export const CHEMICAL_LIBRARY: ChemicalLibraryEntry[] = [
         molecularWeight: '60.06 g/mol'
     },
 
+    // --- AMINO ACIDS (Standard 20) ---
+    {
+        id: '5960',
+        title: 'Glycine',
+        category: 'Metabolites',
+        description: 'Smallest amino acid, inhibitory neurotransmitter.',
+        formula: 'C2H5NO2',
+        molecularWeight: '75.07 g/mol'
+    },
+    {
+        id: '5950',
+        title: 'Alanine',
+        category: 'Metabolites',
+        description: 'Used in the biosynthesis of proteins.',
+        formula: 'C3H7NO2',
+        molecularWeight: '89.09 g/mol'
+    },
+    {
+        id: '6287',
+        title: 'Valine',
+        category: 'Metabolites',
+        description: 'Branched-chain amino acid.',
+        formula: 'C5H11NO2',
+        molecularWeight: '117.15 g/mol'
+    },
+    {
+        id: '6106',
+        title: 'Leucine',
+        category: 'Metabolites',
+        description: 'Essential branched-chain amino acid.',
+        formula: 'C6H13NO2',
+        molecularWeight: '131.17 g/mol'
+    },
+    {
+        id: '6306',
+        title: 'Isoleucine',
+        category: 'Metabolites',
+        description: 'Isomer of leucine.',
+        formula: 'C6H13NO2',
+        molecularWeight: '131.17 g/mol'
+    },
+    {
+        id: '6274',
+        title: 'Proline',
+        category: 'Metabolites',
+        description: 'Cyclic amino acid influencing protein structure.',
+        formula: 'C5H9NO2',
+        molecularWeight: '115.13 g/mol'
+    },
+    {
+        id: '994',
+        title: 'Phenylalanine',
+        category: 'Metabolites',
+        description: 'Precursor for tyrosine and neurotransmitters.',
+        formula: 'C9H11NO2',
+        molecularWeight: '165.19 g/mol'
+    },
+    {
+        id: '6057',
+        title: 'Tyrosine',
+        category: 'Metabolites',
+        description: 'Precursor for dopamine and epinephrine.',
+        formula: 'C9H11NO3',
+        molecularWeight: '181.19 g/mol'
+    },
+    {
+        id: '6305',
+        title: 'Tryptophan',
+        category: 'Metabolites',
+        description: 'Precursor for serotonin and melatonin.',
+        formula: 'C11H12N2O2',
+        molecularWeight: '204.23 g/mol'
+    },
+    {
+        id: '5951',
+        title: 'Serine',
+        category: 'Metabolites',
+        description: 'Key role in metabolism and signaling.',
+        formula: 'C3H7NO3',
+        molecularWeight: '105.09 g/mol'
+    },
+    {
+        id: '6288',
+        title: 'Threonine',
+        category: 'Metabolites',
+        description: 'Polar amino acid with a hydroxyl group.',
+        formula: 'C4H9NO3',
+        molecularWeight: '119.12 g/mol'
+    },
+    {
+        id: '5862',
+        title: 'Cysteine',
+        category: 'Metabolites',
+        description: 'Contains thiol group, forms disulfide bonds.',
+        formula: 'C3H7NO2S',
+        molecularWeight: '121.16 g/mol'
+    },
+    {
+        id: '6137',
+        title: 'Methionine',
+        category: 'Metabolites',
+        description: 'Initiator amino acid in protein synthesis.',
+        formula: 'C5H11NO2S',
+        molecularWeight: '149.21 g/mol'
+    },
+    {
+        id: '5961',
+        title: 'Histidine',
+        category: 'Metabolites',
+        description: 'Precursor to histamine.',
+        formula: 'C6H9N3O2',
+        molecularWeight: '155.15 g/mol'
+    },
+    {
+        id: '5962',
+        title: 'Lysine',
+        category: 'Metabolites',
+        description: 'Essential for growth and tissue repair.',
+        formula: 'C6H14N2O2',
+        molecularWeight: '146.19 g/mol'
+    },
+    {
+        id: '6267',
+        title: 'Arginine',
+        category: 'Metabolites',
+        description: 'Precursor for nitric oxide.',
+        formula: 'C6H14N4O2',
+        molecularWeight: '174.20 g/mol'
+    },
+    {
+        id: '5904',
+        title: 'Aspartic Acid',
+        category: 'Metabolites',
+        description: 'Carries excitatory signals.',
+        formula: 'C4H7NO4',
+        molecularWeight: '133.10 g/mol'
+    },
+    {
+        id: '33032',
+        title: 'Glutamic Acid',
+        category: 'Metabolites',
+        description: 'Key neurotransmitter and metabolic fuel.',
+        formula: 'C5H9NO4',
+        molecularWeight: '147.13 g/mol'
+    },
+    {
+        id: '5960',
+        title: 'Asparagine',
+        category: 'Metabolites',
+        description: 'First amino acid isolated.',
+        formula: 'C4H8N2O3',
+        molecularWeight: '132.12 g/mol'
+    },
+    {
+        id: '5961',
+        title: 'Glutamine',
+        category: 'Metabolites',
+        description: 'Most abundant amino acid in blood.',
+        formula: 'C5H10N2O3',
+        molecularWeight: '146.14 g/mol'
+    },
+
     // --- TOXINS ---
     {
         id: '6324668',
@@ -499,6 +749,30 @@ export const CHEMICAL_LIBRARY: ChemicalLibraryEntry[] = [
         formula: 'C45H73NO15',
         molecularWeight: '868.0 g/mol'
     },
+    {
+        id: '5353986',
+        title: 'Ricin',
+        category: 'Toxins',
+        description: 'Highly toxic protein produced in seeds of castor oil plant.',
+        formula: 'Protein',
+        molecularWeight: '~65 kDa'
+    },
+    {
+        id: '1049',
+        title: 'Paraquat',
+        category: 'Toxins',
+        description: 'Toxic herbicide.',
+        formula: 'C12H14N2',
+        molecularWeight: '186.25 g/mol'
+    },
+    {
+        id: '3039',
+        title: 'DDT',
+        category: 'Toxins',
+        description: 'Infamous organochlorine insecticide.',
+        formula: 'C14H9Cl5',
+        molecularWeight: '354.49 g/mol'
+    },
 
     // --- HORMONES ---
     {
@@ -548,6 +822,22 @@ export const CHEMICAL_LIBRARY: ChemicalLibraryEntry[] = [
         description: 'Thyroid hormone responsible for metabolism regulation.',
         formula: 'C15H11I4NO4',
         molecularWeight: '776.87 g/mol'
+    },
+    {
+        id: '5743',
+        title: 'Dexamethasone',
+        category: 'Hormones',
+        description: 'Corticosteroid medication.',
+        formula: 'C22H29FO5',
+        molecularWeight: '392.46 g/mol'
+    },
+    {
+        id: '5753',
+        title: 'Prednisone',
+        category: 'Hormones',
+        description: 'Synthetic corticosteroid drug.',
+        formula: 'C21H26O5',
+        molecularWeight: '358.43 g/mol'
     },
 
     // --- NATURAL PRODUCTS ---
@@ -614,5 +904,37 @@ export const CHEMICAL_LIBRARY: ChemicalLibraryEntry[] = [
         description: 'Bright red carotene pigment in tomatoes.',
         formula: 'C40H56',
         molecularWeight: '536.87 g/mol'
+    },
+    {
+        id: '5281233',
+        title: 'Beta-Carotene',
+        category: 'Natural Products',
+        description: 'Red-orange pigment in plants and fruits.',
+        formula: 'C40H56',
+        molecularWeight: '536.87 g/mol'
+    },
+    {
+        id: '992',
+        title: 'Limonene',
+        category: 'Natural Products',
+        description: 'Major component of the oil of citrus fruit peels.',
+        formula: 'C10H16',
+        molecularWeight: '136.23 g/mol'
+    },
+    {
+        id: '6549',
+        title: 'Menthol',
+        category: 'Natural Products',
+        description: 'Waxy, crystalline substance from mint.',
+        formula: 'C10H20O',
+        molecularWeight: '156.27 g/mol'
+    },
+    {
+        id: '702',
+        title: 'Ethanol',
+        category: 'Natural Products',
+        description: 'Simple alcohol and psychoactive substance.',
+        formula: 'C2H6O',
+        molecularWeight: '46.07 g/mol'
     }
 ];
