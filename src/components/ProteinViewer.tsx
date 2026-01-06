@@ -1790,25 +1790,31 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 });
             } else if ((currentColoring as string) === 'sstruc') {
                 // SECONDARY STRUCTURE: Explicit Multi-representation approach
-                // This ensures consistent colors (Magenta/Gold/White) regardless of NGL's internal scheme defaults.
+                // Ensure Secondary Structure is computed (DSSP) if missing
+                try {
+                    // Force calculation if not present
+                    component.structure.eachModel((m: any) => {
+                        if (m.calculateSecondaryStructure) m.calculateSecondaryStructure();
+                    });
+                } catch (e) { }
 
                 // Helices -> Magenta
                 component.addRepresentation(repType, {
-                    color: 0xFF00FF,
+                    color: '#FF00FF',
                     sele: 'helix',
                     name: 'structure_helix'
                 });
 
                 // Sheets -> Gold/Yellow
                 component.addRepresentation(repType, {
-                    color: 0xFFD700,
+                    color: '#FFD700',
                     sele: 'sheet',
                     name: 'structure_sheet'
                 });
 
                 // Coils/Turns (Everything else) -> White
                 component.addRepresentation(repType, {
-                    color: 0xFFFFFF,
+                    color: '#FFFFFF',
                     sele: 'not (helix or sheet)',
                     name: 'structure_coil'
                 });
