@@ -14,6 +14,14 @@ export interface UniProtFeature {
     chain?: string;
 }
 
+export interface AtomInfo {
+    serial: number;
+    name: string;
+    element: string;
+    resNo: number; // In case we have a few residues
+    chain: string;
+}
+
 export interface ChainInfo {
     name: string;
     min: number;
@@ -21,6 +29,7 @@ export interface ChainInfo {
     sequence: string;
     residueMap?: number[]; // Added: Maps sequence index to actual PDB residue number
     type?: 'protein' | 'nucleic' | 'unknown'; // Added: To distinguish polymer type
+    atoms?: AtomInfo[]; // Added: For small chemicals, list atoms directly
 }
 
 export interface StructureInfo {

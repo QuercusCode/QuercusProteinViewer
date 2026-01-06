@@ -92,6 +92,7 @@ export interface ProteinViewerRef {
     highlightRegion: (selection: string, label?: string) => void;
     getLigandInteractions: () => Promise<import('../types').LigandInteraction[]>;
     focusResidue: (chain: string, resNo: number) => void;
+    highlightAtom: (serial: number) => void;
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
@@ -533,6 +534,26 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             } catch (e) {
                 console.warn("Highlight residue failed:", e);
             }
+        },
+        highlightAtom: (serial: number) => {
+            if (!componentRef.current) return;
+            const component = componentRef.current;
+            try {
+                if (highlightComponentRef.current) {
+                    component.removeRepresentation(highlightComponentRef.current);
+                    highlightComponentRef.current = null;
+                }
+                const selection = `@${serial}`;
+                console.log(`Highlighting atom: ${selection}`);
+
+                highlightComponentRef.current = component.addRepresentation('spacefill', {
+                    sele: selection,
+                    color: '#FFD700', // Gold
+                    radius: 0.5
+                });
+
+                component.autoView(selection, 1000);
+            } catch (e) { console.warn("Highlight atom failed:", e); }
         },
         focusLigands: () => {
             if (!componentRef.current || !stageRef.current) return;
@@ -1372,8 +1393,34 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                 if (nucleicCount > proteinCount) chainType = 'nucleic';
                                 else if (proteinCount > 0) chainType = 'protein';
 
-                                console.log(`Chain ${c.chainname}: Range ${minSeq}-${maxSeq}, SeqLen: ${seq.length}, Type: ${chainType}`);
-                                chains.push({ name: c.chainname, min: minSeq, max: maxSeq, sequence: seq, residueMap: resMap, type: chainType });
+                                // Extract Atoms for Small Molecules
+                                let atomList: any[] = [];
+                                if (chainType === 'unknown' && seq.length < 50) { // Limit to reasonable size
+                                    try {
+                                        c.eachResidue((r: any) => {
+                                            r.eachAtom((a: any) => {
+                                                atomList.push({
+                                                    serial: a.serial,
+                                                    name: a.atomname,
+                                                    element: a.element,
+                                                    resNo: r.resno,
+                                                    chain: c.chainname
+                                                });
+                                            });
+                                        });
+                                    } catch (eAtom) { console.warn("Atom iteration failed", eAtom); }
+                                }
+
+                                console.log(`Chain ${c.chainname}: Range ${minSeq}-${maxSeq}, SeqLen: ${seq.length}, Type: ${chainType}, Atoms: ${atomList.length}`);
+                                chains.push({
+                                    name: c.chainname,
+                                    min: minSeq,
+                                    max: maxSeq,
+                                    sequence: seq,
+                                    residueMap: resMap,
+                                    type: chainType,
+                                    atoms: atomList.length > 0 ? atomList : undefined
+                                });
                             });
 
                             // Extract Ligands

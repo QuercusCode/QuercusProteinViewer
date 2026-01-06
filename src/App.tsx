@@ -1083,6 +1083,7 @@ function App() {
         highlightedResidue={highlightedResidue}
         onHoverResidue={() => { }} // Hover disabled per user request
         onClickResidue={(chain, resNo) => viewerRef.current?.focusResidue(chain, resNo)}
+        onClickAtom={(serial) => viewerRef.current?.highlightAtom(serial)}
         isLightMode={isLightMode}
       />
 

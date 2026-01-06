@@ -1,6 +1,6 @@
 
 import React, { useRef, useEffect, useState } from 'react';
-import { Map } from 'lucide-react';
+import { Map, Atom } from 'lucide-react';
 
 import type { ChainInfo } from '../types';
 
@@ -9,6 +9,7 @@ interface SequenceTrackProps {
     highlightedResidue: { chain: string; resNo: number } | null;
     onHoverResidue: (chain: string, resNo: number) => void;
     onClickResidue: (chain: string, resNo: number) => void;
+    onClickAtom?: (serial: number) => void; // Added for Atom Bar
     isLightMode: boolean;
 }
 
@@ -31,6 +32,19 @@ const NUCLEIC_ACID_COLORS: Record<string, string> = {
     U: '#fca5a5', // Red-300 (RNA)
 };
 
+const ATOM_COLORS: Record<string, string> = {
+    C: '#9CA3AF', // Gray (Carbon)
+    O: '#EF4444', // Red (Oxygen)
+    N: '#3B82F6', // Blue (Nitrogen)
+    S: '#EAB308', // Yellow (Sulfur)
+    P: '#F97316', // Orange (Phosphorus)
+    H: '#FFFFFF', // White (Hydrogen)
+    F: '#10B981', // Green (Fluorine)
+    CL: '#10B981', // Green (Chlorine)
+    BR: '#7C3AED', // Violet (Bromine)
+    I: '#7C3AED'   // Violet (Iodine)
+};
+
 const getResidueColor = (res: string, isLight: boolean, type: 'protein' | 'nucleic' | 'unknown' = 'protein') => {
     const char = res.toUpperCase();
     if (type === 'nucleic') {
@@ -40,11 +54,17 @@ const getResidueColor = (res: string, isLight: boolean, type: 'protein' | 'nucle
     return AMINO_ACID_COLORS[char] || (isLight ? '#e5e5e5' : '#404040');
 };
 
+const getAtomColor = (element: string, isLight: boolean) => {
+    const el = element.toUpperCase();
+    return ATOM_COLORS[el] || (isLight ? '#e5e5e5' : '#F472B6'); // Default Pink for others
+};
+
 export const SequenceTrack: React.FC<SequenceTrackProps> = ({
     chains,
     highlightedResidue,
     onHoverResidue,
     onClickResidue,
+    onClickAtom,
     isLightMode
 }) => {
     const [activeChainIndex, setActiveChainIndex] = useState(0);
@@ -65,7 +85,7 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
 
     // Scroll to highlighted residue
     useEffect(() => {
-        if (highlightedResidue && activeChain && highlightedResidue.chain === activeChain.name) {
+        if (highlightedResidue && activeChain && highlightedResidue.chain === activeChain.name && !activeChain.atoms) {
             // Calculate correct index based on residue numbering
             let index = -1;
             if (activeChain.residueMap) {
@@ -90,6 +110,8 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
 
     if (!activeChain) return null;
 
+    const isAtomView = activeChain.atoms && activeChain.atoms.length > 0;
+
     return (
         <div className={`hidden md:flex fixed top-16 right-4 bottom-4 w-24 rounded-xl z-40 transition-transform duration-300 transform translate-x-0
             ${isLightMode ? 'bg-white/90 border border-neutral-300 shadow-xl' : 'bg-black/60 border border-neutral-700 shadow-2xl'} 
@@ -97,8 +119,12 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
 
             {/* Header / Tabs - Compact Vertical */}
             <div className={`flex flex-col items-center pt-3 pb-2 gap-2 border-b ${isLightMode ? 'border-neutral-200 bg-white/50' : 'border-neutral-800 bg-black/50'} z-10 flex-shrink-0 backdrop-blur-md`}>
-                <div className="flex items-center justify-center w-full" title="Sequence">
-                    <Map size={16} className="text-purple-500" />
+                <div className="flex items-center justify-center w-full" title={isAtomView ? "Atoms" : "Sequence"}>
+                    {isAtomView ? (
+                        <Atom size={16} className="text-yellow-500" />
+                    ) : (
+                        <Map size={16} className="text-purple-500" />
+                    )}
                 </div>
 
                 {chains.length > 1 && (
@@ -109,18 +135,18 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
                                 onClick={() => setActiveChainIndex(idx)}
                                 className={`w-8 h-8 flex items-center justify-center text-[10px] font-bold rounded-full transition-all duration-200 flex-shrink-0
                                     ${activeChainIndex === idx
-                                        ? 'bg-purple-600 text-white shadow-md scale-105'
+                                        ? (isAtomView ? 'bg-yellow-600 text-white shadow-md scale-105' : 'bg-purple-600 text-white shadow-md scale-105')
                                         : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-200 hover:bg-neutral-200 dark:hover:bg-neutral-700'}`}
                                 title={`Chain ${chain.name}`}
                             >
-                                {chain.name}
+                                {chain.name || (isAtomView ? 'Mol' : '?')}
                             </button>
                         ))}
                     </div>
                 )}
 
                 <div className="text-[9px] text-neutral-500 font-mono font-bold text-center w-full mt-1 border-t border-neutral-800/30 pt-1 w-3/4 mx-auto">
-                    {activeChain.sequence.length} res
+                    {isAtomView ? `${activeChain.atoms?.length} atoms` : `${activeChain.sequence.length} res`}
                 </div>
             </div>
 
@@ -131,37 +157,65 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
                 style={{ scrollBehavior: 'smooth' }}
             >
                 <div className="flex flex-col items-center w-full gap-1">
-                    {activeChain.sequence.split('').map((res, idx) => {
-                        const resNo = activeChain.residueMap ? activeChain.residueMap[idx] : idx + 1;
-                        const isActive = highlightedResidue?.chain === activeChain.name && highlightedResidue.resNo === resNo;
-                        const color = getResidueColor(res, isLightMode, activeChain.type);
-
-                        return (
-                            <button
-                                key={idx}
-                                onMouseEnter={() => onHoverResidue(activeChain.name, resNo)}
-                                onClick={() => onClickResidue(activeChain.name, resNo)}
-                                className={`group relative flex items-center gap-2 px-2 w-full h-8 rounded-lg transition-all duration-150 flex-shrink-0
-                                    ${isActive
-                                        ? 'bg-purple-500/20 z-10 ring-2 ring-purple-500 scale-105 shadow-lg shadow-purple-500/10'
-                                        : 'hover:bg-black/5 dark:hover:bg-white/5'}`}
-                            >
-                                {/* Residue Box */}
-                                <span
-                                    className={`w-6 h-6 flex items-center justify-center rounded-md text-[11px] font-mono font-bold shadow-sm transition-transform
-                                    ${isActive ? 'text-white scale-110 ring-2 ring-white/20' : 'text-neutral-900 dark:text-white'}`}
-                                    style={{ backgroundColor: isActive ? '#7c3aed' : color }}
+                    {isAtomView ? (
+                        // Atom View
+                        activeChain.atoms!.map((atom, idx) => {
+                            const color = getAtomColor(atom.element, isLightMode);
+                            return (
+                                <button
+                                    key={idx}
+                                    onClick={() => onClickAtom && onClickAtom(atom.serial)}
+                                    // Atom hover? Maybe not needed for now
+                                    className={`group relative flex items-center gap-2 px-2 w-full h-8 rounded-lg transition-all duration-150 flex-shrink-0 hover:bg-black/5 dark:hover:bg-white/5`}
                                 >
-                                    {res}
-                                </span>
+                                    {/* Atom Box */}
+                                    <span
+                                        className={`w-6 h-6 flex items-center justify-center rounded-md text-[11px] font-mono font-bold shadow-sm transition-transform text-neutral-900`}
+                                        style={{ backgroundColor: color }}
+                                    >
+                                        {atom.element}
+                                    </span>
+                                    {/* Atom Name/Serial */}
+                                    <span className={`text-[10px] font-mono flex-1 text-right text-neutral-400 group-hover:text-white`}>
+                                        {atom.name}
+                                    </span>
+                                </button>
+                            );
+                        })
+                    ) : (
+                        // Residue View (Standard)
+                        activeChain.sequence.split('').map((res, idx) => {
+                            const resNo = activeChain.residueMap ? activeChain.residueMap[idx] : idx + 1;
+                            const isActive = highlightedResidue?.chain === activeChain.name && highlightedResidue.resNo === resNo;
+                            const color = getResidueColor(res, isLightMode, activeChain.type);
 
-                                {/* Residue Number */}
-                                <span className={`text-[10px] font-mono flex-1 text-right ${isActive ? 'text-purple-600 dark:text-purple-300 font-bold' : 'text-neutral-400'}`}>
-                                    {resNo}
-                                </span>
-                            </button>
-                        );
-                    })}
+                            return (
+                                <button
+                                    key={idx}
+                                    onMouseEnter={() => onHoverResidue(activeChain.name, resNo)}
+                                    onClick={() => onClickResidue(activeChain.name, resNo)}
+                                    className={`group relative flex items-center gap-2 px-2 w-full h-8 rounded-lg transition-all duration-150 flex-shrink-0
+                                        ${isActive
+                                            ? 'bg-purple-500/20 z-10 ring-2 ring-purple-500 scale-105 shadow-lg shadow-purple-500/10'
+                                            : 'hover:bg-black/5 dark:hover:bg-white/5'}`}
+                                >
+                                    {/* Residue Box */}
+                                    <span
+                                        className={`w-6 h-6 flex items-center justify-center rounded-md text-[11px] font-mono font-bold shadow-sm transition-transform
+                                        ${isActive ? 'text-white scale-110 ring-2 ring-white/20' : 'text-neutral-900 dark:text-white'}`}
+                                        style={{ backgroundColor: isActive ? '#7c3aed' : color }}
+                                    >
+                                        {res}
+                                    </span>
+
+                                    {/* Residue Number */}
+                                    <span className={`text-[10px] font-mono flex-1 text-right ${isActive ? 'text-purple-600 dark:text-purple-300 font-bold' : 'text-neutral-400'}`}>
+                                        {resNo}
+                                    </span>
+                                </button>
+                            );
+                        })
+                    )}
                 </div>
             </div>
 
