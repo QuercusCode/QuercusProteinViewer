@@ -1816,17 +1816,25 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     } catch (e) { }
 
                     // Unified cartoon with optimized parameters for arrows and helices
-                    component.addRepresentation('cartoon', {
+                    const params: any = {
                         color: currentColoring,
                         aspectRatio: 5,          // Flat arrows for sheets
                         subdiv: 12,              // Smooth curves
                         radialSegments: 20,      // Smooth helix cylinders
-                    });
+                    };
+                    if (colorPalette !== 'standard') {
+                        params.colorScale = colorPalette;
+                    }
+                    component.addRepresentation('cartoon', params);
                 } else {
                     // Non-cartoon representations
-                    component.addRepresentation(repType, {
+                    const params: any = {
                         color: currentColoring
-                    });
+                    };
+                    if (colorPalette !== 'standard') {
+                        params.colorScale = colorPalette;
+                    }
+                    component.addRepresentation(repType, params);
                 }
             }
 
