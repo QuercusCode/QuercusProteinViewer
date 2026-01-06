@@ -576,6 +576,39 @@ export const Controls: React.FC<ControlsProps> = ({
                                         </div>
                                     </>
                                 )}
+
+                                {/* Chemical Metadata */}
+                                {pdbMetadata && isChemical && (
+                                    <>
+                                        {pdbMetadata.formula && (
+                                            <div>
+                                                <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Formula</span>
+                                                <span className={`text-[10px] font-medium leading-tight block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                                    {pdbMetadata.formula}
+                                                </span>
+                                            </div>
+                                        )}
+                                        {pdbMetadata.molecularWeight && (
+                                            <div className="pl-2 border-l border-neutral-200 dark:border-neutral-800">
+                                                <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Mol. Weight</span>
+                                                <span className={`text-[10px] font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                                    {pdbMetadata.molecularWeight.toFixed(2)} g/mol
+                                                </span>
+                                            </div>
+                                        )}
+
+                                        {/* Source / ID */}
+                                        <div
+                                            className={`pt-1 border-t border-neutral-200 dark:border-neutral-800 ${(pdbMetadata.formula || pdbMetadata.molecularWeight) ? 'pl-2 border-l' : ''}`}
+                                            style={{ borderTopStyle: 'dashed' }}
+                                        >
+                                            <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Source</span>
+                                            <span className={`text-[10px] font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                                {pdbMetadata.title}
+                                            </span>
+                                        </div>
+                                    </>
+                                )}
                             </div>
                         </div>
                     )}

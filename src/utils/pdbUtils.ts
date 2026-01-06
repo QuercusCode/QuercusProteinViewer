@@ -94,7 +94,9 @@ export const fetchPubChemMetadata = async (cid: string): Promise<PDBMetadata | n
             resolution: 'N/A',
             organism: 'Synthetic/Nature',
             depositionDate: 'N/A',
-            title: props.IUPACName || props.Title || `PubChem CID ${cid}`
+            title: props.IUPACName || props.Title || `PubChem CID ${cid}`,
+            formula: props.MolecularFormula,
+            molecularWeight: props.MolecularWeight ? parseFloat(props.MolecularWeight) : undefined
         };
     } catch (e) {
         console.warn("PubChem metadata fetch failed", e);

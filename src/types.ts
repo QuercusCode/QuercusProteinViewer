@@ -82,6 +82,8 @@ export interface PDBMetadata {
     organism: string;
     depositionDate: string;
     title?: string;
+    formula?: string; // Chemical Formula
+    molecularWeight?: number; // Molecular Weight
 }
 
 export interface LigandInteraction {
