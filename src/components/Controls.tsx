@@ -139,11 +139,11 @@ const StructureImageModal = ({ cid }: { cid: string }) => {
 const ChemicalPropertiesPanel = ({ cid, isLightMode, cardBg, subtleText }: { cid: string; isLightMode: boolean; cardBg: string; subtleText: string }) => {
     const [properties, setProperties] = useState<{
         smiles?: string;
-        canonicalSmiles?: string;
-        inchi?: string;
-        inchiKey?: string;
+        xLogP?: number;
+        hBondDonorCount?: number;
+        hBondAcceptorCount?: number;
+        rotatableBondCount?: number;
         heavyAtomCount?: number;
-        totalAtomCount?: number;
     } | null>(null);
     const [loading, setLoading] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
@@ -152,16 +152,17 @@ const ChemicalPropertiesPanel = ({ cid, isLightMode, cardBg, subtleText }: { cid
         const fetchProperties = async () => {
             setLoading(true);
             try {
-                const res = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property/CanonicalSMILES,IsomericSMILES,InChI,InChIKey,HeavyAtomCount/JSON`);
+                const res = await fetch(`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property/IsomericSMILES,XLogP,HBondDonorCount,HBondAcceptorCount,RotatableBondCount,HeavyAtomCount/JSON`);
                 if (res.ok) {
                     const data = await res.json();
                     const props = data.PropertyTable?.Properties?.[0];
                     if (props) {
                         setProperties({
-                            canonicalSmiles: props.CanonicalSMILES,
                             smiles: props.IsomericSMILES,
-                            inchi: props.InChI,
-                            inchiKey: props.InChIKey,
+                            xLogP: props.XLogP,
+                            hBondDonorCount: props.HBondDonorCount,
+                            hBondAcceptorCount: props.HBondAcceptorCount,
+                            rotatableBondCount: props.RotatableBondCount,
                             heavyAtomCount: props.HeavyAtomCount,
                         });
                     }
@@ -201,11 +202,35 @@ const ChemicalPropertiesPanel = ({ cid, isLightMode, cardBg, subtleText }: { cid
                                     </div>
                                 </div>
                             )}
-                            {properties.inchiKey && (
+                            {properties.xLogP !== undefined && (
                                 <div>
-                                    <div className={`text-[9px] font-bold uppercase tracking-wider ${subtleText}`}>InChIKey</div>
-                                    <div className={`text-[10px] font-mono break-all ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
-                                        {properties.inchiKey}
+                                    <div className={`text-[9px] font-bold uppercase tracking-wider ${subtleText}`}>XLogP</div>
+                                    <div className={`text-[10px] ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                        {properties.xLogP.toFixed(2)} (Lipophilicity)
+                                    </div>
+                                </div>
+                            )}
+                            {properties.hBondDonorCount !== undefined && (
+                                <div>
+                                    <div className={`text-[9px] font-bold uppercase tracking-wider ${subtleText}`}>H-Bond Donors</div>
+                                    <div className={`text-[10px] ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                        {properties.hBondDonorCount}
+                                    </div>
+                                </div>
+                            )}
+                            {properties.hBondAcceptorCount !== undefined && (
+                                <div>
+                                    <div className={`text-[9px] font-bold uppercase tracking-wider ${subtleText}`}>H-Bond Acceptors</div>
+                                    <div className={`text-[10px] ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                        {properties.hBondAcceptorCount}
+                                    </div>
+                                </div>
+                            )}
+                            {properties.rotatableBondCount !== undefined && (
+                                <div>
+                                    <div className={`text-[9px] font-bold uppercase tracking-wider ${subtleText}`}>Rotatable Bonds</div>
+                                    <div className={`text-[10px] ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                        {properties.rotatableBondCount}
                                     </div>
                                 </div>
                             )}
