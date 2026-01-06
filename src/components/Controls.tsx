@@ -398,7 +398,7 @@ export const Controls: React.FC<ControlsProps> = ({
     const [searchPattern, setSearchPattern] = useState('');
     const [searchResults, setSearchResults] = useState<MotifMatch[]>([]);
     const [isSearching, setIsSearching] = useState(false);
-    const [isMotifSearchOpen, setIsMotifSearchOpen] = useState(false);
+
 
     const handleSearch = () => {
         setIsSearching(true);
@@ -456,7 +456,8 @@ export const Controls: React.FC<ControlsProps> = ({
     const openSections = propOpenSections || {
         'appearance': true,
         'analysis': false,
-        'tools': false
+        'tools': false,
+        'motif-search': false
     };
 
     const toggleSection = (section: string) => {
@@ -1256,8 +1257,8 @@ export const Controls: React.FC<ControlsProps> = ({
                             <SidebarSection
                                 title="Motif Search"
                                 icon={ScanSearch}
-                                isOpen={isMotifSearchOpen}
-                                onToggle={() => setIsMotifSearchOpen(!isMotifSearchOpen)}
+                                isOpen={openSections['motif-search']}
+                                onToggle={() => toggleSection('motif-search')}
                                 isLightMode={isLightMode}
                                 id="motif-search"
                             >

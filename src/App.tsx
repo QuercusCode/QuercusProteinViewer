@@ -102,7 +102,8 @@ function App() {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     'appearance': true,
     'analysis': false,
-    'tools': false
+    'tools': false,
+    'motif-search': false
   });
 
   const handleToggleSection = (section: string) => {
@@ -119,7 +120,8 @@ function App() {
     const newSections = {
       'appearance': false,
       'analysis': false,
-      'tools': false
+      'tools': false,
+      'motif-search': false
     };
 
     if (elementId === '#visualization-controls') {
@@ -128,8 +130,10 @@ function App() {
       newSections['analysis'] = true;
     } else if (elementId === '#export-tools') {
       newSections['tools'] = true;
-    } else if (elementId === '#sequence-viewer') {
+    } else if (elementId === '#sequence-track') {
       newSections['analysis'] = true;
+    } else if (elementId === '#motif-search') {
+      newSections['motif-search'] = true;
     }
 
     setOpenSections(newSections);
