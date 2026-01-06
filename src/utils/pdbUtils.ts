@@ -96,7 +96,8 @@ export const fetchPubChemMetadata = async (cid: string): Promise<PDBMetadata | n
             depositionDate: 'N/A',
             title: props.IUPACName || props.Title || `PubChem CID ${cid}`,
             formula: props.MolecularFormula,
-            molecularWeight: props.MolecularWeight ? parseFloat(props.MolecularWeight) : undefined
+            molecularWeight: props.MolecularWeight ? parseFloat(props.MolecularWeight) : undefined,
+            cid: cid
         };
     } catch (e) {
         console.warn("PubChem metadata fetch failed", e);

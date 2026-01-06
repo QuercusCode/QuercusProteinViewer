@@ -597,15 +597,28 @@ export const Controls: React.FC<ControlsProps> = ({
                                             </div>
                                         )}
 
-                                        {/* Source / ID */}
+                                        {/* Structure Image or Source */}
                                         <div
                                             className={`pt-1 border-t border-neutral-200 dark:border-neutral-800 ${(pdbMetadata.formula || pdbMetadata.molecularWeight) ? 'pl-2 border-l' : ''}`}
                                             style={{ borderTopStyle: 'dashed' }}
                                         >
-                                            <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Source</span>
-                                            <span className={`text-[10px] font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
-                                                {pdbMetadata.title}
+                                            <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>
+                                                {pdbMetadata.cid ? 'Structure' : 'Source'}
                                             </span>
+
+                                            {pdbMetadata.cid ? (
+                                                <div className="mt-1 bg-white p-1 rounded-sm flex justify-center border border-neutral-200">
+                                                    <img
+                                                        src={`https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=${pdbMetadata.cid}&t=l`}
+                                                        alt="2D Structure"
+                                                        className="h-20 w-auto object-contain mix-blend-multiply"
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <span className={`text-[10px] font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                                    {pdbMetadata.title}
+                                                </span>
+                                            )}
                                         </div>
                                     </>
                                 )}

@@ -84,6 +84,7 @@ export interface PDBMetadata {
     title?: string;
     formula?: string; // Chemical Formula
     molecularWeight?: number; // Molecular Weight
+    cid?: string; // PubChem CID for 2D Image
 }
 
 export interface LigandInteraction {
