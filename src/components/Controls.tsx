@@ -1243,7 +1243,8 @@ export const Controls: React.FC<ControlsProps> = ({
                                         </div>
                                         <span className={`text-[10px] font-bold uppercase tracking-wider ${subtleText}`}>Functional Groups</span>
                                     </div>
-                                    <div className="flex gap-2">
+                                    <div className="grid grid-cols-3 gap-2">
+                                        {/* Row 1 */}
                                         <button
                                             onClick={() => {
                                                 const isActive = activeFunctionalGroups?.includes('aromatic');
@@ -1252,7 +1253,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                                     : [...(activeFunctionalGroups || []), 'aromatic'];
                                                 setActiveFunctionalGroups && setActiveFunctionalGroups(newGroups);
                                             }}
-                                            className={`flex-1 py-1.5 px-2 rounded-md border text-[10px] font-medium transition-all ${activeFunctionalGroups?.includes('aromatic')
+                                            className={`py-1.5 px-2 rounded-md border text-[10px] font-medium transition-all ${activeFunctionalGroups?.includes('aromatic')
                                                 ? 'bg-purple-500 text-white border-purple-600 shadow-sm'
                                                 : `${isLightMode ? 'bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100' : 'bg-white/5 border-neutral-700 text-neutral-400 hover:bg-white/10'}`
                                                 }`}
@@ -1268,12 +1269,61 @@ export const Controls: React.FC<ControlsProps> = ({
                                                     : [...(activeFunctionalGroups || []), 'polar'];
                                                 setActiveFunctionalGroups && setActiveFunctionalGroups(newGroups);
                                             }}
-                                            className={`flex-1 py-1.5 px-2 rounded-md border text-[10px] font-medium transition-all ${activeFunctionalGroups?.includes('polar')
+                                            className={`py-1.5 px-2 rounded-md border text-[10px] font-medium transition-all ${activeFunctionalGroups?.includes('polar')
                                                 ? 'bg-blue-500 text-white border-blue-600 shadow-sm'
                                                 : `${isLightMode ? 'bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100' : 'bg-white/5 border-neutral-700 text-neutral-400 hover:bg-white/10'}`
                                                 }`}
                                         >
                                             Polar
+                                        </button>
+
+                                        <button
+                                            onClick={() => {
+                                                const isActive = activeFunctionalGroups?.includes('halogens');
+                                                const newGroups = isActive
+                                                    ? activeFunctionalGroups?.filter(g => g !== 'halogens') || []
+                                                    : [...(activeFunctionalGroups || []), 'halogens'];
+                                                setActiveFunctionalGroups && setActiveFunctionalGroups(newGroups);
+                                            }}
+                                            className={`py-1.5 px-2 rounded-md border text-[10px] font-medium transition-all ${activeFunctionalGroups?.includes('halogens')
+                                                ? 'bg-emerald-500 text-white border-emerald-600 shadow-sm'
+                                                : `${isLightMode ? 'bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100' : 'bg-white/5 border-neutral-700 text-neutral-400 hover:bg-white/10'}`
+                                                }`}
+                                        >
+                                            Halogens
+                                        </button>
+
+                                        {/* Row 2 */}
+                                        <button
+                                            onClick={() => {
+                                                const isActive = activeFunctionalGroups?.includes('sulfur');
+                                                const newGroups = isActive
+                                                    ? activeFunctionalGroups?.filter(g => g !== 'sulfur') || []
+                                                    : [...(activeFunctionalGroups || []), 'sulfur'];
+                                                setActiveFunctionalGroups && setActiveFunctionalGroups(newGroups);
+                                            }}
+                                            className={`py-1.5 px-2 rounded-md border text-[10px] font-medium transition-all ${activeFunctionalGroups?.includes('sulfur')
+                                                ? 'bg-yellow-500 text-black border-yellow-600 shadow-sm'
+                                                : `${isLightMode ? 'bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100' : 'bg-white/5 border-neutral-700 text-neutral-400 hover:bg-white/10'}`
+                                                }`}
+                                        >
+                                            Sulfur
+                                        </button>
+
+                                        <button
+                                            onClick={() => {
+                                                const isActive = activeFunctionalGroups?.includes('metals');
+                                                const newGroups = isActive
+                                                    ? activeFunctionalGroups?.filter(g => g !== 'metals') || []
+                                                    : [...(activeFunctionalGroups || []), 'metals'];
+                                                setActiveFunctionalGroups && setActiveFunctionalGroups(newGroups);
+                                            }}
+                                            className={`py-1.5 px-2 rounded-md border text-[10px] font-medium transition-all ${activeFunctionalGroups?.includes('metals')
+                                                ? 'bg-slate-500 text-white border-slate-600 shadow-sm'
+                                                : `${isLightMode ? 'bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100' : 'bg-white/5 border-neutral-700 text-neutral-400 hover:bg-white/10'}`
+                                                }`}
+                                        >
+                                            Metals
                                         </button>
 
                                         <button
@@ -1284,7 +1334,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                                     : [...(activeFunctionalGroups || []), 'rings'];
                                                 setActiveFunctionalGroups && setActiveFunctionalGroups(newGroups);
                                             }}
-                                            className={`flex-1 py-1.5 px-2 rounded-md border text-[10px] font-medium transition-all ${activeFunctionalGroups?.includes('rings')
+                                            className={`py-1.5 px-2 rounded-md border text-[10px] font-medium transition-all ${activeFunctionalGroups?.includes('rings')
                                                 ? 'bg-orange-500 text-white border-orange-600 shadow-sm'
                                                 : `${isLightMode ? 'bg-neutral-50 border-neutral-200 text-neutral-600 hover:bg-neutral-100' : 'bg-white/5 border-neutral-700 text-neutral-400 hover:bg-white/10'}`
                                                 }`}

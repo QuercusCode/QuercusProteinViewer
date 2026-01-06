@@ -1744,6 +1744,33 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     });
                 }
 
+                if (activeFunctionalGroups.includes('halogens')) {
+                    component.addRepresentation('ball+stick', {
+                        sele: '(element F or element Cl or element Br or element I) and not (water or ion)',
+                        color: '#10b981', // Emerald-500
+                        radiusScale: 1.5,
+                        name: 'highlight_halogens'
+                    });
+                }
+
+                if (activeFunctionalGroups.includes('sulfur')) {
+                    component.addRepresentation('ball+stick', {
+                        sele: 'element S and not (water or ion)',
+                        color: '#facc15', // Yellow-400
+                        radiusScale: 1.5,
+                        name: 'highlight_sulfur'
+                    });
+                }
+
+                if (activeFunctionalGroups.includes('metals')) {
+                    component.addRepresentation('ball+stick', {
+                        sele: '(metal or ion)',
+                        color: '#94a3b8', // Slate-400
+                        radiusScale: 1.5,
+                        name: 'highlight_metals'
+                    });
+                }
+
                 // Optional: Ghost Surface
                 if (showSurface) {
                     component.addRepresentation('surface', {
