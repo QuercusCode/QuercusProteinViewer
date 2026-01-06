@@ -46,10 +46,12 @@ export interface ProteinViewerProps {
     backgroundColor: string;
     customColors?: any[]; // Simplified type for now
     measurementTextColor?: MeasurementTextColor; // Added prop
+    activeFunctionalGroups?: string[]; // Added: Functional Group Highlights
 
     // Quality
     quality?: 'low' | 'medium' | 'high';
     enableAmbientOcclusion?: boolean;
+
 
     // Callbacks
     onStructureLoaded?: (info: StructureInfo) => void;
@@ -124,7 +126,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     onAddMeasurement,
     onHover,
     isLightMode,
-    measurementTextColor = 'auto'
+    measurementTextColor = 'auto',
+    activeFunctionalGroups // Destructured
 }: ProteinViewerProps, ref: React.Ref<ProteinViewerRef>) => {
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -1701,6 +1704,64 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             component.removeAllRepresentations();
             highlightComponentRef.current = null;
 
+            // --- FUNCTIONAL GROUP HIGHLIGHT MODE ---
+            if (activeFunctionalGroups && activeFunctionalGroups.length > 0) {
+                // 1. Base Skeleton (Faded)
+                // Use 'licorice' or 'ball+stick' depending on preference. Licorice is cleaner for skeleton.
+                component.addRepresentation('licorice', {
+                    color: '#e5e7eb', // Light Gray (Neutral-200)
+                    opacity: 0.3,
+                    sele: '*',
+                    name: 'skeleton_base'
+                });
+
+                // 2. Apply Highlights
+                if (activeFunctionalGroups.includes('aromatic')) {
+                    component.addRepresentation('ball+stick', {
+                        sele: '(aromatic or ring) and not (water or ion)',
+                        color: '#a855f7', // Purple-500
+                        radiusScale: 1.5,
+                        name: 'highlight_aromatic'
+                    });
+                }
+
+                if (activeFunctionalGroups.includes('polar')) {
+                    component.addRepresentation('ball+stick', {
+                        sele: '(element N or element O or element S or element P) and not (water or ion)',
+                        color: 'element', // Keep element colors for specific ID
+                        radiusScale: 1.5,
+                        name: 'highlight_polar'
+                    });
+                }
+
+                if (activeFunctionalGroups.includes('rings')) {
+                    component.addRepresentation('ball+stick', {
+                        sele: 'ring and not (aromatic)', // Non-aromatic rings if aromatic is separate? Or just all rings?
+                        // Let's make 'rings' cover all rings if selected
+                        color: '#f97316', // Orange-500
+                        radiusScale: 1.5,
+                        name: 'highlight_rings'
+                    });
+                }
+
+                // Optional: Ghost Surface
+                if (showSurface) {
+                    component.addRepresentation('surface', {
+                        color: 'white',
+                        opacity: 0.1,
+                        depthWrite: false,
+                        side: 'front',
+                        name: 'ghost_surface'
+                    });
+                }
+
+                if (stageRef.current?.viewer) {
+                    stageRef.current.viewer.requestRender();
+                }
+                return; // EXIT STANDARD PIPELINE
+            }
+
+
             let repType = representation || 'cartoon';
             let currentColoring = coloring || 'chainid'; // SAFETY DEFAULT
 
@@ -1876,7 +1937,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     useEffect(() => {
         updateRepresentation();
-    }, [representation, coloring, customColors, showSurface, showLigands, showIons, colorPalette]);
+    }, [representation, coloring, customColors, showSurface, showLigands, showIons, colorPalette, activeFunctionalGroups]);
 
     useEffect(() => {
         if (stageRef.current) {

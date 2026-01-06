@@ -75,6 +75,8 @@ export type RepresentationType = 'cartoon' | 'licorice' | 'backbone' | 'spacefil
 export type ColoringType = 'chainid' | 'residue' | 'secondary' | 'hydrophobicity' | 'structure' | 'bfactor' | 'charge' | 'residueindex';
 export type ColorPalette = 'standard' | 'viridis' | 'magma' | 'cividis' | 'plasma';
 export type MeasurementTextColor = 'auto' | string;
+export type FunctionalGroup = 'aromatic' | 'polar' | 'rings';
+
 
 export interface PDBMetadata {
     method: string;
