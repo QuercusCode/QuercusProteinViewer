@@ -1,19 +1,19 @@
 import React, { useState, useMemo } from 'react';
-import { Search, X, BookOpen, Database, FlaskConical, Dna, Activity, Zap, Shield, Grid, Archive, Anchor, Layers, ArrowLeft, Syringe, Hexagon, Magnet } from 'lucide-react';
+import { Search, X, BookOpen, Database, FlaskConical, Dna, Activity, Zap, Shield, Grid, Archive, Anchor, Layers, ArrowLeft, Syringe, Hexagon, Magnet, Pill, Leaf, Sun, Brain, HeartPulse } from 'lucide-react';
 import clsx from 'clsx';
 import { OFFLINE_LIBRARY } from '../data/library';
+import { CHEMICAL_LIBRARY } from '../data/chemicalLibrary';
 
 // --- TYPES ---
 
 interface LibraryModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSelect: (fileUrl: string) => void;
+    onSelect: (url: string) => void;
 }
 
-// --- CATEGORY CONFIG ---
-// Maps categories to Icons and Color Schemes
-const CATEGORY_CONFIG: Record<string, { icon: React.ReactNode, style: string, description: string }> = {
+// --- PROTEIN CATEGORY CONFIG ---
+const PROTEIN_CATEGORY_CONFIG: Record<string, { icon: React.ReactNode, style: string, description: string }> = {
     'Enzymes': { icon: <Activity size={20} />, style: 'text-amber-400 border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 active-color:bg-amber-500', description: 'Biological catalysts speeding up reactions.' },
     'Structural': { icon: <Grid size={20} />, style: 'text-blue-400 border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 active-color:bg-blue-500', description: 'Scaffolding and shape-giving proteins.' },
     'Transport': { icon: <Archive size={20} />, style: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 active-color:bg-emerald-500', description: 'Ferries molecules across membranes/blood.' },
@@ -25,27 +25,52 @@ const CATEGORY_CONFIG: Record<string, { icon: React.ReactNode, style: string, de
     'Immune': { icon: <Shield size={20} />, style: 'text-rose-400 border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 active-color:bg-rose-500', description: 'Antibodies and defense systems.' },
     'Energy': { icon: <Zap size={20} />, style: 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10 hover:bg-yellow-500/20 active-color:bg-yellow-500', description: 'Photosynthesis and metabolism.' },
     'Chaperone': { icon: <Anchor size={20} />, style: 'text-indigo-400 border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 active-color:bg-indigo-500', description: 'Helpers for protein folding.' },
-    // New Categories
     'Antibodies': { icon: <Syringe size={20} />, style: 'text-teal-400 border-teal-500/30 bg-teal-500/10 hover:bg-teal-500/20 active-color:bg-teal-500', description: 'Therapeutic and functional antibodies.' },
     'Nanobodies': { icon: <Hexagon size={20} />, style: 'text-pink-400 border-pink-500/30 bg-pink-500/10 hover:bg-pink-500/20 active-color:bg-pink-500', description: 'Single-domain antibody fragments.' },
     'Binders': { icon: <Magnet size={20} />, style: 'text-violet-400 border-violet-500/30 bg-violet-500/10 hover:bg-violet-500/20 active-color:bg-violet-500', description: 'Engineered binding proteins.' },
 };
 
+// --- CHEMICAL CATEGORY CONFIG ---
+const CHEMICAL_CATEGORY_CONFIG: Record<string, { icon: React.ReactNode, style: string, description: string }> = {
+    'Vitamins': { icon: <Sun size={20} />, style: 'text-yellow-400 border-yellow-500/30 bg-yellow-500/10 hover:bg-yellow-500/20 active-color:bg-yellow-500', description: 'Essential organic nutrients.' },
+    'Drugs': { icon: <Pill size={20} />, style: 'text-blue-400 border-blue-500/30 bg-blue-500/10 hover:bg-blue-500/20 active-color:bg-blue-500', description: 'Pharmaceutical compounds.' },
+    'Neurotransmitters': { icon: <Brain size={20} />, style: 'text-purple-400 border-purple-500/30 bg-purple-500/10 hover:bg-purple-500/20 active-color:bg-purple-500', description: 'Brain signaling molecules.' },
+    'Toxins': { icon: <Shield size={20} />, style: 'text-red-400 border-red-500/30 bg-red-500/10 hover:bg-red-500/20 active-color:bg-red-500', description: 'Harmful natural substances.' },
+    'Metabolites': { icon: <Activity size={20} />, style: 'text-green-400 border-green-500/30 bg-green-500/10 hover:bg-green-500/20 active-color:bg-green-500', description: 'Intermediates of metabolism.' },
+    'Hormones': { icon: <HeartPulse size={20} />, style: 'text-pink-400 border-pink-500/30 bg-pink-500/10 hover:bg-pink-500/20 active-color:bg-pink-500', description: 'Signaling molecules.' },
+    'Calculated': { icon: <Database size={20} />, style: 'text-gray-400 border-gray-500/30 bg-gray-500/10 hover:bg-gray-500/20 active-color:bg-gray-500', description: 'Computational models.' },
+    'Nutrients': { icon: <Leaf size={20} />, style: 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10 hover:bg-emerald-500/20 active-color:bg-emerald-500', description: 'Food components.' },
+    'Natural Products': { icon: <Leaf size={20} />, style: 'text-lime-400 border-lime-500/30 bg-lime-500/10 hover:bg-lime-500/20 active-color:bg-lime-500', description: 'Compounds from nature.' },
+};
+
 const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }) => {
+    const [activeTab, setActiveTab] = useState<'proteins' | 'chemicals'>('proteins');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string | 'All'>('All');
     const [viewMode, setViewMode] = useState<'categories' | 'list'>('categories');
 
+    // Select Data Source
+    const currentLibrary = useMemo(() => activeTab === 'proteins' ? OFFLINE_LIBRARY : CHEMICAL_LIBRARY, [activeTab]);
+    const currentConfig = activeTab === 'proteins' ? PROTEIN_CATEGORY_CONFIG : CHEMICAL_CATEGORY_CONFIG;
+
+    // Reset view on tab change
+    const handleTabChange = (tab: 'proteins' | 'chemicals') => {
+        setActiveTab(tab);
+        setViewMode('categories');
+        setSelectedCategory('All');
+        setSearchTerm('');
+    };
+
     // Extract unique categories
     const categories = useMemo(() => {
-        const cats = new Set(OFFLINE_LIBRARY.map(item => item.category));
+        const cats = new Set(currentLibrary.map(item => item.category));
         return Array.from(cats).sort();
-    }, []);
+    }, [currentLibrary]);
 
     // Filter items
     const filteredItems = useMemo(() => {
         const lowerTerm = searchTerm.toLowerCase().trim();
-        return OFFLINE_LIBRARY.filter(item => {
+        return currentLibrary.filter(item => {
             // Category Filter
             if (selectedCategory !== 'All' && item.category !== selectedCategory) {
                 return false;
@@ -54,10 +79,10 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
             // Search Filter
             if (!lowerTerm) return true;
 
-            const searchableText = `${item.title} ${item.id} ${item.description} ${item.details || ''}`.toLowerCase();
+            const searchableText = `${item.title} ${item.id} ${item.description}`.toLowerCase();
             return searchableText.includes(lowerTerm);
         });
-    }, [searchTerm, selectedCategory]);
+    }, [searchTerm, selectedCategory, currentLibrary]);
 
     // Handle Category Selection
     const handleCategorySelect = (category: string) => {
@@ -82,6 +107,16 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
         }
     };
 
+    // Handle Item Selection
+    const handleItemSelect = (item: any) => {
+        if (activeTab === 'proteins') {
+            onSelect(`models/${item.id}.pdb`);
+        } else {
+            // Pass special PubChem URL format that App.tsx will recognize
+            onSelect(`pubchem://${item.id}`);
+        }
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -90,29 +125,53 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
 
                 {/* HEADER */}
                 <div className="flex items-center justify-between p-6 border-b border-white/10 bg-gray-900/50">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-4">
                         <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400">
                             <BookOpen size={24} />
                         </div>
                         <div>
-                            <h2 className="text-2xl font-bold text-white">Known Structure Library</h2>
-                            <p className="text-gray-400 text-sm">Curated collection of {OFFLINE_LIBRARY.length} famous proteins.</p>
+                            <h2 className="text-2xl font-bold text-white">Structure Library</h2>
+                            <p className="text-gray-400 text-sm">Curated collection of biomolecules.</p>
                         </div>
                     </div>
 
+                    {/* TABS */}
+                    <div className="flex p-1 bg-black/40 rounded-xl border border-white/10 mx-6">
+                        <button
+                            onClick={() => handleTabChange('proteins')}
+                            className={clsx(
+                                "px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2",
+                                activeTab === 'proteins' ? "bg-blue-500/20 text-blue-400 shadow-sm" : "text-gray-500 hover:text-gray-300"
+                            )}
+                        >
+                            <Dna size={16} />
+                            Proteins
+                        </button>
+                        <button
+                            onClick={() => handleTabChange('chemicals')}
+                            className={clsx(
+                                "px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2",
+                                activeTab === 'chemicals' ? "bg-emerald-500/20 text-emerald-400 shadow-sm" : "text-gray-500 hover:text-gray-300"
+                            )}
+                        >
+                            <FlaskConical size={16} />
+                            Chemicals
+                        </button>
+                    </div>
+
                     {/* Search Bar (Global) */}
-                    <div className="relative flex-1 max-w-md mx-6 hidden sm:block">
+                    <div className="relative flex-1 max-w-md hidden sm:block">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
                         <input
                             type="text"
-                            placeholder="Quick search..."
+                            placeholder={activeTab === 'proteins' ? "Search PDB code, name..." : "Search chemical name..."}
                             value={searchTerm}
                             onChange={(e) => handleSearch(e.target.value)}
                             className="w-full bg-black/40 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-sm"
                         />
                     </div>
 
-                    <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white">
+                    <button onClick={onClose} className="p-2 ml-4 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white">
                         <X size={24} />
                     </button>
                 </div>
@@ -124,30 +183,34 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
                     {viewMode === 'categories' && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-in fade-in zoom-in-95 duration-300">
                             {categories.map(cat => {
-                                const config = CATEGORY_CONFIG[cat];
-                                const count = OFFLINE_LIBRARY.filter(i => i.category === cat).length;
+                                const config = currentConfig[cat];
+                                const count = currentLibrary.filter(i => i.category === cat).length;
+                                // Fallback style if config missing
+                                const style = config?.style || "text-gray-400 border-gray-500/30 bg-gray-500/10 hover:bg-gray-500/20 active-color:bg-gray-500";
+                                const icon = config?.icon || <Database size={20} />;
+
                                 return (
                                     <button
                                         key={cat}
                                         onClick={() => handleCategorySelect(cat)}
                                         className={clsx(
                                             "group relative flex flex-col items-start text-left p-6 rounded-2xl border transition-all hover:-translate-y-1 hover:shadow-xl overflow-hidden",
-                                            config?.style.replace(/active-color:[\w-]+/g, '').trim() || "bg-gray-800 border-white/10 text-white"
+                                            style.replace(/active-color:[\w-]+/g, '').trim()
                                         )}
                                     >
                                         <div className={`absolute -right-4 -bottom-4 opacity-10 scale-[4] group-hover:scale-[4.5] transition-transform duration-500`}>
-                                            {config?.icon}
+                                            {icon}
                                         </div>
 
                                         <div className="mb-4 p-3 rounded-xl bg-black/20 backdrop-blur-sm border border-white/10 shadow-inner group-hover:scale-110 transition-transform">
-                                            {config?.icon}
+                                            {icon}
                                         </div>
 
                                         <h3 className="text-xl font-bold mb-1">{cat}</h3>
                                         <p className="text-sm opacity-70 mb-4 h-10">{config?.description || 'Browse collection.'}</p>
 
                                         <div className="mt-auto py-1 px-3 rounded-full bg-black/20 text-xs font-mono border border-white/10">
-                                            {count} proteins
+                                            {count} entries
                                         </div>
                                     </button>
                                 );
@@ -168,7 +231,7 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
                                 </button>
                                 {selectedCategory !== 'All' && (
                                     <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                                        {CATEGORY_CONFIG[selectedCategory]?.icon}
+                                        {currentConfig[selectedCategory]?.icon}
                                         <span className="font-bold">{selectedCategory}</span>
                                     </div>
                                 )}
@@ -177,16 +240,16 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
                             {filteredItems.length === 0 ? (
                                 <div className="text-center py-20 text-gray-500">
                                     <Database size={48} className="mx-auto mb-4 opacity-50" />
-                                    <p className="text-lg">No proteins found matching your search.</p>
+                                    <p className="text-lg">No items found matching your search.</p>
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                     {filteredItems.map(item => {
-                                        const config = CATEGORY_CONFIG[item.category];
+                                        const config = currentConfig[item.category];
                                         return (
                                             <button
                                                 key={item.id}
-                                                onClick={() => onSelect(`models/${item.id}.pdb`)}
+                                                onClick={() => handleItemSelect(item)}
                                                 className="group relative flex flex-col items-start text-left bg-gray-800/40 hover:bg-gray-800/80 border border-white/5 hover:border-white/20 rounded-xl p-4 transition-all hover:shadow-xl hover:-translate-y-1 overflow-hidden"
                                             >
                                                 <div className={`absolute top-0 right-0 p-2 opacity-5 scale-150 transition-transform group-hover:scale-[2] group-hover:opacity-10 ${config?.style.split(' ')[0]}`}>
@@ -219,7 +282,7 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
 
                 {/* FOOTER */}
                 <div className="p-4 border-t border-white/10 bg-gray-950/80 text-right text-xs text-gray-500 font-mono">
-                    Library Version 1.0 • {OFFLINE_LIBRARY.length} entries
+                    Library Version 2.0 • {OFFLINE_LIBRARY.length} proteins • {CHEMICAL_LIBRARY.length} chemicals
                 </div>
             </div>
         </div>

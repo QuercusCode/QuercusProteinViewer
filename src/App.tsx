@@ -15,7 +15,7 @@ import { CommandPalette, type CommandAction } from './components/CommandPalette'
 import { HUD } from './components/HUD';
 import { MeasurementPanel } from './components/MeasurementPanel';
 import { OFFLINE_LIBRARY } from './data/library';
-import { fetchStructureMetadata, type DataSource } from './utils/pdbUtils';
+import { fetchStructureMetadata, type DataSource, fetchPubChemMetadata } from './utils/pdbUtils';
 import type { PDBMetadata, Measurement, MeasurementTextColor } from './types';
 import {
   Camera, RefreshCw, Upload,
@@ -888,35 +888,68 @@ function App() {
         isOpen={isLibraryOpen}
         onClose={() => setIsLibraryOpen(false)}
         onSelect={(url) => {
-          // Extract ID
+          setIsLibraryOpen(false);
+
+          // Handle Chemical Library Selection
+          if (url.startsWith('pubchem://')) {
+            const cid = url.replace('pubchem://', '');
+            if (!cid) return;
+
+            setFile(null); // Clear any local file to force fetch
+            setPdbId(cid);
+            setDataSource('pubchem');
+            setProteinTitle(`Loading Chemical (CID: ${cid})...`);
+            setRepresentation('ball+stick'); // Better default for small molecules
+            setPdbMetadata(null);
+
+            // Fetch Metadata for Chemical
+            fetchPubChemMetadata(cid).then(meta => {
+              if (meta) {
+                setPdbMetadata(meta);
+                setProteinTitle(meta.title || `CID: ${cid}`);
+              } else {
+                setProteinTitle(`CID: ${cid}`);
+              }
+            });
+            return;
+          }
+
+          // Handle Protein Library Selection (Standard PDB)
+          // Extract ID from local path models/ID.pdb
           const idMatch = url.match(/models\/([a-zA-Z0-9]+)\.pdb/);
           const id = idMatch ? idMatch[1] : 'Unknown';
 
-          setIsLibraryOpen(false);
           setPdbId(id);
+          setDataSource('pdb'); // Ensure we are in PDB mode
           setProteinTitle(`Loading ${id}...`);
 
-          // Fetch and Load
+          // Find metadata
+          const libMeta = OFFLINE_LIBRARY.find(i => i.id === id);
+          if (libMeta) {
+            setPdbMetadata(libMeta as unknown as PDBMetadata);
+          } else {
+            setPdbMetadata(null);
+          }
+
+          // Fetch local file
           fetch(url)
             .then(res => {
-              if (!res.ok) throw new Error("Failed to load local file");
+              if (!res.ok) throw new Error("File not found");
               return res.blob();
             })
             .then(blob => {
               const file = new File([blob], `${id}.pdb`, { type: 'chemical/x-pdb' });
-              handleUpload(file, false, true); // preservePdbId = true for library selections
-
-              // Smart Title Lookup
-              const libEntry = OFFLINE_LIBRARY.find(e => e.id.toLowerCase() === id.toLowerCase());
-              if (libEntry) {
-                setProteinTitle(libEntry.title);
+              setFile(file);
+              // Update title from library metadata if available
+              if (libMeta) {
+                setProteinTitle(libMeta.title);
               } else {
                 setProteinTitle(`Offline: ${id}`);
               }
             })
             .catch(err => {
-              console.warn("Local library load failed, falling back to RCSB.", err);
-              // Fallback is automatic via setPdbId(id) above
+              console.warn("Local library load failed.", err);
+              alert(`Failed to load ${id} from library resources.`);
             });
         }}
       />
