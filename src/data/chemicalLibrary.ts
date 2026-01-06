@@ -651,5 +651,72 @@ export const CHEMICAL_LIBRARY: ChemicalLibraryEntry[] = [
     { id: '7238', title: 'o-Xylene', category: 'Toxins', description: 'Solvent.', formula: 'C8H10', molecularWeight: '106.17 g/mol' },
     { id: '8091', title: 'Hexamine', category: 'Toxins', description: 'Solid fuel.', formula: 'C6H12N4', molecularWeight: '140.19 g/mol' },
     { id: '7561', title: 'Cyclohexane', category: 'Toxins', description: 'Nonpolar solvent.', formula: 'C6H12', molecularWeight: '84.16 g/mol' },
-    { id: '8900', title: 'Methyl Methacrylate', category: 'Toxins', description: 'PMMA (Acrylic) monomer.', formula: 'C5H8O2', molecularWeight: '100.12 g/mol' }
+    { id: '8900', title: 'Methyl Methacrylate', category: 'Toxins', description: 'PMMA (Acrylic) monomer.', formula: 'C5H8O2', molecularWeight: '100.12 g/mol' },
+
+    // --- BATCH 9: SUNSCREENS & COSMETICS (Natural Products/Other) ---
+    { id: '51040', title: 'Avobenzone', category: 'Natural Products', description: 'UVA sunscreen.', formula: 'C20H22O3', molecularWeight: '310.39 g/mol' },
+    { id: '4632', title: 'Oxybenzone', category: 'Toxins', description: 'Sunscreen/Coral toxic.', formula: 'C14H12O3', molecularWeight: '228.24 g/mol' },
+    { id: '5354276', title: 'Octocrylene', category: 'Natural Products', description: 'UVB sunscreen.', formula: 'C24H27NO2', molecularWeight: '361.5 g/mol' },
+    { id: '5352899', title: 'Octinoxate', category: 'Natural Products', description: 'UVB sunscreen.', formula: 'C18H26O3', molecularWeight: '290.40 g/mol' },
+    { id: '4636', title: 'Homosalate', category: 'Natural Products', description: 'UVB sunscreen.', formula: 'C16H22O3', molecularWeight: '262.35 g/mol' },
+    { id: '14806', title: 'Zinc Oxide', category: 'Natural Products', description: 'Physical sunscreen.', formula: 'ZnO', molecularWeight: '81.41 g/mol' },
+    { id: '14771', title: 'Titanium Dioxide', category: 'Natural Products', description: 'Physical sunscreen/Pigment.', formula: 'TiO2', molecularWeight: '79.87 g/mol' },
+    { id: '7628', title: 'Ascorbic Acid (Vitamin C)', category: 'Vitamins', description: 'Antioxidant.', formula: 'C6H8O6', molecularWeight: '176.12 g/mol' },
+    { id: '1071', title: 'Niacinamide', category: 'Vitamins', description: 'Skin care B3.', formula: 'C6H6N2O', molecularWeight: '122.12 g/mol' },
+
+    // --- BATCH 9: GASTROINTESTINAL & ALLERGY (Drugs) ---
+    { id: '3033332', title: 'Ranitidine (Zantac)', category: 'Drugs', description: 'H2 blocker (withdrawn).', formula: 'C13H22N4O3S', molecularWeight: '314.40 g/mol' },
+    { id: '3325', title: 'Famotidine (Pepcid)', category: 'Drugs', description: 'H2 blocker.', formula: 'C8H15N7O2S3', molecularWeight: '337.4 g/mol' },
+    { id: '2744', title: 'Cimetidine', category: 'Drugs', description: 'First H2 blocker.', formula: 'C10H16N6S', molecularWeight: '252.34 g/mol' },
+    { id: '9568614', title: 'Esomeprazole', category: 'Drugs', description: 'PPI (Nexium).', formula: 'C17H19N3O3S', molecularWeight: '345.4 g/mol' },
+    { id: '3883', title: 'Lansoprazole', category: 'Drugs', description: 'PPI.', formula: 'C16H14F3N3O2S', molecularWeight: '369.36 g/mol' },
+    { id: '4679', title: 'Pantoprazole', category: 'Drugs', description: 'PPI.', formula: 'C16H15F2N3O4S', molecularWeight: '383.4 g/mol' },
+    { id: '2088', title: 'Albuterol (Salbutamol)', category: 'Drugs', description: 'Asthma rescue.', formula: 'C13H21NO3', molecularWeight: '239.31 g/mol' },
+    { id: '5152', title: 'Salmeterol', category: 'Drugs', description: 'Long-acting beta agonist.', formula: 'C25H37NO4', molecularWeight: '415.57 g/mol' },
+    { id: '3948', title: 'Loratadine', category: 'Drugs', description: 'Antihistamine.', formula: 'C22H23ClN2O2', molecularWeight: '382.88 g/mol' },
+    { id: '2678', title: 'Cetirizine', category: 'Drugs', description: 'Antihistamine.', formula: 'C21H25ClN2O3', molecularWeight: '388.89 g/mol' },
+
+    // --- BATCH 9: SUPPLEMENTS & NOOTROPICS (Nutrients/Drugs) ---
+    { id: '298', title: 'Taurine', category: 'Nutrients', description: 'Amino sulfonic acid.', formula: 'C2H7NO3S', molecularWeight: '125.15 g/mol' },
+    { id: '702', title: 'L-Carnitine', category: 'Nutrients', description: 'Fat metabolism.', formula: 'C7H15NO3', molecularWeight: '161.20 g/mol' },
+    { id: '4843', title: 'Piracetam', category: 'Drugs', description: 'First nootropic.', formula: 'C6H10N2O2', molecularWeight: '142.16 g/mol' },
+    { id: '182458', title: 'Noopept', category: 'Drugs', description: 'Potent peptide nootropic.', formula: 'C17H22N2O4', molecularWeight: '318.37 g/mol' },
+    { id: '4195', title: 'Modafinil', category: 'Drugs', description: 'Wakefulness agent.', formula: 'C15H15NO2S', molecularWeight: '273.35 g/mol' },
+    { id: '4829', title: 'Phenibut', category: 'Drugs', description: 'Anxiolytic.', formula: 'C10H13NO2', molecularWeight: '179.22 g/mol' },
+
+    // --- BATCH 9: HOUSEHOLD CHEMICALS (Toxins/Metabolites) ---
+    { id: '222', title: 'Ammonia', category: 'Toxins', description: 'Cleaning agent.', formula: 'NH3', molecularWeight: '17.03 g/mol' },
+    { id: '784', title: 'Hydrogen Peroxide', category: 'Toxins', description: 'Disinfectant.', formula: 'H2O2', molecularWeight: '34.01 g/mol' },
+    { id: '23665760', title: 'Sodium Hypochlorite', category: 'Toxins', description: 'Bleach.', formula: 'NaClO', molecularWeight: '74.44 g/mol' },
+    { id: '1119', title: 'Sodium Hydroxide (Lye)', category: 'Toxins', description: 'Drain cleaner.', formula: 'NaOH', molecularWeight: '40.00 g/mol' },
+    { id: '2265', title: 'Borax', category: 'Toxins', description: 'Detergent booster.', formula: 'Na2B4O7', molecularWeight: '201.22 g/mol' },
+    { id: '8118', title: 'Naphthalene', category: 'Toxins', description: 'Mothballs (old).', formula: 'C10H8', molecularWeight: '128.17 g/mol' },
+    { id: '6597', title: 'Paradichlorobenzene', category: 'Toxins', description: 'Mothballs (new).', formula: 'C6H4Cl2', molecularWeight: '147.00 g/mol' },
+
+    // --- BATCH 9: PSYCHOACTIVE & POISONS (Drugs/Toxins) ---
+    { id: '1615', title: 'MDMA (Ecstasy)', category: 'Drugs', description: 'Empathogen.', formula: 'C11H15NO2', molecularWeight: '193.24 g/mol' },
+    { id: '5761', title: 'LSD', category: 'Drugs', description: 'Psychedelic.', formula: 'C20H25N3O', molecularWeight: '323.43 g/mol' },
+    { id: '4980', title: 'Psilocybin', category: 'Drugs', description: 'Mushroom psychedelic.', formula: 'C12H17N2O4P', molecularWeight: '284.25 g/mol' },
+    { id: '107971', title: 'Psilocin', category: 'Drugs', description: 'Active mushroom metabolite.', formula: 'C12H16N2O', molecularWeight: '204.27 g/mol' },
+    { id: '3423', title: 'Mescaline', category: 'Drugs', description: 'Cactus psychedelic.', formula: 'C11H17NO3', molecularWeight: '211.26 g/mol' },
+    { id: '5978', title: 'Potassium Cyanide', category: 'Toxins', description: 'Fast-acting poison.', formula: 'KCN', molecularWeight: '65.12 g/mol' },
+    { id: '14793', title: 'Arsenic Trioxide', category: 'Toxins', description: 'Poison/Chemotherapy.', formula: 'As2O3', molecularWeight: '197.84 g/mol' },
+    { id: '4046', title: 'Methadone', category: 'Drugs', description: 'Opioid maintenance.', formula: 'C21H27NO', molecularWeight: '309.45 g/mol' },
+    { id: '2708', title: 'Chlorpromazine', category: 'Drugs', description: 'First antipsychotic.', formula: 'C17H19ClN2S', molecularWeight: '318.86 g/mol' },
+    { id: '3561', title: 'Haloperidol', category: 'Drugs', description: 'Typical antipsychotic.', formula: 'C21H23ClFNO2', molecularWeight: '375.86 g/mol' },
+
+    // --- BATCH 9: DYES & INDICATORS (Natural Products) ---
+    { id: '1116', title: 'Bromothymol Blue', category: 'Natural Products', description: 'pH indicator.', formula: 'C27H28Br2O5S', molecularWeight: '624.4 g/mol' },
+    { id: '23673835', title: 'Methyl Orange', category: 'Natural Products', description: 'pH indicator.', formula: 'C14H14N3NaO3S', molecularWeight: '327.33 g/mol' },
+    { id: '4764', title: 'Phenolphthalein', category: 'Natural Products', description: 'pH indicator.', formula: 'C20H14O4', molecularWeight: '318.32 g/mol' },
+    { id: '2723854', title: 'Neutral Red', category: 'Natural Products', description: 'Histological stain.', formula: 'C15H17ClN4', molecularWeight: '288.78 g/mol' },
+    { id: '65231', title: 'Fluorescein Isothiocyanate (FITC)', category: 'Natural Products', description: 'Fluorescent labeling.', formula: 'C21H11NO5S', molecularWeight: '389.38 g/mol' },
+
+    // --- BATCH 9: MUSCLE RELAXANTS & SLEEP (Drugs) ---
+    { id: '2904', title: 'Cyclobenzaprine', category: 'Drugs', description: 'Muscle relaxant.', formula: 'C20H21N', molecularWeight: '275.39 g/mol' },
+    { id: '2284', title: 'Baclofen', category: 'Drugs', description: 'Muscle relaxant (GABA-B).', formula: 'C10H12ClNO2', molecularWeight: '213.66 g/mol' },
+    { id: '2520', title: 'Carisoprodol', category: 'Drugs', description: 'Muscle relaxant.', formula: 'C12H24N2O4', molecularWeight: '260.33 g/mol' },
+    { id: '6918474', title: 'Ramelteon', category: 'Drugs', description: 'Sleep aid.', formula: 'C16H21NO2', molecularWeight: '259.34 g/mol' },
+    { id: '4763', title: 'Phenobarbital', category: 'Drugs', description: 'Barbiturate.', formula: 'C12H12N2O3', molecularWeight: '232.24 g/mol' },
+    { id: '4737', title: 'Pentobarbital', category: 'Drugs', description: 'Barbiturate.', formula: 'C11H18N2O3', molecularWeight: '226.27 g/mol' }
 ];
