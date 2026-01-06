@@ -540,8 +540,8 @@ export const Controls: React.FC<ControlsProps> = ({
                                     </>
                                 )}
 
-                                {/* Metadata */}
-                                {pdbMetadata && (
+                                {/* Metadata: Only Show for Proteins */}
+                                {pdbMetadata && !isChemical && (
                                     <>
                                         <div>
                                             <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Method</span>
