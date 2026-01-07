@@ -12,10 +12,12 @@ interface ShareModalProps {
 export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUrl, isLightMode }) => {
     const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
+    const [generationError, setGenerationError] = useState<string | null>(null);
 
     // Generate QR Code
     useEffect(() => {
         if (isOpen && shareUrl) {
+            console.log(`Generating QR for URL (${shareUrl.length} chars)`);
             QRCode.toDataURL(shareUrl, {
                 margin: 2,
                 width: 300,
@@ -25,8 +27,14 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                     light: isLightMode ? '#FFFFFF' : '#171717'
                 }
             })
-                .then(url => setQrCodeDataUrl(url))
-                .catch(err => console.error('Failed to generate QR code', err));
+                .then(url => {
+                    setQrCodeDataUrl(url);
+                    setGenerationError(null);
+                })
+                .catch(err => {
+                    console.error('Failed to generate QR code', err);
+                    setGenerationError('URL too long for QR Code');
+                });
         }
     }, [isOpen, shareUrl, isLightMode]);
 
@@ -73,8 +81,16 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                             <img src={qrCodeDataUrl} alt="QR Code" className="w-64 h-64" />
                         </div>
                     ) : (
-                        <div className="w-64 h-64 flex items-center justify-center">
-                            <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full" />
+                        <div className="w-64 h-64 flex flex-col items-center justify-center text-center p-4">
+                            {generationError ? (
+                                <>
+                                    <div className="text-red-500 mb-2">⚠️</div>
+                                    <p className="text-sm text-red-400">{generationError}</p>
+                                    <p className="text-xs text-neutral-500 mt-2">Try shortening the URL or using fewer viewports.</p>
+                                </>
+                            ) : (
+                                <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full" />
+                            )}
                         </div>
                     )}
                     <p className={`text-sm text-center ${isLightMode ? 'text-neutral-600' : 'text-neutral-400'}`}>
