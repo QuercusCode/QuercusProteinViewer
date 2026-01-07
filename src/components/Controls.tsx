@@ -34,8 +34,7 @@ import {
     Star,
     Clock,
     Undo2,
-    Redo2,
-    Split
+    Redo2
 } from 'lucide-react';
 import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, PDBMetadata } from '../types';
 import type { DataSource } from '../utils/pdbUtils';
@@ -347,9 +346,9 @@ interface ControlsProps {
     canUndo?: boolean;
     canRedo?: boolean;
 
-    // Comparison Mode
-    isComparisonMode?: boolean;
-    onToggleComparisonMode?: () => void;
+    // Multi-View Mode
+    viewMode?: 'single' | 'dual' | 'triple' | 'quad';
+    onSetViewMode?: (mode: 'single' | 'dual' | 'triple' | 'quad') => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -358,8 +357,8 @@ export const Controls: React.FC<ControlsProps> = ({
     dataSource,
     setDataSource,
     isChemical = false,
-    isComparisonMode = false,
-    onToggleComparisonMode,
+    viewMode = 'single',
+    onSetViewMode,
     onUpload,
     representation,
     setRepresentation,
@@ -1018,16 +1017,56 @@ export const Controls: React.FC<ControlsProps> = ({
                                             <div className={`w-1 h-1 rounded-full mt-0.5 ${isDyslexicFont ? 'bg-blue-500' : 'bg-neutral-500'}`} />
                                         </button>
 
-                                        {/* Dual View Toggle */}
-                                        {onToggleComparisonMode && (
-                                            <button
-                                                onClick={onToggleComparisonMode}
-                                                className={`flex flex-col items-center justify-center gap-1 px-1 py-2 rounded-lg border transition-all ${isComparisonMode ? 'bg-indigo-600/10 border-indigo-500 text-indigo-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
-                                            >
-                                                <Split className="w-3.5 h-3.5" />
-                                                <span className="text-[10px] font-medium">Dual View</span>
-                                                <div className={`w-1 h-1 rounded-full mt-0.5 ${isComparisonMode ? 'bg-indigo-500' : 'bg-neutral-500'}`} />
-                                            </button>
+
+                                        {/* Multi-View Mode Selector */}
+                                        {onSetViewMode && (
+                                            <div className="space-y-1">
+                                                <label className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Layout</label>
+                                                <div className="grid grid-cols-2 gap-1.5">
+                                                    <button
+                                                        onClick={() => onSetViewMode('single')}
+                                                        className={`flex flex-col items-center justify-center gap-0.5 px-1 py-1.5 rounded-lg border transition-all ${viewMode === 'single' ? 'bg-indigo-600/10 border-indigo-500 text-indigo-500' : `${cardBg} border-neutral-700 opacity-80 hover:opacity-100`}`}
+                                                    >
+                                                        <div className="w-3 h-3 border rounded" />
+                                                        <span className="text-[9px] font-medium">Single</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => onSetViewMode('dual')}
+                                                        className={`flex flex-col items-center justify-center gap-0.5 px-1 py-1.5 rounded-lg border transition-all ${viewMode === 'dual' ? 'bg-indigo-600/10 border-indigo-500 text-indigo-500' : `${cardBg} border-neutral-700 opacity-80 hover:opacity-100`}`}
+                                                    >
+                                                        <div className="flex gap-0.5">
+                                                            <div className="w-1.5 h-3 border rounded" />
+                                                            <div className="w-1.5 h-3 border rounded" />
+                                                        </div>
+                                                        <span className="text-[9px] font-medium">Dual</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => onSetViewMode('triple')}
+                                                        className={`flex flex-col items-center justify-center gap-0.5 px-1 py-1.5 rounded-lg border transition-all ${viewMode === 'triple' ? 'bg-indigo-600/10 border-indigo-500 text-indigo-500' : `${cardBg} border-neutral-700 opacity-80 hover:opacity-100`}`}
+                                                    >
+                                                        <div className="flex flex-col gap-0.5">
+                                                            <div className="w-3 h-1.5 border rounded" />
+                                                            <div className="flex gap-0.5">
+                                                                <div className="w-1.5 h-1.5 border rounded" />
+                                                                <div className="w-1.5 h-1.5 border rounded" />
+                                                            </div>
+                                                        </div>
+                                                        <span className="text-[9px] font-medium">Triple</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => onSetViewMode('quad')}
+                                                        className={`flex flex-col items-center justify-center gap-0.5 px-1 py-1.5 rounded-lg border transition-all ${viewMode === 'quad' ? 'bg-indigo-600/10 border-indigo-500 text-indigo-500' : `${cardBg} border-neutral-700 opacity-80 hover:opacity-100`}`}
+                                                    >
+                                                        <div className="grid grid-cols-2 gap-0.5">
+                                                            <div className="w-1.5 h-1.5 border rounded" />
+                                                            <div className="w-1.5 h-1.5 border rounded" />
+                                                            <div className="w-1.5 h-1.5 border rounded" />
+                                                            <div className="w-1.5 h-1.5 border rounded" />
+                                                        </div>
+                                                        <span className="text-[9px] font-medium">Quad</span>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         )}
                                     </div>
 

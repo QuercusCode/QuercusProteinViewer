@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useMemo, useCallback, type RefObject } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { ProteinViewer, type ProteinViewerRef } from './components/ProteinViewer';
 import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
@@ -33,9 +33,13 @@ import { useStructureController, type StructureController } from './hooks/useStr
 import { useStructureMetadata } from './hooks/useStructureMetadata';
 
 function App() {
-  // Refs for Dual Viewers
-  const leftRef = useRef<ProteinViewerRef>(null);
-  const rightRef = useRef<ProteinViewerRef>(null);
+  // Refs for Multi-View Viewers (supports 1-4 viewports)
+  const viewerRefs = [
+    useRef<ProteinViewerRef>(null),
+    useRef<ProteinViewerRef>(null),
+    useRef<ProteinViewerRef>(null),
+    useRef<ProteinViewerRef>(null)
+  ];
 
   const { toasts, removeToast, success, error, info } = useToast();
   const { favorites, toggleFavorite, removeFavorite, isFavorite } = useFavorites();
@@ -44,21 +48,28 @@ function App() {
   // Parse Global URL State Once
   const initialUrlState = parseURLState();
 
-  // --- State: Dual Controllers ---
-  const left = useStructureController(initialUrlState);
-  const right = useStructureController({});
+  // --- State: Multi-View Controllers (array of 4) ---
+  const controllers = [
+    useStructureController(initialUrlState), // Viewport 0
+    useStructureController({}),              // Viewport 1
+    useStructureController({}),              // Viewport 2
+    useStructureController({})               // Viewport 3
+  ];
 
-  // --- State: View Management ---
-  const [activeView, setActiveView] = useState<'left' | 'right'>('left');
-  const [isComparisonMode, setIsComparisonMode] = useState(false);
+  // --- State: View Mode & Active Management ---
+  type ViewMode = 'single' | 'dual' | 'triple' | 'quad';
+  const [viewMode, setViewMode] = useState<ViewMode>('single');
+  const [activeViewIndex, setActiveViewIndex] = useState(0);
 
   // Derived Accessors for "Active" Context (Sidebar, Controls, etc operate on this)
-  const activeController = activeView === 'left' ? left : right;
-  const viewerRef = activeView === 'left' ? leftRef : rightRef;
+  const activeController = controllers[activeViewIndex];
+  const viewerRef = viewerRefs[activeViewIndex];
 
-  // Metadata Management
-  useStructureMetadata(left);
-  useStructureMetadata(right);
+  // Metadata Management for all controllers
+  useStructureMetadata(controllers[0]);
+  useStructureMetadata(controllers[1]);
+  useStructureMetadata(controllers[2]);
+  useStructureMetadata(controllers[3]);
 
   // Destructure Active Controller for UI Consistency
   const {
@@ -381,35 +392,27 @@ function App() {
     return { chainCount, residueCount, ligandCount };
   }, [chains, ligands]);
 
-  // Need to insert logic into handleAtomClick
-  const handleAtomClick = async (info: ResidueInfo | null, ctrl: StructureController = activeController, ref: RefObject<ProteinViewerRef | null> = viewerRef) => {
+  const handleAtomClick = (
+    info: { chain: string; resNo: number; resName: string; atomIndex?: number; position?: { x: number; y: number; z: number } } | null,
+    controllerIndex = activeViewIndex
+  ) => {
+    const ctrl = controllers[controllerIndex];
+    const ref = viewerRefs[controllerIndex];
+
     if (!info) {
       ctrl.setHighlightedResidue(null);
-      return;
-    }
-
-    if (info) {
-      // Toggle off (Deselect)
-      if (ctrl.highlightedResidue &&
-        ctrl.highlightedResidue.chain === info.chain &&
-        ctrl.highlightedResidue.resNo === info.resNo) {
-
-        console.log("App: Deselecting residue", info);
-        ctrl.setHighlightedResidue(null);
-        ref.current?.clearHighlight();
+      ref.current?.clearHighlight?.();
+    } else {
+      if (isMeasurementMode || (highlightedResidue?.chain === info.chain && highlightedResidue?.resNo === info.resNo)) {
+        // Ignore if measurement mode or same residue
       } else {
-        if (isMeasurementMode) {
-          return; // ProteinViewer handles measurement logic directly
-        }
-
-        // Select new
         console.log("App: Atom Clicked", info);
         ctrl.setHighlightedResidue({ chain: info.chain, resNo: info.resNo, resName: info.resName });
         ref.current?.highlightResidue(info.chain, info.resNo);
 
         // Auto-switch active view if clicking inactive
-        if (ctrl !== activeController) {
-          setActiveView(ctrl === left ? 'left' : 'right');
+        if (controllerIndex !== activeViewIndex) {
+          setActiveViewIndex(controllerIndex);
         }
       }
     }
@@ -421,8 +424,6 @@ function App() {
   };
 
   const handleLoad = useCallback((info: StructureInfo, ctrl: StructureController) => {
-
-
     ctrl.setChains(info.chains);
     ctrl.setLigands(info.ligands);
 
@@ -1403,167 +1404,151 @@ function App() {
               onUndo={undo}
               onRedo={redo}
               canUndo={canUndo}
-
               canRedo={canRedo}
 
-              // Dual View
-              isComparisonMode={isComparisonMode}
-              onToggleComparisonMode={() => setIsComparisonMode(!isComparisonMode)}
+              // Multi-View Mode
+              viewMode={viewMode}
+              onSetViewMode={setViewMode}
             />
           );
         })()}
 
-        {/* Dual View Layout */}
+        {/* Multi-View Layout */}
         <div className="relative flex-1 flex w-full h-full overflow-hidden bg-black">
+          {(() => {
+            // Helper: Render single viewport
+            const renderViewport = (index: number, extraClasses = '') => {
+              const ctrl = controllers[index];
+              const ref = viewerRefs[index];
+              const isActive = activeViewIndex === index;
+              const showHeader = viewMode !== 'single';
+              const viewportLabels = ['Viewport 1', 'Viewport 2', 'Viewport 3', 'Viewport 4'];
 
-          {/* Left / Single View */}
-          <div className={`flex flex-col h-full transition-all duration-300 ${isComparisonMode ? 'w-1/2 border-r border-[#333]' : 'w-full'}`}>
-            {/* Viewport Header (Dual Mode Only) */}
-            {isComparisonMode && (
-              <div
-                onClick={() => setActiveView('left')}
-                className={`shrink-0 h-9 flex items-center justify-between px-3 border-b transition-colors cursor-pointer select-none
-                ${activeView === 'left' ? 'bg-[#1a1a1a] border-indigo-500/50' : 'bg-black border-[#222] opacity-60 hover:opacity-100'}
-              `}
-              >
-                <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full shadow-sm transition-all ${activeView === 'left' ? 'bg-indigo-500 shadow-indigo-500/50 scale-110' : 'bg-neutral-700'}`} />
-                  <span className={`text-[10px] font-bold uppercase tracking-widest ${activeView === 'left' ? 'text-indigo-400' : 'text-neutral-500'}`}>Left View</span>
+              return (
+                <div key={index} className={`flex flex-col h-full ${extraClasses}`}>
+                  {/* Viewport Header */}
+                  {showHeader && (
+                    <div
+                      onClick={() => setActiveViewIndex(index)}
+                      className={`shrink-0 h-9 flex items-center justify-between px-3 border-b transition-colors cursor-pointer select-none
+                        ${isActive ? 'bg-[#1a1a1a] border-indigo-500/50' : 'bg-black border-[#222] opacity-60 hover:opacity-100'}
+                      `}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full shadow-sm transition-all ${isActive ? 'bg-indigo-500 shadow-indigo-500/50 scale-110' : 'bg-neutral-700'}`} />
+                        <span className={`text-[10px] font-bold uppercase tracking-widest ${isActive ? 'text-indigo-400' : 'text-neutral-500'}`}>
+                          {viewportLabels[index]}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] text-neutral-400 font-mono max-w-[120px] truncate">
+                          {ctrl.proteinTitle || ctrl.pdbId || (ctrl.file ? ctrl.file.name : "No Structure")}
+                        </span>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); ctrl.handleResetView(); }}
+                          className="p-1 hover:bg-white/10 rounded text-neutral-500 hover:text-white transition-colors"
+                          title="Reset Camera"
+                        >
+                          <RefreshCw className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Viewer */}
+                  <div className="relative flex-1 w-full h-full">
+                    <ProteinViewer
+                      ref={ref}
+                      pdbId={ctrl.pdbId}
+                      dataSource={ctrl.dataSource}
+                      file={ctrl.file || undefined}
+                      fileType={ctrl.fileType}
+                      isLightMode={isLightMode}
+                      isSpinning={ctrl.isSpinning}
+                      representation={ctrl.representation}
+                      showSurface={ctrl.showSurface}
+                      showLigands={ctrl.showLigands}
+                      showIons={ctrl.showIons}
+                      coloring={ctrl.coloring}
+                      palette={colorPalette}
+                      backgroundColor={ctrl.customBackgroundColor || (isLightMode ? 'white' : 'black')}
+                      measurementTextColor={measurementTextColorMode}
+                      enableAmbientOcclusion={true}
+
+                      onStructureLoaded={(info) => handleLoad(info, ctrl)}
+                      onAtomClick={(info) => handleAtomClick(info, index)}
+                      isMeasurementMode={isMeasurementMode}
+                      measurements={ctrl.measurements}
+                      onAddMeasurement={(m) => {
+                        ctrl.setMeasurements([...ctrl.measurements, m]);
+                        setActiveViewIndex(index);
+                      }}
+                      onHover={setHoveredResidue}
+
+                      quality={isPublicationMode ? 'high' : 'medium'}
+                      resetCamera={ctrl.resetKey}
+                      customColors={ctrl.customColors}
+                      className="w-full h-full"
+                    />
+                  </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-[10px] text-neutral-400 font-mono max-w-[120px] truncate">
-                    {left.proteinTitle || left.pdbId || (left.file ? left.file.name : "No Structure")}
-                  </span>
-                  {/* Quick Action: Reset */}
-                  <button
-                    onClick={(e) => { e.stopPropagation(); left.handleResetView(); }}
-                    className="p-1 hover:bg-white/10 rounded text-neutral-500 hover:text-white transition-colors"
-                    title="Reset Camera"
-                  >
-                    <RefreshCw className="w-3 h-3" />
-                  </button>
-                </div>
-              </div>
-            )}
+              );
+            };
 
-            <div className="relative flex-1 w-full h-full">
-              <ProteinViewer
-                ref={leftRef}
-                pdbId={left.pdbId}
-                dataSource={left.dataSource}
-                file={left.file || undefined}
-                fileType={left.fileType}
-                isLightMode={isLightMode}
-                isSpinning={left.isSpinning}
-                representation={left.representation}
-                showSurface={left.showSurface}
-                showLigands={left.showLigands}
-                showIons={left.showIons}
-                coloring={left.coloring}
-                palette={colorPalette}
-                backgroundColor={left.customBackgroundColor || (isLightMode ? 'white' : 'black')}
-                measurementTextColor={measurementTextColorMode}
-                enableAmbientOcclusion={true}
+            // Render layout based on viewMode
+            switch (viewMode) {
+              case 'single':
+                return renderViewport(0);
 
-                onStructureLoaded={(info) => handleLoad(info, left)}
-                onAtomClick={(info) => handleAtomClick(info, left, leftRef)}
-                isMeasurementMode={isMeasurementMode}
-                measurements={left.measurements}
-                onAddMeasurement={(m) => {
-                  left.setMeasurements([...left.measurements, m]);
-                  setActiveView('left');
-                }}
-                onHover={setHoveredResidue}
+              case 'dual':
+                return (
+                  <>
+                    {renderViewport(0, 'w-1/2 border-r border-[#333]')}
+                    {renderViewport(1, 'w-1/2')}
+                  </>
+                );
 
-                quality={isPublicationMode ? 'high' : 'medium'}
-                resetCamera={left.resetKey}
-                customColors={left.customColors}
-                className="w-full h-full"
-              />
-            </div>
-          </div>
+              case 'triple':
+                return (
+                  <div className="flex flex-col w-full h-full">
+                    {renderViewport(0, 'w-full h-1/2 border-b border-[#333]')}
+                    <div className="flex h-1/2 w-full">
+                      {renderViewport(1, 'w-1/2 border-r border-[#333]')}
+                      {renderViewport(2, 'w-1/2')}
+                    </div>
+                  </div>
+                );
 
-          {/* Right View */}
-          {isComparisonMode && (
-            <div className="flex flex-col w-1/2 h-full bg-black">
-              {/* Viewport Header */}
-              <div
-                onClick={() => setActiveView('right')}
-                className={`shrink-0 h-9 flex items-center justify-between px-3 border-b transition-colors cursor-pointer select-none
-                ${activeView === 'right' ? 'bg-[#1a1a1a] border-indigo-500/50' : 'bg-black border-[#222] opacity-60 hover:opacity-100'}
-              `}
-              >
-                <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full shadow-sm transition-all ${activeView === 'right' ? 'bg-indigo-500 shadow-indigo-500/50 scale-110' : 'bg-neutral-700'}`} />
-                  <span className={`text-[10px] font-bold uppercase tracking-widest ${activeView === 'right' ? 'text-indigo-400' : 'text-neutral-500'}`}>Right View</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-[10px] text-neutral-400 font-mono max-w-[120px] truncate">
-                    {right.proteinTitle || right.pdbId || (right.file ? right.file.name : "No Structure")}
-                  </span>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); right.handleResetView(); }}
-                    className="p-1 hover:bg-white/10 rounded text-neutral-500 hover:text-white transition-colors"
-                    title="Reset Camera"
-                  >
-                    <RefreshCw className="w-3 h-3" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="relative flex-1 w-full h-full">
-                <ProteinViewer
-                  ref={rightRef}
-                  pdbId={right.pdbId}
-                  dataSource={right.dataSource}
-                  file={right.file || undefined}
-                  fileType={right.fileType}
-                  isLightMode={isLightMode}
-                  isSpinning={right.isSpinning}
-                  representation={right.representation}
-                  showSurface={right.showSurface}
-                  showLigands={right.showLigands}
-                  showIons={right.showIons}
-                  coloring={right.coloring}
-                  palette={colorPalette}
-                  backgroundColor={right.customBackgroundColor || (isLightMode ? 'white' : 'black')}
-                  measurementTextColor={measurementTextColorMode}
-                  enableAmbientOcclusion={true}
-
-                  onStructureLoaded={(info) => handleLoad(info, right)}
-                  onAtomClick={(info) => handleAtomClick(info, right, rightRef)}
-                  isMeasurementMode={isMeasurementMode}
-                  measurements={right.measurements}
-                  onAddMeasurement={(m) => {
-                    right.setMeasurements([...right.measurements, m]);
-                    setActiveView('right');
-                  }}
-                  onHover={setHoveredResidue}
-
-                  quality={isPublicationMode ? 'high' : 'medium'}
-                  resetCamera={right.resetKey}
-                  customColors={right.customColors}
-                  className="w-full h-full"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Right Sidebar: Sequence Track */}
-          <SequenceTrack
-            id="sequence-track"
-            chains={chains}
-            highlightedResidue={highlightedResidue}
-            onHoverResidue={() => { }}
-            onClickResidue={(chain, resNo) => viewerRef.current?.focusResidue(chain, resNo)}
-            onClickAtom={(serial) => viewerRef.current?.highlightAtom(serial)}
-            isLightMode={isLightMode}
-            coloring={coloring}
-            colorPalette={colorPalette}
-          />
-        </div>
+              case 'quad':
+                return (
+                  <div className="flex flex-col w-full h-full">
+                    <div className="flex h-1/2 w-full border-b border-[#333]">
+                      {renderViewport(0, 'w-1/2 border-r border-[#333]')}
+                      {renderViewport(1, 'w-1/2')}
+                    </div>
+                    <div className="flex h-1/2 w-full">
+                      {renderViewport(2, 'w-1/2 border-r border-[#333]')}
+                      {renderViewport(3, 'w-1/2')}
+                    </div>
+                  </div>
+                );
+            }
+          })()}
+        </div>   {/* Right Sidebar: Sequence Track */}
+        <SequenceTrack
+          id="sequence-track"
+          chains={chains}
+          highlightedResidue={highlightedResidue}
+          onHoverResidue={() => { }}
+          onClickResidue={(chain, resNo) => viewerRef.current?.focusResidue(chain, resNo)}
+          onClickAtom={(serial) => viewerRef.current?.highlightAtom(serial)}
+          isLightMode={isLightMode}
+          coloring={coloring}
+          colorPalette={colorPalette}
+        />
       </div>
       {/* End Main Content Flex Container */}
+
 
       <ContactMap
         isOpen={showContactMap}
@@ -1635,7 +1620,7 @@ function App() {
 
       {/* Background Gradient */}
       <div className={`absolute inset-0 pointer-events-none transition-opacity duration-300 ${isLightMode ? 'opacity-0' : 'opacity-100 bg-[radial-gradient(circle_at_50%_50%,rgba(50,50,80,0.2),rgba(0,0,0,0))]'}`} />
-    </main>
+    </main >
   );
 }
 
