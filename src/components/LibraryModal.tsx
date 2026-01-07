@@ -125,23 +125,28 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
             <div className="bg-gray-900 border border-white/20 rounded-2xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col overflow-hidden">
 
                 {/* HEADER */}
-                <div className="flex items-center justify-between p-6 border-b border-white/10 bg-gray-900/50">
-                    <div className="flex items-center gap-4">
-                        <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400">
-                            <BookOpen size={24} />
+                <div className="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 border-b border-white/10 bg-gray-900/50 gap-4 shrink-0">
+                    <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-blue-500/20 rounded-lg text-blue-400 shrink-0">
+                                <BookOpen size={20} />
+                            </div>
+                            <div>
+                                <h2 className="text-xl sm:text-2xl font-bold text-white leading-tight">Structure Library</h2>
+                                <p className="text-gray-400 text-xs sm:text-sm">Curated biomolecules.</p>
+                            </div>
                         </div>
-                        <div>
-                            <h2 className="text-2xl font-bold text-white">Structure Library</h2>
-                            <p className="text-gray-400 text-sm">Curated collection of biomolecules.</p>
-                        </div>
+                        <button onClick={onClose} className="sm:hidden p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white">
+                            <X size={20} />
+                        </button>
                     </div>
 
                     {/* TABS */}
-                    <div className="flex p-1 bg-black/40 rounded-xl border border-white/10 mx-6">
+                    <div className="flex p-1 bg-black/40 rounded-xl border border-white/10 w-full sm:w-auto overflow-x-auto shrink-0">
                         <button
                             onClick={() => handleTabChange('proteins')}
                             className={clsx(
-                                "px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2",
+                                "flex-1 sm:flex-none px-3 py-2 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 whitespace-nowrap",
                                 activeTab === 'proteins' ? "bg-blue-500/20 text-blue-400 shadow-sm" : "text-gray-500 hover:text-gray-300"
                             )}
                         >
@@ -151,7 +156,7 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
                         <button
                             onClick={() => handleTabChange('chemicals')}
                             className={clsx(
-                                "px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2",
+                                "flex-1 sm:flex-none px-3 py-2 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 whitespace-nowrap",
                                 activeTab === 'chemicals' ? "bg-emerald-500/20 text-emerald-400 shadow-sm" : "text-gray-500 hover:text-gray-300"
                             )}
                         >
@@ -161,28 +166,28 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
                     </div>
 
                     {/* Search Bar (Global) */}
-                    <div className="relative flex-1 max-w-md hidden sm:block">
+                    <div className="relative w-full sm:w-auto sm:flex-1 sm:max-w-md hidden sm:block">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
                         <input
                             type="text"
-                            placeholder={activeTab === 'proteins' ? "Search PDB code, name..." : "Search chemical name..."}
+                            placeholder={activeTab === 'proteins' ? "Search..." : "Search..."}
                             value={searchTerm}
                             onChange={(e) => handleSearch(e.target.value)}
                             className="w-full bg-black/40 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-sm"
                         />
                     </div>
 
-                    <button onClick={onClose} className="p-2 ml-4 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white">
+                    <button onClick={onClose} className="hidden sm:block p-2 ml-4 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white shrink-0">
                         <X size={24} />
                     </button>
                 </div>
 
                 {/* CONTENT AREA */}
-                <div className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent bg-gradient-to-br from-gray-900 via-gray-900 to-black">
+                <div className="flex-1 overflow-y-auto min-h-0 p-4 sm:p-6 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent bg-gradient-to-br from-gray-900 via-gray-900 to-black">
 
                     {/* VIEW: CATEGORY DASHBOARD */}
                     {viewMode === 'categories' && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 animate-in fade-in zoom-in-95 duration-300">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 animate-in fade-in zoom-in-95 duration-300">
                             {categories.map(cat => {
                                 const config = currentConfig[cat];
                                 const count = currentLibrary.filter(i => i.category === cat).length;
@@ -195,7 +200,7 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
                                         key={cat}
                                         onClick={() => handleCategorySelect(cat)}
                                         className={clsx(
-                                            "group relative flex flex-col items-start text-left p-6 rounded-2xl border transition-all hover:-translate-y-1 hover:shadow-xl overflow-hidden",
+                                            "group relative flex flex-col items-start text-left p-5 sm:p-6 rounded-2xl border transition-all hover:-translate-y-1 hover:shadow-xl overflow-hidden min-h-[140px]",
                                             style.replace(/active-color:[\w-]+/g, '').trim()
                                         )}
                                     >
@@ -203,14 +208,14 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
                                             {icon}
                                         </div>
 
-                                        <div className="mb-4 p-3 rounded-xl bg-black/20 backdrop-blur-sm border border-white/10 shadow-inner group-hover:scale-110 transition-transform">
+                                        <div className="mb-3 sm:mb-4 p-2.5 sm:p-3 rounded-xl bg-black/20 backdrop-blur-sm border border-white/10 shadow-inner group-hover:scale-110 transition-transform">
                                             {icon}
                                         </div>
 
-                                        <h3 className="text-xl font-bold mb-1">{cat}</h3>
-                                        <p className="text-sm opacity-70 mb-4 h-10">{config?.description || 'Browse collection.'}</p>
+                                        <h3 className="text-lg sm:text-xl font-bold mb-1">{cat}</h3>
+                                        <p className="text-xs sm:text-sm opacity-70 mb-3 sm:mb-4 h-8 sm:h-10 line-clamp-2">{config?.description || 'Browse collection.'}</p>
 
-                                        <div className="mt-auto py-1 px-3 rounded-full bg-black/20 text-xs font-mono border border-white/10">
+                                        <div className="mt-auto py-1 px-3 rounded-full bg-black/20 text-[10px] sm:text-xs font-mono border border-white/10">
                                             {count} entries
                                         </div>
                                     </button>
@@ -221,17 +226,17 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
 
                     {/* VIEW: LIST */}
                     {viewMode === 'list' && (
-                        <div className="h-full flex flex-col animate-in slide-in-from-right-4 duration-300">
-                            <div className="flex items-center gap-4 mb-6">
+                        <div className="flex flex-col animate-in slide-in-from-right-4 duration-300">
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6 sticky top-0 z-20 bg-gray-900/95 backdrop-blur py-2 -mx-2 px-2 border-b border-white/5 sm:border-none sm:bg-transparent sm:py-0 sm:static">
                                 <button
                                     onClick={handleBack}
-                                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-800 text-white border border-white/10 hover:bg-gray-700 transition-colors"
+                                    className="self-start flex items-center gap-2 px-3 py-2 rounded-xl bg-gray-800 text-white border border-white/10 hover:bg-gray-700 transition-colors text-sm"
                                 >
-                                    <ArrowLeft size={16} />
-                                    Back to Categories
+                                    <ArrowLeft size={14} />
+                                    Back
                                 </button>
                                 {selectedCategory !== 'All' && (
-                                    <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                                    <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 text-sm">
                                         {currentConfig[selectedCategory]?.icon}
                                         <span className="font-bold">{selectedCategory}</span>
                                     </div>
@@ -244,7 +249,7 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
                                     <p className="text-lg">No items found matching your search.</p>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 pb-10">
                                     {filteredItems.map(item => {
                                         const config = currentConfig[item.category];
                                         return (
@@ -282,8 +287,8 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
                 </div>
 
                 {/* FOOTER */}
-                <div className="p-4 border-t border-white/10 bg-gray-950/80 text-right text-xs text-gray-500 font-mono">
-                    Library Version 2.0 • {OFFLINE_LIBRARY.length} proteins • {CHEMICAL_LIBRARY.length} chemicals
+                <div className="p-3 sm:p-4 border-t border-white/10 bg-gray-950 text-right text-[10px] sm:text-xs text-gray-500 font-mono shrink-0 z-30">
+                    Library v2.0 • {OFFLINE_LIBRARY.length} proteins • {CHEMICAL_LIBRARY.length} chemicals
                 </div>
             </div>
         </div>
