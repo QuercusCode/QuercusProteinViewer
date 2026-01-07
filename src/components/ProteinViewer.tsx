@@ -1661,7 +1661,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                     const newMeasurement: Measurement = {
                         id: crypto.randomUUID(),
-                        name: `${a1.resName} ${a1.resNo}-${a2.resName} ${a2.resNo}`,
+                        name: `${a1.resName} ${a1.resNo}${a1.atomName ? ` (${a1.atomName})` : ''}-${a2.resName} ${a2.resNo}${a2.atomName ? ` (${a2.atomName})` : ''}`,
                         distance: dist,
                         color: '#3b82f6', // Default blue
                         atom1: a1,
