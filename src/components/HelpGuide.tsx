@@ -371,7 +371,7 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
                     <div className="relative w-full max-w-5xl h-[85vh] flex flex-col md:flex-row bg-neutral-950 border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
 
                         {/* Sidebar */}
-                        <div className={`w-full md:w-64 flex-shrink-0 border-b md:border-b-0 md:border-r border-neutral-800 bg-neutral-900/50 flex-col ${showMobileList ? 'flex' : 'hidden md:flex'}`}>
+                        <div className={`w-full md:w-64 flex-shrink-0 border-b md:border-b-0 md:border-r border-neutral-800 bg-neutral-900/50 flex-col min-h-0 ${showMobileList ? 'flex' : 'hidden md:flex'}`}>
                             <div className="p-5 border-b border-neutral-800">
                                 <h2 className="text-lg font-bold text-white flex items-center gap-2">
                                     <CircleHelp className="w-5 h-5 text-blue-500" />
@@ -379,7 +379,7 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
                                 </h2>
                                 <p className="text-[10px] text-neutral-500 mt-1 uppercase tracking-wider font-semibold">Quercus Viewer v1.0</p>
                             </div>
-                            <div className="flex-1 overflow-y-auto p-3 space-y-1">
+                            <div className="flex-1 overflow-y-auto p-3 space-y-1 scrollbar-thin scrollbar-thumb-neutral-800">
                                 {features.map(feature => (
                                     <button
                                         key={feature.id}
@@ -387,7 +387,7 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
                                             setActiveTab(feature.id);
                                             setShowMobileList(false);
                                         }}
-                                        className={`w-full flex items-center gap-3 p-3 rounded-lg text-sm font-medium transition-all ${activeTab === feature.id && !showMobileList // Highlight only if not looking at list (mobile) logic doesn't apply well, keep simple active state
+                                        className={`w-full flex items-center gap-3 p-3 rounded-lg text-sm font-medium transition-all ${activeTab === feature.id && !showMobileList
                                             ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
                                             : activeTab === feature.id
                                                 ? 'bg-blue-600/10 text-blue-400 md:bg-blue-600 md:text-white md:shadow-lg'
@@ -412,7 +412,7 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
                         </div>
 
                         {/* Content Area */}
-                        <div className={`flex-1 flex-col min-w-0 bg-neutral-900/30 ${showMobileList ? 'hidden md:flex' : 'flex'}`}>
+                        <div className={`flex-1 flex-col min-w-0 min-h-0 bg-neutral-900/30 ${showMobileList ? 'hidden md:flex' : 'flex'}`}>
                             {/* Header */}
                             <div className="h-16 flex items-center justify-between px-4 md:px-8 border-b border-neutral-800 bg-neutral-900/50 backdrop-blur-xl shrink-0">
                                 <div className="flex items-center gap-3">
