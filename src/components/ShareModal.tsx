@@ -20,8 +20,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
             console.log(`Generating QR for URL (${shareUrl.length} chars)`);
             QRCode.toDataURL(shareUrl, {
                 margin: 2,
-                width: 300,
-                errorCorrectionLevel: 'M',
+                width: 400,
+                errorCorrectionLevel: 'L',
                 color: {
                     dark: isLightMode ? '#000000' : '#FFFFFF',
                     light: isLightMode ? '#FFFFFF' : '#171717'

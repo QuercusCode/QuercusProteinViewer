@@ -49,7 +49,15 @@ export const getShareableURL = (viewMode: string, viewports: AppState[]): string
 
         if (state.orientation) {
             try {
-                const b64 = btoa(JSON.stringify(state.orientation));
+                // Optimize: Round floats to 3 decimal places to save space
+                // NGL orientation is usually a 16-element array (matrix) or similar
+                let optimizedOrientation = state.orientation;
+                if (Array.isArray(state.orientation)) {
+                    optimizedOrientation = state.orientation.map(n =>
+                        typeof n === 'number' ? Number(n.toFixed(3)) : n
+                    );
+                }
+                const b64 = btoa(JSON.stringify(optimizedOrientation));
                 params.set(p('cam'), b64);
             } catch (e) { console.warn("Serialization warning", e); }
         }
