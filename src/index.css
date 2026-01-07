@@ -6,7 +6,7 @@
   }
 
   body {
-    @apply bg-neutral-900 text-neutral-100 m-0 overflow-hidden w-screen h-screen;
+    @apply bg-neutral-900 text-neutral-100 m-0 overflow-hidden w-screen h-screen fixed inset-0;
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   }
 
