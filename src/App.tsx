@@ -1220,6 +1220,7 @@ function App() {
         palette={colorPalette}
         backgroundColor={customBackgroundColor || (isLightMode ? 'white' : 'black')}
         measurementTextColor={measurementTextColorMode}
+        enableAmbientOcclusion={true} // Visual Ecstasy: Always On for Premium Feel
 
         onStructureLoaded={handleStructureLoaded}
         onAtomClick={handleAtomClick}
@@ -1229,7 +1230,8 @@ function App() {
         onHover={setHoveredResidue}
 
         quality={isPublicationMode ? 'high' : 'medium'}
-        enableAmbientOcclusion={isPublicationMode}
+        // enableAmbientOcclusion={isPublicationMode} // Removed in favor of always-on V6
+        // presentation
         resetCamera={resetKey}
         customColors={customColors}
         className="w-full h-full"
