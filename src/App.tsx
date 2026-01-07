@@ -1498,7 +1498,7 @@ function App() {
             // Render layout based on viewMode
             switch (viewMode) {
               case 'single':
-                return renderViewport(0);
+                return renderViewport(0, 'w-full');
 
               case 'dual':
                 return (
@@ -1532,6 +1532,10 @@ function App() {
                     </div>
                   </div>
                 );
+
+              default:
+                // Fallback to single view
+                return renderViewport(0, 'w-full');
             }
           })()}
         </div>   {/* Right Sidebar: Sequence Track */}
