@@ -853,54 +853,58 @@ export const Controls: React.FC<ControlsProps> = ({
                             {/* Visual Style */}
                             <div className="space-y-2">
                                 <label className={`text-[10px] font-bold uppercase tracking-wider block ${subtleText}`}>Visualization</label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    <button
-                                        onClick={() => setShowSurface(!showSurface)}
-                                        className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${showSurface ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
-                                    >
-                                        <div className="flex items-center gap-2">
+                                <div className="space-y-3">
+                                    {/* Toggles Row */}
+                                    <div className="grid grid-cols-3 gap-2">
+                                        <button
+                                            onClick={() => setShowSurface(!showSurface)}
+                                            className={`flex flex-col items-center justify-center gap-1 px-1 py-2 rounded-lg border transition-all ${showSurface ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
+                                        >
                                             <Layers className="w-3.5 h-3.5" />
-                                            <span className="text-xs font-medium">Surface</span>
-                                        </div>
-                                        <div className={`w-1.5 h-1.5 rounded-full ${showSurface ? 'bg-blue-500' : 'bg-neutral-500'}`} />
-                                    </button>
-                                    <button
-                                        onClick={() => setIsSpinning(!isSpinning)}
-                                        className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isSpinning ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
-                                    >
-                                        <div className="flex items-center gap-2">
+                                            <span className="text-[10px] font-medium">Surface</span>
+                                            <div className={`w-1 h-1 rounded-full mt-0.5 ${showSurface ? 'bg-blue-500' : 'bg-neutral-500'}`} />
+                                        </button>
+                                        <button
+                                            onClick={() => setIsSpinning(!isSpinning)}
+                                            className={`flex flex-col items-center justify-center gap-1 px-1 py-2 rounded-lg border transition-all ${isSpinning ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
+                                        >
                                             <RefreshCw className={`w-3.5 h-3.5 ${isSpinning ? 'animate-spin' : ''}`} />
-                                            <span className="text-xs font-medium">Spin</span>
+                                            <span className="text-[10px] font-medium">Spin</span>
+                                            <div className={`w-1 h-1 rounded-full mt-0.5 ${isSpinning ? 'bg-blue-500' : 'bg-neutral-500'}`} />
+                                        </button>
+                                        <button
+                                            onClick={() => setIsDyslexicFont(!isDyslexicFont)}
+                                            className={`flex flex-col items-center justify-center gap-1 px-1 py-2 rounded-lg border transition-all ${isDyslexicFont ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
+                                        >
+                                            <span className="text-lg leading-none font-serif">Aa</span>
+                                            <span className="text-[10px] font-medium">Dyslexic</span>
+                                            <div className={`w-1 h-1 rounded-full mt-0.5 ${isDyslexicFont ? 'bg-blue-500' : 'bg-neutral-500'}`} />
+                                        </button>
+                                    </div>
+
+                                    {/* Color Palettes Grid */}
+                                    <div className="space-y-1">
+                                        <label className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Color Palette</label>
+                                        <div className="grid grid-cols-1 gap-1.5">
+                                            {[
+                                                { id: 'standard', label: 'Standard', gradient: 'linear-gradient(to right, #3b82f6, #ef4444)' },
+                                                { id: 'viridis', label: 'Viridis', gradient: 'linear-gradient(to right, #440154, #31688e, #35b779, #fde725)' },
+                                                { id: 'magma', label: 'Magma', gradient: 'linear-gradient(to right, #000004, #51127c, #b73779, #fcfdbf)' },
+                                                { id: 'cividis', label: 'Cividis', gradient: 'linear-gradient(to right, #00204d, #7c7b78, #fdea45)' },
+                                            ].map((p) => (
+                                                <button
+                                                    key={p.id}
+                                                    onClick={() => setColorPalette(p.id as ColorPalette)}
+                                                    className={`flex items-center gap-2 px-2 py-1.5 rounded border transition-all ${colorPalette === p.id
+                                                        ? 'border-blue-500 bg-blue-500/10 text-blue-500'
+                                                        : `border-transparent ${isLightMode ? 'hover:bg-neutral-100' : 'hover:bg-white/5'} opacity-70 hover:opacity-100`}`}
+                                                >
+                                                    <div className="h-3 w-12 rounded-sm border border-black/10 shadow-sm" style={{ background: p.gradient }} />
+                                                    <span className="text-[10px] font-medium uppercase tracking-wider">{p.label}</span>
+                                                    {colorPalette === p.id && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-500" />}
+                                                </button>
+                                            ))}
                                         </div>
-                                        <div className={`w-1.5 h-1.5 rounded-full ${isSpinning ? 'bg-blue-500' : 'bg-neutral-500'}`} />
-                                    </button>
-                                    <button
-                                        onClick={() => setIsDyslexicFont(!isDyslexicFont)}
-                                        className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isDyslexicFont ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
-                                    >
-                                        <span className="text-xs font-medium">Dyslexic</span>
-                                        <div className={`w-1.5 h-1.5 rounded-full ${isDyslexicFont ? 'bg-blue-500' : 'bg-neutral-500'}`} />
-                                    </button>
-                                    <div className="grid grid-cols-1 gap-1.5 mt-1">
-                                        {[
-                                            { id: 'standard', label: 'Standard', gradient: 'linear-gradient(to right, #3b82f6, #ef4444)' }, // Blue to Red fallback
-                                            { id: 'viridis', label: 'Viridis', gradient: 'linear-gradient(to right, #440154, #31688e, #35b779, #fde725)' },
-                                            { id: 'magma', label: 'Magma', gradient: 'linear-gradient(to right, #000004, #51127c, #b73779, #fcfdbf)' },
-                                            { id: 'cividis', label: 'Cividis', gradient: 'linear-gradient(to right, #00204d, #7c7b78, #fdea45)' },
-                                            // { id: 'plasma', label: 'Plasma', gradient: 'linear-gradient(to right, #0d0887, #cc4678, #f0f921)' }
-                                        ].map((p) => (
-                                            <button
-                                                key={p.id}
-                                                onClick={() => setColorPalette(p.id as ColorPalette)}
-                                                className={`flex items-center gap-2 px-2 py-1.5 rounded border transition-all ${colorPalette === p.id
-                                                    ? 'border-blue-500 bg-blue-500/10 text-blue-500'
-                                                    : `border-transparent ${isLightMode ? 'hover:bg-neutral-100' : 'hover:bg-white/5'} opacity-70 hover:opacity-100`}`}
-                                            >
-                                                <div className="h-3 w-12 rounded-sm border border-black/10 shadow-sm" style={{ background: p.gradient }} />
-                                                <span className="text-[10px] font-medium uppercase tracking-wider">{p.label}</span>
-                                                {colorPalette === p.id && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-blue-500" />}
-                                            </button>
-                                        ))}
                                     </div>
                                 </div>
 
