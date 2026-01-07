@@ -1228,6 +1228,7 @@ function App() {
 
       <FavoritesPanel
         favorites={favorites}
+        history={history}
         isOpen={isFavoritesOpen}
         onClose={() => setIsFavoritesOpen(false)}
         onSelect={(id, dataSource) => {

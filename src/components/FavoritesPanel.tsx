@@ -1,9 +1,11 @@
-import React from 'react';
-import { Star, Trash2, X } from 'lucide-react';
+import React, { useState } from 'react';
+import { Star, Trash2, X, Clock, History } from 'lucide-react';
 import type { Favorite } from '../hooks/useFavorites';
+import type { HistoryItem } from '../hooks/useHistory';
 
 interface FavoritesPanelProps {
     favorites: Favorite[];
+    history?: HistoryItem[];
     isOpen: boolean;
     onClose: () => void;
     onSelect: (id: string, dataSource: 'pdb' | 'pubchem') => void;
@@ -13,18 +15,22 @@ interface FavoritesPanelProps {
 
 export const FavoritesPanel: React.FC<FavoritesPanelProps> = ({
     favorites,
+    history = [],
     isOpen,
     onClose,
     onSelect,
     onRemove,
     isLightMode,
 }) => {
+    const [activeTab, setActiveTab] = useState<'favorites' | 'history'>('favorites');
+
     if (!isOpen) return null;
 
     const bgColor = isLightMode ? 'bg-white/95' : 'bg-black/95';
     const textColor = isLightMode ? 'text-neutral-900' : 'text-white';
     const borderColor = isLightMode ? 'border-neutral-200' : 'border-white/10';
     const hoverBg = isLightMode ? 'hover:bg-neutral-100' : 'hover:bg-white/5';
+    const subtleText = isLightMode ? 'text-neutral-500' : 'text-neutral-400';
 
     return (
         <>
@@ -39,12 +45,29 @@ export const FavoritesPanel: React.FC<FavoritesPanelProps> = ({
 
                 {/* Header */}
                 <div className={`flex items-center justify-between px-6 py-4 border-b ${borderColor}`}>
-                    <div className="flex items-center gap-2">
-                        <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
-                        <h2 className={`text-lg font-bold ${textColor}`}>Favorites</h2>
-                        <span className={`text-sm ${isLightMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
-                            ({favorites.length})
-                        </span>
+                    <div className="flex gap-4">
+                        <button
+                            onClick={() => setActiveTab('favorites')}
+                            className={`flex items-center gap-2 pb-1 border-b-2 transition-all ${activeTab === 'favorites'
+                                ? `border-yellow-500 ${textColor}`
+                                : 'border-transparent text-neutral-500 hover:text-neutral-400'
+                                }`}
+                        >
+                            <Star className={`w-5 h-5 ${activeTab === 'favorites' ? 'text-yellow-500 fill-yellow-500' : ''}`} />
+                            <h2 className="text-lg font-bold">Favorites</h2>
+                            <span className="text-xs opacity-60">({favorites.length})</span>
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('history')}
+                            className={`flex items-center gap-2 pb-1 border-b-2 transition-all ${activeTab === 'history'
+                                ? `border-blue-500 ${textColor}`
+                                : 'border-transparent text-neutral-500 hover:text-neutral-400'
+                                }`}
+                        >
+                            <History className={`w-5 h-5 ${activeTab === 'history' ? 'text-blue-500' : ''}`} />
+                            <h2 className="text-lg font-bold">History</h2>
+                            <span className="text-xs opacity-60">({history.length})</span>
+                        </button>
                     </div>
                     <button
                         onClick={onClose}
@@ -56,49 +79,87 @@ export const FavoritesPanel: React.FC<FavoritesPanelProps> = ({
 
                 {/* Content */}
                 <div className="flex-1 overflow-y-auto p-4">
-                    {favorites.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-full py-12">
-                            <Star className={`w-16 h-16 mb-4 ${isLightMode ? 'text-neutral-300' : 'text-neutral-700'}`} />
-                            <p className={`text-center ${isLightMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
-                                No favorites yet. Star structures to save them here!
-                            </p>
-                        </div>
+                    {activeTab === 'favorites' ? (
+                        favorites.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center h-full py-12">
+                                <Star className={`w-16 h-16 mb-4 opacity-20`} />
+                                <p className={`text-center ${subtleText}`}>
+                                    No favorites yet. Star structures to save them here!
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="grid gap-2">
+                                {favorites.map((fav) => (
+                                    <div
+                                        key={`${fav.dataSource}-${fav.id}`}
+                                        className={`flex items-center justify-between p-4 rounded-lg border ${borderColor} ${hoverBg} transition-all group`}
+                                    >
+                                        <button
+                                            onClick={() => onSelect(fav.id, fav.dataSource)}
+                                            className="flex-1 flex items-center gap-4 text-left"
+                                        >
+                                            <Star className="w-5 h-5 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                                            <div className="flex-1 min-w-0">
+                                                <div className={`font-medium ${textColor} truncate`}>
+                                                    {fav.title || fav.id}
+                                                </div>
+                                                <div className={`text-sm ${subtleText}`}>
+                                                    {fav.dataSource === 'pdb' ? 'PDB' : 'PubChem'}: {fav.id}
+                                                    {' • '}
+                                                    {new Date(fav.addedAt).toLocaleDateString()}
+                                                </div>
+                                            </div>
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onRemove(fav.id, fav.dataSource);
+                                            }}
+                                            className={`p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all ${isLightMode ? 'hover:bg-red-100 text-red-600' : 'hover:bg-red-950/50 text-red-400'}`}
+                                            title="Remove from favorites"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )
                     ) : (
-                        <div className="grid gap-2">
-                            {favorites.map((fav) => (
-                                <div
-                                    key={`${fav.dataSource}-${fav.id}`}
-                                    className={`flex items-center justify-between p-4 rounded-lg border ${borderColor} ${hoverBg} transition-all group`}
-                                >
-                                    <button
-                                        onClick={() => onSelect(fav.id, fav.dataSource)}
-                                        className="flex-1 flex items-center gap-4 text-left"
+                        history.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center h-full py-12">
+                                <Clock className={`w-16 h-16 mb-4 opacity-20`} />
+                                <p className={`text-center ${subtleText}`}>
+                                    No history yet. Structures you view will appear here.
+                                </p>
+                            </div>
+                        ) : (
+                            <div className="grid gap-2">
+                                {history.map((item) => (
+                                    <div
+                                        key={`${item.dataSource}-${item.id}-${item.timestamp}`}
+                                        className={`flex items-center justify-between p-3 rounded-lg border ${borderColor} ${hoverBg} transition-all group`}
                                     >
-                                        <Star className="w-5 h-5 text-yellow-500 fill-yellow-500 flex-shrink-0" />
-                                        <div className="flex-1 min-w-0">
-                                            <div className={`font-medium ${textColor} truncate`}>
-                                                {fav.title || fav.id}
+                                        <button
+                                            onClick={() => onSelect(item.id, item.dataSource)}
+                                            className="flex-1 flex items-center gap-4 text-left"
+                                        >
+                                            <Clock className="w-4 h-4 text-neutral-400 flex-shrink-0" />
+                                            <div className="flex-1 min-w-0">
+                                                <div className={`font-mono font-medium ${textColor}`}>
+                                                    {item.id}
+                                                </div>
+                                                <div className={`text-xs ${subtleText} flex items-center gap-2`}>
+                                                    <span className={`px-1.5 rounded ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`}>
+                                                        {item.dataSource === 'pdb' ? 'PDB' : 'CHEM'}
+                                                    </span>
+                                                    {new Date(item.timestamp).toLocaleTimeString()}
+                                                </div>
                                             </div>
-                                            <div className={`text-sm ${isLightMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
-                                                {fav.dataSource === 'pdb' ? 'PDB' : 'PubChem'}: {fav.id}
-                                                {' • '}
-                                                {new Date(fav.addedAt).toLocaleDateString()}
-                                            </div>
-                                        </div>
-                                    </button>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            onRemove(fav.id, fav.dataSource);
-                                        }}
-                                        className={`p-2 rounded-lg opacity-0 group-hover:opacity-100 transition-all ${isLightMode ? 'hover:bg-red-100 text-red-600' : 'hover:bg-red-950/50 text-red-400'}`}
-                                        title="Remove from favorites"
-                                    >
-                                        <Trash2 className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )
                     )}
                 </div>
             </div>
