@@ -6,10 +6,9 @@ interface HUDProps {
     pdbMetadata: PDBMetadata | null;
     pdbId: string | null;
     isLightMode: boolean;
-    viewMode?: 'single' | 'dual' | 'triple' | 'quad';
 }
 
-export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, viewMode = 'single' }: HUDProps) {
+export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode }: HUDProps) {
     const textColor = isLightMode ? 'text-gray-800' : 'text-gray-200';
     const bgColor = isLightMode ? 'bg-white/80' : 'bg-black/80';
     const borderColor = isLightMode ? 'border-gray-200' : 'border-neutral-800';
@@ -27,11 +26,10 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, viewMode 
         'A', 'C', 'G', 'T', 'U', 'DA', 'DC', 'DG', 'DT'
     ]);
 
-    // Adjust position based on view mode - move down when headers are present
-    const topPosition = viewMode === 'single' ? 'top-6' : 'top-14';
+    // Position at bottom center to avoid interfering with any viewports
 
     return (
-        <div className={`absolute ${topPosition} left-1/2 -translate-x-1/2 z-10 pointer-events-none select-none transition-all duration-300 font-sans`}>
+        <div className={`absolute bottom-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none select-none transition-all duration-300 font-sans`}>
 
             {/* Minimal Capsule */}
             <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-4 py-1.5 flex items-center justify-center min-w-[120px]`}>

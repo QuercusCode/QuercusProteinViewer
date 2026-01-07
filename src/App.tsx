@@ -1277,13 +1277,12 @@ function App() {
         chains={chains}
         onAction={handleAIAction}
       />
-      {/* HUD - Repositions based on view mode to avoid overlays */}
+      {/* HUD - Positioned at bottom to avoid viewport interference */}
       <HUD
         hoveredResidue={hoveredResidue}
         pdbMetadata={pdbMetadata}
         pdbId={pdbId}
         isLightMode={isLightMode}
-        viewMode={viewMode}
       />
 
       {isMeasurementPanelOpen && (
