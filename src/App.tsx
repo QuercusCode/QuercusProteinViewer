@@ -1277,12 +1277,15 @@ function App() {
         chains={chains}
         onAction={handleAIAction}
       />
-      <HUD
-        hoveredResidue={hoveredResidue}
-        pdbMetadata={pdbMetadata}
-        pdbId={pdbId}
-        isLightMode={isLightMode}
-      />
+      {/* HUD - Only show in single view mode to avoid overlap */}
+      {viewMode === 'single' && (
+        <HUD
+          hoveredResidue={hoveredResidue}
+          pdbMetadata={pdbMetadata}
+          pdbId={pdbId}
+          isLightMode={isLightMode}
+        />
+      )}
 
       {isMeasurementPanelOpen && (
         <MeasurementPanel
@@ -1441,7 +1444,7 @@ function App() {
                         </span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-[10px] text-neutral-400 font-mono max-w-[120px] truncate">
+                        <span className="text-[10px] text-neutral-400 font-mono flex-1 text-center">
                           {ctrl.proteinTitle || ctrl.pdbId || (ctrl.file ? ctrl.file.name : "No Structure")}
                         </span>
                         <button
