@@ -20,7 +20,7 @@ import type { PDBMetadata, Measurement, MeasurementTextColor } from './types';
 import {
   Camera, RefreshCw, Upload,
   Settings, Zap, Activity, Grid3X3, Palette,
-  Share2, Save, FolderOpen, Video
+  Share2, Save, FolderOpen, Video, Ruler, Maximize2
 } from 'lucide-react';
 import { startOnboardingTour } from './components/TourGuide';
 
@@ -914,6 +914,7 @@ function App() {
       id: 'take-snapshot',
       label: 'Take Snapshot',
       icon: Camera,
+      shortcut: 'S',
       category: 'Export',
       perform: handleSnapshot
     },
@@ -937,6 +938,7 @@ function App() {
       id: 'style-cartoon',
       label: 'Style: Cartoon',
       icon: Activity,
+      shortcut: '1',
       category: 'Appearance',
       perform: () => setRepresentation('cartoon')
     },
@@ -944,6 +946,7 @@ function App() {
       id: 'style-surface',
       label: 'Style: Molecular Surface',
       icon: Grid3X3,
+      shortcut: '3',
       category: 'Appearance',
       perform: () => {
         setRepresentation('cartoon'); // Surface usually adds to cartoon
@@ -954,6 +957,7 @@ function App() {
       id: 'style-sphere',
       label: 'Style: Spacefill (Sphere)',
       icon: Zap,
+      shortcut: '2',
       category: 'Appearance',
       perform: () => setRepresentation('spacefill')
     },
@@ -961,6 +965,7 @@ function App() {
       id: 'color-chain',
       label: 'Color by Chain',
       icon: Palette,
+      shortcut: 'Q',
       category: 'Appearance',
       perform: () => setColoring('chainid')
     },
@@ -968,6 +973,7 @@ function App() {
       id: 'color-hydro',
       label: 'Color by Hydrophobicity',
       icon: Palette,
+      shortcut: 'E',
       category: 'Appearance',
       perform: () => setColoring('hydrophobicity')
     },
@@ -975,6 +981,7 @@ function App() {
       id: 'color-bfactor',
       label: 'Color by B-Factor (Mobility)',
       icon: Palette,
+      shortcut: 'A',
       category: 'Appearance',
       perform: () => setColoring('bfactor')
     },
@@ -982,6 +989,7 @@ function App() {
       id: 'toggle-spin',
       label: isSpinning ? 'Stop Spinning' : 'Start Spinning',
       icon: RefreshCw,
+      shortcut: 'Space',
       category: 'View',
       perform: () => setIsSpinning(prev => !prev)
     },
@@ -989,10 +997,127 @@ function App() {
       id: 'toggle-theme',
       label: isLightMode ? 'Switch to Dark Mode' : 'Switch to Light Mode',
       icon: Settings,
+      shortcut: 'T',
       category: 'View',
       perform: () => setIsLightMode(prev => !prev)
     },
-  ], [isPublicationMode, isSpinning, isLightMode, handleSaveSession, handleSnapshot, handleResetView]);
+
+    // --- Additional Representations ---
+    {
+      id: 'style-licorice',
+      label: 'Style: Licorice',
+      icon: Activity,
+      shortcut: '4',
+      category: 'Appearance',
+      perform: () => setRepresentation('licorice')
+    },
+    {
+      id: 'style-backbone',
+      label: 'Style: Backbone',
+      icon: Activity,
+      shortcut: '5',
+      category: 'Appearance',
+      perform: () => setRepresentation('backbone')
+    },
+    {
+      id: 'style-ribbon',
+      label: 'Style: Ribbon',
+      icon: Activity,
+      shortcut: '6',
+      category: 'Appearance',
+      perform: () => setRepresentation('ribbon')
+    },
+    {
+      id: 'style-ball-stick',
+      label: 'Style: Ball + Stick',
+      icon: Activity,
+      shortcut: '7',
+      category: 'Appearance',
+      perform: () => setRepresentation('ball+stick')
+    },
+    {
+      id: 'style-line',
+      label: 'Style: Line',
+      icon: Activity,
+      shortcut: '8',
+      category: 'Appearance',
+      perform: () => setRepresentation('line')
+    },
+
+    // --- Additional Coloring ---
+    {
+      id: 'color-element',
+      label: 'Color by Element (CPK)',
+      icon: Palette,
+      shortcut: 'W',
+      category: 'Appearance',
+      perform: () => setColoring('element' as ColoringType)
+    },
+    {
+      id: 'color-secondary',
+      label: 'Color by Secondary Structure',
+      icon: Palette,
+      shortcut: 'D',
+      category: 'Appearance',
+      perform: () => setColoring('secondary')
+    },
+    {
+      id: 'color-charge',
+      label: 'Color by Charge',
+      icon: Palette,
+      shortcut: 'Z',
+      category: 'Appearance',
+      perform: () => setColoring('charge')
+    },
+    {
+      id: 'color-rainbow',
+      label: 'Color by Rainbow (Residue Index)',
+      icon: Palette,
+      shortcut: 'X',
+      category: 'Appearance',
+      perform: () => setColoring('residueindex')
+    },
+    {
+      id: 'color-residue',
+      label: 'Color by Residue Name',
+      icon: Palette,
+      shortcut: 'V',
+      category: 'Appearance',
+      perform: () => setColoring('residue')
+    },
+
+    // --- Tools ---
+    {
+      id: 'toggle-measurement',
+      label: isMeasurementMode ? 'Exit Measurement Mode' : 'Enter Measurement Mode',
+      icon: Ruler,
+      shortcut: 'M',
+      category: 'Tools',
+      perform: () => setIsMeasurementMode(prev => !prev)
+    },
+    {
+      id: 'toggle-contact-map',
+      label: showContactMap ? 'Hide Contact Map' : 'Show Contact Map',
+      icon: Grid3X3,
+      shortcut: 'C',
+      category: 'Tools',
+      perform: () => setShowContactMap(prev => !prev)
+    },
+    {
+      id: 'fullscreen',
+      label: 'Toggle Fullscreen',
+      icon: Maximize2,
+      shortcut: 'F',
+      category: 'View',
+      perform: () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen();
+        } else {
+          document.exitFullscreen();
+        }
+      }
+    },
+  ], [isPublicationMode, isSpinning, isLightMode, isMeasurementMode, showContactMap, handleSaveSession, handleSnapshot, handleResetView]);
 
 
   return (
