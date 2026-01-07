@@ -1177,7 +1177,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     // Handle Window Resize
     useEffect(() => {
         if (stageRef.current) {
-            stageRef.current.setParameters({ backgroundColor });
+            const bgColor = backgroundColor === 'transparent' ? 'rgba(0,0,0,0)' : backgroundColor;
+            stageRef.current.setParameters({ backgroundColor: bgColor });
         }
     }, [backgroundColor]);
 
@@ -1190,10 +1191,14 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         if (!containerRef.current) return;
 
         try {
+            const bgColor = backgroundColor === 'transparent' ? 'rgba(0,0,0,0)' : backgroundColor;
             const stage = new window.NGL.Stage(containerRef.current, {
-                backgroundColor: backgroundColor,
+                backgroundColor: bgColor,
                 tooltip: false, // Disable default NGL tooltip to use HUD
-                webglParams: { preserveDrawingBuffer: true }
+                webglParams: {
+                    preserveDrawingBuffer: true,
+                    alpha: true // Enable transparency support
+                }
             });
             stageRef.current = stage;
 
