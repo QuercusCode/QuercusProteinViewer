@@ -1277,15 +1277,14 @@ function App() {
         chains={chains}
         onAction={handleAIAction}
       />
-      {/* HUD - Only show in single view mode to avoid overlap */}
-      {viewMode === 'single' && (
-        <HUD
-          hoveredResidue={hoveredResidue}
-          pdbMetadata={pdbMetadata}
-          pdbId={pdbId}
-          isLightMode={isLightMode}
-        />
-      )}
+      {/* HUD - Repositions based on view mode to avoid overlays */}
+      <HUD
+        hoveredResidue={hoveredResidue}
+        pdbMetadata={pdbMetadata}
+        pdbId={pdbId}
+        isLightMode={isLightMode}
+        viewMode={viewMode}
+      />
 
       {isMeasurementPanelOpen && (
         <MeasurementPanel
