@@ -1442,12 +1442,16 @@ function App() {
                         </span>
                       </div>
                       <div className="flex items-center gap-3 flex-1 min-w-0 justify-center">
-                        <span
-                          className="text-[10px] text-neutral-400 font-mono truncate max-w-full"
-                          title={ctrl.proteinTitle || ctrl.pdbId || (ctrl.file ? ctrl.file.name : "No Structure")}
-                        >
-                          {ctrl.proteinTitle || ctrl.pdbId || (ctrl.file ? ctrl.file.name : "No Structure")}
-                        </span>
+                        <div className="relative group flex-1 min-w-0">
+                          <span
+                            className="text-[10px] text-neutral-400 font-mono truncate max-w-full block"
+                          >
+                            {ctrl.proteinTitle || ctrl.pdbId || (ctrl.file ? ctrl.file.name : "No Structure")}
+                          </span>
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-900 text-white text-[10px] rounded whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border border-neutral-700">
+                            {ctrl.proteinTitle || ctrl.pdbId || (ctrl.file ? ctrl.file.name : "No Structure")}
+                          </div>
+                        </div>
                         <button
                           onClick={(e) => { e.stopPropagation(); ctrl.handleResetView(); }}
                           className="p-1 hover:bg-white/10 rounded text-neutral-500 hover:text-white transition-colors shrink-0"
