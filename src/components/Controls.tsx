@@ -30,7 +30,8 @@ import {
     Activity,
     Wrench,
     Share2,
-    ScanSearch // Added Icon
+    ScanSearch, // Added Icon
+    Star
 } from 'lucide-react';
 import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, PDBMetadata } from '../types';
 import type { DataSource } from '../utils/pdbUtils';
@@ -327,6 +328,10 @@ interface ControlsProps {
     onToggleSection?: (section: string) => void;
     isMobileSidebarOpen?: boolean;
     onToggleMobileSidebar?: () => void;
+
+    // Favorites
+    onToggleFavorite?: () => void;
+    isFavorite?: boolean;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -396,7 +401,9 @@ export const Controls: React.FC<ControlsProps> = ({
     openSections: propOpenSections,
     onToggleSection,
     isMobileSidebarOpen = false,
-    onToggleMobileSidebar
+    onToggleMobileSidebar,
+    onToggleFavorite,
+    isFavorite
 }) => {
     // Motif Search State
     const [searchPattern, setSearchPattern] = useState('');
@@ -677,6 +684,19 @@ export const Controls: React.FC<ControlsProps> = ({
                                         className={`w-full rounded-lg pl-9 pr-3 py-2 border outline-none transition-all ${inputBg}`}
                                     />
                                 </div>
+                                {onToggleFavorite && (
+                                    <button
+                                        type="button"
+                                        onClick={onToggleFavorite}
+                                        className={`px-3 py-2 rounded-lg transition-all ${isFavorite
+                                            ? 'bg-yellow-500 hover:bg-yellow-400 text-white'
+                                            : 'bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600'
+                                            }`}
+                                        title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                                    >
+                                        <Star className={`w-4 h-4 ${isFavorite ? 'fill-white' : ''}`} />
+                                    </button>
+                                )}
                                 <button type="submit" className="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors font-medium">
                                     Load
                                 </button>

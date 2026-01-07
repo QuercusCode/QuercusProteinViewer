@@ -20,15 +20,18 @@ import type { PDBMetadata, Measurement, MeasurementTextColor } from './types';
 import {
   Camera, RefreshCw, Upload,
   Settings, Zap, Activity, Grid3X3, Palette,
-  Share2, Save, FolderOpen, Video, Ruler, Maximize2
+  Share2, Save, FolderOpen, Video, Ruler, Maximize2, Star
 } from 'lucide-react';
 import { startOnboardingTour } from './components/TourGuide';
 import { ToastContainer } from './components/Toast';
 import { useToast } from './hooks/useToast';
+import { FavoritesPanel } from './components/FavoritesPanel';
+import { useFavorites } from './hooks/useFavorites';
 
 function App() {
   const viewerRef = useRef<ProteinViewerRef>(null);
   const { toasts, removeToast, success, error, info } = useToast();
+  const { favorites, toggleFavorite, removeFavorite, isFavorite } = useFavorites();
   // Parse Global URL State Once
   const initialUrlState = parseURLState();
 
@@ -102,6 +105,7 @@ function App() {
   const [showContactMap, setShowContactMap] = useState(false);
   const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
+  const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [colorPalette, setColorPalette] = useState<ColorPalette>('standard');
 
@@ -895,6 +899,13 @@ function App() {
       perform: () => setIsLibraryOpen(true)
     },
     {
+      id: 'view-favorites',
+      label: 'View Favorites',
+      icon: Star,
+      category: 'File',
+      perform: () => setIsFavoritesOpen(true)
+    },
+    {
       id: 'save-session',
       label: 'Save Session',
       icon: Save,
@@ -1207,6 +1218,24 @@ function App() {
         }}
       />
 
+      <FavoritesPanel
+        favorites={favorites}
+        isOpen={isFavoritesOpen}
+        onClose={() => setIsFavoritesOpen(false)}
+        onSelect={(id, dataSource) => {
+          setIsFavoritesOpen(false);
+          setPdbId(id);
+          setDataSource(dataSource);
+          setFile(null);
+          if (dataSource === 'pubchem') {
+            setRepresentation('ball+stick');
+          }
+        }}
+        onRemove={removeFavorite}
+        isLightMode={isLightMode}
+      />
+
+
       <AISidebar
         isOpen={isAISidebarOpen}
         onClose={() => setIsAISidebarOpen(false)}
@@ -1325,6 +1354,8 @@ function App() {
             onToggleSection={handleToggleSection}
             isMobileSidebarOpen={isMobileSidebarOpen}
             onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+            onToggleFavorite={() => toggleFavorite(pdbId, dataSource, proteinTitle || undefined)}
+            isFavorite={isFavorite(pdbId, dataSource)}
           />
         );
       })()}
