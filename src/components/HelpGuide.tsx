@@ -179,13 +179,15 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
                     <div className="bg-neutral-800/50 p-4 rounded-xl border border-neutral-700/50">
                         <h4 className="text-sm font-bold text-white mb-2">Built-in Library</h4>
                         <p className="text-xs text-neutral-400 mb-3">
-                            Explore our curated collection of important biological structures.
+                            Explore our curated collection of over 1000+ protein structures and small molecule chemicals.
                         </p>
                         <div className="flex flex-wrap gap-2">
                             <span className="px-2 py-1 bg-neutral-700 rounded text-[10px] text-neutral-300">Essential Enzymes</span>
                             <span className="px-2 py-1 bg-neutral-700 rounded text-[10px] text-neutral-300">Viral Proteins</span>
                             <span className="px-2 py-1 bg-neutral-700 rounded text-[10px] text-neutral-300">Drug Targets</span>
-                            <span className="px-2 py-1 bg-neutral-700 rounded text-[10px] text-neutral-300">New Materials</span>
+                            <span className="px-2 py-1 bg-blue-900/30 text-blue-200 border border-blue-500/20 rounded text-[10px]">Vitamins</span>
+                            <span className="px-2 py-1 bg-blue-900/30 text-blue-200 border border-blue-500/20 rounded text-[10px]">Antibiotics</span>
+                            <span className="px-2 py-1 bg-blue-900/30 text-blue-200 border border-blue-500/20 rounded text-[10px]">Nucleotides</span>
                         </div>
                     </div>
                 </div>
