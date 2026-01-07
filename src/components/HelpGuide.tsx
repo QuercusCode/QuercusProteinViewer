@@ -44,7 +44,6 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
                             <h4 className="text-sm font-bold text-white flex items-center gap-2">
                                 <FileUp className="w-4 h-4 text-blue-400" /> Loading Structures
                             </h4>
-                            <span className="bg-blue-500/10 text-blue-400 text-[10px] px-2 py-0.5 rounded-full border border-blue-500/20">Updated</span>
                         </div>
                         <ul className="space-y-3 text-xs text-neutral-300">
                             <li className="flex gap-3">
@@ -68,16 +67,23 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
                                     Browse our curated collection of interesting proteins and chemicals.
                                 </span>
                             </li>
+                            <li className="flex gap-3">
+                                <span className="text-neutral-500 font-mono">04</span>
+                                <span>
+                                    <strong className="text-white block">Local Files</strong>
+                                    Drag and drop <code className="text-blue-300">.pdb</code>, <code className="text-blue-300">.sdf</code>, or <code className="text-blue-300">.mol</code> files anywhere on the screen.
+                                </span>
+                            </li>
                         </ul>
                     </div>
 
-                    <div className="p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg flex items-center gap-3">
-                        <div className="p-2 bg-purple-500/20 rounded-full">
-                            <Sparkles className="w-4 h-4 text-purple-400" />
+                    <div className="bg-neutral-800/50 p-3 rounded-lg flex items-center gap-3 border border-neutral-700/50">
+                        <div className="p-2 bg-neutral-700/50 rounded-full">
+                            <Sparkles className="w-4 h-4 text-neutral-300" />
                         </div>
                         <div>
-                            <h4 className="text-xs font-bold text-purple-400 mb-0.5">New: Interactive Tour</h4>
-                            <p className="text-[11px] text-neutral-300">
+                            <h4 className="text-xs font-bold text-white mb-0.5">Interactive Tour</h4>
+                            <p className="text-[11px] text-neutral-400">
                                 Click "Start Tour" in the sidebar for a guided walkthrough of all features.
                             </p>
                         </div>
@@ -442,7 +448,6 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
                                     <div className="flex gap-4 text-[10px] text-neutral-500">
                                         <a href="https://www.rcsb.org/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">RCSB PDB</a>
                                         <a href="http://nglviewer.org/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">NGL Viewer</a>
-                                        <a href="https://alphafold.ebi.ac.uk/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">AlphaFold DB</a>
                                     </div>
                                     <div className="text-[10px] text-neutral-600">
                                         Powered by React & NGL
