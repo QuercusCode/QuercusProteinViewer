@@ -108,7 +108,9 @@ function App() {
   const [showContactMap, setShowContactMap] = useState(false);
   const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
+
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
+  const [favoritesTab, setFavoritesTab] = useState<'favorites' | 'history'>('favorites');
   const [showShareModal, setShowShareModal] = useState(false);
   const [colorPalette, setColorPalette] = useState<ColorPalette>('standard');
 
@@ -1259,6 +1261,7 @@ function App() {
         favorites={favorites}
         history={history}
         isOpen={isFavoritesOpen}
+        initialTab={favoritesTab}
         onClose={() => setIsFavoritesOpen(false)}
         onSelect={(id, dataSource) => {
           setIsFavoritesOpen(false);
@@ -1394,7 +1397,14 @@ function App() {
             onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
             onToggleFavorite={() => toggleFavorite(pdbId, dataSource, proteinTitle || undefined)}
             isFavorite={isFavorite(pdbId, dataSource)}
-            onOpenFavorites={() => setIsFavoritesOpen(true)}
+            onOpenFavorites={() => {
+              setFavoritesTab('favorites');
+              setIsFavoritesOpen(true);
+            }}
+            onOpenHistory={() => {
+              setFavoritesTab('history');
+              setIsFavoritesOpen(true);
+            }}
             history={history}
 
             // Undo/Redo

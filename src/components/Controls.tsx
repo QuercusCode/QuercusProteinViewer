@@ -340,6 +340,7 @@ interface ControlsProps {
     onToggleFavorite?: () => void;
     isFavorite?: boolean;
     onOpenFavorites?: () => void;
+    onOpenHistory?: () => void;
     onUndo?: () => void;
     onRedo?: () => void;
     canUndo?: boolean;
@@ -417,6 +418,7 @@ export const Controls: React.FC<ControlsProps> = ({
     onToggleFavorite,
     isFavorite,
     onOpenFavorites,
+    onOpenHistory,
     history = [],
     onUndo,
     onRedo,
@@ -669,9 +671,18 @@ export const Controls: React.FC<ControlsProps> = ({
                                     <button
                                         onClick={onOpenFavorites}
                                         className={`p-2 rounded-lg transition-colors ${isLightMode ? 'text-neutral-600 hover:bg-neutral-100' : 'text-neutral-400 hover:bg-neutral-800'}`}
-                                        title="Favorites & History"
+                                        title="Favorites"
                                     >
                                         <Star className="w-4 h-4" />
+                                    </button>
+                                )}
+                                {onOpenHistory && (
+                                    <button
+                                        onClick={onOpenHistory}
+                                        className={`p-2 rounded-lg transition-colors ${isLightMode ? 'text-neutral-600 hover:bg-neutral-100' : 'text-neutral-400 hover:bg-neutral-800'}`}
+                                        title="Recent History"
+                                    >
+                                        <Clock className="w-4 h-4" />
                                     </button>
                                 )}
                                 <button

@@ -7,6 +7,7 @@ interface FavoritesPanelProps {
     favorites: Favorite[];
     history?: HistoryItem[];
     isOpen: boolean;
+    initialTab?: 'favorites' | 'history';
     onClose: () => void;
     onSelect: (id: string, dataSource: 'pdb' | 'pubchem') => void;
     onRemove: (id: string, dataSource: 'pdb' | 'pubchem') => void;
@@ -21,8 +22,9 @@ export const FavoritesPanel: React.FC<FavoritesPanelProps> = ({
     onSelect,
     onRemove,
     isLightMode,
+    initialTab = 'favorites',
 }) => {
-    const [activeTab, setActiveTab] = useState<'favorites' | 'history'>('favorites');
+    const [activeTab, setActiveTab] = useState<'favorites' | 'history'>(initialTab);
 
     if (!isOpen) return null;
 
