@@ -34,7 +34,8 @@ import {
     Star,
     Clock,
     Undo2,
-    Redo2
+    Redo2,
+    Split
 } from 'lucide-react';
 import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, PDBMetadata } from '../types';
 import type { DataSource } from '../utils/pdbUtils';
@@ -345,6 +346,10 @@ interface ControlsProps {
     onRedo?: () => void;
     canUndo?: boolean;
     canRedo?: boolean;
+
+    // Comparison Mode
+    isComparisonMode?: boolean;
+    onToggleComparisonMode?: () => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -353,6 +358,8 @@ export const Controls: React.FC<ControlsProps> = ({
     dataSource,
     setDataSource,
     isChemical = false,
+    isComparisonMode = false,
+    onToggleComparisonMode,
     onUpload,
     representation,
     setRepresentation,
@@ -984,7 +991,8 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <label className={`text-[10px] font-bold uppercase tracking-wider block ${subtleText}`}>Visualization</label>
                                 <div className="space-y-3">
                                     {/* Toggles Row */}
-                                    <div className="grid grid-cols-3 gap-2">
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {/* Surface Toggle */}
                                         <button
                                             onClick={() => setShowSurface(!showSurface)}
                                             className={`flex flex-col items-center justify-center gap-1 px-1 py-2 rounded-lg border transition-all ${showSurface ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
@@ -1009,6 +1017,18 @@ export const Controls: React.FC<ControlsProps> = ({
                                             <span className="text-[10px] font-medium">Dyslexic</span>
                                             <div className={`w-1 h-1 rounded-full mt-0.5 ${isDyslexicFont ? 'bg-blue-500' : 'bg-neutral-500'}`} />
                                         </button>
+
+                                        {/* Dual View Toggle */}
+                                        {onToggleComparisonMode && (
+                                            <button
+                                                onClick={onToggleComparisonMode}
+                                                className={`flex flex-col items-center justify-center gap-1 px-1 py-2 rounded-lg border transition-all ${isComparisonMode ? 'bg-indigo-600/10 border-indigo-500 text-indigo-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
+                                            >
+                                                <Split className="w-3.5 h-3.5" />
+                                                <span className="text-[10px] font-medium">Dual View</span>
+                                                <div className={`w-1 h-1 rounded-full mt-0.5 ${isComparisonMode ? 'bg-indigo-500' : 'bg-neutral-500'}`} />
+                                            </button>
+                                        )}
                                     </div>
 
                                     {/* Color Palettes Grid */}
@@ -1599,8 +1619,8 @@ export const Controls: React.FC<ControlsProps> = ({
 
                         </div>
                     </SidebarSection>
-                </div>
-            </div>
+                </div >
+            </div >
 
             {/* Snapshot Preview Modal */}
             {

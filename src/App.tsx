@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback, type RefObject } from 'react';
 import { ProteinViewer, type ProteinViewerRef } from './components/ProteinViewer';
 import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
 import { AISidebar, type AIAction } from './components/AISidebar';
 import { HelpGuide } from './components/HelpGuide';
 import { parseURLState, getShareableURL } from './utils/urlManager';
-import type { ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, RepresentationType, ColoringType, ResidueInfo, StructureInfo } from './types';
+import type { Snapshot, Movie, ColorPalette, ColoringType, ResidueInfo, StructureInfo } from './types';
 
 import LibraryModal from './components/LibraryModal';
 import { ShareModal } from './components/ShareModal';
@@ -15,7 +15,7 @@ import { CommandPalette, type CommandAction } from './components/CommandPalette'
 import { HUD } from './components/HUD';
 import { MeasurementPanel } from './components/MeasurementPanel';
 import { OFFLINE_LIBRARY } from './data/library';
-import { fetchStructureMetadata, type DataSource, fetchPubChemMetadata } from './utils/pdbUtils';
+import { fetchPubChemMetadata } from './utils/pdbUtils';
 import type { PDBMetadata, Measurement, MeasurementTextColor } from './types';
 import {
   Camera, RefreshCw, Upload,
@@ -29,30 +29,67 @@ import { FavoritesPanel } from './components/FavoritesPanel';
 import { useFavorites } from './hooks/useFavorites';
 import { useHistory } from './hooks/useHistory';
 import { useVisualStack, type VisualState } from './hooks/useVisualStack';
+import { useStructureController, type StructureController } from './hooks/useStructureController';
+import { useStructureMetadata } from './hooks/useStructureMetadata';
 
 function App() {
-  const viewerRef = useRef<ProteinViewerRef>(null);
+  // Refs for Dual Viewers
+  const leftRef = useRef<ProteinViewerRef>(null);
+  const rightRef = useRef<ProteinViewerRef>(null);
+
   const { toasts, removeToast, success, error, info } = useToast();
   const { favorites, toggleFavorite, removeFavorite, isFavorite } = useFavorites();
   const { history, addToHistory } = useHistory();
+
   // Parse Global URL State Once
   const initialUrlState = parseURLState();
 
-  const [pdbId, setPdbId] = useState(() => initialUrlState.pdbId || '2b3p');
-  const [dataSource, setDataSource] = useState<DataSource>(initialUrlState.dataSource || 'pdb');
-  const [file, setFile] = useState<File | null>(null);
-  const [, setIsLoading] = useState(false);
+  // --- State: Dual Controllers ---
+  const left = useStructureController(initialUrlState);
+  const right = useStructureController({});
 
-  const [representation, setRepresentation] = useState<RepresentationType>(
-    initialUrlState.representation || 'cartoon'
-  );
+  // --- State: View Management ---
+  const [activeView, setActiveView] = useState<'left' | 'right'>('left');
+  const [isComparisonMode, setIsComparisonMode] = useState(false);
 
-  const [coloring, setColoring] = useState<ColoringType>(
-    initialUrlState.coloring || 'chainid'
-  );
+  // Derived Accessors for "Active" Context (Sidebar, Controls, etc operate on this)
+  const activeController = activeView === 'left' ? left : right;
+  const viewerRef = activeView === 'left' ? leftRef : rightRef;
+
+  // Metadata Management
+  useStructureMetadata(left);
+  useStructureMetadata(right);
+
+  // Destructure Active Controller for UI Consistency
+  const {
+    pdbId, setPdbId,
+    dataSource, setDataSource,
+    file, setFile,
+
+    representation, setRepresentation,
+    coloring, setColoring,
+    isSpinning, setIsSpinning,
+    showSurface, setShowSurface,
+    showLigands, setShowLigands,
+    showIons, setShowIons,
+    customColors, setCustomColors,
+    customBackgroundColor, setCustomBackgroundColor,
+    chains,
+    ligands,
+    pdbMetadata, setPdbMetadata,
+    proteinTitle, setProteinTitle,
+    highlightedResidue, setHighlightedResidue,
+    measurements, setMeasurements,
+    isMeasurementPanelOpen, setIsMeasurementPanelOpen,
+    handleUpload,
+    handleResetView,
+
+  } = activeController;
+
+
+
 
   const [hasRestoredState, setHasRestoredState] = useState(!!initialUrlState.orientation);
-  const [resetKey, setResetKey] = useState(0);
   const [isMeasurementMode, setIsMeasurementMode] = useState(false);
 
   useEffect(() => {
@@ -103,7 +140,9 @@ function App() {
   }, [isLightMode]);
 
   // Presentation State
-  const [isSpinning, setIsSpinning] = useState(initialUrlState.isSpinning || false);
+  // isSpinning extracted to hook
+  // Presentation State
+  // isSpinning extracted to hook
   const [isCleanMode, setIsCleanMode] = useState(false);
   const [showContactMap, setShowContactMap] = useState(false);
   const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
@@ -182,14 +221,7 @@ function App() {
   };
 
   // Custom Colors need to be initialized too
-  const [customColors, setCustomColors] = useState<CustomColorRule[]>(initialUrlState.customColors || []);
-  const [customBackgroundColor, setCustomBackgroundColor] = useState<string | null>(initialUrlState.customBackgroundColor || null);
-  const [showLigands, setShowLigands] = useState(initialUrlState.showLigands || false);
-  const [showIons, setShowIons] = useState(false);
 
-  const [showSurface, setShowSurface] = useState(initialUrlState.showSurface || false);
-  const [measurements, setMeasurements] = useState<Measurement[]>([]);
-  const [proteinTitle, setProteinTitle] = useState<string | null>(null);
 
 
 
@@ -226,68 +258,14 @@ function App() {
   // Visualization Toggles
   // Tools
 
-  const [highlightedResidue, setHighlightedResidue] = useState<ResidueInfo | null>(null);
+  // Visualization Toggles
+  // Tools
 
-  const [chains, setChains] = useState<ChainInfo[]>([]);
-  const [ligands, setLigands] = useState<string[]>([]);
-
-  const [fileType, setFileType] = useState<'pdb' | 'mmcif'>('pdb');
+  // highlightedResidue, chains, ligands, fileType extracted to hook.
 
 
 
-  const handleResetView = () => {
-    setResetKey(prev => prev + 1);
-    setResetKey(prev => prev + 1);
-  };
-
-  const handleUpload = (uploadedFile: File, isCif?: boolean, preservePdbId?: boolean) => {
-    setFile(uploadedFile);
-    setFileType(isCif ? 'mmcif' : 'pdb');
-    if (!preservePdbId) {
-      setPdbId(''); // Only clear PDB ID if not preserving (i.e., manual upload)
-    }
-    setChains([]);
-    setLigands([]);
-    setCustomColors([]);
-    setMeasurements([]);
-
-    // If implementing "Publication Mode", checking if we need to reset it?
-    // Probably keep it active if user wants to load many files in high quality.
-
-    setHighlightedResidue(null);
-    // Auto-set title from filename (removing extension)
-    const filenameTitle = uploadedFile.name.replace(/\.[^/.]+$/, "");
-    setProteinTitle(filenameTitle);
-
-    // Attempt to extract IUPAC Name for chemicals (SDF/MOL)
-    const ext = uploadedFile.name.split('.').pop()?.toLowerCase();
-    if (ext === 'sdf' || ext === 'mol') {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const content = e.target?.result as string;
-        if (!content) return;
-
-        // 1. Look for <PUBCHEM_IUPAC_NAME> tag (Standard PubChem SDF)
-        // Format: > <PUBCHEM_IUPAC_NAME>\nName\n
-        const iupacMatch = content.match(/>\s*<PUBCHEM_IUPAC_NAME>\s*\n(.*?)\n/i);
-        if (iupacMatch && iupacMatch[1]) {
-          setProteinTitle(iupacMatch[1].trim());
-          return;
-        }
-
-        // 2. Fallback: First line of SDF is technically the molecule title
-        const lines = content.split('\n');
-        if (lines.length > 0) {
-          const firstLine = lines[0].trim();
-          // Check if it's a valid title (not empty, not too long, not just the CID if filename was CID)
-          if (firstLine.length > 0 && firstLine.length < 150) {
-            setProteinTitle(firstLine);
-          }
-        }
-      };
-      reader.readAsText(uploadedFile); // Read full text (usually small for chemicals)
-    }
-  };
+  // handleResetView and handleUpload extracted to hook
 
   const [isPublicationMode, setIsPublicationMode] = useState(false);
 
@@ -404,26 +382,21 @@ function App() {
   }, [chains, ligands]);
 
   // Need to insert logic into handleAtomClick
-  const handleAtomClick = async (info: ResidueInfo | null) => {
+  const handleAtomClick = async (info: ResidueInfo | null, ctrl: StructureController = activeController, ref: RefObject<ProteinViewerRef | null> = viewerRef) => {
     if (!info) {
-      setHighlightedResidue(null);
+      ctrl.setHighlightedResidue(null);
       return;
     }
 
-
-
-    // Annotation Logic
-
-
     if (info) {
-      // ... highlight logic ...
-      if (highlightedResidue &&
-        highlightedResidue.chain === info.chain &&
-        highlightedResidue.resNo === info.resNo) {
-        // Toggle off (Deselect)
+      // Toggle off (Deselect)
+      if (ctrl.highlightedResidue &&
+        ctrl.highlightedResidue.chain === info.chain &&
+        ctrl.highlightedResidue.resNo === info.resNo) {
+
         console.log("App: Deselecting residue", info);
-        setHighlightedResidue(null);
-        viewerRef.current?.clearHighlight();
+        ctrl.setHighlightedResidue(null);
+        ref.current?.clearHighlight();
       } else {
         if (isMeasurementMode) {
           return; // ProteinViewer handles measurement logic directly
@@ -431,8 +404,13 @@ function App() {
 
         // Select new
         console.log("App: Atom Clicked", info);
-        setHighlightedResidue({ chain: info.chain, resNo: info.resNo, resName: info.resName });
-        viewerRef.current?.highlightResidue(info.chain, info.resNo);
+        ctrl.setHighlightedResidue({ chain: info.chain, resNo: info.resNo, resName: info.resName });
+        ref.current?.highlightResidue(info.chain, info.resNo);
+
+        // Auto-switch active view if clicking inactive
+        if (ctrl !== activeController) {
+          setActiveView(ctrl === left ? 'left' : 'right');
+        }
       }
     }
   };
@@ -442,89 +420,41 @@ function App() {
     viewerRef.current?.highlightResidue(chain, resNo);
   };
 
-  const handleStructureLoaded = useCallback((info: StructureInfo) => {
-    setIsLoading(false);
-    setChains(info.chains);
-    setLigands(info.ligands);
+  const handleLoad = useCallback((info: StructureInfo, ctrl: StructureController) => {
 
-    const hasLigands = info.ligands.length > 0;
 
-    // Smart Representation Switching
-    // If we detect ONLY unknown/small chains (likely .mol/.sdf chemicals) or no protein/nucleic, switch to ball+stick
-    // This ensures chemicals are visible immediately instead of empty cartoon
+    ctrl.setChains(info.chains);
+    ctrl.setLigands(info.ligands);
+
     const hasPolymer = info.chains.some(c => c.type === 'protein' || c.type === 'nucleic');
     const totalResidues = info.chains.reduce((acc, c) => acc + c.sequence.length, 0);
 
+    // Smart Representation Switching for small molecules
     if (!hasPolymer || totalResidues < 5) {
       console.log("App: Detected small molecule or non-polymer. Switching to Ball+Stick.");
-      setRepresentation('ball+stick');
-      setShowLigands(true);
-      if (info.chains.length > 0) setShowIons(true); // Ensure single-atom ions are also seen
+      ctrl.setRepresentation('ball+stick');
+      ctrl.setShowLigands(true);
+      if (info.chains.length > 0) ctrl.setShowIons(true);
     }
 
-    if (hasLigands && !showLigands && !initialUrlState.showLigands) {
-      // Optional logic: if mixed, maybe prompt or simple notification?
-      // For now, we leave it to user unless it's the *only* thing (handled above)
+    // Add to History (using global helper)
+    if (ctrl.dataSource === 'pdb' && ctrl.pdbId) {
+      addToHistory(ctrl.pdbId, 'pdb');
+    } else if (ctrl.dataSource === 'pubchem' && ctrl.pdbId) {
+      addToHistory(ctrl.pdbId, 'pubchem');
     }
-    // Add to Recent History
-    if (dataSource === 'pdb' && pdbId) {
-      addToHistory(pdbId, 'pdb');
-    } else if (dataSource === 'pubchem' && pdbId) {
-      addToHistory(pdbId, 'pubchem');
-    }
-  }, [showLigands, initialUrlState.showLigands, pdbId, dataSource, addToHistory]);
-
-
-
-  // Consolidate Title & Metadata Fetching
-  // 1. Remove separate 'fetchTitle' effect that was specific to RCSB PDB
-  // 2. Rely entirely on the 'pdbMetadata' effect below which handles both data sources via fetchStructureMetadata
+  }, [addToHistory]);
 
   const handlePdbIdChange = (id: string) => {
-    setPdbId(id);
-    setFile(null); // Clear file when PDB ID is set
-    setProteinTitle(null); // Reset title while fetching
-    setChains([]);
-    setCustomColors([]);
-    setHighlightedResidue(null);
-    setMeasurements([]);
+    activeController.setPdbId(id);
+    activeController.setFile(null);
+    activeController.setProteinTitle(null);
+    activeController.setChains([]);
+    activeController.setCustomColors([]);
+    activeController.setHighlightedResidue(null);
+    activeController.setMeasurements([]);
   };
 
-  const [pdbMetadata, setPdbMetadata] = useState<PDBMetadata | null>(null);
-
-  // Fetch Metadata when PDB ID changes
-  useEffect(() => {
-    if (pdbId) {
-      const libraryEntry = OFFLINE_LIBRARY.find(entry => entry.id.toLowerCase() === pdbId.toLowerCase());
-
-      if (libraryEntry && libraryEntry.method) {
-        // Use local metadata if available
-        setPdbMetadata({
-          method: libraryEntry.method,
-          resolution: libraryEntry.resolution || 'N/A',
-          organism: libraryEntry.organism || 'Unknown source',
-          depositionDate: libraryEntry.depositionDate || 'Unknown',
-          title: libraryEntry.title
-        });
-        setProteinTitle(libraryEntry.title);
-      } else if (!file) {
-        // Fallback to generic fetch (PDB or PubChem)
-        setIsLoading(true);
-        fetchStructureMetadata(pdbId, dataSource).then(data => {
-          if (data) {
-            setPdbMetadata(data);
-            if (data.title) setProteinTitle(data.title);
-          } else {
-            setPdbMetadata(null);
-            setProteinTitle(null);
-          }
-          setIsLoading(false);
-        });
-      }
-    } else {
-      setPdbMetadata(null); // Clear/Reset if file uploaded or no ID
-    }
-  }, [pdbId, dataSource, file]);
 
   const [isRecording, setIsRecording] = useState(false);
 
@@ -801,7 +731,7 @@ function App() {
         setShowSurface(action.value);
         break;
       case 'RESET_VIEW':
-        setResetKey(prev => prev + 1);
+        handleResetView();
         if (viewerRef.current) viewerRef.current.resetCamera();
         break;
       case 'HIGHLIGHT_REGION':
@@ -858,15 +788,11 @@ function App() {
   // --- HUD STATE ---
   const [hoveredResidue, setHoveredResidue] = useState<ResidueInfo | null>(null);
 
-  // --- MEASUREMENT STATE ---
 
-  const [isMeasurementPanelOpen, setIsMeasurementPanelOpen] = useState(false);
+
   const [measurementTextColorMode, setMeasurementTextColorMode] = useState<MeasurementTextColor>('auto');
 
-  const handleAddMeasurement = (m: Measurement) => {
-    setMeasurements(prev => [...prev, m]);
-    setIsMeasurementPanelOpen(true); // Auto-open when adding
-  };
+
 
   const handleUpdateMeasurement = (id: string, updates: Partial<Measurement>) => {
     setMeasurements(prev => prev.map(m => m.id === id ? { ...m, ...updates } : m));
@@ -1474,43 +1400,112 @@ function App() {
             onUndo={undo}
             onRedo={redo}
             canUndo={canUndo}
+
             canRedo={canRedo}
+
+            // Dual View
+            isComparisonMode={isComparisonMode}
+            onToggleComparisonMode={() => setIsComparisonMode(!isComparisonMode)}
           />
         );
       })()}
 
-      <ProteinViewer
-        ref={viewerRef}
-        pdbId={pdbId}
-        dataSource={dataSource}
-        file={file || undefined}
-        fileType={fileType}
-        isLightMode={isLightMode}
-        isSpinning={isSpinning}
-        representation={representation}
-        showSurface={showSurface}
-        showLigands={showLigands}
-        showIons={showIons}
-        coloring={coloring}
-        palette={colorPalette}
-        backgroundColor={customBackgroundColor || (isLightMode ? 'white' : 'black')}
-        measurementTextColor={measurementTextColorMode}
-        enableAmbientOcclusion={true} // Visual Ecstasy: Always On for Premium Feel
+      {/* Dual View Layout */}
+      <div className="relative flex-1 flex w-full h-full overflow-hidden">
 
-        onStructureLoaded={handleStructureLoaded}
-        onAtomClick={handleAtomClick}
-        isMeasurementMode={isMeasurementMode}
-        measurements={measurements}
-        onAddMeasurement={handleAddMeasurement}
-        onHover={setHoveredResidue}
+        {/* Left / Single View */}
+        <div className={`relative h-full transition-all duration-300 ${isComparisonMode ? 'w-1/2 border-r border-white/10' : 'w-full'}`}>
+          <ProteinViewer
+            ref={leftRef}
+            // Spread Left Controller State
+            pdbId={left.pdbId}
+            dataSource={left.dataSource}
+            file={left.file || undefined}
+            fileType={left.fileType}
+            isLightMode={isLightMode}
+            isSpinning={left.isSpinning}
+            representation={left.representation}
+            showSurface={left.showSurface}
+            showLigands={left.showLigands}
+            showIons={left.showIons}
+            coloring={left.coloring}
+            palette={colorPalette} // Global
+            backgroundColor={left.customBackgroundColor || (isLightMode ? 'white' : 'black')}
+            measurementTextColor={measurementTextColorMode} // Global?
+            enableAmbientOcclusion={true}
 
-        quality={isPublicationMode ? 'high' : 'medium'}
-        // enableAmbientOcclusion={isPublicationMode} // Removed in favor of always-on V6
-        // presentation
-        resetCamera={resetKey}
-        customColors={customColors}
-        className="w-full h-full"
-      />
+            onStructureLoaded={(info) => handleLoad(info, left)}
+            onAtomClick={(info) => handleAtomClick(info, left, leftRef)}
+            isMeasurementMode={isMeasurementMode} // Global
+            measurements={left.measurements}
+            onAddMeasurement={(m) => {
+              left.setMeasurements([...left.measurements, m]);
+              setActiveView('left');
+            }}
+            onHover={setHoveredResidue} // Global
+
+            quality={isPublicationMode ? 'high' : 'medium'} // Global
+            resetCamera={left.resetKey}
+            customColors={left.customColors}
+            className="w-full h-full"
+          />
+
+          {/* Active Indicator for Dual Mode */}
+          {isComparisonMode && (
+            <div
+              onClick={() => setActiveView('left')}
+              className={`absolute top-4 left-4 z-10 px-3 py-1 rounded-full text-xs font-bold cursor-pointer transition-colors backdrop-blur-md border ${activeView === 'left' ? 'bg-indigo-600/90 text-white border-indigo-400 shadow-[0_0_15px_rgba(79,70,229,0.5)]' : 'bg-black/40 text-white/50 border-white/10 hover:bg-black/60 hover:text-white'}`}
+            >
+              Left View
+            </div>
+          )}
+        </div>
+
+        {/* Right View */}
+        {isComparisonMode && (
+          <div className="relative w-1/2 h-full">
+            <ProteinViewer
+              ref={rightRef}
+              pdbId={right.pdbId}
+              dataSource={right.dataSource}
+              file={right.file || undefined}
+              fileType={right.fileType}
+              isLightMode={isLightMode}
+              isSpinning={right.isSpinning}
+              representation={right.representation}
+              showSurface={right.showSurface}
+              showLigands={right.showLigands}
+              showIons={right.showIons}
+              coloring={right.coloring}
+              palette={colorPalette}
+              backgroundColor={right.customBackgroundColor || (isLightMode ? 'white' : 'black')}
+              measurementTextColor={measurementTextColorMode}
+              enableAmbientOcclusion={true}
+
+              onStructureLoaded={(info) => handleLoad(info, right)}
+              onAtomClick={(info) => handleAtomClick(info, right, rightRef)}
+              isMeasurementMode={isMeasurementMode}
+              measurements={right.measurements}
+              onAddMeasurement={(m) => {
+                right.setMeasurements([...right.measurements, m]);
+                setActiveView('right');
+              }}
+              onHover={setHoveredResidue}
+
+              quality={isPublicationMode ? 'high' : 'medium'}
+              resetCamera={right.resetKey}
+              customColors={right.customColors}
+              className="w-full h-full"
+            />
+            <div
+              onClick={() => setActiveView('right')}
+              className={`absolute top-4 left-4 z-10 px-3 py-1 rounded-full text-xs font-bold cursor-pointer transition-colors backdrop-blur-md border ${activeView === 'right' ? 'bg-indigo-600/90 text-white border-indigo-400 shadow-[0_0_15px_rgba(79,70,229,0.5)]' : 'bg-black/40 text-white/50 border-white/10 hover:bg-black/60 hover:text-white'}`}
+            >
+              Right View
+            </div>
+          </div>
+        )}
+      </div>
 
       <ContactMap
         isOpen={showContactMap}

@@ -1,0 +1,164 @@
+import { useState, useCallback } from 'react';
+import type { RepresentationType, ColoringType, ResidueInfo, Measurement, CustomColorRule, PDBMetadata, ChainInfo } from '../types';
+import type { DataSource } from '../utils/pdbUtils';
+
+// Types for the Controller Return Value
+export interface StructureController {
+    // State
+    pdbId: string;
+    setPdbId: (id: string) => void;
+    dataSource: DataSource;
+    setDataSource: (source: DataSource) => void;
+    file: File | null;
+    setFile: (file: File | null) => void;
+    fileType: 'pdb' | 'mmcif';
+
+    // Visualization
+    representation: RepresentationType;
+    setRepresentation: (type: RepresentationType) => void;
+    coloring: ColoringType;
+    setColoring: (type: ColoringType) => void;
+    isSpinning: boolean;
+    setIsSpinning: (spinning: boolean | ((prev: boolean) => boolean)) => void;
+    showSurface: boolean;
+    setShowSurface: (show: boolean | ((prev: boolean) => boolean)) => void;
+    showLigands: boolean;
+    setShowLigands: (show: boolean | ((prev: boolean) => boolean)) => void;
+    showIons: boolean;
+    setShowIons: (show: boolean | ((prev: boolean) => boolean)) => void;
+    customColors: CustomColorRule[];
+    setCustomColors: (colors: CustomColorRule[]) => void;
+    customBackgroundColor: string | null;
+    setCustomBackgroundColor: (color: string | null) => void;
+
+    // Data/Analysis
+    chains: ChainInfo[];
+    setChains: (chains: ChainInfo[]) => void;
+    ligands: string[];
+    setLigands: (ligands: string[]) => void;
+    pdbMetadata: PDBMetadata | null;
+    setPdbMetadata: (meta: PDBMetadata | null) => void;
+    proteinTitle: string | null;
+    setProteinTitle: (title: string | null) => void;
+
+    // Interaction
+    highlightedResidue: ResidueInfo | null;
+    setHighlightedResidue: (res: ResidueInfo | null) => void;
+    measurements: Measurement[];
+    setMeasurements: (measurements: Measurement[] | ((prev: Measurement[]) => Measurement[])) => void;
+    isMeasurementPanelOpen: boolean;
+    setIsMeasurementPanelOpen: (isOpen: boolean | ((prev: boolean) => boolean)) => void;
+
+    // Actions
+    handleUpload: (file: File, isCif?: boolean, preservePdbId?: boolean) => void;
+    handleResetView: () => void;
+    resetKey: number; // Used to trigger re-renders/resets in the viewer
+}
+
+export const useStructureController = (initialState: any = {}): StructureController => {
+    // Core Data
+    const [pdbId, setPdbId] = useState<string>(initialState.pdbId || '');
+    const [dataSource, setDataSource] = useState<DataSource>(initialState.dataSource || 'rcsb');
+    const [file, setFile] = useState<File | null>(null);
+    const [fileType, setFileType] = useState<'pdb' | 'mmcif'>('pdb');
+
+    // Visuals
+    const [representation, setRepresentation] = useState<RepresentationType>(initialState.representation || 'cartoon');
+    const [coloring, setColoring] = useState<ColoringType>(initialState.coloring || 'chainid');
+    const [isSpinning, setIsSpinning] = useState(false);
+    const [showSurface, setShowSurface] = useState(false);
+    const [showLigands, setShowLigands] = useState(false);
+    const [showIons, setShowIons] = useState(false);
+    const [customColors, setCustomColors] = useState<CustomColorRule[]>([]);
+    const [customBackgroundColor, setCustomBackgroundColor] = useState<string | null>(null);
+
+    // Analysis
+    const [chains, setChains] = useState<ChainInfo[]>([]);
+    const [ligands, setLigands] = useState<string[]>([]);
+    const [pdbMetadata, setPdbMetadata] = useState<PDBMetadata | null>(null);
+    const [proteinTitle, setProteinTitle] = useState<string | null>(null);
+
+    // Interaction
+    const [highlightedResidue, setHighlightedResidue] = useState<ResidueInfo | null>(null);
+    const [measurements, setMeasurements] = useState<Measurement[]>([]);
+    const [isMeasurementPanelOpen, setIsMeasurementPanelOpen] = useState(false);
+
+    // View Control
+    const [resetKey, setResetKey] = useState(0);
+
+    // -- Handlers --
+
+    const handleResetView = useCallback(() => {
+        setResetKey(prev => prev + 1);
+    }, []);
+
+    const handleUpload = useCallback((uploadedFile: File, isCif?: boolean, preservePdbId?: boolean) => {
+        setFile(uploadedFile);
+        setFileType(isCif ? 'mmcif' : 'pdb');
+        if (!preservePdbId) {
+            setPdbId('');
+            // Only switch to url if not preserving. Actually handleUpload usually implies local file so 'url' mode is confusing naming but acceptable?
+            // Actually 'url' source is usually used for URL-loaded files. 
+            // If user uploads from disk, we might want a new source 'file'? 
+            // But preserving existing logic: App used `setDataSource('pdb')` or similar?
+            // Let's stick to 'url' or leave dataSource as is if we don't care.
+            // App logic: `setDataSource` wasn't explicitly called in handleUpload but usually implied?
+            // Wait, App logic (Step 7635) didn't touch dataSource in handleUpload.
+            // But `handleUpload` clears `pdbId` unless preserved.
+        }
+
+        // Reset analysis data
+        setChains([]);
+        setLigands([]);
+        setCustomColors([]);
+        setMeasurements([]);
+        setHighlightedResidue(null);
+
+        // Set Title
+        const filenameTitle = uploadedFile.name.replace(/\.[^/.]+$/, "");
+        setProteinTitle(filenameTitle);
+
+        // Basic chemical title extraction
+        const ext = uploadedFile.name.split('.').pop()?.toLowerCase();
+        if (ext === 'sdf' || ext === 'mol') {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target?.result as string;
+                if (content) {
+                    const match = content.match(/>\s*<PUBCHEM_IUPAC_NAME>\s*\n(.*?)\n/i);
+                    if (match && match[1]) setProteinTitle(match[1].trim());
+                    else {
+                        const firstLine = content.split('\n')[0].trim();
+                        if (firstLine.length > 0 && firstLine.length < 150) setProteinTitle(firstLine);
+                    }
+                }
+            };
+            reader.readAsText(uploadedFile);
+        }
+    }, []);
+
+    return {
+        pdbId, setPdbId,
+        dataSource, setDataSource,
+        file, setFile,
+        fileType,
+        representation, setRepresentation,
+        coloring, setColoring,
+        isSpinning, setIsSpinning,
+        showSurface, setShowSurface,
+        showLigands, setShowLigands,
+        showIons, setShowIons,
+        customColors, setCustomColors,
+        customBackgroundColor, setCustomBackgroundColor,
+        chains, setChains,
+        ligands, setLigands,
+        pdbMetadata, setPdbMetadata,
+        proteinTitle, setProteinTitle,
+        highlightedResidue, setHighlightedResidue,
+        measurements, setMeasurements,
+        isMeasurementPanelOpen, setIsMeasurementPanelOpen,
+        handleUpload,
+        handleResetView,
+        resetKey
+    };
+};
