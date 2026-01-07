@@ -188,35 +188,10 @@ function App() {
   const [showIons, setShowIons] = useState(false);
 
   const [showSurface, setShowSurface] = useState(initialUrlState.showSurface || false);
+  const [measurements, setMeasurements] = useState<Measurement[]>([]);
+  const [proteinTitle, setProteinTitle] = useState<string | null>(null);
 
-  // Undo/Redo Stack
-  const visualState: VisualState = useMemo(() => ({
-    representation,
-    coloring,
-    colorPalette,
-    showLigands,
-    showIons,
-    showSurface,
-    customBackgroundColor: customBackgroundColor || '',
-    customColors
-  }), [representation, coloring, colorPalette, showLigands, showIons, showSurface, customBackgroundColor, customColors]);
 
-  const handleVisualStateChange = useCallback((newState: VisualState) => {
-    setRepresentation(newState.representation);
-    setColoring(newState.coloring);
-    setColorPalette(newState.colorPalette);
-    setShowLigands(newState.showLigands);
-    setShowIons(newState.showIons);
-    setShowSurface(newState.showSurface);
-    setCustomBackgroundColor(newState.customBackgroundColor || null);
-    setCustomColors(newState.customColors);
-  }, []);
-
-  const { undo, redo, canUndo, canRedo } = useVisualStack({
-    state: visualState,
-    onChange: handleVisualStateChange,
-    resetTrigger: pdbId // Reset stack when PDB ID changes to avoid cross-structure confusing undos
-  });
 
   // ... (lines 53-343) ...
 
@@ -319,28 +294,74 @@ function App() {
   // Store previous theme to restore after exiting Publication Mode
   const previousThemeRef = useRef(isLightMode);
 
-  // Effect to apply Publication Mode settings
-  useEffect(() => {
-    if (isPublicationMode) {
-      // Save current theme before overriding
-      previousThemeRef.current = isLightMode;
+  const togglePublicationMode = useCallback((shouldBeEnabled?: boolean) => {
+    const nextState = shouldBeEnabled !== undefined ? shouldBeEnabled : !isPublicationMode;
 
-      // Auto-set High Quality Defaults
+    if (nextState === isPublicationMode) return;
+
+    setIsPublicationMode(nextState);
+
+    if (nextState) {
+      // Enable
+      previousThemeRef.current = isLightMode;
       setRepresentation('cartoon');
       setIsCleanMode(true);
       setColoring('chainid');
       setCustomBackgroundColor('#ffffff'); // White background
       setIsLightMode(true); // Ensure light mode for paper look
     } else {
-      // Restore previous configuration
+      // Disable
       setIsCleanMode(false);
       setCustomBackgroundColor(null); // Revert to theme
       setIsLightMode(previousThemeRef.current); // Restore original theme
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isPublicationMode]);
+  }, [isPublicationMode, isLightMode]);
+
+
+
 
   // ... (fetchTitle logic) ... 
+
+  // Undo/Redo Stack (Moved here to access all state variables)
+  const visualState: VisualState = useMemo(() => ({
+    representation,
+    coloring,
+    colorPalette,
+    showLigands,
+    showIons,
+    showSurface,
+    customBackgroundColor: customBackgroundColor || '',
+    customColors,
+    isSpinning,
+    isCleanMode,
+    showContactMap,
+    isPublicationMode,
+    highlightedResidue,
+    measurements
+  }), [representation, coloring, colorPalette, showLigands, showIons, showSurface, customBackgroundColor, customColors, isSpinning, isCleanMode, showContactMap, isPublicationMode, highlightedResidue, measurements]);
+
+  const handleVisualStateChange = useCallback((newState: VisualState) => {
+    setRepresentation(newState.representation);
+    setColoring(newState.coloring);
+    setColorPalette(newState.colorPalette);
+    setShowLigands(newState.showLigands);
+    setShowIons(newState.showIons);
+    setShowSurface(newState.showSurface);
+    setCustomBackgroundColor(newState.customBackgroundColor || null);
+    setCustomColors(newState.customColors);
+    setIsSpinning(newState.isSpinning);
+    setIsCleanMode(newState.isCleanMode);
+    setShowContactMap(newState.showContactMap);
+    setIsPublicationMode(newState.isPublicationMode);
+    setHighlightedResidue(newState.highlightedResidue);
+    setMeasurements(newState.measurements);
+  }, []);
+
+  const { undo, redo, canUndo, canRedo } = useVisualStack({
+    state: visualState,
+    onChange: handleVisualStateChange,
+    resetTrigger: pdbId
+  });
 
   // --- DERIVED STATE (Dr. AI V4) ---
   const structureStats = useMemo(() => {
@@ -430,7 +451,7 @@ function App() {
     }
   }, [showLigands, initialUrlState.showLigands, pdbId, dataSource, addToHistory]);
 
-  const [proteinTitle, setProteinTitle] = useState<string | null>(null);
+
 
   // Consolidate Title & Metadata Fetching
   // 1. Remove separate 'fetchTitle' effect that was specific to RCSB PDB
@@ -815,7 +836,7 @@ function App() {
   const [hoveredResidue, setHoveredResidue] = useState<ResidueInfo | null>(null);
 
   // --- MEASUREMENT STATE ---
-  const [measurements, setMeasurements] = useState<Measurement[]>([]);
+
   const [isMeasurementPanelOpen, setIsMeasurementPanelOpen] = useState(false);
   const [measurementTextColorMode, setMeasurementTextColorMode] = useState<MeasurementTextColor>('auto');
 
@@ -968,7 +989,7 @@ function App() {
       label: isPublicationMode ? 'Exit Publication Mode' : 'Enter Publication Mode',
       icon: Camera,
       category: 'View',
-      perform: () => setIsPublicationMode(prev => !prev)
+      perform: () => togglePublicationMode()
     },
     {
       id: 'take-snapshot',
@@ -1344,7 +1365,7 @@ function App() {
             isMeasurementMode={isMeasurementMode}
             setIsMeasurementMode={setIsMeasurementMode}
             isPublicationMode={isPublicationMode}
-            setIsPublicationMode={setIsPublicationMode}
+            onTogglePublicationMode={togglePublicationMode}
             onClearMeasurements={() => {
               setMeasurements([]);
               viewerRef.current?.clearMeasurements();

@@ -277,7 +277,7 @@ interface ControlsProps {
     isMeasurementMode: boolean;
     setIsMeasurementMode: (mode: boolean) => void;
     isPublicationMode: boolean;
-    setIsPublicationMode: (val: boolean) => void;
+    onTogglePublicationMode: () => void;
     onShare: () => void;
     onToggleMeasurement?: () => void;
     onClearMeasurements: () => void;
@@ -368,7 +368,7 @@ export const Controls: React.FC<ControlsProps> = ({
     onToggleMeasurement,
     onClearMeasurements,
     isPublicationMode,
-    setIsPublicationMode,
+    onTogglePublicationMode,
     pdbMetadata,
     isLightMode,
     setIsLightMode,
@@ -1118,7 +1118,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                     {/* Tools: Publication & Measure */}
                                     <div className="pt-2 border-t border-white/5 space-y-2">
                                         <button
-                                            onClick={() => setIsPublicationMode(!isPublicationMode)}
+                                            onClick={onTogglePublicationMode}
                                             className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold transition-all ${isPublicationMode
                                                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/20'
                                                 : (isLightMode ? 'bg-neutral-100 hover:bg-purple-50 text-neutral-600 hover:text-purple-600 border border-neutral-200' : 'bg-neutral-800 hover:bg-neutral-700 text-neutral-300 border border-white/10')
