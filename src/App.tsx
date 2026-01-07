@@ -384,38 +384,9 @@ function App() {
 
   const [proteinTitle, setProteinTitle] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!pdbId || pdbId.length < 4) {
-      return;
-    }
-
-    const fetchTitle = async () => {
-      const cleanId = pdbId.trim().toLowerCase();
-      console.log(`Fetching title for PDB: ${cleanId} `);
-      try {
-        const response = await fetch(`https://data.rcsb.org/rest/v1/core/entry/${cleanId}`);
-        if (!response.ok) {
-          console.error(`Fetch failed with status: ${response.status}`);
-          throw new Error('Failed to fetch metadata');
-        }
-        const data = await response.json();
-        console.log("Fetched structure data:", data);
-        if (data.struct && data.struct.title) {
-          console.log("Setting protein title:", data.struct.title);
-          setProteinTitle(data.struct.title);
-        } else {
-          console.warn("No struct.title found in response");
-          setProteinTitle(null);
-        }
-      } catch (error) {
-        console.error("Failed to fetch protein title:", error);
-        // Fallback to ID if fetch fails
-        setProteinTitle(pdbId.toUpperCase());
-      }
-    };
-
-    fetchTitle();
-  }, [pdbId]);
+  // Consolidate Title & Metadata Fetching
+  // 1. Remove separate 'fetchTitle' effect that was specific to RCSB PDB
+  // 2. Rely entirely on the 'pdbMetadata' effect below which handles both data sources via fetchStructureMetadata
 
   const handlePdbIdChange = (id: string) => {
     setPdbId(id);
