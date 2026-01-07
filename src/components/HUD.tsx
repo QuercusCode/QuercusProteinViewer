@@ -16,7 +16,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode }: HUDProp
     // Show ID or Title when idle
     const structTitle = useMemo(() => {
         if (pdbMetadata?.title) return pdbMetadata.title;
-        return pdbId ? pdbId.toUpperCase() : "Loaded Model";
+        return pdbId ? pdbId.toUpperCase() : null;
     }, [pdbMetadata, pdbId]);
 
     // Standard residues list to filter out atom details for proteins/nucleic acids
@@ -27,6 +27,8 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode }: HUDProp
     ]);
 
     // Position at bottom center to avoid interfering with any viewports
+
+    if (!hoveredResidue && !structTitle) return null;
 
     return (
         <div className={`absolute bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none select-none transition-all duration-300 font-sans`}>
