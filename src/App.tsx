@@ -20,7 +20,7 @@ import type { PDBMetadata, Measurement, MeasurementTextColor } from './types';
 import {
   Camera, RefreshCw, Upload,
   Settings, Zap, Activity, Grid3X3, Palette,
-  Share2, Save, FolderOpen, Video, Ruler, Maximize2, Star, Undo2, Redo2
+  Share2, Save, FolderOpen, Video, Ruler, Maximize2, Star, Undo2, Redo2, BookOpen
 } from 'lucide-react';
 import { startOnboardingTour } from './components/TourGuide';
 import { ViewportSelector } from './components/ViewportSelector';
@@ -1372,8 +1372,13 @@ function App() {
               }
             })
             .catch(err => {
-              console.warn("Local library load failed.", err);
-              alert(`Failed to load ${id} from library resources.`);
+              console.warn(`Local library load failed for ${id}. Falling back to RCSB PDB.`, err);
+              // Fallback to online fetch (ProteinViewer handles this via pdbId)
+              if (libMeta) {
+                setProteinTitle(libMeta.title);
+              } else {
+                setProteinTitle(id);
+              }
             });
         }}
       />
@@ -1601,39 +1606,86 @@ function App() {
 
                   {/* Viewer */}
                   <div className="relative flex-1 w-full h-full">
-                    <ProteinViewer
-                      ref={ref}
-                      pdbId={ctrl.pdbId}
-                      dataSource={ctrl.dataSource}
-                      file={ctrl.file || undefined}
-                      fileType={ctrl.fileType}
-                      isLightMode={isLightMode}
-                      isSpinning={ctrl.isSpinning}
-                      representation={ctrl.representation}
-                      showSurface={ctrl.showSurface}
-                      showLigands={ctrl.showLigands}
-                      showIons={ctrl.showIons}
-                      coloring={ctrl.coloring}
-                      palette={colorPalette}
-                      backgroundColor={ctrl.customBackgroundColor || (isLightMode ? 'white' : 'black')}
-                      measurementTextColor={measurementTextColorMode}
-                      enableAmbientOcclusion={true}
+                    {!ctrl.pdbId && !ctrl.file ? (
+                      <div className="absolute inset-0 flex items-center justify-center p-6 text-center select-none z-0">
+                        <div className="max-w-md space-y-4 opacity-100 transform translate-y-0 transition-all duration-500 animate-in fade-in zoom-in-95">
+                          <div className="flex justify-center mb-4">
+                            <div className="p-4 bg-neutral-800/50 rounded-2xl border border-white/5 shadow-2xl backdrop-blur-sm">
+                              <Grid3X3 className="w-12 h-12 text-blue-500/50" />
+                            </div>
+                          </div>
 
-                      onStructureLoaded={(info) => handleLoad(info, ctrl)}
-                      onAtomClick={(info) => handleAtomClick(info, index)}
-                      isMeasurementMode={isMeasurementMode}
-                      measurements={ctrl.measurements}
-                      onAddMeasurement={(m) => {
-                        ctrl.setMeasurements([...ctrl.measurements, m]);
-                        setActiveViewIndex(index);
-                      }}
-                      onHover={setHoveredResidue}
+                          <h2 className="text-2xl font-bold text-white tracking-tight">Ready to Visualize?</h2>
+                          <p className="text-neutral-400">
+                            Select a structure to begin exploring in 3D.
+                          </p>
 
-                      quality={isPublicationMode ? 'high' : 'medium'}
-                      resetCamera={ctrl.resetKey}
-                      customColors={ctrl.customColors}
-                      className="w-full h-full"
-                    />
+                          <div className="flex items-center justify-center gap-3 pt-4">
+                            <button
+                              onClick={() => setIsLibraryOpen(true)}
+                              className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-900/20"
+                            >
+                              <BookOpen className="w-4 h-4" />
+                              Browse Library
+                            </button>
+                            <label className="flex items-center gap-2 px-5 py-2.5 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl font-medium transition-all hover:scale-105 active:scale-95 cursor-pointer border border-white/10 hover:border-white/20">
+                              <Upload className="w-4 h-4" />
+                              Upload File
+                              <input
+                                type="file"
+                                className="hidden"
+                                accept=".pdb,.cif,.ent,.mol,.sdf,.mol2,.xyz"
+                                onChange={(e) => {
+                                  if (e.target.files?.[0]) {
+                                    handleUpload(e.target.files[0]);
+                                    // Also set active index?? Actually handleUpload uses activeController
+                                    if (activeViewIndex !== index) setActiveViewIndex(index);
+                                  }
+                                }}
+                              />
+                            </label>
+                          </div>
+
+                          <div className="pt-8 text-xs text-neutral-600 font-mono">
+                            <p>Or enter a PDB ID (e.g., <span className="text-neutral-400">1crn</span>) in the sidebar.</p>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <ProteinViewer
+                        ref={ref}
+                        pdbId={ctrl.pdbId}
+                        dataSource={ctrl.dataSource}
+                        file={ctrl.file || undefined}
+                        fileType={ctrl.fileType}
+                        isLightMode={isLightMode}
+                        isSpinning={ctrl.isSpinning}
+                        representation={ctrl.representation}
+                        showSurface={ctrl.showSurface}
+                        showLigands={ctrl.showLigands}
+                        showIons={ctrl.showIons}
+                        coloring={ctrl.coloring}
+                        palette={colorPalette}
+                        backgroundColor={ctrl.customBackgroundColor || (isLightMode ? 'white' : 'black')}
+                        measurementTextColor={measurementTextColorMode}
+                        enableAmbientOcclusion={true}
+
+                        onStructureLoaded={(info) => handleLoad(info, ctrl)}
+                        onAtomClick={(info) => handleAtomClick(info, index)}
+                        isMeasurementMode={isMeasurementMode}
+                        measurements={ctrl.measurements}
+                        onAddMeasurement={(m) => {
+                          ctrl.setMeasurements([...ctrl.measurements, m]);
+                          setActiveViewIndex(index);
+                        }}
+                        onHover={setHoveredResidue}
+
+                        quality={isPublicationMode ? 'high' : 'medium'}
+                        resetCamera={ctrl.resetKey}
+                        customColors={ctrl.customColors}
+                        className="w-full h-full"
+                      />
+                    )}
                   </div>
                 </div>
               );
