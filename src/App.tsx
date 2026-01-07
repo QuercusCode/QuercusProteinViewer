@@ -1411,97 +1411,137 @@ function App() {
       })()}
 
       {/* Dual View Layout */}
-      <div className="relative flex-1 flex w-full h-full overflow-hidden">
+      <div className="relative flex-1 flex w-full h-full overflow-hidden bg-black">
 
         {/* Left / Single View */}
-        <div className={`relative h-full transition-all duration-300 ${isComparisonMode ? 'w-1/2 border-r border-white/10' : 'w-full'}`}>
-          <ProteinViewer
-            ref={leftRef}
-            // Spread Left Controller State
-            pdbId={left.pdbId}
-            dataSource={left.dataSource}
-            file={left.file || undefined}
-            fileType={left.fileType}
-            isLightMode={isLightMode}
-            isSpinning={left.isSpinning}
-            representation={left.representation}
-            showSurface={left.showSurface}
-            showLigands={left.showLigands}
-            showIons={left.showIons}
-            coloring={left.coloring}
-            palette={colorPalette} // Global
-            backgroundColor={left.customBackgroundColor || (isLightMode ? 'white' : 'black')}
-            measurementTextColor={measurementTextColorMode} // Global?
-            enableAmbientOcclusion={true}
-
-            onStructureLoaded={(info) => handleLoad(info, left)}
-            onAtomClick={(info) => handleAtomClick(info, left, leftRef)}
-            isMeasurementMode={isMeasurementMode} // Global
-            measurements={left.measurements}
-            onAddMeasurement={(m) => {
-              left.setMeasurements([...left.measurements, m]);
-              setActiveView('left');
-            }}
-            onHover={setHoveredResidue} // Global
-
-            quality={isPublicationMode ? 'high' : 'medium'} // Global
-            resetCamera={left.resetKey}
-            customColors={left.customColors}
-            className="w-full h-full"
-          />
-
-          {/* Active Indicator for Dual Mode */}
+        <div className={`flex flex-col h-full transition-all duration-300 ${isComparisonMode ? 'w-1/2 border-r border-[#333]' : 'w-full'}`}>
+          {/* Viewport Header (Dual Mode Only) */}
           {isComparisonMode && (
             <div
               onClick={() => setActiveView('left')}
-              className={`absolute top-4 left-4 z-10 px-3 py-1 rounded-full text-xs font-bold cursor-pointer transition-colors backdrop-blur-md border ${activeView === 'left' ? 'bg-indigo-600/90 text-white border-indigo-400 shadow-[0_0_15px_rgba(79,70,229,0.5)]' : 'bg-black/40 text-white/50 border-white/10 hover:bg-black/60 hover:text-white'}`}
+              className={`shrink-0 h-9 flex items-center justify-between px-3 border-b transition-colors cursor-pointer select-none
+                ${activeView === 'left' ? 'bg-[#1a1a1a] border-indigo-500/50' : 'bg-black border-[#222] opacity-60 hover:opacity-100'}
+              `}
             >
-              Left View
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full shadow-sm transition-all ${activeView === 'left' ? 'bg-indigo-500 shadow-indigo-500/50 scale-110' : 'bg-neutral-700'}`} />
+                <span className={`text-[10px] font-bold uppercase tracking-widest ${activeView === 'left' ? 'text-indigo-400' : 'text-neutral-500'}`}>Left View</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] text-neutral-400 font-mono max-w-[120px] truncate">
+                  {left.proteinTitle || left.pdbId || (left.file ? left.file.name : "No Structure")}
+                </span>
+                {/* Quick Action: Reset */}
+                <button
+                  onClick={(e) => { e.stopPropagation(); left.handleResetView(); }}
+                  className="p-1 hover:bg-white/10 rounded text-neutral-500 hover:text-white transition-colors"
+                  title="Reset Camera"
+                >
+                  <RefreshCw className="w-3 h-3" />
+                </button>
+              </div>
             </div>
           )}
-        </div>
 
-        {/* Right View */}
-        {isComparisonMode && (
-          <div className="relative w-1/2 h-full">
+          <div className="relative flex-1 w-full h-full">
             <ProteinViewer
-              ref={rightRef}
-              pdbId={right.pdbId}
-              dataSource={right.dataSource}
-              file={right.file || undefined}
-              fileType={right.fileType}
+              ref={leftRef}
+              pdbId={left.pdbId}
+              dataSource={left.dataSource}
+              file={left.file || undefined}
+              fileType={left.fileType}
               isLightMode={isLightMode}
-              isSpinning={right.isSpinning}
-              representation={right.representation}
-              showSurface={right.showSurface}
-              showLigands={right.showLigands}
-              showIons={right.showIons}
-              coloring={right.coloring}
+              isSpinning={left.isSpinning}
+              representation={left.representation}
+              showSurface={left.showSurface}
+              showLigands={left.showLigands}
+              showIons={left.showIons}
+              coloring={left.coloring}
               palette={colorPalette}
-              backgroundColor={right.customBackgroundColor || (isLightMode ? 'white' : 'black')}
+              backgroundColor={left.customBackgroundColor || (isLightMode ? 'white' : 'black')}
               measurementTextColor={measurementTextColorMode}
               enableAmbientOcclusion={true}
 
-              onStructureLoaded={(info) => handleLoad(info, right)}
-              onAtomClick={(info) => handleAtomClick(info, right, rightRef)}
+              onStructureLoaded={(info) => handleLoad(info, left)}
+              onAtomClick={(info) => handleAtomClick(info, left, leftRef)}
               isMeasurementMode={isMeasurementMode}
-              measurements={right.measurements}
+              measurements={left.measurements}
               onAddMeasurement={(m) => {
-                right.setMeasurements([...right.measurements, m]);
-                setActiveView('right');
+                left.setMeasurements([...left.measurements, m]);
+                setActiveView('left');
               }}
               onHover={setHoveredResidue}
 
               quality={isPublicationMode ? 'high' : 'medium'}
-              resetCamera={right.resetKey}
-              customColors={right.customColors}
+              resetCamera={left.resetKey}
+              customColors={left.customColors}
               className="w-full h-full"
             />
+          </div>
+        </div>
+
+        {/* Right View */}
+        {isComparisonMode && (
+          <div className="flex flex-col w-1/2 h-full bg-black">
+            {/* Viewport Header */}
             <div
               onClick={() => setActiveView('right')}
-              className={`absolute top-4 left-4 z-10 px-3 py-1 rounded-full text-xs font-bold cursor-pointer transition-colors backdrop-blur-md border ${activeView === 'right' ? 'bg-indigo-600/90 text-white border-indigo-400 shadow-[0_0_15px_rgba(79,70,229,0.5)]' : 'bg-black/40 text-white/50 border-white/10 hover:bg-black/60 hover:text-white'}`}
+              className={`shrink-0 h-9 flex items-center justify-between px-3 border-b transition-colors cursor-pointer select-none
+                ${activeView === 'right' ? 'bg-[#1a1a1a] border-indigo-500/50' : 'bg-black border-[#222] opacity-60 hover:opacity-100'}
+              `}
             >
-              Right View
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full shadow-sm transition-all ${activeView === 'right' ? 'bg-indigo-500 shadow-indigo-500/50 scale-110' : 'bg-neutral-700'}`} />
+                <span className={`text-[10px] font-bold uppercase tracking-widest ${activeView === 'right' ? 'text-indigo-400' : 'text-neutral-500'}`}>Right View</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] text-neutral-400 font-mono max-w-[120px] truncate">
+                  {right.proteinTitle || right.pdbId || (right.file ? right.file.name : "No Structure")}
+                </span>
+                <button
+                  onClick={(e) => { e.stopPropagation(); right.handleResetView(); }}
+                  className="p-1 hover:bg-white/10 rounded text-neutral-500 hover:text-white transition-colors"
+                  title="Reset Camera"
+                >
+                  <RefreshCw className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
+
+            <div className="relative flex-1 w-full h-full">
+              <ProteinViewer
+                ref={rightRef}
+                pdbId={right.pdbId}
+                dataSource={right.dataSource}
+                file={right.file || undefined}
+                fileType={right.fileType}
+                isLightMode={isLightMode}
+                isSpinning={right.isSpinning}
+                representation={right.representation}
+                showSurface={right.showSurface}
+                showLigands={right.showLigands}
+                showIons={right.showIons}
+                coloring={right.coloring}
+                palette={colorPalette}
+                backgroundColor={right.customBackgroundColor || (isLightMode ? 'white' : 'black')}
+                measurementTextColor={measurementTextColorMode}
+                enableAmbientOcclusion={true}
+
+                onStructureLoaded={(info) => handleLoad(info, right)}
+                onAtomClick={(info) => handleAtomClick(info, right, rightRef)}
+                isMeasurementMode={isMeasurementMode}
+                measurements={right.measurements}
+                onAddMeasurement={(m) => {
+                  right.setMeasurements([...right.measurements, m]);
+                  setActiveView('right');
+                }}
+                onHover={setHoveredResidue}
+
+                quality={isPublicationMode ? 'high' : 'medium'}
+                resetCamera={right.resetKey}
+                customColors={right.customColors}
+                className="w-full h-full"
+              />
             </div>
           </div>
         )}
