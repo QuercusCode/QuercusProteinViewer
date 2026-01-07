@@ -47,17 +47,19 @@ export const startOnboardingTour = (onComplete?: () => void, onHighlight?: (elem
                     : 'Measure distances, view contact maps, or inspect specific properties.'
             }
         },
+        {
+            element: '#sequence-track',
+            popover: {
+                title: isChemical ? 'Atom List' : 'Sequence Track',
+                description: isChemical
+                    ? 'View and interact with individual atoms. Click an atom in the list to highlight it in 3D.'
+                    : 'View and interact with the amino acid sequence on the right side. Click residues to focus them in 3D.',
+                side: 'left' as const,
+                align: 'center' as const
+            }
+        },
         // Protein Only Steps
         ...(!isChemical ? [
-            {
-                element: '#sequence-track',
-                popover: {
-                    title: 'Sequence Track',
-                    description: 'View and interact with the amino acid sequence on the right side. Click residues to focus them in 3D.',
-                    side: 'left' as const,
-                    align: 'center' as const
-                }
-            },
             {
                 element: '#motif-search',
                 popover: {
