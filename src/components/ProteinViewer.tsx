@@ -1237,11 +1237,16 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 }
             });
 
-            const handleResize = () => stage.handleResize();
-            window.addEventListener('resize', handleResize);
+            // Handle Container Resize (Robust)
+            const resizeObserver = new ResizeObserver(() => {
+                stage.handleResize();
+            });
+            if (containerRef.current) {
+                resizeObserver.observe(containerRef.current);
+            }
 
             return () => {
-                window.removeEventListener('resize', handleResize);
+                resizeObserver.disconnect();
                 try { stage.dispose(); } catch (e) { }
                 stageRef.current = null;
             };
