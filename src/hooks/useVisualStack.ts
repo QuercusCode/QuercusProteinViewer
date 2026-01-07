@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import type { RepresentationType, ColoringType, ColorPalette } from '../types';
+import type { RepresentationType, ColoringType, ColorPalette, CustomColorRule } from '../types';
 
 export interface VisualState {
     representation: RepresentationType;
@@ -9,6 +9,7 @@ export interface VisualState {
     showIons: boolean;
     showSurface: boolean;
     customBackgroundColor: string;
+    customColors: CustomColorRule[];
 }
 
 interface UseVisualStackProps {
@@ -53,7 +54,8 @@ export function useVisualStack({ state, onChange, resetTrigger }: UseVisualStack
             prev.showLigands !== state.showLigands ||
             prev.showIons !== state.showIons ||
             prev.showSurface !== state.showSurface ||
-            prev.customBackgroundColor !== state.customBackgroundColor;
+            prev.customBackgroundColor !== state.customBackgroundColor ||
+            prev.customColors !== state.customColors;
 
         if (hasChanged) {
             setPast(prevPast => {

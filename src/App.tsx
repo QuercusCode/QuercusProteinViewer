@@ -197,8 +197,9 @@ function App() {
     showLigands,
     showIons,
     showSurface,
-    customBackgroundColor: customBackgroundColor || ''
-  }), [representation, coloring, colorPalette, showLigands, showIons, showSurface, customBackgroundColor]);
+    customBackgroundColor: customBackgroundColor || '',
+    customColors
+  }), [representation, coloring, colorPalette, showLigands, showIons, showSurface, customBackgroundColor, customColors]);
 
   const handleVisualStateChange = useCallback((newState: VisualState) => {
     setRepresentation(newState.representation);
@@ -208,6 +209,7 @@ function App() {
     setShowIons(newState.showIons);
     setShowSurface(newState.showSurface);
     setCustomBackgroundColor(newState.customBackgroundColor || null);
+    setCustomColors(newState.customColors);
   }, []);
 
   const { undo, redo, canUndo, canRedo } = useVisualStack({
