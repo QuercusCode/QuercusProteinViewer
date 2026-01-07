@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import clsx from 'clsx';
-import { Loader2 } from 'lucide-react';
+import { Skeleton } from './Skeleton';
 import type {
     ChainInfo,
     ColorPalette,
@@ -1965,8 +1965,18 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         <div className={clsx("relative w-full h-full", className)}>
             <div ref={containerRef} className="w-full h-full" />
             {loading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
-                    <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
+                <div className="absolute inset-0 bg-neutral-900 z-50 flex flex-col items-center justify-center">
+                    <div className="relative w-24 h-24 mb-6">
+                        <Skeleton variant="circular" className="absolute inset-0 border-4 border-neutral-800 bg-transparent animate-[spin_3s_linear_infinite]" />
+                        <Skeleton variant="circular" className="absolute inset-4 border-4 border-neutral-700 bg-transparent animate-[spin_2s_linear_infinite_reverse]" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <Skeleton variant="circular" className="w-4 h-4 bg-blue-500/50" />
+                        </div>
+                    </div>
+                    <div className="space-y-2 text-center">
+                        <Skeleton variant="text" className="w-32 h-4 mx-auto bg-neutral-800" />
+                        <Skeleton variant="text" className="w-24 h-3 mx-auto bg-neutral-800/50" />
+                    </div>
                 </div>
             )}
             {error && (

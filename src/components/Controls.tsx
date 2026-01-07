@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { Skeleton } from './Skeleton';
 import {
     Camera,
 
@@ -195,8 +196,17 @@ const ChemicalPropertiesPanel = ({ cid, isLightMode, cardBg, subtleText }: { cid
             {isExpanded && (
                 <div className="px-3 pb-3 space-y-2">
                     {loading ? (
-                        <div className="flex items-center justify-center py-4">
-                            <Loader2 className="w-4 h-4 animate-spin text-neutral-400" />
+                        <div className="space-y-2 py-2">
+                            <Skeleton variant="text" className="h-3 w-1/3 bg-neutral-700/50" />
+                            <Skeleton variant="text" className="h-4 w-full bg-neutral-800/50" />
+                            <div className="pt-1 space-y-1">
+                                <Skeleton variant="text" className="h-3 w-1/4 bg-neutral-700/50" />
+                                <div className="grid grid-cols-3 gap-2">
+                                    <Skeleton variant="rounded" className="h-8 bg-neutral-800/50" />
+                                    <Skeleton variant="rounded" className="h-8 bg-neutral-800/50" />
+                                    <Skeleton variant="rounded" className="h-8 bg-neutral-800/50" />
+                                </div>
+                            </div>
                         </div>
                     ) : properties ? (
                         <>
@@ -1509,6 +1519,17 @@ export const Controls: React.FC<ControlsProps> = ({
                                             </button>
                                         </div>
                                         <p className="text-[9px] opacity-50">Use 'x' as wildcard. Dashes ignored.</p>
+
+                                        {/* Loading Skeletons */}
+                                        {isSearching && (
+                                            <div className="space-y-2 pt-2">
+                                                {[1, 2, 3].map(i => (
+                                                    <div key={i} className="flex gap-2">
+                                                        <Skeleton variant="rounded" className="w-full h-8 bg-neutral-800/50" />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
 
                                     {/* Results List */}
