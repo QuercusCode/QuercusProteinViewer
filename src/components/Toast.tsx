@@ -64,7 +64,7 @@ const Toast: React.FC<ToastProps> = ({ toast, onRemove }) => {
 
     return (
         <div
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg border backdrop-blur-xl shadow-2xl transition-all duration-300 ${getBgColor()} ${isExiting ? 'opacity-0 translate-x-full' : 'opacity-100 translate-x-0'
+            className={`flex items-center gap-3 px-4 py-3 rounded-lg border backdrop-blur-xl shadow-2xl transition-all duration-300 ${getBgColor()} ${isExiting ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
                 }`}
         >
             {getIcon()}
@@ -89,7 +89,7 @@ interface ToastContainerProps {
 
 export const ToastContainer: React.FC<ToastContainerProps> = ({ toasts, onRemove }) => {
     return (
-        <div className="fixed top-20 right-4 z-[100] flex flex-col gap-2 pointer-events-none">
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-2 pointer-events-none">
             <div className="flex flex-col gap-2 pointer-events-auto">
                 {toasts.map((toast) => (
                     <Toast key={toast.id} toast={toast} onRemove={onRemove} />
