@@ -221,6 +221,8 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
                     <div className="flex justify-between text-neutral-300"><span>Full Screen</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">F</kbd></div>
                     <div className="flex justify-between text-neutral-300"><span>Theme Toggle</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">T</kbd></div>
                     <div className="flex justify-between text-neutral-300"><span>Screenshot</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">S</kbd></div>
+                    <div className="flex justify-between text-neutral-300"><span>Undo</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">⌘Z / Ctrl+Z</kbd></div>
+                    <div className="flex justify-between text-neutral-300"><span>Redo</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">⇧⌘Z / Shift+Ctrl+Z</kbd></div>
 
                     <div className="col-span-2 pb-1 mb-1 mt-3 border-b border-neutral-800 font-bold text-neutral-400 uppercase tracking-widest text-[10px]">Views</div>
                     <div className="flex justify-between text-neutral-300"><span>Reset View</span> <kbd className="font-mono bg-neutral-800 px-1.5 rounded text-neutral-400">R</kbd></div>

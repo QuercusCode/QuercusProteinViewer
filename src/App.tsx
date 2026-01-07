@@ -20,7 +20,7 @@ import type { PDBMetadata, Measurement, MeasurementTextColor } from './types';
 import {
   Camera, RefreshCw, Upload,
   Settings, Zap, Activity, Grid3X3, Palette,
-  Share2, Save, FolderOpen, Video, Ruler, Maximize2, Star
+  Share2, Save, FolderOpen, Video, Ruler, Maximize2, Star, Undo2, Redo2
 } from 'lucide-react';
 import { startOnboardingTour } from './components/TourGuide';
 import { ToastContainer } from './components/Toast';
@@ -1006,6 +1006,22 @@ function App() {
       shortcut: 'R',
       category: 'View',
       perform: handleResetView
+    },
+    {
+      id: 'undo',
+      label: 'Undo',
+      icon: Undo2,
+      shortcut: 'Cmd/Ctrl+Z',
+      category: 'Edit',
+      perform: () => { if (canUndo) undo(); }
+    },
+    {
+      id: 'redo',
+      label: 'Redo',
+      icon: Redo2,
+      shortcut: 'Shift+Cmd/Ctrl+Z',
+      category: 'Edit',
+      perform: () => { if (canRedo) redo(); }
     },
     {
       id: 'toggle-pub-mode',
