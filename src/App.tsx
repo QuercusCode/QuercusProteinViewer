@@ -1431,7 +1431,7 @@ function App() {
                   {showHeader && (
                     <div
                       onClick={() => setActiveViewIndex(index)}
-                      className={`shrink-0 h-9 flex items-center justify-between px-3 border-b transition-colors cursor-pointer select-none
+                      className={`shrink-0 h-9 flex items-center justify-between px-3 border-b transition-colors cursor-pointer select-none relative
                         ${isActive ? 'bg-[#1a1a1a] border-indigo-500/50' : 'bg-black border-[#222] opacity-60 hover:opacity-100'}
                       `}
                     >
