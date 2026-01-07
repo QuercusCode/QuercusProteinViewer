@@ -1441,13 +1441,16 @@ function App() {
                           {viewportLabels[index]}
                         </span>
                       </div>
-                      <div className="flex items-center gap-3 flex-1 min-w-0">
-                        <span className="text-[10px] text-neutral-400 font-mono truncate max-w-full">
+                      <div className="flex items-center gap-3 flex-1 min-w-0 justify-center">
+                        <span
+                          className="text-[10px] text-neutral-400 font-mono truncate max-w-full"
+                          title={ctrl.proteinTitle || ctrl.pdbId || (ctrl.file ? ctrl.file.name : "No Structure")}
+                        >
                           {ctrl.proteinTitle || ctrl.pdbId || (ctrl.file ? ctrl.file.name : "No Structure")}
                         </span>
                         <button
                           onClick={(e) => { e.stopPropagation(); ctrl.handleResetView(); }}
-                          className="p-1 hover:bg-white/10 rounded text-neutral-500 hover:text-white transition-colors"
+                          className="p-1 hover:bg-white/10 rounded text-neutral-500 hover:text-white transition-colors shrink-0"
                           title="Reset Camera"
                         >
                           <RefreshCw className="w-3 h-3" />
