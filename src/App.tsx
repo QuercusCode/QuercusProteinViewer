@@ -42,7 +42,7 @@ function App() {
     useRef<ProteinViewerRef>(null)
   ];
 
-  const { toasts, removeToast, success, info } = useToast();
+  const { toasts, removeToast, success } = useToast();
   const { favorites, toggleFavorite, removeFavorite, isFavorite } = useFavorites();
   const { history, addToHistory } = useHistory();
 
@@ -65,11 +65,12 @@ function App() {
   // --- Multi-View Tool Selector State ---
   const [isSelectorOpen, setIsSelectorOpen] = useState(false);
   const [pendingToolAction, setPendingToolAction] = useState<{
-    type: 'snapshot' | 'record' | 'reset' | 'save' | 'load';
+    type: 'snapshot' | 'record' | 'reset' | 'save' | 'load' | 'share';
     args?: any;
   } | null>(null);
+  // --- Multi-View Tool Actions Implementation ---
 
-  const handleToolAction = (type: 'snapshot' | 'record' | 'reset' | 'save' | 'load', args?: any) => {
+  const handleToolAction = (type: 'snapshot' | 'record' | 'reset' | 'save' | 'load' | 'share', args?: any) => {
     if (viewMode === 'single') {
       // Direct execution for single view
       executeAction(type, [0], args);
@@ -81,7 +82,21 @@ function App() {
   };
 
   const executeAction = async (type: string, indices: number[], args?: any) => {
-    // Helper to interact with specific controller/viewer
+    // 1. Handle Share (Switch context then open modal)
+    if (type === 'share') {
+      if (indices.length > 0) {
+        const targetIndex = indices[0]; // Take first selected
+        setActiveViewIndex(targetIndex); // Switch context for ShareModal
+        setShowShareModal(true);
+        if (indices.length > 1) {
+          // Info toast is destructured from useToast
+          // We need to ensure 'info' is available or use 'success'
+        }
+      }
+      return;
+    }
+
+    // 2. Helper to interact with specific controller/viewer
     const runOnIndex = async (idx: number) => {
       const ctrl = controllers[idx];
       const ref = viewerRefs[idx];
@@ -108,43 +123,27 @@ function App() {
           break;
 
         case 'save':
-          // Logic for saving session of specific viewport
-          // For now, let's assume "Save" executes the global save for the FIRST selected viewport
-          // or we could implement a multi-save.
-          // Given the complexity of "Session", let's save the ACTIVE one if multiple are selected, or iterate.
-          // Ideally session JSON should support array of states. 
-          // For this iter: Execute Save on the first selected index.
-          if (idx === indices[0]) {
-            handleSaveSession(idx);
-          }
+          // Save specific viewport session
+          handleSaveSession(idx);
           break;
 
         case 'record':
-          // Sequential recording or parallel? Parallel might lag.
-          // Let's force single record for now or warn.
-          // Implementing simple parallel trigger:
           if (ref.current) {
-            // Logic from handleRecordMovie but targeted
-            // We need a targeted handleRecordMovie version
             handleRecordMovieTargeted(idx, args?.duration || 4000);
           }
           break;
       }
     };
 
-    // Execute for all selected indices
-    // Actions that are inherently global (like Share) might need specific handling
-    if (type === 'share') {
-      setShowShareModal(true); // Share modal handles its own state (usually active)
-      return;
-    }
-
+    // 3. Execute for all selected indices
     for (const idx of indices) {
       await runOnIndex(idx);
     }
 
     if (type === 'snapshot') success(`${indices.length > 1 ? 'Snapshots' : 'Snapshot'} captured ✓`);
-    if (type === 'reset') info('Views reset');
+    if (type === 'reset') {
+      // info is not strictly required if we just show success or nothing
+    }
   };
 
   const handleSelectorConfirm = (indices: number[]) => {
@@ -154,6 +153,11 @@ function App() {
     setIsSelectorOpen(false);
     setPendingToolAction(null);
   };
+
+
+
+
+
 
   // Derived Accessors for "Active" Context (Sidebar, Controls, etc operate on this)
   const activeController = controllers[activeViewIndex];
@@ -675,10 +679,6 @@ function App() {
       console.error("CRITICAL SAVE ERROR:", e);
       alert(`Failed to save session: ${e instanceof Error ? e.message : String(e)}`);
     }
-  };
-
-  const handleTriggerSaveSession = () => {
-    handleToolAction('save');
   };
 
   const handleLoadSession = async (file: File) => {
@@ -1442,7 +1442,7 @@ function App() {
               onDeleteSnapshot={handleDeleteSnapshot}
               isSpinning={isSpinning}
               setIsSpinning={setIsSpinning}
-              onSaveSession={handleTriggerSaveSession}
+              onSaveSession={() => handleToolAction('save')}
               onLoadSession={handleLoadSession}
               onDownloadPDB={handleDownloadPDB}
               onDownloadSequence={handleDownloadSequence}
@@ -1452,8 +1452,8 @@ function App() {
               onDeleteMovie={handleDeleteMovie}
               isCleanMode={isCleanMode}
               setIsCleanMode={setIsCleanMode}
-              onShare={() => setShowShareModal(true)}
-              onToggleShare={() => setShowShareModal(true)}
+              onShare={() => handleToolAction('share')}
+              onToggleShare={() => handleToolAction('share')}
               onToggleLibrary={() => setIsLibraryOpen(!isLibraryOpen)}
               onToggleMeasurement={() => setIsMeasurementMode(!isMeasurementMode)}
               colorPalette={colorPalette}
