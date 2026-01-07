@@ -640,17 +640,28 @@ export const Controls: React.FC<ControlsProps> = ({
                     <div className="space-y-3 mb-2" id="upload-section">
                         <form onSubmit={handleSubmit} className="flex flex-col gap-2">
                             {/* Datasource Selector */}
-                            <select
-                                value={dataSource}
-                                onChange={(e) => setDataSource(e.target.value as DataSource)}
-                                className={`w-full rounded-lg px-3 py-1.5 text-xs font-medium border outline-none transition-all appearance-none cursor-pointer ${isLightMode
-                                    ? 'bg-neutral-50 border-neutral-200 text-neutral-700 hover:border-neutral-300'
-                                    : 'bg-white/5 border-white/10 text-neutral-300 hover:border-white/20'
-                                    }`}
-                            >
-                                <option value="pdb">RCSB PDB (Protein/Macromolecules)</option>
-                                <option value="pubchem">PubChem (Small Molecules)</option>
-                            </select>
+                            <div className={`grid grid-cols-2 gap-1 p-1 rounded-lg border ${isLightMode ? 'bg-neutral-100 border-neutral-200' : 'bg-black/20 border-white/5'}`}>
+                                <button
+                                    type="button"
+                                    onClick={() => setDataSource('pdb')}
+                                    className={`text-xs font-medium py-1.5 rounded-md transition-all ${dataSource === 'pdb'
+                                        ? 'bg-blue-600 text-white shadow-sm'
+                                        : `${subtleText} hover:bg-black/5 dark:hover:bg-white/10`
+                                        }`}
+                                >
+                                    RCSB PDB
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setDataSource('pubchem')}
+                                    className={`text-xs font-medium py-1.5 rounded-md transition-all ${dataSource === 'pubchem'
+                                        ? 'bg-blue-600 text-white shadow-sm'
+                                        : `${subtleText} hover:bg-black/5 dark:hover:bg-white/10`
+                                        }`}
+                                >
+                                    PubChem
+                                </button>
+                            </div>
 
                             <div className="flex gap-2">
                                 <div className="relative flex-1">
@@ -660,8 +671,8 @@ export const Controls: React.FC<ControlsProps> = ({
                                         value={localPdbId}
                                         onChange={(e) => setLocalPdbId(e.target.value)}
                                         placeholder={
-                                            dataSource === 'pubchem' ? "PubChem CID (e.g. 2244)" :
-                                                "PDB ID (e.g. 1crn)"
+                                            dataSource === 'pubchem' ? "Search PubChem CID (e.g. 2244)" :
+                                                "Search PDB ID (e.g. 1crn)"
                                         }
                                         className={`w-full rounded-lg pl-9 pr-3 py-2 border outline-none transition-all ${inputBg}`}
                                     />
