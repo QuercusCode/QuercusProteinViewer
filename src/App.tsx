@@ -219,21 +219,8 @@ function App() {
 
   // Handle Default Loading on DataSource Switch
   useEffect(() => {
-    // Only apply defaults if there's no file loaded (user is exploring via ID)
-    if (!file) {
-      if (dataSource === 'pubchem') {
-        // Switch to PubChem: Load Aspirin (2244) by default if current ID is not a valid CID or is a standard PDB ID
-        // Simple heuristic: PDB IDs are length 4, CIDs are usually digits only (though can be stringy in code)
-        if (!pdbId || pdbId.length === 4 || isNaN(Number(pdbId))) {
-          setPdbId('2244'); // Default to Aspirin
-        }
-      } else if (dataSource === 'pdb') {
-        // Switch to PDB: Load 2B3P by default if current ID looks like a CID (digits)
-        if (!pdbId || !isNaN(Number(pdbId))) {
-          setPdbId('2b3p');
-        }
-      }
-    }
+    // Removed auto-loading of default structures to prevent unwanted overlays
+    // Users should explicitly select structures from the library or enter IDs
   }, [dataSource]);
 
 

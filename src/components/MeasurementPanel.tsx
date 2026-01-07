@@ -225,9 +225,19 @@ export const MeasurementPanel: React.FC<MeasurementPanelProps> = ({ measurements
                                     </div>
                                 </div>
                                 <div className="flex justify-between text-[10px] text-neutral-500 uppercase tracking-wide px-1">
-                                    <span>{m.atom1.resName} {m.atom1.resNo} ({m.atom1.chain}){m.atom1.atomName ? ` : ${m.atom1.atomName}` : ''}</span>
+                                    <span>
+                                        {m.atom1.resName === 'HET' && m.atom1.atomName
+                                            ? m.atom1.atomName
+                                            : `${m.atom1.resName} ${m.atom1.resNo} (${m.atom1.chain})${m.atom1.atomName ? ` : ${m.atom1.atomName}` : ''}`
+                                        }
+                                    </span>
                                     <span className="opacity-30 mx-1">↔</span>
-                                    <span>{m.atom2.resName} {m.atom2.resNo} ({m.atom2.chain}){m.atom2.atomName ? ` : ${m.atom2.atomName}` : ''}</span>
+                                    <span>
+                                        {m.atom2.resName === 'HET' && m.atom2.atomName
+                                            ? m.atom2.atomName
+                                            : `${m.atom2.resName} ${m.atom2.resNo} (${m.atom2.chain})${m.atom2.atomName ? ` : ${m.atom2.atomName}` : ''}`
+                                        }
+                                    </span>
                                 </div>
                             </div>
                         ))}
