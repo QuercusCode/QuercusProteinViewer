@@ -49,25 +49,19 @@ export const HelpGuide: React.FC = () => {
                                     Enter a 4-character PDB ID (e.g., <code className="bg-neutral-800 px-1 rounded">2B3P</code>) to fetch directly from the database.
                                 </span>
                             </li>
+
                             <li className="flex gap-3">
                                 <span className="text-neutral-500 font-mono">02</span>
-                                <span>
-                                    <strong className="text-white block">AlphaFold DB</strong>
-                                    Search for UniProt IDs to load predicted structures.
-                                </span>
-                            </li>
-                            <li className="flex gap-3">
-                                <span className="text-neutral-500 font-mono">03</span>
                                 <span>
                                     <strong className="text-white block">PubChem</strong>
                                     Load small molecules by CID (e.g., <code className="bg-neutral-800 px-1 rounded">2244</code> for Aspirin).
                                 </span>
                             </li>
                             <li className="flex gap-3">
-                                <span className="text-neutral-500 font-mono">04</span>
+                                <span className="text-neutral-500 font-mono">03</span>
                                 <span>
                                     <strong className="text-white block">Local Files</strong>
-                                    Drag and drop <code className="text-blue-300">.pdb</code>, <code className="text-blue-300">.cif</code>, or <code className="text-blue-300">.mol</code> files anywhere on the screen.
+                                    Drag and drop <code className="text-blue-300">.pdb</code>, <code className="text-blue-300">.sdf</code>, or <code className="text-blue-300">.mol</code> files anywhere on the screen.
                                 </span>
                             </li>
                         </ul>
@@ -292,10 +286,10 @@ export const HelpGuide: React.FC = () => {
                                             setShowMobileList(false);
                                         }}
                                         className={`w-full flex items-center gap-3 p-3 rounded-lg text-sm font-medium transition-all ${activeTab === feature.id && !showMobileList // Highlight only if not looking at list (mobile) logic doesn't apply well, keep simple active state
-                                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
-                                                : activeTab === feature.id
-                                                    ? 'bg-blue-600/10 text-blue-400 md:bg-blue-600 md:text-white md:shadow-lg'
-                                                    : 'text-neutral-400 hover:text-white hover:bg-white/5'
+                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
+                                            : activeTab === feature.id
+                                                ? 'bg-blue-600/10 text-blue-400 md:bg-blue-600 md:text-white md:shadow-lg'
+                                                : 'text-neutral-400 hover:text-white hover:bg-white/5'
                                             }`}
                                     >
                                         <feature.icon className={`w-4 h-4 ${activeTab === feature.id ? 'text-blue-400 md:text-white' : 'text-neutral-500'}`} />
