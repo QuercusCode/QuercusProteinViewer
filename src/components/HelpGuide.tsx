@@ -12,7 +12,7 @@ type FeatureSection = {
     content: React.ReactNode;
 };
 
-export const HelpGuide: React.FC = () => {
+export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('start');
     const [showMobileList, setShowMobileList] = useState(true);
@@ -28,6 +28,8 @@ export const HelpGuide: React.FC = () => {
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [isOpen]);
+
+    if (!isVisible && !isOpen) return null;
 
     const features: FeatureSection[] = [
         {

@@ -325,6 +325,8 @@ interface ControlsProps {
     // UI State Lifted Info
     openSections?: Record<string, boolean>;
     onToggleSection?: (section: string) => void;
+    isMobileSidebarOpen?: boolean;
+    onToggleMobileSidebar?: () => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -392,7 +394,9 @@ export const Controls: React.FC<ControlsProps> = ({
     onDownloadSequence,
     onStartTour,
     openSections: propOpenSections,
-    onToggleSection
+    onToggleSection,
+    isMobileSidebarOpen = false,
+    onToggleMobileSidebar
 }) => {
     // Motif Search State
     const [searchPattern, setSearchPattern] = useState('');
@@ -467,7 +471,7 @@ export const Controls: React.FC<ControlsProps> = ({
     };
 
     // Mobile Sidebar State
-    const [isOpen, setIsOpen] = useState(false);
+    // const [isOpen, setIsOpen] = useState(false);
 
     // Refs for scrolling
     const sequenceContainerRef = useRef<HTMLDivElement>(null);
@@ -568,7 +572,7 @@ export const Controls: React.FC<ControlsProps> = ({
     return (
         <>
             <button
-                onClick={() => setIsOpen(true)}
+                onClick={onToggleMobileSidebar}
                 className={`absolute top-4 left-4 z-40 md:hidden p-2 rounded-lg backdrop-blur-md shadow-lg transition-opacity hover:opacity-80 border ${isLightMode ? 'bg-white border-neutral-900 text-black' : 'bg-neutral-900/90 border-white/10 text-white'}`}
             >
                 <Menu className="w-6 h-6" />
@@ -580,14 +584,14 @@ export const Controls: React.FC<ControlsProps> = ({
                 backdrop-blur-xl border-r shadow-2xl
                 transition-transform duration-300 ease-in-out
                 flex flex-col
-                ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+                ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
                 md:translate-x-0 md:top-4 md:left-4 md:h-[calc(100vh-2rem)] md:rounded-xl md:z-10
                 ${isLightMode ? 'bg-white border-neutral-900 shadow-none' : 'bg-neutral-900/80 border-white/10 md:shadow-2xl'}
             `}>
                 {/* Header - Fixed */}
                 <div className="flex-none p-4 pb-2 relative">
                     <button
-                        onClick={() => setIsOpen(false)}
+                        onClick={onToggleMobileSidebar}
                         className={`absolute top-4 right-4 p-1 md:hidden ${subtleText}`}
                     >
                         <X className="w-6 h-6" />
