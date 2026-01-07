@@ -631,9 +631,10 @@ export const Controls: React.FC<ControlsProps> = ({
                             <p className={`text-xs ${subtleText}`}>Visualize 3D structures</p>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-3">
+                            {/* Group 1: Visual History */}
                             {onUndo && onRedo && (
-                                <div className="flex items-center bg-neutral-100 dark:bg-neutral-800 rounded-lg p-0.5 mr-1 border border-black/5 dark:border-white/5">
+                                <div className="flex items-center gap-0.5 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-0.5 border border-black/5 dark:border-white/5">
                                     <button
                                         onClick={onUndo}
                                         disabled={!canUndo}
@@ -641,7 +642,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                             ? 'opacity-30 cursor-not-allowed'
                                             : 'hover:bg-white dark:hover:bg-neutral-700 hover:shadow-sm text-neutral-600 dark:text-neutral-300'
                                             }`}
-                                        title="Undo"
+                                        title="Undo (Ctrl+Z)"
                                     >
                                         <Undo2 className="w-4 h-4" />
                                     </button>
@@ -652,44 +653,57 @@ export const Controls: React.FC<ControlsProps> = ({
                                             ? 'opacity-30 cursor-not-allowed'
                                             : 'hover:bg-white dark:hover:bg-neutral-700 hover:shadow-sm text-neutral-600 dark:text-neutral-300'
                                             }`}
-                                        title="Redo"
+                                        title="Redo (Ctrl+Y)"
                                     >
                                         <Redo2 className="w-4 h-4" />
                                     </button>
                                 </div>
                             )}
 
-                            <button
-                                onClick={onStartTour}
-                                className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-white border border-neutral-900 text-black hover:bg-neutral-100' : 'bg-neutral-800/80 text-neutral-400 hover:bg-neutral-700'}`}
-                                title="Start Interactive Tour"
-                                id="help-button"
-                            >
-                                <HelpCircle className="w-4 h-4" />
-                            </button>
-                            {onOpenFavorites && (
+                            {/* Divider */}
+                            <div className="hidden sm:block w-px h-5 bg-gray-200 dark:bg-neutral-700" />
+
+                            {/* Group 2: Resources */}
+                            <div className="flex items-center gap-1">
+                                {onOpenFavorites && (
+                                    <button
+                                        onClick={onOpenFavorites}
+                                        className={`p-2 rounded-lg transition-colors ${isLightMode ? 'text-neutral-600 hover:bg-neutral-100' : 'text-neutral-400 hover:bg-neutral-800'}`}
+                                        title="Favorites & History"
+                                    >
+                                        <Star className="w-4 h-4" />
+                                    </button>
+                                )}
                                 <button
-                                    onClick={onOpenFavorites}
-                                    className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-white border border-neutral-900 text-black hover:bg-neutral-100' : 'bg-neutral-800/80 text-neutral-400 hover:bg-neutral-700'}`}
-                                    title="View Favorites"
+                                    onClick={onToggleLibrary}
+                                    className={`p-2 rounded-lg transition-colors ${isLightMode ? 'text-neutral-600 hover:bg-neutral-100' : 'text-neutral-400 hover:bg-neutral-800'}`}
+                                    title="Offline Library"
                                 >
-                                    <Star className="w-4 h-4" />
+                                    <BookOpen className="w-4 h-4" />
                                 </button>
-                            )}
-                            <button
-                                onClick={onToggleLibrary}
-                                className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-white border border-neutral-900 text-black hover:bg-neutral-100' : 'bg-neutral-800/80 text-neutral-400 hover:bg-neutral-700'}`}
-                                title="Open Offline Library"
-                            >
-                                <BookOpen className="w-4 h-4" />
-                            </button>
-                            <button
-                                onClick={() => setIsLightMode(!isLightMode)}
-                                className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-white border border-neutral-900 text-black hover:bg-neutral-100' : 'bg-neutral-800/80 text-blue-300 hover:bg-neutral-700'}`}
-                                title="Toggle Theme"
-                            >
-                                {isLightMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                            </button>
+                            </div>
+
+                            {/* Divider */}
+                            <div className="hidden sm:block w-px h-5 bg-gray-200 dark:bg-neutral-700" />
+
+                            {/* Group 3: System */}
+                            <div className="flex items-center gap-1">
+                                <button
+                                    onClick={onStartTour}
+                                    className={`p-2 rounded-lg transition-colors ${isLightMode ? 'text-neutral-600 hover:bg-neutral-100' : 'text-neutral-400 hover:bg-neutral-800'}`}
+                                    title="Interactive Tour"
+                                    id="help-button"
+                                >
+                                    <HelpCircle className="w-4 h-4" />
+                                </button>
+                                <button
+                                    onClick={() => setIsLightMode(!isLightMode)}
+                                    className={`p-2 rounded-lg transition-colors ${isLightMode ? 'text-amber-500 hover:bg-neutral-100' : 'text-blue-400 hover:bg-neutral-800'}`}
+                                    title="Toggle Theme"
+                                >
+                                    {isLightMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
