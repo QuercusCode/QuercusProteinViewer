@@ -27,11 +27,13 @@ import { ToastContainer } from './components/Toast';
 import { useToast } from './hooks/useToast';
 import { FavoritesPanel } from './components/FavoritesPanel';
 import { useFavorites } from './hooks/useFavorites';
+import { useHistory } from './hooks/useHistory';
 
 function App() {
   const viewerRef = useRef<ProteinViewerRef>(null);
   const { toasts, removeToast, success, error, info } = useToast();
   const { favorites, toggleFavorite, removeFavorite, isFavorite } = useFavorites();
+  const { history, addToHistory } = useHistory();
   // Parse Global URL State Once
   const initialUrlState = parseURLState();
 
@@ -387,7 +389,13 @@ function App() {
       // Optional logic: if mixed, maybe prompt or simple notification?
       // For now, we leave it to user unless it's the *only* thing (handled above)
     }
-  }, [showLigands, initialUrlState.showLigands]);
+    // Add to Recent History
+    if (dataSource === 'pdb' && pdbId) {
+      addToHistory(pdbId, 'pdb');
+    } else if (dataSource === 'pubchem' && pdbId) {
+      addToHistory(pdbId, 'pubchem');
+    }
+  }, [showLigands, initialUrlState.showLigands, pdbId, dataSource, addToHistory]);
 
   const [proteinTitle, setProteinTitle] = useState<string | null>(null);
 
@@ -1357,6 +1365,7 @@ function App() {
             onToggleFavorite={() => toggleFavorite(pdbId, dataSource, proteinTitle || undefined)}
             isFavorite={isFavorite(pdbId, dataSource)}
             onOpenFavorites={() => setIsFavoritesOpen(true)}
+            history={history}
           />
         );
       })()}

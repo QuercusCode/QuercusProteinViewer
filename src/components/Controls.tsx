@@ -31,10 +31,12 @@ import {
     Wrench,
     Share2,
     ScanSearch, // Added Icon
-    Star
+    Star,
+    Clock
 } from 'lucide-react';
 import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, PDBMetadata } from '../types';
 import type { DataSource } from '../utils/pdbUtils';
+import type { HistoryItem } from '../hooks/useHistory';
 import { formatChemicalId } from '../utils/pdbUtils';
 import { findMotifs } from '../utils/searchUtils';
 import type { MotifMatch } from '../utils/searchUtils';
@@ -323,6 +325,9 @@ interface ControlsProps {
     setShowIons?: (show: boolean) => void;
     onStartTour?: () => void;
 
+    // History
+    history?: HistoryItem[];
+
     // UI State Lifted Info
     openSections?: Record<string, boolean>;
     onToggleSection?: (section: string) => void;
@@ -405,12 +410,14 @@ export const Controls: React.FC<ControlsProps> = ({
     onToggleMobileSidebar,
     onToggleFavorite,
     isFavorite,
-    onOpenFavorites
+    onOpenFavorites,
+    history = []
 }) => {
     // Motif Search State
     const [searchPattern, setSearchPattern] = useState('');
     const [searchResults, setSearchResults] = useState<MotifMatch[]>([]);
     const [isSearching, setIsSearching] = useState(false);
+    const [isSearchFocused, setIsSearchFocused] = useState(false);
 
 
     const handleSearch = () => {
@@ -688,12 +695,42 @@ export const Controls: React.FC<ControlsProps> = ({
                                         type="text"
                                         value={localPdbId}
                                         onChange={(e) => setLocalPdbId(e.target.value)}
+                                        onFocus={() => setIsSearchFocused(true)}
+                                        onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
                                         placeholder={
                                             dataSource === 'pubchem' ? "Search PubChem CID (e.g. 2244)" :
                                                 "Search PDB ID (e.g. 1crn)"
                                         }
                                         className={`w-full rounded-lg pl-9 pr-3 py-2 border outline-none transition-all ${inputBg}`}
                                     />
+                                    {isSearchFocused && history && history.length > 0 && !localPdbId && (
+                                        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-neutral-800 rounded-lg shadow-xl border border-neutral-200 dark:border-neutral-700 z-50 overflow-hidden">
+                                            <div className="px-3 py-2 text-xs font-semibold text-neutral-500 uppercase tracking-wider bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 flex items-center gap-2">
+                                                <Clock className="w-3 h-3" />
+                                                Recent History
+                                            </div>
+                                            <div className="max-h-60 overflow-y-auto">
+                                                {history.slice(0, 10).map((item) => (
+                                                    <button
+                                                        key={`${item.id}-${item.dataSource}-${item.timestamp}`}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setLocalPdbId(item.id);
+                                                            setDataSource(item.dataSource);
+                                                            setPdbId(item.id);
+                                                            setIsSearchFocused(false);
+                                                        }}
+                                                        className="w-full text-left px-3 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700 flex items-center justify-between group border-b border-neutral-100 dark:border-neutral-800 last:border-0"
+                                                    >
+                                                        <span className="font-mono font-medium">{item.id}</span>
+                                                        <span className="text-[10px] text-neutral-400 group-hover:text-neutral-500 bg-neutral-100 dark:bg-neutral-900 px-1.5 py-0.5 rounded border border-neutral-200 dark:border-neutral-700">
+                                                            {item.dataSource === 'pdb' ? 'PDB' : 'CHEM'}
+                                                        </span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
                                 {onToggleFavorite && (
                                     <button
