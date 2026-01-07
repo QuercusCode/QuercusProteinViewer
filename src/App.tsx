@@ -51,15 +51,15 @@ function App() {
 
   // --- State: Multi-View Controllers (array of 4) ---
   const controllers = [
-    useStructureController(initialUrlState), // Viewport 0
-    useStructureController({}),              // Viewport 1
-    useStructureController({}),              // Viewport 2
-    useStructureController({})               // Viewport 3
+    useStructureController(initialUrlState.viewports[0] || {}), // Viewport 0
+    useStructureController(initialUrlState.viewports[1] || {}), // Viewport 1
+    useStructureController(initialUrlState.viewports[2] || {}), // Viewport 2
+    useStructureController(initialUrlState.viewports[3] || {})  // Viewport 3
   ];
 
   // --- State: View Mode & Active Management ---
   type ViewMode = 'single' | 'dual' | 'triple' | 'quad';
-  const [viewMode, setViewMode] = useState<ViewMode>('single');
+  const [viewMode, setViewMode] = useState<ViewMode>((initialUrlState.viewMode as ViewMode) || 'single');
   const [activeViewIndex, setActiveViewIndex] = useState(0);
 
   // --- Multi-View Tool Selector State ---
@@ -68,9 +68,16 @@ function App() {
     type: 'snapshot' | 'record' | 'reset' | 'save' | 'load' | 'share';
     args?: any;
   } | null>(null);
+
   // --- Multi-View Tool Actions Implementation ---
 
   const handleToolAction = (type: 'snapshot' | 'record' | 'reset' | 'save' | 'load' | 'share', args?: any) => {
+    if (type === 'share') {
+      // Share is global or context-aware but we just open the modal with the global state
+      setShowShareModal(true);
+      return;
+    }
+
     if (viewMode === 'single') {
       // Direct execution for single view
       executeAction(type, [0], args);
@@ -82,20 +89,6 @@ function App() {
   };
 
   const executeAction = async (type: string, indices: number[], args?: any) => {
-    // 1. Handle Share (Switch context then open modal)
-    if (type === 'share') {
-      if (indices.length > 0) {
-        const targetIndex = indices[0]; // Take first selected
-        setActiveViewIndex(targetIndex); // Switch context for ShareModal
-        setShowShareModal(true);
-        if (indices.length > 1) {
-          // Info toast is destructured from useToast
-          // We need to ensure 'info' is available or use 'success'
-        }
-      }
-      return;
-    }
-
     // 2. Helper to interact with specific controller/viewer
     const runOnIndex = async (idx: number) => {
       const ctrl = controllers[idx];
@@ -123,8 +116,14 @@ function App() {
           break;
 
         case 'save':
-          // Save specific viewport session
-          handleSaveSession(idx);
+          // Now handleSaveSession saves the entire viewport state, ignoring index for now as per V2 design
+          // But if we want to export specific VIEWPORT state as a session, we could.
+          // However, user asked for "Save actions should preserve the exact layout".
+          // So "Save Session" is a global action.
+          // We will just trigger handleSaveSession once.
+          if (idx === indices[0]) { // Only run once if multiple selected
+            handleSaveSession();
+          }
           break;
 
         case 'record':
@@ -143,6 +142,9 @@ function App() {
     if (type === 'snapshot') success(`${indices.length > 1 ? 'Snapshots' : 'Snapshot'} captured ✓`);
     if (type === 'reset') {
       // info is not strictly required if we just show success or nothing
+    }
+    if (type === 'save') {
+      // Handled inside runOnIndex
     }
   };
 
@@ -198,15 +200,11 @@ function App() {
 
 
 
-  const [hasRestoredState, setHasRestoredState] = useState(!!initialUrlState.orientation);
+  // Removed hasRestoredState as it is no longer used
+  // const [hasRestoredState, setHasRestoredState] = useState(!!initialUrlState.orientation);
   const [isMeasurementMode, setIsMeasurementMode] = useState(false);
 
   useEffect(() => {
-    // Store pending orientation for later application
-    if (initialUrlState.orientation) {
-      (window as any).__pendingOrientation = initialUrlState.orientation;
-    }
-
     // Check for onboarding tour
     const hasSeenTour = localStorage.getItem('hasSeenViewerTour');
     if (!hasSeenTour) {
@@ -341,18 +339,7 @@ function App() {
   // If we upload a file or change PDB manually, we reset customColors in handlePdbIdChange/handleUpload.
   // So here we should NOT clear them.
 
-  // Restore Orientation & Measurements if pending
-  if (hasRestoredState && viewerRef.current) {
-    try {
-      setTimeout(() => {
-        if ((window as any).__pendingOrientation) {
-          viewerRef.current?.setCameraOrientation((window as any).__pendingOrientation);
-          delete (window as any).__pendingOrientation;
-        }
-        setHasRestoredState(false);
-      }, 500);
-    } catch (e) { console.warn("App: Failed to restore state", e); }
-  }
+  // Removed legacy orientation restore effect
 
 
 
@@ -542,7 +529,17 @@ function App() {
     } else if (ctrl.dataSource === 'pubchem' && ctrl.pdbId) {
       addToHistory(ctrl.pdbId, 'pubchem');
     }
-  }, [addToHistory]);
+
+    // Multi-View Orientation Restore
+    // Find index of this controller
+    const index = controllers.indexOf(ctrl);
+    if (index !== -1 && initialUrlState.viewports?.[index]?.orientation) {
+      // Apply orientation after a short delay to ensure rendering matches
+      setTimeout(() => {
+        viewerRefs[index].current?.setCameraOrientation(initialUrlState.viewports[index].orientation);
+      }, 500);
+    }
+  }, [addToHistory, controllers, initialUrlState]);
 
   const handlePdbIdChange = (id: string) => {
     activeController.setPdbId(id);
@@ -631,35 +628,48 @@ function App() {
   // Session Management
   // Session Management
   // Session Management
-  const handleSaveSession = (targetIndex: number = activeViewIndex) => {
+  // Session Management
+  const handleSaveSession = () => {
     try {
-      console.log("Starting save session for index:", targetIndex);
-      const ctrl = controllers[targetIndex];
-      const ref = viewerRefs[targetIndex];
+      console.log("Starting save session (Version 2 Mockup)");
 
-      // 2. Safely get orientation
-      let safeOrientation = null;
-      try {
-        safeOrientation = ref.current?.getCameraOrientation() || null;
-      } catch (err) {
-        console.warn("Could not get orientation for save:", err);
-      }
+      // Collect state from all controllers
+      const viewportsData = controllers.map((ctrl, index) => {
+        const ref = viewerRefs[index];
+        return {
+          pdbId: String(ctrl.pdbId || ""),
+          representation: String(ctrl.representation),
+          coloring: String(ctrl.coloring),
+          showSurface: ctrl.showSurface,
+          showLigands: ctrl.showLigands,
+          showIons: ctrl.showIons,
+          isSpinning: ctrl.isSpinning,
+          customColors: ctrl.customColors,
+          customBackgroundColor: ctrl.customBackgroundColor,
+          isMeasurementMode: isMeasurementMode, // This is global for now, or per-viewport?
+          measurements: ctrl.measurements,
+          orientation: ref.current?.getCameraOrientation() || null
+        };
+      });
 
-      // 3. Construct Data safely
+      // Construct Data safely (V2 Format)
       const sessionData = {
-        version: 1,
-        pdbId: String(ctrl.pdbId || ""),
-        representation: String(ctrl.representation),
-        coloring: String(ctrl.coloring),
-        orientation: safeOrientation,
-        timestamp: Date.now()
+        version: 2,
+        viewMode: viewMode,
+        timestamp: Date.now(),
+        // Global boolean flags or specific viewport data
+        isLightMode,
+        isCleanMode,
+        snapshots, // Global snapshots
+        customColors: controllers[0].customColors, // Keep legacy top-level for compat if needed, but V2 relies on viewports
+        // The core data
+        viewports: viewportsData
       };
 
-      console.log("Session data prepared, converting to JSON...");
+      console.log("Session data prepared (V2), converting to JSON...");
 
       // 4. Safe Stringify
       const jsonString = JSON.stringify(sessionData, (key, value) => {
-        // Prevent circular references just in case (though we sanitized above)
         if (key === 'viewerRef' || key === 'stageRef' || key === 'structure') return undefined;
         return value;
       }, 2);
@@ -668,13 +678,13 @@ function App() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `session-${ctrl.pdbId || 'structure'}-${new Date().toISOString().slice(0, 10)}.json`;
+      link.download = `session-multiview-${new Date().toISOString().slice(0, 10)}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      console.log("Save session completed successfully.");
+      success("Session saved successfully ✓");
     } catch (e) {
       console.error("CRITICAL SAVE ERROR:", e);
       alert(`Failed to save session: ${e instanceof Error ? e.message : String(e)}`);
@@ -688,26 +698,66 @@ function App() {
 
       if (!session.timestamp) console.warn("Session file missing timestamp");
 
-      if (session.pdbId) setPdbId(session.pdbId);
-      if (session.representation) setRepresentation(session.representation);
-      if (session.coloring) setColoring(session.coloring);
+      if (session.version === 2) {
+        // Load Version 2 (Multi-View)
+        if (session.viewMode) setViewMode(session.viewMode as ViewMode);
+        if (session.isLightMode !== undefined) setIsLightMode(session.isLightMode);
+        if (session.isCleanMode !== undefined) setIsCleanMode(session.isCleanMode);
+        if (session.snapshots) setSnapshots(session.snapshots);
 
-      // Handle boolean flags safely
-      if (session.isLightMode !== undefined) setIsLightMode(session.isLightMode);
-      if (session.showSurface !== undefined) setShowSurface(session.showSurface);
-      if (session.showLigands !== undefined) setShowLigands(session.showLigands);
-      if (session.isSpinning !== undefined) setIsSpinning(session.isSpinning);
-      if (session.isCleanMode !== undefined) setIsCleanMode(session.isCleanMode);
+        if (Array.isArray(session.viewports)) {
+          session.viewports.forEach((vp: any, index: number) => {
+            if (index < controllers.length) {
+              const ctrl = controllers[index];
+              if (vp.pdbId) ctrl.setPdbId(vp.pdbId);
+              if (vp.representation) ctrl.setRepresentation(vp.representation);
+              if (vp.coloring) ctrl.setColoring(vp.coloring);
+              if (vp.showSurface !== undefined) ctrl.setShowSurface(vp.showSurface);
+              if (vp.showLigands !== undefined) ctrl.setShowLigands(vp.showLigands);
+              if (vp.showIons !== undefined) ctrl.setShowIons(vp.showIons);
+              if (vp.isSpinning !== undefined) ctrl.setIsSpinning(vp.isSpinning);
+              if (vp.customColors) ctrl.setCustomColors(vp.customColors);
+              if (vp.customBackgroundColor) ctrl.setCustomBackgroundColor(vp.customBackgroundColor);
+              if (vp.measurements) ctrl.setMeasurements(vp.measurements);
 
-      if (session.customColors) setCustomColors(session.customColors);
-      if (session.snapshots) setSnapshots(session.snapshots);
+              // Orientation
+              if (vp.orientation) {
+                setTimeout(() => {
+                  viewerRefs[index].current?.setCameraOrientation(vp.orientation);
+                }, 1500); // Delay to allow loading
+              }
+            }
+          });
+        }
+        success("Multi-view session loaded ✓");
 
+      } else {
+        // Load Legacy Format (Version 1 or implicit)
+        // Assume it applies to Viewport 0
+        const ctrl = controllers[0];
 
-      if (session.orientation) {
-        setTimeout(() => {
-          viewerRef.current?.setCameraOrientation(session.orientation);
-        }, 1500);
+        if (session.pdbId) ctrl.setPdbId(session.pdbId);
+        if (session.representation) ctrl.setRepresentation(session.representation);
+        if (session.coloring) ctrl.setColoring(session.coloring);
+
+        // Handle boolean flags safely
+        if (session.isLightMode !== undefined) setIsLightMode(session.isLightMode);
+        if (session.showSurface !== undefined) ctrl.setShowSurface(session.showSurface);
+        if (session.showLigands !== undefined) ctrl.setShowLigands(session.showLigands);
+        if (session.isSpinning !== undefined) ctrl.setIsSpinning(session.isSpinning);
+        if (session.isCleanMode !== undefined) setIsCleanMode(session.isCleanMode);
+
+        if (session.customColors) ctrl.setCustomColors(session.customColors);
+        if (session.snapshots) setSnapshots(session.snapshots);
+
+        if (session.orientation) {
+          setTimeout(() => {
+            viewerRefs[0].current?.setCameraOrientation(session.orientation);
+          }, 1500);
+        }
+        success("Session loaded ✓");
       }
+
     } catch (error) {
       console.error("Failed to load session:", error);
       alert("Failed to load session file");
@@ -1681,17 +1731,19 @@ function App() {
           });
         }}
         getShareableLink={() => {
-          return getShareableURL({
-            pdbId,
-            representation,
-            coloring,
-            isSpinning,
-            showLigands,
-            showSurface,
-            customColors,
-            customBackgroundColor,
-            orientation: viewerRef.current?.getCameraOrientation()
-          });
+          return getShareableURL(viewMode, controllers.map((ctrl, index) => ({
+            pdbId: ctrl.pdbId,
+            representation: ctrl.representation,
+            coloring: ctrl.coloring,
+            isSpinning: ctrl.isSpinning,
+            showLigands: ctrl.showLigands,
+            showSurface: ctrl.showSurface,
+            showIons: ctrl.showIons,
+            customColors: ctrl.customColors,
+            customBackgroundColor: ctrl.customBackgroundColor,
+            dataSource: ctrl.dataSource,
+            orientation: viewerRefs[index].current?.getCameraOrientation()
+          })));
         }}
         pdbMetadata={pdbMetadata}
         getLigandInteractions={async () => {
@@ -1706,18 +1758,19 @@ function App() {
       <ShareModal
         isOpen={showShareModal}
         onClose={() => setShowShareModal(false)}
-        shareUrl={getShareableURL({
-          pdbId,
-          representation,
-          coloring,
-          isSpinning,
-          showLigands,
-          showSurface,
-          customColors,
-          customBackgroundColor,
-          dataSource,
-          orientation: viewerRef.current?.getCameraOrientation()
-        })}
+        shareUrl={getShareableURL(viewMode, controllers.map((ctrl, index) => ({
+          pdbId: ctrl.pdbId,
+          representation: ctrl.representation,
+          coloring: ctrl.coloring,
+          isSpinning: ctrl.isSpinning,
+          showLigands: ctrl.showLigands,
+          showSurface: ctrl.showSurface,
+          showIons: ctrl.showIons,
+          customColors: ctrl.customColors,
+          customBackgroundColor: ctrl.customBackgroundColor,
+          dataSource: ctrl.dataSource,
+          orientation: viewerRefs[index].current?.getCameraOrientation()
+        })))}
         isLightMode={isLightMode}
       />
 

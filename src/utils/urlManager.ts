@@ -15,63 +15,80 @@ export interface AppState {
     dataSource?: 'pdb' | 'pubchem'; // Added for chemical structures
 }
 
+export interface MultiViewState {
+    viewMode: 'single' | 'dual' | 'triple' | 'quad';
+    viewports: Partial<AppState>[];
+}
+
 /**
- * Serializes the current app state into a compact Base64 strings or query params.
- * Using Base64 helps avoid issues with special characters in JSON.
+ * Serializes the current app state (single or multi-view) into a URL.
  */
-export const getShareableURL = (state: AppState): string => {
+export const getShareableURL = (viewMode: string, viewports: AppState[]): string => {
     const params = new URLSearchParams();
 
-    // 1. Basic Params
-    params.set('pdb', state.pdbId || '');
-    params.set('rep', state.representation);
-    params.set('color', state.coloring);
-    if (state.dataSource && state.dataSource !== 'pdb') {
-        params.set('src', state.dataSource); // Only set if non-default
+    // Set View Mode if not single
+    if (viewMode !== 'single') {
+        params.set('view', viewMode);
     }
 
-    // 2. Boolean Flags (Compact: 1/0)
-    if (state.isSpinning) params.set('spin', '1');
-    if (state.showLigands) params.set('lig', '1');
-    if (state.showSurface) params.set('surf', '1');
+    // Helper to set params with optional prefix
+    const setParams = (prefix: string, state: AppState) => {
+        const p = (key: string) => prefix ? `${prefix}_${key}` : key;
 
-    // 3. Camera Orientation (Encoded JSON)
-    if (state.orientation) {
-        try {
-            const json = JSON.stringify(state.orientation);
-            const b64 = btoa(json); // Base64 encode
-            params.set('cam', b64);
-        } catch (e) {
-            console.warn("Failed to serialize camera orientation", e);
+        if (state.pdbId) params.set(p('pdb'), state.pdbId);
+        params.set(p('rep'), state.representation);
+        params.set(p('color'), state.coloring);
+
+        if (state.dataSource && state.dataSource !== 'pdb') {
+            params.set(p('src'), state.dataSource);
         }
-    }
 
-    // 4. Custom Colors (Encoded JSON)
-    if (state.customColors && state.customColors.length > 0) {
-        try {
-            const json = JSON.stringify(state.customColors);
-            const b64 = btoa(json);
-            params.set('cust', b64);
-        } catch (e) { console.warn("Failed to serialize custom colors", e); }
-    }
+        if (state.isSpinning) params.set(p('spin'), '1');
+        if (state.showLigands) params.set(p('lig'), '1');
+        if (state.showSurface) params.set(p('surf'), '1');
 
-    // 5. Measurements (Encoded JSON)
-    if (state.measurements && state.measurements.length > 0) {
-        try {
-            // Simplify measurement data to essential IDs to save space
-            const minimalData = state.measurements.map(m => ({
-                a1: { c: m.atom1.chain, r: m.atom1.resNo, a: m.atom1.atomName },
-                a2: { c: m.atom2.chain, r: m.atom2.resNo, a: m.atom2.atomName }
-            }));
-            const json = JSON.stringify(minimalData);
-            const b64 = btoa(json);
-            params.set('meas', b64);
-        } catch (e) { console.warn("Failed to serialize measurements", e); }
-    }
+        if (state.orientation) {
+            try {
+                const b64 = btoa(JSON.stringify(state.orientation));
+                params.set(p('cam'), b64);
+            } catch (e) { console.warn("Serialization warning", e); }
+        }
 
-    // 6. Custom Background
-    if (state.customBackgroundColor) {
-        params.set('bg', encodeURIComponent(state.customBackgroundColor));
+        if (state.customColors && state.customColors.length > 0) {
+            try {
+                const b64 = btoa(JSON.stringify(state.customColors));
+                params.set(p('cust'), b64);
+            } catch (e) { }
+        }
+
+        if (state.measurements && state.measurements.length > 0) {
+            try {
+                const minimalData = state.measurements.map(m => ({
+                    a1: { c: m.atom1.chain, r: m.atom1.resNo, a: m.atom1.atomName },
+                    a2: { c: m.atom2.chain, r: m.atom2.resNo, a: m.atom2.atomName }
+                }));
+                const b64 = btoa(JSON.stringify(minimalData));
+                params.set(p('meas'), b64);
+            } catch (e) { }
+        }
+
+        if (state.customBackgroundColor) {
+            params.set(p('bg'), encodeURIComponent(state.customBackgroundColor));
+        }
+    };
+
+    // Encode states
+    if (viewMode === 'single') {
+        // Legacy/Simple format (no prefix)
+        if (viewports[0]) setParams('', viewports[0]);
+    } else {
+        // Multi-view format (v0_, v1_, etc.)
+        viewports.forEach((vp, index) => {
+            // Only save if it has content (pdbId)
+            if (vp.pdbId) {
+                setParams(`v${index}`, vp);
+            }
+        });
     }
 
     const url = new URL(window.location.href);
@@ -81,71 +98,83 @@ export const getShareableURL = (state: AppState): string => {
 
 /**
  * Parses the current URL search parameters to restore state.
+ * Returns a MultiViewState object.
  */
-export const parseURLState = (): Partial<AppState> => {
+export const parseURLState = (): MultiViewState => {
     const params = new URLSearchParams(window.location.search);
-    const state: Partial<AppState> = {};
 
-    // 1. Basic Params
-    const pdb = params.get('pdb');
-    if (pdb) state.pdbId = pdb;
+    const viewMode = (params.get('view') as any) || 'single';
+    const viewports: Partial<AppState>[] = [];
 
-    const rep = params.get('rep');
-    if (rep) state.representation = rep as RepresentationType;
+    // Helper to parse params with optional prefix
+    const parseParams = (prefix: string): Partial<AppState> | null => {
+        const p = (key: string) => prefix ? `${prefix}_${key}` : key;
+        const state: Partial<AppState> = {};
 
-    const color = params.get('color');
-    if (color) state.coloring = color as ColoringType;
+        const pdb = params.get(p('pdb'));
+        if (!pdb) return null; // No PDB = empty viewport (unless we want to support empty views?)
 
-    // Data Source (default to 'pdb' if not specified)
-    const src = params.get('src');
-    if (src === 'pubchem') state.dataSource = 'pubchem';
-    else state.dataSource = 'pdb';
+        state.pdbId = pdb;
+        state.representation = (params.get(p('rep')) as any) || 'cartoon';
+        state.coloring = (params.get(p('color')) as any) || 'chainid';
 
-    // 2. Boolean Flags
-    if (params.get('spin') === '1') state.isSpinning = true;
-    if (params.get('lig') === '1') state.showLigands = true;
-    if (params.get('surf') === '1') state.showSurface = true;
+        const src = params.get(p('src'));
+        state.dataSource = (src === 'pubchem') ? 'pubchem' : 'pdb';
 
-    // 3. Camera Orientation
-    const cam = params.get('cam');
-    if (cam) {
-        try {
-            const json = atob(cam);
-            state.orientation = JSON.parse(json);
-        } catch (e) {
-            console.warn("Failed to parse camera orientation from URL", e);
+        if (params.get(p('spin')) === '1') state.isSpinning = true;
+        if (params.get(p('lig')) === '1') state.showLigands = true;
+        if (params.get(p('surf')) === '1') state.showSurface = true;
+
+        const cam = params.get(p('cam'));
+        if (cam) {
+            try { state.orientation = JSON.parse(atob(cam)); } catch (e) { }
+        }
+
+        const cust = params.get(p('cust'));
+        if (cust) {
+            try { state.customColors = JSON.parse(atob(cust)); } catch (e) { }
+        }
+
+        const meas = params.get(p('meas'));
+        if (meas) {
+            try {
+                const minimalData = JSON.parse(atob(meas));
+                state.measurements = minimalData.map((m: any) => ({
+                    atom1: { chain: m.a1.c, resNo: m.a1.r, atomName: m.a1.a },
+                    atom2: { chain: m.a2.c, resNo: m.a2.r, atomName: m.a2.a },
+                    distance: 0
+                }));
+            } catch (e) { }
+        }
+
+        const bg = params.get(p('bg'));
+        if (bg) state.customBackgroundColor = decodeURIComponent(bg);
+
+        return state;
+    };
+
+    if (viewMode === 'single') {
+        const vp = parseParams(''); // Try legacy format
+        if (vp) viewports[0] = vp;
+    } else {
+        // Try parsing v0 to v3
+        for (let i = 0; i < 4; i++) {
+            const vp = parseParams(`v${i}`);
+            // If it's a valid view mode, we might want to respect the slot even if empty?
+            // But parseParams returns null if no PDB. 
+            // Let's populate the array with what we found.
+            // If explicit holes are needed, we'd need a stronger signal in URL.
+            // For now, index-based mapping is crucial.
+            if (vp) viewports[i] = vp;
+            else viewports[i] = {}; // Empty slot
         }
     }
 
-    // 4. Custom Colors
-    const cust = params.get('cust');
-    if (cust) {
-        try {
-            const json = atob(cust);
-            state.customColors = JSON.parse(json);
-        } catch (e) { console.warn("Failed to parse custom colors", e); }
-    }
+    // Default cleanup: ensure at least one empty object if nothing parsed
+    if (viewports.length === 0) viewports.push({});
 
-    // 5. Measurements
-    const meas = params.get('meas');
-    if (meas) {
-        try {
-            const json = atob(meas);
-            const minimalData = JSON.parse(json);
-            // Rehydrate to expected format (partial)
-            state.measurements = minimalData.map((m: any) => ({
-                atom1: { chain: m.a1.c, resNo: m.a1.r, atomName: m.a1.a },
-                atom2: { chain: m.a2.c, resNo: m.a2.r, atomName: m.a2.a },
-                distance: 0 // Will be recalculated by viewer
-            }));
-        } catch (e) { console.warn("Failed to parse measurements", e); }
-    }
-
-    // 6. Custom Background
-    const bg = params.get('bg');
-    if (bg) {
-        state.customBackgroundColor = decodeURIComponent(bg);
-    }
-
-    return state;
+    return {
+        viewMode,
+        viewports
+    };
 };
