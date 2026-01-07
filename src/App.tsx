@@ -28,6 +28,7 @@ import { useToast } from './hooks/useToast';
 import { FavoritesPanel } from './components/FavoritesPanel';
 import { useFavorites } from './hooks/useFavorites';
 import { useHistory } from './hooks/useHistory';
+import { useVisualStack, type VisualState } from './hooks/useVisualStack';
 
 function App() {
   const viewerRef = useRef<ProteinViewerRef>(null);
@@ -183,7 +184,35 @@ function App() {
   const [customBackgroundColor, setCustomBackgroundColor] = useState<string | null>(initialUrlState.customBackgroundColor || null);
   const [showLigands, setShowLigands] = useState(initialUrlState.showLigands || false);
   const [showIons, setShowIons] = useState(false);
+
   const [showSurface, setShowSurface] = useState(initialUrlState.showSurface || false);
+
+  // Undo/Redo Stack
+  const visualState: VisualState = useMemo(() => ({
+    representation,
+    coloring,
+    colorPalette,
+    showLigands,
+    showIons,
+    showSurface,
+    customBackgroundColor: customBackgroundColor || ''
+  }), [representation, coloring, colorPalette, showLigands, showIons, showSurface, customBackgroundColor]);
+
+  const handleVisualStateChange = useCallback((newState: VisualState) => {
+    setRepresentation(newState.representation);
+    setColoring(newState.coloring);
+    setColorPalette(newState.colorPalette);
+    setShowLigands(newState.showLigands);
+    setShowIons(newState.showIons);
+    setShowSurface(newState.showSurface);
+    setCustomBackgroundColor(newState.customBackgroundColor || null);
+  }, []);
+
+  const { undo, redo, canUndo, canRedo } = useVisualStack({
+    state: visualState,
+    onChange: handleVisualStateChange,
+    resetTrigger: pdbId // Reset stack when PDB ID changes to avoid cross-structure confusing undos
+  });
 
   // ... (lines 53-343) ...
 
@@ -1367,6 +1396,12 @@ function App() {
             isFavorite={isFavorite(pdbId, dataSource)}
             onOpenFavorites={() => setIsFavoritesOpen(true)}
             history={history}
+
+            // Undo/Redo
+            onUndo={undo}
+            onRedo={redo}
+            canUndo={canUndo}
+            canRedo={canRedo}
           />
         );
       })()}

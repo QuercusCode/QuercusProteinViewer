@@ -32,7 +32,9 @@ import {
     Share2,
     ScanSearch, // Added Icon
     Star,
-    Clock
+    Clock,
+    Undo2,
+    Redo2
 } from 'lucide-react';
 import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, PDBMetadata } from '../types';
 import type { DataSource } from '../utils/pdbUtils';
@@ -338,6 +340,10 @@ interface ControlsProps {
     onToggleFavorite?: () => void;
     isFavorite?: boolean;
     onOpenFavorites?: () => void;
+    onUndo?: () => void;
+    onRedo?: () => void;
+    canUndo?: boolean;
+    canRedo?: boolean;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -411,7 +417,11 @@ export const Controls: React.FC<ControlsProps> = ({
     onToggleFavorite,
     isFavorite,
     onOpenFavorites,
-    history = []
+    history = [],
+    onUndo,
+    onRedo,
+    canUndo,
+    canRedo
 }) => {
     // Motif Search State
     const [searchPattern, setSearchPattern] = useState('');
@@ -622,6 +632,32 @@ export const Controls: React.FC<ControlsProps> = ({
                         </div>
 
                         <div className="flex items-center gap-2">
+                            {onUndo && onRedo && (
+                                <div className="flex items-center bg-neutral-100 dark:bg-neutral-800 rounded-lg p-0.5 mr-1 border border-black/5 dark:border-white/5">
+                                    <button
+                                        onClick={onUndo}
+                                        disabled={!canUndo}
+                                        className={`p-1.5 rounded-md transition-all ${!canUndo
+                                            ? 'opacity-30 cursor-not-allowed'
+                                            : 'hover:bg-white dark:hover:bg-neutral-700 hover:shadow-sm text-neutral-600 dark:text-neutral-300'
+                                            }`}
+                                        title="Undo"
+                                    >
+                                        <Undo2 className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        onClick={onRedo}
+                                        disabled={!canRedo}
+                                        className={`p-1.5 rounded-md transition-all ${!canRedo
+                                            ? 'opacity-30 cursor-not-allowed'
+                                            : 'hover:bg-white dark:hover:bg-neutral-700 hover:shadow-sm text-neutral-600 dark:text-neutral-300'
+                                            }`}
+                                        title="Redo"
+                                    >
+                                        <Redo2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            )}
 
                             <button
                                 onClick={onStartTour}
