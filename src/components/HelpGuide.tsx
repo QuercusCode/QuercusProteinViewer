@@ -20,8 +20,9 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
     React.useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape' && isOpen) setIsOpen(false);
-            if (e.key === '?' && !isOpen) {
+            if ((e.key === '?' || e.key === '/') && !isOpen) {
                 if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLSelectElement) return;
+                setActiveTab('shortcuts');
                 setIsOpen(true);
             }
         };
