@@ -23,9 +23,12 @@ import {
   Share2, Save, FolderOpen, Video, Ruler, Maximize2
 } from 'lucide-react';
 import { startOnboardingTour } from './components/TourGuide';
+import { ToastContainer } from './components/Toast';
+import { useToast } from './hooks/useToast';
 
 function App() {
   const viewerRef = useRef<ProteinViewerRef>(null);
+  const { toasts, removeToast, success, error, info } = useToast();
   // Parse Global URL State Once
   const initialUrlState = parseURLState();
 
@@ -439,6 +442,7 @@ function App() {
   const handleRecordMovie = async (duration: number = 4000) => {
     if (viewerRef.current && !isRecording) {
       setIsRecording(true);
+      info('Recording movie...');
       try {
         const blob = await viewerRef.current.recordTurntable(duration);
 
@@ -456,10 +460,11 @@ function App() {
         };
 
         setMovies(prev => [newMovie, ...prev]);
+        success('Movie recorded ✓');
 
       } catch (e: any) {
         console.error("Recording failed", e);
-        alert(`Recording failed: ${e.message || e.toString() || "Unknown error"}`);
+        error(`Recording failed: ${e.message || 'Unknown error'}`);
       } finally {
         setIsRecording(false);
       }
@@ -626,6 +631,9 @@ function App() {
         timestamp: Date.now()
       };
       setSnapshots(prev => [newSnapshot, ...prev]);
+      success('Snapshot captured ✓');
+    } else {
+      error('Failed to capture snapshot');
     }
   };
 
@@ -636,6 +644,7 @@ function App() {
       link.href = snapshot.url;
       link.download = `snapshot-${pdbId || 'structure'}-${snapshot.id.slice(0, 4)}.png`;
       link.click();
+      success('Snapshot downloaded ✓');
     }
   };
 
@@ -1435,6 +1444,8 @@ function App() {
         coloring={coloring}
         colorPalette={colorPalette}
       />
+
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
 
       <HelpGuide isVisible={!isMobileSidebarOpen} />
 
