@@ -41,8 +41,10 @@ export const startOnboardingTour = (onComplete?: () => void, onHighlight?: (elem
         {
             element: '#analysis-tools',
             popover: {
-                title: 'Analysis Tools',
-                description: 'Measure distances, view contact maps, or inspect specific properties.'
+                title: isChemical ? 'Analysis & Properties' : 'Analysis Tools',
+                description: isChemical
+                    ? 'Inspect calculated chemical properties (Lipophilicity, H-Bonds) and measure atomic distances.'
+                    : 'Measure distances, view contact maps, or inspect specific properties.'
             }
         },
         // Protein Only Steps
