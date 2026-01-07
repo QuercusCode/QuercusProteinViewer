@@ -161,9 +161,12 @@ function App() {
   };
 
   const handleStartTour = () => {
+    // Determine context (simple check based on dataSource or explicit logic)
+    const isChemical = dataSource === 'pubchem';
+
     startOnboardingTour(() => {
       localStorage.setItem('hasSeenViewerTour', 'true');
-    }, handleTourHighlight);
+    }, handleTourHighlight, isChemical);
   };
 
   // Custom Colors need to be initialized too
