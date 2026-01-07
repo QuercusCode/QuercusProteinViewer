@@ -261,7 +261,7 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
             {/* Trigger Button */}
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed top-4 right-4 z-[60] p-2 bg-neutral-900/80 text-neutral-400 hover:text-white rounded-full border border-white/10 shadow-lg backdrop-blur-md transition-all hover:scale-105 group"
+                className="fixed top-4 right-[27px] z-[60] p-2 bg-neutral-900/80 text-neutral-400 hover:text-white rounded-full border border-white/10 shadow-lg backdrop-blur-md transition-all hover:scale-105 group"
                 title="Viewer Controls & Help"
             >
                 <CircleHelp className="w-6 h-6 group-hover:rotate-12 transition-transform" />
