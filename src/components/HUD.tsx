@@ -29,10 +29,10 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode }: HUDProp
     // Position at bottom center to avoid interfering with any viewports
 
     return (
-        <div className={`absolute bottom-12 md:bottom-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none select-none transition-all duration-300 font-sans`}>
+        <div className={`absolute bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none select-none transition-all duration-300 font-sans`}>
 
             {/* Minimal Capsule */}
-            <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-4 py-1.5 flex items-center justify-center min-w-[120px]`}>
+            <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-3 md:px-4 py-1 md:py-1.5 flex items-center justify-center min-w-[100px] md:min-w-[120px]`}>
 
                 {hoveredResidue ? (
                     <div className="flex items-center gap-3 animate-in fade-in duration-200">
