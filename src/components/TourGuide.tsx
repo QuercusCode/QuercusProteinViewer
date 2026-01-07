@@ -47,7 +47,8 @@ export const startOnboardingTour = (onComplete?: () => void, onHighlight?: (elem
                     : 'Measure distances, view contact maps, or inspect specific properties.'
             }
         },
-        {
+        // Sequence Track (Atom List) - Desktop Only
+        ...(window.innerWidth >= 768 ? [{
             element: '#sequence-track',
             popover: {
                 title: isChemical ? 'Atom List' : 'Sequence Track',
@@ -57,7 +58,7 @@ export const startOnboardingTour = (onComplete?: () => void, onHighlight?: (elem
                 side: 'left' as const,
                 align: 'center' as const
             }
-        },
+        }] : []),
         // Protein Only Steps
         ...(!isChemical ? [
             {
