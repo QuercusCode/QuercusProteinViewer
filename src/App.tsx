@@ -1264,6 +1264,7 @@ function App() {
         history={history}
         isOpen={isFavoritesOpen}
         initialTab={favoritesTab}
+        showTabs={false}
         onClose={() => setIsFavoritesOpen(false)}
         onSelect={(id, dataSource) => {
           setIsFavoritesOpen(false);

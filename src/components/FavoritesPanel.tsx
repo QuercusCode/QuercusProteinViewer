@@ -7,7 +7,9 @@ interface FavoritesPanelProps {
     favorites: Favorite[];
     history?: HistoryItem[];
     isOpen: boolean;
+
     initialTab?: 'favorites' | 'history';
+    showTabs?: boolean;
     onClose: () => void;
     onSelect: (id: string, dataSource: 'pdb' | 'pubchem') => void;
     onRemove: (id: string, dataSource: 'pdb' | 'pubchem') => void;
@@ -22,9 +24,16 @@ export const FavoritesPanel: React.FC<FavoritesPanelProps> = ({
     onSelect,
     onRemove,
     isLightMode,
+
     initialTab = 'favorites',
+    showTabs = true,
 }) => {
     const [activeTab, setActiveTab] = useState<'favorites' | 'history'>(initialTab);
+
+    // Sync active tab with prop (for external switching)
+    React.useEffect(() => {
+        setActiveTab(initialTab);
+    }, [initialTab]);
 
     if (!isOpen) return null;
 
@@ -47,30 +56,48 @@ export const FavoritesPanel: React.FC<FavoritesPanelProps> = ({
 
                 {/* Header */}
                 <div className={`flex items-center justify-between px-6 py-4 border-b ${borderColor}`}>
-                    <div className="flex gap-4">
-                        <button
-                            onClick={() => setActiveTab('favorites')}
-                            className={`flex items-center gap-2 pb-1 border-b-2 transition-all ${activeTab === 'favorites'
-                                ? `border-yellow-500 ${textColor}`
-                                : 'border-transparent text-neutral-500 hover:text-neutral-400'
-                                }`}
-                        >
-                            <Star className={`w-5 h-5 ${activeTab === 'favorites' ? 'text-yellow-500 fill-yellow-500' : ''}`} />
-                            <h2 className="text-lg font-bold">Favorites</h2>
-                            <span className="text-xs opacity-60">({favorites.length})</span>
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('history')}
-                            className={`flex items-center gap-2 pb-1 border-b-2 transition-all ${activeTab === 'history'
-                                ? `border-blue-500 ${textColor}`
-                                : 'border-transparent text-neutral-500 hover:text-neutral-400'
-                                }`}
-                        >
-                            <History className={`w-5 h-5 ${activeTab === 'history' ? 'text-blue-500' : ''}`} />
-                            <h2 className="text-lg font-bold">History</h2>
-                            <span className="text-xs opacity-60">({history.length})</span>
-                        </button>
-                    </div>
+                    {showTabs ? (
+                        <div className="flex gap-4">
+                            <button
+                                onClick={() => setActiveTab('favorites')}
+                                className={`flex items-center gap-2 pb-1 border-b-2 transition-all ${activeTab === 'favorites'
+                                    ? `border-yellow-500 ${textColor}`
+                                    : 'border-transparent text-neutral-500 hover:text-neutral-400'
+                                    }`}
+                            >
+                                <Star className={`w-5 h-5 ${activeTab === 'favorites' ? 'text-yellow-500 fill-yellow-500' : ''}`} />
+                                <h2 className="text-lg font-bold">Favorites</h2>
+                                <span className="text-xs opacity-60">({favorites.length})</span>
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('history')}
+                                className={`flex items-center gap-2 pb-1 border-b-2 transition-all ${activeTab === 'history'
+                                    ? `border-blue-500 ${textColor}`
+                                    : 'border-transparent text-neutral-500 hover:text-neutral-400'
+                                    }`}
+                            >
+                                <History className={`w-5 h-5 ${activeTab === 'history' ? 'text-blue-500' : ''}`} />
+                                <h2 className="text-lg font-bold">History</h2>
+                                <span className="text-xs opacity-60">({history.length})</span>
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex gap-4 items-center">
+                            {activeTab === 'favorites' ? (
+                                <div className={`flex items-center gap-2 pb-1 border-b-2 border-transparent ${textColor}`}>
+                                    <Star className="w-5 h-5 text-yellow-500 fill-yellow-500" />
+                                    <h2 className="text-lg font-bold">Favorites</h2>
+                                    <span className="text-xs opacity-60">({favorites.length})</span>
+                                </div>
+                            ) : (
+                                <div className={`flex items-center gap-2 pb-1 border-b-2 border-transparent ${textColor}`}>
+                                    <History className="w-5 h-5 text-blue-500" />
+                                    <h2 className="text-lg font-bold">History</h2>
+                                    <span className="text-xs opacity-60">({history.length})</span>
+                                </div>
+                            )}
+                        </div>
+                    )}
                     <button
                         onClick={onClose}
                         className={`p-2 rounded-lg transition-colors ${hoverBg}`}
