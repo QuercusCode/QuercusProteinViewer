@@ -1622,13 +1622,19 @@ function App() {
 
                           <div className="flex items-center justify-center gap-3 pt-4">
                             <button
-                              onClick={() => setIsLibraryOpen(true)}
+                              onClick={() => {
+                                setActiveViewIndex(index);
+                                setIsLibraryOpen(true);
+                              }}
                               className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-900/20"
                             >
                               <BookOpen className="w-4 h-4" />
                               Browse Library
                             </button>
-                            <label className="flex items-center gap-2 px-5 py-2.5 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl font-medium transition-all hover:scale-105 active:scale-95 cursor-pointer border border-white/10 hover:border-white/20">
+                            <label
+                              onClick={() => setActiveViewIndex(index)}
+                              className="flex items-center gap-2 px-5 py-2.5 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl font-medium transition-all hover:scale-105 active:scale-95 cursor-pointer border border-white/10 hover:border-white/20"
+                            >
                               <Upload className="w-4 h-4" />
                               Upload File
                               <input
@@ -1637,9 +1643,10 @@ function App() {
                                 accept=".pdb,.cif,.ent,.mol,.sdf,.mol2,.xyz"
                                 onChange={(e) => {
                                   if (e.target.files?.[0]) {
-                                    handleUpload(e.target.files[0]);
-                                    // Also set active index?? Actually handleUpload uses activeController
-                                    if (activeViewIndex !== index) setActiveViewIndex(index);
+                                    // Set this viewport as active
+                                    setActiveViewIndex(index);
+                                    // Use the specific controller for this viewport
+                                    ctrl.handleUpload(e.target.files[0]);
                                   }
                                 }}
                               />
