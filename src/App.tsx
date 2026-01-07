@@ -1668,7 +1668,7 @@ function App() {
 
                           {viewMode === 'single' && (
                             <div className="pt-8 text-xs text-neutral-600 font-mono">
-                              <p>Or enter a PDB ID (e.g., <span className="text-neutral-400">1crn</span>) in the sidebar.</p>
+                              <p>Or enter a PDB ID or Chemical Name (e.g., <span className="text-neutral-400">Aspirin</span>) in the sidebar.</p>
                             </div>
                           )}
                         </div>
