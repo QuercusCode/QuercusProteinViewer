@@ -155,9 +155,9 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
     const isAtomView = activeChain.atoms && activeChain.atoms.length > 0;
 
     return (
-        <div id={id} className={`hidden md:flex fixed top-16 right-4 bottom-4 w-24 rounded-xl z-40 transition-transform duration-300 transform translate-x-0
-            ${isLightMode ? 'bg-white/90 border border-neutral-300 shadow-xl' : 'bg-black/60 border border-neutral-700 shadow-2xl'} 
-            backdrop-blur-md flex-col overflow-hidden`}>
+        <div id={id} className={`hidden md:flex relative h-full w-24 rounded-none shrink-0 z-10 border-l
+            ${isLightMode ? 'bg-white border-neutral-300' : 'bg-black/90 border-neutral-700'} 
+            flex-col overflow-hidden`}>
 
             {/* Header / Tabs - Compact Vertical */}
             <div className={`flex flex-col items-center pt-3 pb-2 gap-2 border-b ${isLightMode ? 'border-neutral-200 bg-white/50' : 'border-neutral-800 bg-black/50'} z-10 flex-shrink-0 backdrop-blur-md`}>

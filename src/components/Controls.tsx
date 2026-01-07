@@ -620,8 +620,8 @@ export const Controls: React.FC<ControlsProps> = ({
                 transition-transform duration-300 ease-in-out
                 flex flex-col
                 ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-                md:translate-x-0 md:top-4 md:left-4 md:h-[calc(100vh-2rem)] md:rounded-xl md:z-10
-                ${isLightMode ? 'bg-white border-neutral-900 shadow-none' : 'bg-neutral-900/80 border-white/10 md:shadow-2xl'}
+                md:relative md:translate-x-0 md:h-full md:w-80 md:rounded-none md:z-10 md:shrink-0
+                ${isLightMode ? 'bg-white border-neutral-900 shadow-none' : 'bg-neutral-900/80 border-white/10 md:bg-neutral-900 md:shadow-none'}
             `}>
                 {/* Header - Fixed */}
                 <div className="flex-none p-4 pb-2 relative">

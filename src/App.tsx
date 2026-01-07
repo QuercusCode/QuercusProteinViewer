@@ -1545,6 +1545,19 @@ function App() {
             </div>
           </div>
         )}
+
+        {/* Right Sidebar: Sequence Track */}
+        <SequenceTrack
+          id="sequence-track"
+          chains={chains}
+          highlightedResidue={highlightedResidue}
+          onHoverResidue={() => { }}
+          onClickResidue={(chain, resNo) => viewerRef.current?.focusResidue(chain, resNo)}
+          onClickAtom={(serial) => viewerRef.current?.highlightAtom(serial)}
+          isLightMode={isLightMode}
+          coloring={coloring}
+          colorPalette={colorPalette}
+        />
       </div>
 
       <ContactMap
@@ -1609,17 +1622,7 @@ function App() {
         isLightMode={isLightMode}
       />
 
-      <SequenceTrack
-        id="sequence-track"
-        chains={chains}
-        highlightedResidue={highlightedResidue}
-        onHoverResidue={() => { }} // Hover disabled per user request
-        onClickResidue={(chain, resNo) => viewerRef.current?.focusResidue(chain, resNo)}
-        onClickAtom={(serial) => viewerRef.current?.highlightAtom(serial)}
-        isLightMode={isLightMode}
-        coloring={coloring}
-        colorPalette={colorPalette}
-      />
+
 
       <ToastContainer toasts={toasts} onRemove={removeToast} />
 
