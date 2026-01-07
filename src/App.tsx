@@ -1356,6 +1356,7 @@ function App() {
             onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
             onToggleFavorite={() => toggleFavorite(pdbId, dataSource, proteinTitle || undefined)}
             isFavorite={isFavorite(pdbId, dataSource)}
+            onOpenFavorites={() => setIsFavoritesOpen(true)}
           />
         );
       })()}

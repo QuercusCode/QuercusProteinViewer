@@ -332,6 +332,7 @@ interface ControlsProps {
     // Favorites
     onToggleFavorite?: () => void;
     isFavorite?: boolean;
+    onOpenFavorites?: () => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -403,7 +404,8 @@ export const Controls: React.FC<ControlsProps> = ({
     isMobileSidebarOpen = false,
     onToggleMobileSidebar,
     onToggleFavorite,
-    isFavorite
+    isFavorite,
+    onOpenFavorites
 }) => {
     // Motif Search State
     const [searchPattern, setSearchPattern] = useState('');
@@ -622,6 +624,15 @@ export const Controls: React.FC<ControlsProps> = ({
                             >
                                 <HelpCircle className="w-4 h-4" />
                             </button>
+                            {onOpenFavorites && (
+                                <button
+                                    onClick={onOpenFavorites}
+                                    className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-white border border-neutral-900 text-black hover:bg-neutral-100' : 'bg-neutral-800/80 text-neutral-400 hover:bg-neutral-700'}`}
+                                    title="View Favorites"
+                                >
+                                    <Star className="w-4 h-4" />
+                                </button>
+                            )}
                             <button
                                 onClick={onToggleLibrary}
                                 className={`p-2 rounded-full transition-colors ${isLightMode ? 'bg-white border border-neutral-900 text-black hover:bg-neutral-100' : 'bg-neutral-800/80 text-neutral-400 hover:bg-neutral-700'}`}
