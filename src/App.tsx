@@ -1435,16 +1435,17 @@ function App() {
                         ${isActive ? 'bg-[#1a1a1a] border-indigo-500/50' : 'bg-black border-[#222] opacity-60 hover:opacity-100'}
                       `}
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 relative z-10 pointer-events-none">
                         <div className={`w-2 h-2 rounded-full shadow-sm transition-all ${isActive ? 'bg-indigo-500 shadow-indigo-500/50 scale-110' : 'bg-neutral-700'}`} />
                         <span className={`text-[10px] font-bold uppercase tracking-widest ${isActive ? 'text-indigo-400' : 'text-neutral-500'}`}>
                           {viewportLabels[index]}
                         </span>
                       </div>
-                      <div className="flex items-center gap-3 flex-1 min-w-0 justify-center">
-                        <div className="relative group flex-1 min-w-0">
+
+                      <div className="absolute inset-0 flex items-center justify-center px-20 pointer-events-none">
+                        <div className="relative group flex justify-center pointer-events-auto max-w-full">
                           <span
-                            className="text-[10px] text-neutral-400 font-mono truncate max-w-full block"
+                            className="text-[10px] text-neutral-400 font-mono truncate block text-center"
                           >
                             {ctrl.proteinTitle || ctrl.pdbId || (ctrl.file ? ctrl.file.name : "No Structure")}
                           </span>
@@ -1452,6 +1453,9 @@ function App() {
                             {ctrl.proteinTitle || ctrl.pdbId || (ctrl.file ? ctrl.file.name : "No Structure")}
                           </div>
                         </div>
+                      </div>
+
+                      <div className="relative z-10 ml-auto">
                         <button
                           onClick={(e) => { e.stopPropagation(); ctrl.handleResetView(); }}
                           className="p-1 hover:bg-white/10 rounded text-neutral-500 hover:text-white transition-colors shrink-0"
