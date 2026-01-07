@@ -397,7 +397,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     type: 'png',
                     antialias: true,
                     trim: false,
-                    transparent: false
+                    transparent: true
                 });
             } catch (err) {
                 console.warn("High-res export failed, trying low-res fallback...", err);
@@ -407,7 +407,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         type: 'png',
                         antialias: true,
                         trim: false,
-                        transparent: false
+                        transparent: true
                     });
                 } catch (err2) {
                     console.error("Snapshot failed:", err2);

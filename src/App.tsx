@@ -1281,11 +1281,16 @@ function App() {
   return (
     <main
       className={`w-full h-full relative overflow-hidden transition-colors duration-300 ${customBackgroundColor === 'transparent'
-          ? 'text-white'
+          ? 'text-white bg-[#111]' // Dark base for checkerboard
           : isLightMode
             ? 'bg-slate-50 text-slate-900'
             : 'bg-neutral-950 text-white'
         }`}
+      style={customBackgroundColor === 'transparent' ? {
+        backgroundImage: 'linear-gradient(45deg, #222 25%, transparent 25%), linear-gradient(-45deg, #222 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #222 75%), linear-gradient(-45deg, transparent 75%, #222 75%)',
+        backgroundSize: '20px 20px',
+        backgroundPosition: '0 0, 0 10px, 10px -10px, -10px 0px'
+      } : {}}
       onDragOver={handleDragOver}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
