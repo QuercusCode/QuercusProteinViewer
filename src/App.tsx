@@ -1280,7 +1280,12 @@ function App() {
 
   return (
     <main
-      className={`w-full h-full relative overflow-hidden transition-colors duration-300 ${isLightMode ? 'bg-slate-50 text-slate-900' : 'bg-neutral-950 text-white'}`}
+      className={`w-full h-full relative overflow-hidden transition-colors duration-300 ${customBackgroundColor === 'transparent'
+          ? 'text-white'
+          : isLightMode
+            ? 'bg-slate-50 text-slate-900'
+            : 'bg-neutral-950 text-white'
+        }`}
       onDragOver={handleDragOver}
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
