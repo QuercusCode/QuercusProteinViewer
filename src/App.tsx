@@ -1698,6 +1698,7 @@ function App() {
                         measurements={ctrl.measurements}
                         onAddMeasurement={(m) => {
                           ctrl.setMeasurements([...ctrl.measurements, m]);
+                          ctrl.setIsMeasurementPanelOpen(true);
                           setActiveViewIndex(index);
                         }}
                         onHover={setHoveredResidue}
