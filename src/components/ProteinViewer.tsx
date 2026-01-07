@@ -1636,6 +1636,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     resNo: atom.resno,
                     resName: atom.resname,
                     atomIndex: atom.index,
+                    atomName: atom.atomname,
                     position: { x: atom.x, y: atom.y, z: atom.z }
                 };
 
