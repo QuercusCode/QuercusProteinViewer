@@ -40,33 +40,47 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
             content: (
                 <div className="space-y-6 intro-slide">
                     <div className="bg-neutral-800/50 p-4 rounded-xl border border-neutral-700/50">
-                        <h4 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
-                            <FileUp className="w-4 h-4 text-blue-400" /> Loading Structures
-                        </h4>
+                        <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm font-bold text-white flex items-center gap-2">
+                                <FileUp className="w-4 h-4 text-blue-400" /> Loading Structures
+                            </h4>
+                            <span className="bg-blue-500/10 text-blue-400 text-[10px] px-2 py-0.5 rounded-full border border-blue-500/20">Updated</span>
+                        </div>
                         <ul className="space-y-3 text-xs text-neutral-300">
                             <li className="flex gap-3">
                                 <span className="text-neutral-500 font-mono">01</span>
                                 <span>
                                     <strong className="text-white block">RCSB PDB</strong>
-                                    Enter a 4-character PDB ID (e.g., <code className="bg-neutral-800 px-1 rounded">2B3P</code>) to fetch directly from the database.
+                                    Enter a 4-character PDB ID (e.g., <code className="bg-neutral-800 px-1 rounded">2B3P</code>) to fetch directly.
                                 </span>
                             </li>
-
                             <li className="flex gap-3">
                                 <span className="text-neutral-500 font-mono">02</span>
                                 <span>
                                     <strong className="text-white block">PubChem</strong>
-                                    Load small molecules by CID (e.g., <code className="bg-neutral-800 px-1 rounded">2244</code> for Aspirin).
+                                    Load small molecules by CID (e.g., <code className="bg-neutral-800 px-1 rounded">2244</code>).
                                 </span>
                             </li>
                             <li className="flex gap-3">
                                 <span className="text-neutral-500 font-mono">03</span>
                                 <span>
-                                    <strong className="text-white block">Local Files</strong>
-                                    Drag and drop <code className="text-blue-300">.pdb</code>, <code className="text-blue-300">.sdf</code>, or <code className="text-blue-300">.mol</code> files anywhere on the screen.
+                                    <strong className="text-white block">Library</strong>
+                                    Browse our curated collection of interesting proteins and chemicals.
                                 </span>
                             </li>
                         </ul>
+                    </div>
+
+                    <div className="p-3 bg-purple-500/10 border border-purple-500/20 rounded-lg flex items-center gap-3">
+                        <div className="p-2 bg-purple-500/20 rounded-full">
+                            <Sparkles className="w-4 h-4 text-purple-400" />
+                        </div>
+                        <div>
+                            <h4 className="text-xs font-bold text-purple-400 mb-0.5">New: Interactive Tour</h4>
+                            <p className="text-[11px] text-neutral-300">
+                                Click "Start Tour" in the sidebar for a guided walkthrough of all features.
+                            </p>
+                        </div>
                     </div>
 
                     <div className="bg-neutral-800/50 p-4 rounded-xl border border-neutral-700/50">
@@ -96,9 +110,85 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
             )
         },
         {
+            id: 'layout',
+            title: 'Multi-View & Layout',
+            icon: Layers,
+            description: 'Compare structures side-by-side.',
+            content: (
+                <div className="space-y-6">
+                    <div className="bg-gradient-to-br from-indigo-500/10 to-blue-500/10 border border-indigo-500/20 p-4 rounded-xl">
+                        <h4 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                            <Layers className="w-4 h-4 text-indigo-400" /> Multi-View System
+                        </h4>
+                        <p className="text-xs text-neutral-300 mb-4 leading-relaxed">
+                            Visualize up to 4 structures simultaneously. Perfect for comparing mutants, binding sites, or different conformations.
+                        </p>
+                        <div className="grid grid-cols-2 gap-3 text-xs">
+                            <div className="bg-black/20 p-2 rounded border border-white/5 flex items-center gap-2">
+                                <div className="w-4 h-4 rounded bg-indigo-500/20 border border-indigo-500/50" />
+                                <span className="text-white">Single View</span>
+                            </div>
+                            <div className="bg-black/20 p-2 rounded border border-white/5 flex items-center gap-2">
+                                <div className="flex gap-0.5 w-4 h-4"><div className="w-full bg-indigo-500/20 border border-indigo-500/50" /><div className="w-full bg-indigo-500/20 border border-indigo-500/50" /></div>
+                                <span className="text-white">Side-by-Side</span>
+                            </div>
+                            <div className="bg-black/20 p-2 rounded border border-white/5 flex items-center gap-2">
+                                <div className="flex flex-col gap-0.5 w-4 h-4"><div className="h-full bg-indigo-500/20 border border-indigo-500/50" /><div className="flex gap-0.5 h-full"><div className="w-full bg-indigo-500/20 border border-indigo-500/50" /><div className="w-full bg-indigo-500/20 border border-indigo-500/50" /></div></div>
+                                <span className="text-white">Triple View</span>
+                            </div>
+                            <div className="bg-black/20 p-2 rounded border border-white/5 flex items-center gap-2">
+                                <div className="grid grid-cols-2 gap-0.5 w-4 h-4"><div className="bg-indigo-500/20 border border-indigo-500/50" /><div className="bg-indigo-500/20 border border-indigo-500/50" /><div className="bg-indigo-500/20 border border-indigo-500/50" /><div className="bg-indigo-500/20 border border-indigo-500/50" /></div>
+                                <span className="text-white">Quad Grid</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )
+        },
+        {
+            id: 'data',
+            title: 'History & Favorites',
+            icon: BookOpen,
+            description: 'Manage your saved structures.',
+            content: (
+                <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-neutral-800/50 p-3 rounded-lg border border-neutral-700/50">
+                            <h4 className="text-xs font-bold text-white mb-2 flex items-center gap-2">
+                                <span className="text-yellow-500">★</span> Favorites
+                            </h4>
+                            <p className="text-[11px] text-neutral-400">
+                                Click the star icon next to any structure name to save it to your local favorites for quick access.
+                            </p>
+                        </div>
+                        <div className="bg-neutral-800/50 p-3 rounded-lg border border-neutral-700/50">
+                            <h4 className="text-xs font-bold text-white mb-2 flex items-center gap-2">
+                                <span className="text-blue-400">🕒</span> History
+                            </h4>
+                            <p className="text-[11px] text-neutral-400">
+                                Usually revisit structures? We automatically keep track of your last 10 viewed items in the History tab.
+                            </p>
+                        </div>
+                    </div>
+                    <div className="bg-neutral-800/50 p-4 rounded-xl border border-neutral-700/50">
+                        <h4 className="text-sm font-bold text-white mb-2">Built-in Library</h4>
+                        <p className="text-xs text-neutral-400 mb-3">
+                            Explore our curated collection of important biological structures.
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                            <span className="px-2 py-1 bg-neutral-700 rounded text-[10px] text-neutral-300">Essential Enzymes</span>
+                            <span className="px-2 py-1 bg-neutral-700 rounded text-[10px] text-neutral-300">Viral Proteins</span>
+                            <span className="px-2 py-1 bg-neutral-700 rounded text-[10px] text-neutral-300">Drug Targets</span>
+                            <span className="px-2 py-1 bg-neutral-700 rounded text-[10px] text-neutral-300">New Materials</span>
+                        </div>
+                    </div>
+                </div>
+            )
+        },
+        {
             id: 'visuals',
             title: 'Visualization',
-            icon: Layers,
+            icon: Sparkles,
             description: 'Representations, Coloring, and Lighting.',
             content: (
                 <div className="space-y-6">
@@ -108,27 +198,27 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
                                 <Sparkles className="w-4 h-4 text-blue-400" /> Scientific Palettes
                             </h4>
                             <p className="text-xs text-neutral-300 mb-3">
-                                Switch between <span className="text-white">Viridis, Magma, Cividis</span>, and Standard palettes. These are color-blind friendly and perceptually uniform, perfect for visualizing data like B-Factors.
+                                Switch between <span className="text-white">Viridis, Magma, Cividis</span>, and Standard palettes. These are color-blind friendly and perceptually uniform.
                             </p>
                         </div>
 
                         <div className="bg-neutral-800/50 p-3 rounded-lg border border-neutral-700/50">
                             <h5 className="text-xs font-bold text-white mb-2">Representations</h5>
                             <ul className="text-xs space-y-1.5 text-neutral-400">
-                                <li><strong className="text-neutral-300">Cartoon:</strong> Best for secondary structure overlay.</li>
-                                <li><strong className="text-neutral-300">Surface:</strong> visualizing pockets and volume.</li>
-                                <li><strong className="text-neutral-300">Ball & Stick:</strong> Detailed atomic inspection.</li>
-                                <li><strong className="text-neutral-300">Licorice:</strong> Good for ligand interactions.</li>
+                                <li><strong className="text-neutral-300">Cartoon:</strong> Best for secondary structure.</li>
+                                <li><strong className="text-neutral-300">Surface:</strong> visualizing pockets/volume.</li>
+                                <li><strong className="text-neutral-300">Ball & Stick:</strong> Atomic details.</li>
+                                <li><strong className="text-neutral-300">Licorice:</strong> Ligand interactions.</li>
                             </ul>
                         </div>
 
                         <div className="bg-neutral-800/50 p-3 rounded-lg border border-neutral-700/50">
                             <h5 className="text-xs font-bold text-white mb-2">Smart Coloring</h5>
                             <ul className="text-xs space-y-1.5 text-neutral-400">
-                                <li><strong className="text-neutral-300">Hydrophobicity:</strong> Color by residue polarity.</li>
-                                <li><strong className="text-neutral-300">B-Factor:</strong> Visualize flexibility/confidence.</li>
-                                <li><strong className="text-neutral-300">Chain ID:</strong> Distinct color per chain.</li>
-                                <li><strong className="text-neutral-300">Element:</strong> Standard CPK coloring.</li>
+                                <li><strong className="text-neutral-300">Hydrophobicity:</strong> Residue polarity.</li>
+                                <li><strong className="text-neutral-300">B-Factor:</strong> Flexibility/Confidence.</li>
+                                <li><strong className="text-neutral-300">Chain ID:</strong> Distinct chain colors.</li>
+                                <li><strong className="text-neutral-300">Element:</strong> CPK standard.</li>
                             </ul>
                         </div>
                     </div>
@@ -136,36 +226,42 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
             )
         },
         {
-            id: 'analysis',
-            title: 'Analysis Tools',
-            icon: Activity,
-            description: 'Sequence, Contact Maps, and Measurements.',
+            id: 'settings',
+            title: 'Personalization',
+            icon: Activity, // Using Activity icon as placeholder for settings-like thing if Settings icon isn't imported, but imports show Activity is used for Analysis. Let's check imports.
+            description: 'Accessibility and appearance settings.',
             content: (
                 <div className="space-y-4">
                     <div className="bg-neutral-800/50 p-4 rounded-xl border border-neutral-700/50">
-                        <h4 className="text-sm font-bold text-white mb-2">Sequence Bar</h4>
-                        <p className="text-xs text-neutral-400 mb-3">
-                            The interactive sequence bar on the right syncs with your 3D view.
-                        </p>
-                        <div className="flex gap-2 text-[10px] text-neutral-500 uppercase tracking-wider font-bold">
-                            <span className="bg-neutral-800 px-2 py-1 rounded">Syncs Colors</span>
-                            <span className="bg-neutral-800 px-2 py-1 rounded">Click to Focus</span>
-                            <span className="bg-neutral-800 px-2 py-1 rounded">Hover Info</span>
+                        <h4 className="text-sm font-bold text-white mb-3">Accessibility</h4>
+                        <div className="flex items-start gap-3">
+                            <div className="bg-black/20 p-2 rounded border border-white/5 shrink-0">
+                                <span className="text-lg">Aa</span>
+                            </div>
+                            <div>
+                                <strong className="text-white text-xs block mb-1">OpenDyslexic Font</strong>
+                                <p className="text-[11px] text-neutral-400">
+                                    Toggle the specialized font designed to mitigate some of the common reading errors caused by dyslexia.
+                                </p>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-neutral-800/50 p-3 rounded-lg border border-neutral-700/50">
-                            <h4 className="text-xs font-bold text-white mb-2">Contact Map</h4>
-                            <p className="text-[11px] text-neutral-400 leading-relaxed">
-                                Visualize residue-residue interactions in a 2D matrix. Click any pixel to draw a contact line between residues in the 3D structure.
-                            </p>
-                        </div>
-                        <div className="bg-neutral-800/50 p-3 rounded-lg border border-neutral-700/50">
-                            <h4 className="text-xs font-bold text-white mb-2">Measurements</h4>
-                            <p className="text-[11px] text-neutral-400 leading-relaxed">
-                                Press <kbd className="bg-neutral-700 px-1 rounded">M</kbd> to enter measurement mode. Click two atoms to measure distance, three for angle, four for dihedral.
-                            </p>
+                    <div className="bg-neutral-800/50 p-4 rounded-xl border border-neutral-700/50">
+                        <h4 className="text-sm font-bold text-white mb-3">Appearance</h4>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <strong className="text-white text-xs block mb-1">Background Color</strong>
+                                <p className="text-[11px] text-neutral-400">
+                                    Custom color picker for the viewer background. Try dark blue for presentations!
+                                </p>
+                            </div>
+                            <div>
+                                <strong className="text-white text-xs block mb-1">Clean Mode</strong>
+                                <p className="text-[11px] text-neutral-400">
+                                    Hides all UI elements for distraction-free viewing or clean screenshots.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -197,13 +293,6 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
                                 <div className="text-neutral-500 scale-90">Save JSON State</div>
                             </div>
                         </div>
-                    </div>
-
-                    <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-                        <h4 className="text-xs font-bold text-blue-400 mb-1">Pro Tip: Clean Mode</h4>
-                        <p className="text-[11px] text-neutral-300">
-                            Enable "Publication Mode" in Settings to automatically switch to a white background, remove UI elements, and enable high-quality ambient occlusion.
-                        </p>
                     </div>
                 </div>
             )
