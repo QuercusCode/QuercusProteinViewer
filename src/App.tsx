@@ -870,7 +870,6 @@ function App() {
         case 'e': setColoring('hydrophobicity'); break;
         case 'a': setColoring('bfactor'); break; // pLDDT
         case 'd': setColoring('secondary'); break;
-        case 'z': setColoring('charge'); break;
         case 'x': setColoring('residueindex'); break; // Rainbow
         case 'v': setColoring('residue'); break; // Residue Name
       }
@@ -1069,14 +1068,6 @@ function App() {
       shortcut: 'D',
       category: 'Appearance',
       perform: () => setColoring('secondary')
-    },
-    {
-      id: 'color-charge',
-      label: 'Color by Charge',
-      icon: Palette,
-      shortcut: 'Z',
-      category: 'Appearance',
-      perform: () => setColoring('charge')
     },
     {
       id: 'color-rainbow',
