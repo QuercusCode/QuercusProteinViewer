@@ -1448,7 +1448,7 @@ function App() {
                           >
                             {ctrl.proteinTitle || ctrl.pdbId || (ctrl.file ? ctrl.file.name : "No Structure")}
                           </span>
-                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-900 text-white text-[10px] rounded whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border border-neutral-700">
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 bg-neutral-900 text-white text-[10px] rounded whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border border-neutral-700">
                             {ctrl.proteinTitle || ctrl.pdbId || (ctrl.file ? ctrl.file.name : "No Structure")}
                           </div>
                         </div>
