@@ -1435,34 +1435,31 @@ function App() {
                         ${isActive ? 'bg-[#1a1a1a] border-indigo-500/50' : 'bg-black border-[#222] opacity-60 hover:opacity-100'}
                       `}
                     >
-                      <div className="flex items-center gap-2 z-10">
+                      <div className="flex items-center gap-2">
                         <div className={`w-2 h-2 rounded-full shadow-sm transition-all ${isActive ? 'bg-indigo-500 shadow-indigo-500/50 scale-110' : 'bg-neutral-700'}`} />
                         <span className={`text-[10px] font-bold uppercase tracking-widest ${isActive ? 'text-indigo-400' : 'text-neutral-500'}`}>
                           {viewportLabels[index]}
                         </span>
                       </div>
-
-                      {/* Centered Title */}
-                      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-[50%] flex justify-center">
-                        <div className="relative group min-w-0">
+                      <div className="flex items-center gap-3 flex-1 min-w-0 justify-center">
+                        <div className="relative group flex-1 min-w-0">
                           <span
-                            className="text-[10px] text-neutral-400 font-mono truncate max-w-full block text-center"
+                            className="text-[10px] text-neutral-400 font-mono truncate max-w-full block"
                           >
                             {ctrl.proteinTitle || ctrl.pdbId || (ctrl.file ? ctrl.file.name : "No Structure")}
                           </span>
-                          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 bg-neutral-900 text-white text-[10px] rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border border-neutral-700 w-max max-w-[200px] text-center whitespace-normal break-words shadow-xl">
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 bg-neutral-900 text-white text-[10px] rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border border-neutral-700 w-max max-w-[90%] text-center whitespace-normal break-words shadow-xl">
                             {ctrl.proteinTitle || ctrl.pdbId || (ctrl.file ? ctrl.file.name : "No Structure")}
                           </div>
                         </div>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); ctrl.handleResetView(); }}
+                          className="p-1 hover:bg-white/10 rounded text-neutral-500 hover:text-white transition-colors shrink-0"
+                          title="Reset Camera"
+                        >
+                          <RefreshCw className="w-3 h-3" />
+                        </button>
                       </div>
-
-                      <button
-                        onClick={(e) => { e.stopPropagation(); ctrl.handleResetView(); }}
-                        className="p-1 hover:bg-white/10 rounded text-neutral-500 hover:text-white transition-colors shrink-0 z-10"
-                        title="Reset Camera"
-                      >
-                        <RefreshCw className="w-3 h-3" />
-                      </button>
                     </div>
                   )}
 
