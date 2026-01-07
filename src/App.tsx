@@ -23,6 +23,7 @@ import {
   Share2, Save, FolderOpen, Video, Ruler, Maximize2, Star, Undo2, Redo2
 } from 'lucide-react';
 import { startOnboardingTour } from './components/TourGuide';
+import { ViewportSelector } from './components/ViewportSelector';
 import { ToastContainer } from './components/Toast';
 import { useToast } from './hooks/useToast';
 import { FavoritesPanel } from './components/FavoritesPanel';
@@ -41,7 +42,7 @@ function App() {
     useRef<ProteinViewerRef>(null)
   ];
 
-  const { toasts, removeToast, success, error, info } = useToast();
+  const { toasts, removeToast, success, info } = useToast();
   const { favorites, toggleFavorite, removeFavorite, isFavorite } = useFavorites();
   const { history, addToHistory } = useHistory();
 
@@ -60,6 +61,99 @@ function App() {
   type ViewMode = 'single' | 'dual' | 'triple' | 'quad';
   const [viewMode, setViewMode] = useState<ViewMode>('single');
   const [activeViewIndex, setActiveViewIndex] = useState(0);
+
+  // --- Multi-View Tool Selector State ---
+  const [isSelectorOpen, setIsSelectorOpen] = useState(false);
+  const [pendingToolAction, setPendingToolAction] = useState<{
+    type: 'snapshot' | 'record' | 'reset' | 'save' | 'load';
+    args?: any;
+  } | null>(null);
+
+  const handleToolAction = (type: 'snapshot' | 'record' | 'reset' | 'save' | 'load', args?: any) => {
+    if (viewMode === 'single') {
+      // Direct execution for single view
+      executeAction(type, [0], args);
+    } else {
+      // Open selector for multi-view
+      setPendingToolAction({ type, args });
+      setIsSelectorOpen(true);
+    }
+  };
+
+  const executeAction = async (type: string, indices: number[], args?: any) => {
+    // Helper to interact with specific controller/viewer
+    const runOnIndex = async (idx: number) => {
+      const ctrl = controllers[idx];
+      const ref = viewerRefs[idx];
+
+      switch (type) {
+        case 'reset':
+          ctrl.handleResetView();
+          ref.current?.resetCamera();
+          break;
+
+        case 'snapshot':
+          if (ref.current) {
+            const blob = await ref.current.getSnapshotBlob();
+            if (blob) {
+              const url = URL.createObjectURL(blob);
+              const newSnapshot: Snapshot = {
+                id: crypto.randomUUID(),
+                url,
+                timestamp: Date.now()
+              };
+              setSnapshots(prev => [newSnapshot, ...prev]);
+            }
+          }
+          break;
+
+        case 'save':
+          // Logic for saving session of specific viewport
+          // For now, let's assume "Save" executes the global save for the FIRST selected viewport
+          // or we could implement a multi-save.
+          // Given the complexity of "Session", let's save the ACTIVE one if multiple are selected, or iterate.
+          // Ideally session JSON should support array of states. 
+          // For this iter: Execute Save on the first selected index.
+          if (idx === indices[0]) {
+            handleSaveSession(idx);
+          }
+          break;
+
+        case 'record':
+          // Sequential recording or parallel? Parallel might lag.
+          // Let's force single record for now or warn.
+          // Implementing simple parallel trigger:
+          if (ref.current) {
+            // Logic from handleRecordMovie but targeted
+            // We need a targeted handleRecordMovie version
+            handleRecordMovieTargeted(idx, args?.duration || 4000);
+          }
+          break;
+      }
+    };
+
+    // Execute for all selected indices
+    // Actions that are inherently global (like Share) might need specific handling
+    if (type === 'share') {
+      setShowShareModal(true); // Share modal handles its own state (usually active)
+      return;
+    }
+
+    for (const idx of indices) {
+      await runOnIndex(idx);
+    }
+
+    if (type === 'snapshot') success(`${indices.length > 1 ? 'Snapshots' : 'Snapshot'} captured ✓`);
+    if (type === 'reset') info('Views reset');
+  };
+
+  const handleSelectorConfirm = (indices: number[]) => {
+    if (pendingToolAction && indices.length > 0) {
+      executeAction(pendingToolAction.type, indices, pendingToolAction.args);
+    }
+    setIsSelectorOpen(false);
+    setPendingToolAction(null);
+  };
 
   // Derived Accessors for "Active" Context (Sidebar, Controls, etc operate on this)
   const activeController = controllers[activeViewIndex];
@@ -459,17 +553,15 @@ function App() {
 
   const [isRecording, setIsRecording] = useState(false);
 
-  const handleRecordMovie = async (duration: number = 4000) => {
-    if (viewerRef.current && !isRecording) {
+  // targeted record
+  const handleRecordMovieTargeted = async (index: number, duration: number) => {
+    const ref = viewerRefs[index];
+    if (ref.current) {
       setIsRecording(true);
-      info('Recording movie...');
       try {
-        const blob = await viewerRef.current.recordTurntable(duration);
-
-        // Create Movie Object
-        const mimeType = blob.type; // e.g. 'video/webm'
+        const blob = await ref.current.recordTurntable(duration);
+        const mimeType = blob.type;
         const ext = mimeType.includes('mp4') ? 'mp4' : 'webm';
-
         const newMovie: Movie = {
           id: crypto.randomUUID(),
           url: URL.createObjectURL(blob),
@@ -478,17 +570,15 @@ function App() {
           duration: duration / 1000,
           format: ext
         };
-
         setMovies(prev => [newMovie, ...prev]);
-        success('Movie recorded ✓');
-
-      } catch (e: any) {
-        console.error("Recording failed", e);
-        error(`Recording failed: ${e.message || 'Unknown error'}`);
-      } finally {
-        setIsRecording(false);
-      }
+      } catch (e) { console.error(e); }
+      finally { setIsRecording(false); }
     }
+  };
+
+
+  const handleRecordMovie = async (duration: number = 4000) => {
+    handleToolAction('record', { duration });
   };
 
   const handleDownloadMovie = (id: string) => {
@@ -536,16 +626,17 @@ function App() {
 
   // Session Management
   // Session Management
-  const handleSaveSession = () => {
+  // Session Management
+  const handleSaveSession = (targetIndex: number = activeViewIndex) => {
     try {
-      console.log("Starting save session...");
-
-
+      console.log("Starting save session for index:", targetIndex);
+      const ctrl = controllers[targetIndex];
+      const ref = viewerRefs[targetIndex];
 
       // 2. Safely get orientation
       let safeOrientation = null;
       try {
-        safeOrientation = viewerRef.current?.getCameraOrientation() || null;
+        safeOrientation = ref.current?.getCameraOrientation() || null;
       } catch (err) {
         console.warn("Could not get orientation for save:", err);
       }
@@ -553,9 +644,9 @@ function App() {
       // 3. Construct Data safely
       const sessionData = {
         version: 1,
-        pdbId: String(pdbId || ""),
-        representation: String(representation),
-        coloring: String(coloring),
+        pdbId: String(ctrl.pdbId || ""),
+        representation: String(ctrl.representation),
+        coloring: String(ctrl.coloring),
         orientation: safeOrientation,
         timestamp: Date.now()
       };
@@ -573,7 +664,7 @@ function App() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `session-${pdbId || 'structure'}-${new Date().toISOString().slice(0, 10)}.json`;
+      link.download = `session-${ctrl.pdbId || 'structure'}-${new Date().toISOString().slice(0, 10)}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -584,6 +675,10 @@ function App() {
       console.error("CRITICAL SAVE ERROR:", e);
       alert(`Failed to save session: ${e instanceof Error ? e.message : String(e)}`);
     }
+  };
+
+  const handleTriggerSaveSession = () => {
+    handleToolAction('save');
   };
 
   const handleLoadSession = async (file: File) => {
@@ -641,20 +736,7 @@ function App() {
 
   // Snapshot Handlers
   const handleSnapshot = async () => {
-    if (!viewerRef.current) return;
-    const blob = await viewerRef.current.getSnapshotBlob();
-    if (blob) {
-      const url = URL.createObjectURL(blob);
-      const newSnapshot: Snapshot = {
-        id: crypto.randomUUID(),
-        url,
-        timestamp: Date.now()
-      };
-      setSnapshots(prev => [newSnapshot, ...prev]);
-      success('Snapshot captured ✓');
-    } else {
-      error('Failed to capture snapshot');
-    }
+    handleToolAction('snapshot');
   };
 
   const handleDownloadSnapshot = (id: string) => {
@@ -1327,7 +1409,7 @@ function App() {
               setRepresentation={setRepresentation}
               coloring={coloring}
               setColoring={setColoring}
-              onResetView={handleResetView}
+              onResetView={() => handleToolAction('reset')}
               chains={chains}
               ligands={ligands}
               customColors={customColors}
@@ -1360,7 +1442,7 @@ function App() {
               onDeleteSnapshot={handleDeleteSnapshot}
               isSpinning={isSpinning}
               setIsSpinning={setIsSpinning}
-              onSaveSession={handleSaveSession}
+              onSaveSession={handleTriggerSaveSession}
               onLoadSession={handleLoadSession}
               onDownloadPDB={handleDownloadPDB}
               onDownloadSequence={handleDownloadSequence}
@@ -1563,6 +1645,17 @@ function App() {
           colorPalette={colorPalette}
         />
       </div>
+
+      <ViewportSelector
+        isOpen={isSelectorOpen}
+        viewMode={viewMode}
+        actionName={pendingToolAction?.type === 'record' ? 'Record Video' :
+          pendingToolAction?.type === 'snapshot' ? 'Take Snapshot' :
+            pendingToolAction?.type === 'reset' ? 'Reset View' :
+              pendingToolAction?.type === 'save' ? 'Save Session' : 'Unknown Action'}
+        onConfirm={handleSelectorConfirm}
+        onCancel={() => { setIsSelectorOpen(false); setPendingToolAction(null); }}
+      />
       {/* End Main Content Flex Container */}
 
 
