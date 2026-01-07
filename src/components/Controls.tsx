@@ -623,7 +623,7 @@ export const Controls: React.FC<ControlsProps> = ({
                         <X className="w-6 h-6" />
                     </button>
 
-                    <div className="flex items-center justify-between pt-8 md:pt-0">
+                    <div className="flex flex-col gap-4 pt-8 md:pt-0">
                         <div>
                             <h1 className="text-xl font-bold bg-gradient-to-r from-blue-500 to-teal-500 bg-clip-text text-transparent mb-1">
                                 Quercus Viewer
