@@ -1522,7 +1522,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             if (stageRef.current) stageRef.current.removeAllComponents();
             componentRef.current = null;
         }
-    }, [pdbId, dataSource, file, onStructureLoaded]);
+    }, [pdbId, dataSource, file]);
 
 
 
