@@ -1659,9 +1659,21 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     const dz = a1.position.z - a2.position.z;
                     const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
+                    // Generate measurement name
+                    let measurementName: string;
+                    const isChemical = a1.resName === 'HET' && a2.resName === 'HET';
+
+                    if (isChemical && a1.atomName && a2.atomName) {
+                        // For chemicals, show only atom names
+                        measurementName = `${a1.atomName}-${a2.atomName}`;
+                    } else {
+                        // For proteins or mixed, show full residue info
+                        measurementName = `${a1.resName} ${a1.resNo}${a1.atomName ? ` (${a1.atomName})` : ''}-${a2.resName} ${a2.resNo}${a2.atomName ? ` (${a2.atomName})` : ''}`;
+                    }
+
                     const newMeasurement: Measurement = {
                         id: crypto.randomUUID(),
-                        name: `${a1.resName} ${a1.resNo}${a1.atomName ? ` (${a1.atomName})` : ''}-${a2.resName} ${a2.resNo}${a2.atomName ? ` (${a2.atomName})` : ''}`,
+                        name: measurementName,
                         distance: dist,
                         color: '#3b82f6', // Default blue
                         atom1: a1,
