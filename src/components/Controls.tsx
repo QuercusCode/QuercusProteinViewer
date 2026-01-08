@@ -318,6 +318,7 @@ interface ControlsProps {
     onSaveSession: () => void;
     onLoadSession: (file: File) => void;
     onToggleContactMap: () => void;
+    onTakeSnapshot: () => void; // Opens the unified snapshot modal
     movies: Movie[];
     onDownloadMovie: (id: string) => void;
     onDeleteMovie: (id: string) => void;
@@ -411,6 +412,7 @@ export const Controls: React.FC<ControlsProps> = ({
     onDownloadMovie,
     onDeleteMovie,
     onToggleContactMap,
+    onTakeSnapshot,
     colorPalette,
     setColorPalette,
     isDyslexicFont,
@@ -1606,7 +1608,9 @@ export const Controls: React.FC<ControlsProps> = ({
                                         <button onClick={onResetView} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}>
                                             <RotateCcw className="w-3.5 h-3.5" /> <span className="text-xs">Reset</span>
                                         </button>
-
+                                        <button onClick={onTakeSnapshot} className={`flex-1 flex items-center justify-center gap-1 border py-2 rounded-lg transition-all ${cardBg} hover:text-blue-500 hover:border-blue-500/50`}>
+                                            <Camera className="w-3.5 h-3.5" /> <span className="text-xs">Snapshot</span>
+                                        </button>
                                         <button onClick={onToggleShare} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:text-green-500 hover:border-green-500/50`}>
                                             <Share2 className="w-3.5 h-3.5" /> <span className="text-xs">Share</span>
                                         </button>

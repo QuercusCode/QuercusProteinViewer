@@ -1574,6 +1574,7 @@ function App() {
               onDownloadPDB={handleDownloadPDB}
               onDownloadSequence={handleDownloadSequence}
               onToggleContactMap={() => setShowContactMap(!showContactMap)}
+              onTakeSnapshot={handleSnapshot}
               movies={movies}
               onDownloadMovie={handleDownloadMovie}
               onDeleteMovie={handleDeleteMovie}
