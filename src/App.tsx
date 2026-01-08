@@ -525,10 +525,15 @@ function App() {
       ctrl.setShowLigands(true);
       if (info.chains.length > 0) ctrl.setShowIons(true);
     } else {
-      // Reset to cartoon for proteins/nucleic acids
-      console.log("App: Detected polymer. Resetting to Cartoon.");
-      ctrl.setRepresentation('cartoon');
+      // For proteins: Reset to cartoon (default for proteins)
+      const currentRep = ctrl.representation;
+      if (currentRep === 'ball+stick') {
+        // Only reset if it was set to ball+stick (from a previous chemical load)
+        console.log("App: Resetting representation from ball+stick to cartoon for protein.");
+        ctrl.setRepresentation('cartoon');
+      }
     }
+    // For proteins, use the current representation setting (default is cartoon)
 
     // Add to History (using global helper)
     if (ctrl.dataSource === 'pdb' && ctrl.pdbId) {
