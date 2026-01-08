@@ -83,6 +83,22 @@ function App() {
       return;
     }
 
+    // Special handling for snapshots: always show quality selector
+    if (type === 'snapshot') {
+      if (viewMode === 'single') {
+        // Single view: skip viewport selection, go straight to quality selection
+        setSelectedViewportsForSnapshot([0]);
+        setPendingToolAction({ type, args });
+        setIsQualitySelectorOpen(true);
+      } else {
+        // Multi-view: show viewport selector first
+        setPendingToolAction({ type, args });
+        setIsSelectorOpen(true);
+      }
+      return;
+    }
+
+    // For other actions (record, reset, save, load)
     if (viewMode === 'single') {
       // Direct execution for single view
       executeAction(type, [0], args);
