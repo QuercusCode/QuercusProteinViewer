@@ -1904,7 +1904,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 });
 
                 // Register the custom color scheme
-                window.NGL.ColormakerRegistry.addScheme(function (this: any, params: any) {
+                window.NGL.ColormakerRegistry.addScheme(function (this: any) {
                     this.atomColor = function (atom: any) {
                         return atomColorMap.get(atom.index) || 0xCCCCCC;
                     };
