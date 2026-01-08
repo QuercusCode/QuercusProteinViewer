@@ -1872,21 +1872,22 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     const structParams: any = {
                         color: currentColoring,
                         sele: 'helix or sheet',
-                        aspectRatio: 4.0,  // Flatter ribbon for secondary structure
+                        aspectRatio: 6.0,  // Flatted ribbon for secondary structure (High contrast)
+                        scale: 1.0,
                         subdiv: 12,
                         radialSegments: 20
                     };
                     if (scale && scale.length > 0) structParams.colorScale = scale;
                     component.addRepresentation('cartoon', structParams);
 
-                    // 2. Coils/Loops (Round Tube - PyMOL Style)
+                    // 2. Coils/Loops (Round Thin Tube - PyMOL Style)
                     const coilParams: any = {
                         color: currentColoring,
                         sele: 'not (helix or sheet)',
-                        aspectRatio: 1.0,  // Round tube for loops
+                        aspectRatio: 1.0,  // Perfectly round
+                        scale: 0.25,       // CRITICAL: Much thinner to match PyMOL wire/tube look
                         subdiv: 12,
-                        radialSegments: 20,
-                        scale: 0.8         // Slightly thinner than helices
+                        radialSegments: 20
                     };
                     if (scale && scale.length > 0) coilParams.colorScale = scale;
                     component.addRepresentation('cartoon', coilParams);
