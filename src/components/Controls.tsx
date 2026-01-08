@@ -1,8 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Skeleton } from './Skeleton';
+import { ScreenshotModal } from './ScreenshotModal';
 import {
     Camera,
-
     Download,
     Eye,
     Hexagon,
@@ -15,7 +15,6 @@ import {
     RefreshCw,
     RotateCcw,
     Ruler,
-
     Search,
     Sun,
     Trash2,
@@ -31,7 +30,7 @@ import {
     Activity,
     Wrench,
     Share2,
-    ScanSearch, // Added Icon
+    ScanSearch,
     Star,
     Clock,
     Undo2,
@@ -309,7 +308,7 @@ interface ControlsProps {
     isRecording: boolean;
     proteinTitle: string | null;
     snapshots: Snapshot[];
-    onSnapshot: () => void;
+    onSnapshot: (resolutionFactor: number, transparent: boolean) => void;
     onDownloadSnapshot: (id: string) => void;
     onDeleteSnapshot: (id: string) => void;
     isSpinning: boolean;
@@ -447,6 +446,9 @@ export const Controls: React.FC<ControlsProps> = ({
     const [isSearching, setIsSearching] = useState(false);
     const [isSearchFocused, setIsSearchFocused] = useState(false);
 
+    // State for Screenshot Modal
+    const [isScreenshotModalOpen, setIsScreenshotModalOpen] = useState(false);
+
 
     const handleSearch = () => {
         setIsSearching(true);
@@ -499,6 +501,8 @@ export const Controls: React.FC<ControlsProps> = ({
     const cardBg = isLightMode ? 'bg-white' : 'bg-neutral-900';
     const subtleText = isLightMode ? 'text-neutral-950 font-medium' : 'text-neutral-400';
     const inputBg = isLightMode ? 'bg-white border-neutral-900 text-black focus:ring-black' : 'bg-neutral-800 border-neutral-700 text-white focus:ring-blue-500';
+
+
 
     // Accordion State - Use lifted state from props if available
     const openSections = propOpenSections || {
@@ -615,6 +619,13 @@ export const Controls: React.FC<ControlsProps> = ({
 
     return (
         <>
+            <ScreenshotModal
+                isOpen={isScreenshotModalOpen}
+                onClose={() => setIsScreenshotModalOpen(false)}
+                onCapture={onSnapshot}
+                isLightMode={isLightMode}
+            />
+
             <button
                 onClick={onToggleMobileSidebar}
                 className={`absolute top-4 left-4 z-40 md:hidden p-2 rounded-lg backdrop-blur-md shadow-lg transition-opacity hover:opacity-80 border ${isLightMode ? 'bg-white border-neutral-900 text-black' : 'bg-neutral-900/90 border-white/10 text-white'}`}
@@ -1603,7 +1614,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                         <button onClick={onResetView} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}>
                                             <RotateCcw className="w-3.5 h-3.5" /> <span className="text-xs">Reset</span>
                                         </button>
-                                        <button onClick={onSnapshot} className={`flex-1 flex items-center justify-center gap-1 border py-2 rounded-lg transition-all ${cardBg} hover:text-blue-500 hover:border-blue-500/50`}>
+                                        <button onClick={() => setIsScreenshotModalOpen(true)} className={`flex-1 flex items-center justify-center gap-1 border py-2 rounded-lg transition-all ${cardBg} hover:text-blue-500 hover:border-blue-500/50`}>
                                             <Camera className="w-3.5 h-3.5" /> <span className="text-xs">Snapshot</span>
                                         </button>
                                         <button onClick={onToggleShare} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:text-green-500 hover:border-green-500/50`}>

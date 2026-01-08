@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
+import type { DataSource } from '../utils/pdbUtils';
 
 export interface Favorite {
     id: string;
-    dataSource: 'pdb' | 'pubchem';
+    dataSource: DataSource;
     title?: string;
     addedAt: number;
 }
@@ -28,7 +29,7 @@ export function useFavorites() {
         }
     }, [favorites]);
 
-    const addFavorite = useCallback((id: string, dataSource: 'pdb' | 'pubchem', title?: string) => {
+    const addFavorite = useCallback((id: string, dataSource: DataSource, title?: string) => {
         setFavorites(prev => {
             // Avoid duplicates
             if (prev.some(f => f.id === id && f.dataSource === dataSource)) {
@@ -38,11 +39,11 @@ export function useFavorites() {
         });
     }, []);
 
-    const removeFavorite = useCallback((id: string, dataSource: 'pdb' | 'pubchem') => {
+    const removeFavorite = useCallback((id: string, dataSource: DataSource) => {
         setFavorites(prev => prev.filter(f => !(f.id === id && f.dataSource === dataSource)));
     }, []);
 
-    const toggleFavorite = useCallback((id: string, dataSource: 'pdb' | 'pubchem', title?: string) => {
+    const toggleFavorite = useCallback((id: string, dataSource: DataSource, title?: string) => {
         setFavorites(prev => {
             const exists = prev.some(f => f.id === id && f.dataSource === dataSource);
             if (exists) {
@@ -53,7 +54,7 @@ export function useFavorites() {
         });
     }, []);
 
-    const isFavorite = useCallback((id: string, dataSource: 'pdb' | 'pubchem') => {
+    const isFavorite = useCallback((id: string, dataSource: DataSource) => {
         return favorites.some(f => f.id === id && f.dataSource === dataSource);
     }, [favorites]);
 

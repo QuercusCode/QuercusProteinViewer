@@ -70,11 +70,12 @@ export const fetchPDBMetadata = async (pdbId: string): Promise<PDBMetadata | nul
  * Keeps 3+ letter codes (Molecules) as Uppercase (HEM -> HEM).
  */
 // ... existing imports
-export type DataSource = 'pdb' | 'pubchem';
+export type DataSource = 'pdb' | 'pubchem' | 'alphafold';
 
 export const getStructureUrl = (id: string, source: DataSource): string => {
     switch (source) {
         case 'pubchem': return `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${id}/record/SDF/?record_type=3d`;
+        case 'alphafold': return `https://alphafold.ebi.ac.uk/files/AF-${id}-F1-model_v4.pdb`;
         case 'pdb': default: return `https://files.rcsb.org/download/${id}.pdb`; // Explicitly use PDB format
     }
 };

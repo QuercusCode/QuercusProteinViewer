@@ -772,7 +772,9 @@ function App() {
   };
 
   // Snapshot Handlers
-  const handleSnapshot = async () => {
+  const handleSnapshot = async (resolutionFactor: number = 3, transparent: boolean = false) => {
+    // Pass parameters to the viewer for high-quality export
+    await viewerRef.current?.captureImage(resolutionFactor, transparent);
     handleToolAction('snapshot');
   };
 
@@ -1281,10 +1283,10 @@ function App() {
   return (
     <main
       className={`w-full h-full relative overflow-hidden transition-colors duration-300 ${customBackgroundColor === 'transparent'
-          ? 'text-white bg-[#111]' // Dark base for checkerboard
-          : isLightMode
-            ? 'bg-slate-50 text-slate-900'
-            : 'bg-neutral-950 text-white'
+        ? 'text-white bg-[#111]' // Dark base for checkerboard
+        : isLightMode
+          ? 'bg-slate-50 text-slate-900'
+          : 'bg-neutral-950 text-white'
         }`}
       style={customBackgroundColor === 'transparent' ? {
         backgroundImage: 'linear-gradient(45deg, #222 25%, transparent 25%), linear-gradient(-45deg, #222 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #222 75%), linear-gradient(-45deg, transparent 75%, #222 75%)',
@@ -1332,6 +1334,32 @@ function App() {
                 setProteinTitle(`CID: ${cid}`);
               }
             });
+            return;
+          }
+
+          // Handle AlphaFold Selection
+          if (url.startsWith('alphafold://')) {
+            const id = url.replace('alphafold://', '');
+            if (!id) return;
+            setFile(null);
+            setPdbId(id);
+            setDataSource('alphafold');
+            setProteinTitle(`AlphaFold Prediction: ${id}`);
+            setRepresentation('cartoon');
+            setColoring('bfactor'); // Automatically show Confidence (pLDDT)
+            setPdbMetadata(null);
+            return;
+          }
+
+          // Handle RCSB Direct Selection
+          if (url.startsWith('rcsb://')) {
+            const id = url.replace('rcsb://', '');
+            if (!id) return;
+            setFile(null);
+            setPdbId(id);
+            setDataSource('pdb');
+            setProteinTitle(`RCSB Entry: ${id}`);
+            setPdbMetadata(null);
             return;
           }
 

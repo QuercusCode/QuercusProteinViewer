@@ -91,7 +91,7 @@ export interface ProteinViewerRef {
     getMeasurements: () => MeasurementData[];
     restoreMeasurements: (measurements: { atom1: any, atom2: any }[]) => void; // Legacy internal
     visualizeContact: (chainA: string, resA: number, chainB: string, resB: number) => void;
-    captureImage: () => Promise<void>;
+    captureImage: (resolutionFactor?: number, transparent?: boolean) => Promise<void>;
     highlightRegion: (selection: string, label?: string) => void;
     getLigandInteractions: () => Promise<import('../types').LigandInteraction[]>;
     focusResidue: (chain: string, resNo: number) => void;
@@ -440,7 +440,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             } catch (e) { console.error("Error getting atom by index", e); }
             return null;
         },
-        captureImage: async () => {
+        captureImage: async (resolutionFactor: number = 3, transparent: boolean = false) => {
             const fixPngBlob = async (blob: Blob): Promise<Blob> => {
                 try {
                     const arrayBuffer = await blob.arrayBuffer();
@@ -486,26 +486,26 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             };
 
             if (stageRef.current) {
-                // High Quality Export (3x resolution)
+                // High Quality Export with custom parameters
                 stageRef.current.makeImage({
-                    factor: 3,
+                    factor: resolutionFactor,
                     type: 'png',
                     antialias: true,
                     trim: false,
-                    transparent: false
+                    transparent: transparent
                 }).then((blob: Blob) => {
                     downloadBlob(blob);
                 }).catch((err: any) => {
-                    console.warn("High-res export failed, trying low-res fallback...", err);
-                    // Fallback to standard resolution
+                    console.warn("High-res export failed, trying fallback...", err);
+                    // Fallback to standard resolution if custom fails
                     stageRef.current.makeImage({
                         factor: 1,
                         type: 'png',
                         antialias: true,
                         trim: false,
-                        transparent: false
+                        transparent: transparent
                     }).then((blob: Blob) => {
-                        downloadBlob(blob, '-lowres');
+                        downloadBlob(blob, '-fallback');
                     }).catch((err2: any) => {
                         console.error("Export definitely failed:", err2);
                         setError("Failed to export image.");
@@ -1870,7 +1870,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         color: currentColoring,
                         aspectRatio: 5,          // Flat arrows for sheets
                         subdiv: 12,              // Smooth curves
-                        radialSegments: 100,      // Smooth helix cylinders
+                        radialSegments: 20,      // Smooth helix cylinders
                     };
 
                     const scale = getColorScale(colorPalette);

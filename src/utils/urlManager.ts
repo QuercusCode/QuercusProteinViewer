@@ -1,5 +1,6 @@
 import type { RepresentationType, ColoringType } from '../types';
 import type { CustomColorRule } from '../types';
+import type { DataSource } from '../utils/pdbUtils';
 
 export interface AppState {
     pdbId: string;
@@ -12,7 +13,7 @@ export interface AppState {
     customColors?: CustomColorRule[];
     measurements?: { atom1: any, atom2: any, distance: number }[];
     customBackgroundColor?: string | null;
-    dataSource?: 'pdb' | 'pubchem'; // Added for chemical structures
+    dataSource?: DataSource; // Added for chemical structures
 }
 
 export interface MultiViewState {
@@ -53,7 +54,7 @@ export const getShareableURL = (viewMode: string, viewports: AppState[]): string
                 // NGL orientation is usually a 16-element array (matrix) or similar
                 let optimizedOrientation = state.orientation;
                 if (Array.isArray(state.orientation)) {
-                    optimizedOrientation = state.orientation.map(n =>
+                    optimizedOrientation = state.orientation.map((n: any) =>
                         typeof n === 'number' ? Number(n.toFixed(3)) : n
                     );
                 }
@@ -126,8 +127,13 @@ export const parseURLState = (): MultiViewState => {
         state.representation = (params.get(p('rep')) as any) || 'cartoon';
         state.coloring = (params.get(p('color')) as any) || 'chainid';
 
-        const src = params.get(p('src'));
-        state.dataSource = (src === 'pubchem') ? 'pubchem' : 'pdb';
+        const src = params.get(p('src')) as DataSource | null;
+        if (src === 'pubchem' || src === 'alphafold') {
+            state.dataSource = src;
+        } else {
+            state.dataSource = 'pdb';
+        }
+
 
         if (params.get(p('spin')) === '1') state.isSpinning = true;
         if (params.get(p('lig')) === '1') state.showLigands = true;
