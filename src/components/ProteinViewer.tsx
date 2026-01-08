@@ -1870,63 +1870,100 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         }
                     });
 
-                    // Helper: blend two colors
-                    const blendColors = (c1: number, c2: number, factor: number) => {
-                        const r = Math.round(((c1 >> 16) & 0xFF) + (((c2 >> 16) & 0xFF) - ((c1 >> 16) & 0xFF)) * factor);
-                        const g = Math.round(((c1 >> 8) & 0xFF) + (((c2 >> 8) & 0xFF) - ((c1 >> 8) & 0xFF)) * factor);
-                        const b = Math.round((c1 & 0xFF) + ((c2 & 0xFF) - (c1 & 0xFF)) * factor);
-                        return (r << 16) | (g << 8) | b;
-                    };
 
-                    // Apply gradient transitions at boundaries
-                    const gradWidth = 2; // Number of residues to blend on each side
+                    // --- GLOBAL CHAIN SMOOTHING ALGORITHM ---
+                    // 1. Linearize chain residues to array
+                    // 2. Assign base vs custom colors
+                    // 3. Apply floating-point moving average smoothing
+                    // 4. Map back to atoms
 
                     try {
-                        component.structure.eachResidue((res: any) => {
-                            const key = `${res.chainname}:${res.resno}`;
-                            const customCol = residueColorMap.get(key);
+                        component.structure.eachChain((chain: any) => {
+                            // Collection phase
+                            const residues: any[] = [];
+                            const bgColors: number[] = []; // Base colors (element/custom)
 
-                            // Get element color for this residue
-                            let baseCol = 0xCCCCCC;
-                            try {
-                                const firstAtom = Array.from(res.iterateAtom())[0];
-                                const ElementScheme = window.NGL.ColormakerRegistry.getScheme('element');
-                                if (ElementScheme) {
-                                    const es = new ElementScheme({});
-                                    baseCol = es.atomColor(firstAtom);
+                            chain.eachResidue((res: any) => {
+                                residues.push(res);
+                                const key = `${res.chainname}:${res.resno}`;
+                                let col = residueColorMap.get(key);
+
+                                if (col === undefined) {
+                                    // Default to element color
+                                    col = 0xCCCCCC;
+                                    try {
+                                        const firstAtom = Array.from(res.iterateAtom())[0];
+                                        const ElementScheme = window.NGL.ColormakerRegistry.getScheme('element');
+                                        if (ElementScheme) {
+                                            const es = new ElementScheme({});
+                                            col = es.atomColor(firstAtom);
+                                        }
+                                    } catch (e) { /* ignore */ }
                                 }
-                            } catch (e) { /* ignore */ }
+                                bgColors.push(col || 0xCCCCCC);
+                            });
 
-                            let finalCol = customCol !== undefined ? customCol : baseCol;
+                            // Smoothing Phase (RGB separation)
+                            // We use a floating point buffer for precision accumulation
+                            const len = bgColors.length;
+                            let rBuffer = new Float32Array(len);
+                            let gBuffer = new Float32Array(len);
+                            let bBuffer = new Float32Array(len);
 
-                            // If not custom colored, check for nearby custom residues for gradient
-                            if (customCol === undefined) {
-                                let nearestCustom = null;
-                                let nearestDist = gradWidth + 1;
-
-                                for (let d = -gradWidth; d <= gradWidth; d++) {
-                                    if (d === 0) continue;
-                                    const nKey = `${res.chainname}:${res.resno + d}`;
-                                    const nCol = residueColorMap.get(nKey);
-                                    if (nCol !== undefined && Math.abs(d) < nearestDist) {
-                                        nearestDist = Math.abs(d);
-                                        nearestCustom = nCol;
-                                    }
-                                }
-
-                                if (nearestCustom !== null) {
-                                    const blend = 1 - (nearestDist / (gradWidth + 1));
-                                    finalCol = blendColors(baseCol, nearestCustom, blend);
-                                }
+                            // Initialize
+                            for (let i = 0; i < len; i++) {
+                                const c = bgColors[i] || 0xCCCCCC;
+                                rBuffer[i] = (c >> 16) & 0xFF;
+                                gBuffer[i] = (c >> 8) & 0xFF;
+                                bBuffer[i] = c & 0xFF;
                             }
 
-                            // Apply color to all atoms in residue
-                            res.eachAtom((atom: any) => {
-                                atomColorMap.set(atom.index, finalCol);
+                            // Multi-pass smoothing (3 passes of [0.25, 0.5, 0.25] kernel approx)
+                            const passes = 3;
+                            for (let p = 0; p < passes; p++) {
+                                const newR = new Float32Array(len);
+                                const newG = new Float32Array(len);
+                                const newB = new Float32Array(len);
+
+                                for (let i = 0; i < len; i++) {
+                                    let sumR = 0, sumG = 0, sumB = 0;
+                                    let count = 0;
+
+                                    // Previous
+                                    if (i > 0) {
+                                        sumR += rBuffer[i - 1]; sumG += gBuffer[i - 1]; sumB += bBuffer[i - 1];
+                                        count++;
+                                    }
+                                    // Current (weight x2 for stability)
+                                    sumR += rBuffer[i] * 2; sumG += gBuffer[i] * 2; sumB += bBuffer[i] * 2;
+                                    count += 2;
+                                    // Next
+                                    if (i < len - 1) {
+                                        sumR += rBuffer[i + 1]; sumG += gBuffer[i + 1]; sumB += bBuffer[i + 1];
+                                        count++;
+                                    }
+
+                                    newR[i] = sumR / count;
+                                    newG[i] = sumG / count;
+                                    newB[i] = sumB / count;
+                                }
+                                rBuffer = newR; gBuffer = newG; bBuffer = newB;
+                            }
+
+                            // Assignment Phase
+                            residues.forEach((res, idx) => {
+                                const r = Math.round(rBuffer[idx]);
+                                const g = Math.round(gBuffer[idx]);
+                                const b = Math.round(bBuffer[idx]);
+                                const finalColor = (r << 16) | (g << 8) | b;
+
+                                res.eachAtom((atom: any) => {
+                                    atomColorMap.set(atom.index, finalColor);
+                                });
                             });
                         });
                     } catch (e) {
-                        console.warn("Error in gradient processing", e);
+                        console.warn("Global smoothing failed", e);
                     }
 
                     // Fallback: if atomColorMap is still empty (e.g. error above), force populate
