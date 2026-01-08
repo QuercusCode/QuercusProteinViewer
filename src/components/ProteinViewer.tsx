@@ -1866,31 +1866,18 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         });
                     } catch (e) { }
 
+                    const params: any = {
+                        color: currentColoring,
+                        aspectRatio: 5,          // Flat arrows for sheets
+                        subdiv: 12,              // Smooth curves
+                        radialSegments: 20,      // Smooth helix cylinders
+                    };
+
                     const scale = getColorScale(colorPalette);
-
-                    // 1. Helices and Sheets (Flattened Ribbon - PyMOL Style)
-                    const structParams: any = {
-                        color: currentColoring,
-                        sele: 'helix or sheet',
-                        aspectRatio: 6.0,  // Flatted ribbon for secondary structure (High contrast)
-                        scale: 1.0,
-                        subdiv: 12,
-                        radialSegments: 20
-                    };
-                    if (scale && scale.length > 0) structParams.colorScale = scale;
-                    component.addRepresentation('cartoon', structParams);
-
-                    // 2. Coils/Loops (Round Thin Tube - PyMOL Style)
-                    // We switch to 'tube' representation because 'cartoon' always twists like a ribbon.
-                    const coilParams: any = {
-                        color: currentColoring,
-                        sele: 'not (helix or sheet)',
-                        radius: 0.25,      // Explicit small radius for wire look (PyMOL coil is ~0.25A)
-                        subdiv: 12,
-                        radialSegments: 20
-                    };
-                    if (scale && scale.length > 0) coilParams.colorScale = scale;
-                    component.addRepresentation('tube', coilParams);
+                    if (scale && scale.length > 0) {
+                        params.colorScale = scale;
+                    }
+                    component.addRepresentation('cartoon', params);
                 } else {
                     // Non-cartoon representations
                     const params: any = {
@@ -1963,13 +1950,13 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         const params: any = {
             backgroundColor: backgroundColor,
             quality: quality, // 'medium' or 'high'
-            lightIntensity: 1.4, // Increased brightness (PyMOL style)
+            lightIntensity: 1.0, // Standard key light
         };
 
         if (enableAmbientOcclusion) {
             params.sampleLevel = 2; // -1/0 = off, 1 = low, 2 = medium, 4 = high
-            params.ambientColor = 0x505050; // Brighter ambient shadows
-            params.ambientIntensity = 1.2;
+            params.ambientColor = 0x202020; // Soft grey shadow rather than pitch black
+            params.ambientIntensity = 1.0;
         } else {
             params.sampleLevel = 0;
             params.ambientIntensity = 0.0;
