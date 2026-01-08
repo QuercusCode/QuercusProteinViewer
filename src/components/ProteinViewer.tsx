@@ -1831,20 +1831,22 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     name: 'charge_neutral'
                 });
             } else if (currentColoring === 'custom') {
-                // --- CUSTOM COLORING MODE: Smooth Single-Mesh Rendering ---
-                // This mode uses a custom NGL color scheme for smooth transitions
+                // --- CUSTOM COLORING MODE: Smooth Gradient Rendering ---
+                // This mode uses residue-level color processing with gradient blending
 
                 const schemeId = 'custom_smooth_coloring';
                 const atomColorMap = new Map<number, number>();
+                const residueColorMap = new Map<string, number>();
 
-                // Build the color map from custom color rules
+                // Build residue-level color map from custom rules
                 if (hasValidCustomRules) {
                     customColors.forEach(rule => {
                         if (rule.color && rule.target) {
                             const colorHex = new window.NGL.Color(rule.color).getHex();
                             try {
-                                component.structure.eachAtom((atom: any) => {
-                                    atomColorMap.set(atom.index, colorHex);
+                                component.structure.eachResidue((residue: any) => {
+                                    const resKey = `${residue.chainname}:${residue.resno}`;
+                                    residueColorMap.set(resKey, colorHex);
                                 }, new window.NGL.Selection(rule.target));
                             } catch (e) {
                                 console.warn("Invalid custom color selection:", rule.target, e);
@@ -1853,30 +1855,63 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     });
                 }
 
+                // Helper: blend two colors
+                const blendColors = (c1: number, c2: number, factor: number) => {
+                    const r = Math.round(((c1 >> 16) & 0xFF) + (((c2 >> 16) & 0xFF) - ((c1 >> 16) & 0xFF)) * factor);
+                    const g = Math.round(((c1 >> 8) & 0xFF) + (((c2 >> 8) & 0xFF) - ((c1 >> 8) & 0xFF)) * factor);
+                    const b = Math.round((c1 & 0xFF) + ((c2 & 0xFF) - (c1 & 0xFF)) * factor);
+                    return (r << 16) | (g << 8) | b;
+                };
+
+                // Apply gradient transitions at boundaries
+                const gradWidth = 2; // Number of residues to blend on each side
+                component.structure.eachResidue((res: any) => {
+                    const key = `${res.chainname}:${res.resno}`;
+                    const customCol = residueColorMap.get(key);
+
+                    // Get element color for this residue
+                    const firstAtom = Array.from(res.iterateAtom())[0];
+                    const ElementScheme = window.NGL.ColormakerRegistry.getScheme('element');
+                    const baseCol = ElementScheme ? new ElementScheme({}).atomColor(firstAtom) : 0xCCCCCC;
+
+                    let finalCol = customCol !== undefined ? customCol : baseCol;
+
+                    // If not custom colored, check for nearby custom residues for gradient
+                    if (customCol === undefined) {
+                        let nearestCustom = null;
+                        let nearestDist = gradWidth + 1;
+
+                        for (let d = -gradWidth; d <= gradWidth; d++) {
+                            if (d === 0) continue;
+                            const nKey = `${res.chainname}:${res.resno + d}`;
+                            const nCol = residueColorMap.get(nKey);
+                            if (nCol !== undefined && Math.abs(d) < nearestDist) {
+                                nearestDist = Math.abs(d);
+                                nearestCustom = nCol;
+                            }
+                        }
+
+                        if (nearestCustom !== null) {
+                            const blend = 1 - (nearestDist / (gradWidth + 1));
+                            finalCol = blendColors(baseCol, nearestCustom, blend);
+                        }
+                    }
+
+                    // Apply color to all atoms in residue
+                    res.eachAtom((atom: any) => {
+                        atomColorMap.set(atom.index, finalCol);
+                    });
+                });
+
                 // Register the custom color scheme
                 window.NGL.ColormakerRegistry.addScheme(function (this: any, params: any) {
                     this.atomColor = function (atom: any) {
-                        // Check if this atom has a custom color
-                        const customColor = atomColorMap.get(atom.index);
-                        if (customColor !== undefined) {
-                            return customColor;
-                        }
-
-                        // Fallback to element coloring for undefined regions
-                        const ElementScheme = window.NGL.ColormakerRegistry.getScheme('element');
-                        if (ElementScheme) {
-                            const elementScheme = new ElementScheme(params);
-                            return elementScheme.atomColor(atom);
-                        }
-
-                        // Last resort: light gray
-                        return 0xCCCCCC;
+                        return atomColorMap.get(atom.index) || 0xCCCCCC;
                     };
                 }, schemeId);
 
                 // Create single representation with custom scheme
                 if (repType === 'cartoon') {
-                    // Force recalculation for cartoons
                     try {
                         component.structure.eachModel((m: any) => {
                             if (m.calculateSecondaryStructure) m.calculateSecondaryStructure();
@@ -1895,7 +1930,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     });
                 }
 
-                console.log(`Custom coloring mode: ${atomColorMap.size} atoms with custom colors`);
+                console.log(`Custom coloring: ${residueColorMap.size} residues colored, ${atomColorMap.size} atoms total`);
             } else {
                 // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL
                 // REVERTED to use 'color' property as previously working.
