@@ -42,6 +42,10 @@ export interface Snapshot {
     id: string;
     url: string;
     timestamp: number;
+    description?: string;
+    resolutionFactor?: number;
+    transparent?: boolean;
+    pdbId?: string;
 }
 
 export interface Movie {
@@ -51,6 +55,8 @@ export interface Movie {
     timestamp: number;
     duration: number; // in seconds
     format: string; // 'webm' or 'mp4'
+    pdbId?: string;
+    description?: string;
 }
 
 export interface Annotation {

@@ -556,7 +556,9 @@ function App() {
           blob: blob,
           timestamp: Date.now(),
           duration: duration / 1000,
-          format: ext
+          format: ext,
+          pdbId: pdbId || undefined,
+          description: `Movie of ${pdbId || 'structure'}`
         };
         setMovies(prev => [newMovie, ...prev]);
       } catch (e) { console.error(e); }
@@ -782,7 +784,11 @@ function App() {
         const newSnapshot: Snapshot = {
           id: crypto.randomUUID(),
           url,
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          resolutionFactor,
+          transparent,
+          pdbId: pdbId || undefined,
+          description: `Snapshot of ${pdbId || 'structure'}`
         };
         setSnapshots(prev => [newSnapshot, ...prev]);
         success('Snapshot saved to gallery ✓');
