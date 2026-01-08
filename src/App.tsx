@@ -839,33 +839,9 @@ function App() {
   };
 
   // Snapshot Handlers
-  const handleSnapshot = async (resolutionFactor: number = 3, transparent: boolean = false) => {
-    if (!viewerRef.current) return;
-
-    try {
-      const blob = await viewerRef.current.getSnapshotBlob(resolutionFactor, transparent);
-      if (blob) {
-        const url = URL.createObjectURL(blob);
-        const newSnapshot: Snapshot = {
-          id: crypto.randomUUID(),
-          url,
-          timestamp: Date.now(),
-          resolutionFactor,
-          transparent,
-          pdbId: pdbId || undefined,
-          description: `Snapshot of ${pdbId || 'structure'}`
-        };
-        setSnapshots(prev => [newSnapshot, ...prev]);
-        success('Snapshot saved to gallery ✓');
-
-        // Optionally open the sidebar/gallery if needed, but for now just Toast.
-      } else {
-        throw new Error("Failed to generate snapshot blob");
-      }
-    } catch (e) {
-      console.error("Snapshot error:", e);
-      // alert("Failed to take snapshot"); // Use existing error handling if available
-    }
+  const handleSnapshot = () => {
+    // Use the new two-step workflow (viewport selection → quality selection)
+    handleToolAction('snapshot');
   };
 
   const handleDownloadSnapshot = (id: string) => {
