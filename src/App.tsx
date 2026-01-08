@@ -524,6 +524,10 @@ function App() {
       ctrl.setRepresentation('ball+stick');
       ctrl.setShowLigands(true);
       if (info.chains.length > 0) ctrl.setShowIons(true);
+    } else {
+      // Reset to cartoon for proteins/nucleic acids
+      console.log("App: Detected polymer. Resetting to Cartoon.");
+      ctrl.setRepresentation('cartoon');
     }
 
     // Add to History (using global helper)
