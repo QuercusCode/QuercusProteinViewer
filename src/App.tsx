@@ -290,7 +290,7 @@ function App() {
       'motif-search': false
     };
 
-    if (elementId === '#visualization-controls') {
+    if (elementId === '#visualization-controls' || elementId === '#viewport-controls') {
       newSections['appearance'] = true;
     } else if (elementId === '#analysis-tools') {
       newSections['analysis'] = true;
