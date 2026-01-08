@@ -524,16 +524,8 @@ function App() {
       ctrl.setRepresentation('ball+stick');
       ctrl.setShowLigands(true);
       if (info.chains.length > 0) ctrl.setShowIons(true);
-    } else {
-      // For proteins: Reset to cartoon (default for proteins)
-      const currentRep = ctrl.representation;
-      if (currentRep === 'ball+stick') {
-        // Only reset if it was set to ball+stick (from a previous chemical load)
-        console.log("App: Resetting representation from ball+stick to cartoon for protein.");
-        ctrl.setRepresentation('cartoon');
-      }
     }
-    // For proteins, use the current representation setting (default is cartoon)
+    // For proteins: Don't auto-switch, let user's selection persist
 
     // Add to History (using global helper)
     if (ctrl.dataSource === 'pdb' && ctrl.pdbId) {
@@ -561,6 +553,12 @@ function App() {
     activeController.setCustomColors([]);
     activeController.setHighlightedResidue(null);
     activeController.setMeasurements([]);
+
+    // Reset representation to cartoon (default) when changing structures
+    // This prevents ball+stick from persisting from chemical loads
+    if (activeController.representation === 'ball+stick') {
+      activeController.setRepresentation('cartoon');
+    }
   };
 
 
