@@ -1866,18 +1866,30 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         });
                     } catch (e) { }
 
-                    const params: any = {
-                        color: currentColoring,
-                        aspectRatio: 1.5,        // PyMOL style: Rounder/Tubular (was 5.0 for Flat)
-                        subdiv: 12,              // Smooth curves
-                        radialSegments: 20,      // Smooth helix cylinders
-                    };
-
                     const scale = getColorScale(colorPalette);
-                    if (scale && scale.length > 0) {
-                        params.colorScale = scale;
-                    }
-                    component.addRepresentation('cartoon', params);
+
+                    // 1. Helices and Sheets (Flattened Ribbon - PyMOL Style)
+                    const structParams: any = {
+                        color: currentColoring,
+                        sele: 'helix or sheet',
+                        aspectRatio: 4.0,  // Flatter ribbon for secondary structure
+                        subdiv: 12,
+                        radialSegments: 20
+                    };
+                    if (scale && scale.length > 0) structParams.colorScale = scale;
+                    component.addRepresentation('cartoon', structParams);
+
+                    // 2. Coils/Loops (Round Tube - PyMOL Style)
+                    const coilParams: any = {
+                        color: currentColoring,
+                        sele: 'not (helix or sheet)',
+                        aspectRatio: 1.0,  // Round tube for loops
+                        subdiv: 12,
+                        radialSegments: 20,
+                        scale: 0.8         // Slightly thinner than helices
+                    };
+                    if (scale && scale.length > 0) coilParams.colorScale = scale;
+                    component.addRepresentation('cartoon', coilParams);
                 } else {
                     // Non-cartoon representations
                     const params: any = {
