@@ -1881,16 +1881,16 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     component.addRepresentation('cartoon', structParams);
 
                     // 2. Coils/Loops (Round Thin Tube - PyMOL Style)
+                    // We switch to 'tube' representation because 'cartoon' always twists like a ribbon.
                     const coilParams: any = {
                         color: currentColoring,
                         sele: 'not (helix or sheet)',
-                        aspectRatio: 1.0,  // Perfectly round
-                        scale: 0.03,       // EXTREME: 10x thinner (Wire look)
+                        radius: 0.25,      // Explicit small radius for wire look (PyMOL coil is ~0.25A)
                         subdiv: 12,
                         radialSegments: 20
                     };
                     if (scale && scale.length > 0) coilParams.colorScale = scale;
-                    component.addRepresentation('cartoon', coilParams);
+                    component.addRepresentation('tube', coilParams);
                 } else {
                     // Non-cartoon representations
                     const params: any = {
