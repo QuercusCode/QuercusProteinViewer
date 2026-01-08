@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { startOnboardingTour } from './components/TourGuide';
 import { ViewportSelector } from './components/ViewportSelector';
+import { QualitySelector } from './components/QualitySelector';
 import { ToastContainer } from './components/Toast';
 import { useToast } from './hooks/useToast';
 import { FavoritesPanel } from './components/FavoritesPanel';
@@ -69,6 +70,10 @@ function App() {
     args?: any;
   } | null>(null);
 
+  // --- Snapshot Quality Selector State (for two-step workflow) ---
+  const [isQualitySelectorOpen, setIsQualitySelectorOpen] = useState(false);
+  const [selectedViewportsForSnapshot, setSelectedViewportsForSnapshot] = useState<number[]>([]);
+
   // --- Multi-View Tool Actions Implementation ---
 
   const handleToolAction = (type: 'snapshot' | 'record' | 'reset' | 'save' | 'load' | 'share', args?: any) => {
@@ -102,7 +107,8 @@ function App() {
 
         case 'snapshot':
           if (ref.current) {
-            const blob = await ref.current.getSnapshotBlob();
+            const factor = args?.factor || 1; // Quality factor from QualitySelector
+            const blob = await ref.current.getSnapshotBlob(factor);
             if (blob) {
               const url = URL.createObjectURL(blob);
               const newSnapshot: Snapshot = {
@@ -149,11 +155,31 @@ function App() {
   };
 
   const handleSelectorConfirm = (indices: number[]) => {
-    if (pendingToolAction && indices.length > 0) {
-      executeAction(pendingToolAction.type, indices, pendingToolAction.args);
-    }
     setIsSelectorOpen(false);
+
+    if (pendingToolAction && indices.length > 0) {
+      // For snapshots: show quality selector (Step 2)
+      if (pendingToolAction.type === 'snapshot') {
+        setSelectedViewportsForSnapshot(indices);
+        setIsQualitySelectorOpen(true);
+        // Don't clear pendingToolAction yet - we need it for the quality selector
+      } else {
+        // For other actions: execute immediately
+        executeAction(pendingToolAction.type, indices, pendingToolAction.args);
+        setPendingToolAction(null);
+      }
+    }
+  };
+
+  const handleQualityConfirm = (factor: number) => {
+    setIsQualitySelectorOpen(false);
+
+    if (pendingToolAction && selectedViewportsForSnapshot.length > 0) {
+      executeAction(pendingToolAction.type, selectedViewportsForSnapshot, { factor });
+    }
+
     setPendingToolAction(null);
+    setSelectedViewportsForSnapshot([]);
   };
 
 
@@ -1859,6 +1885,17 @@ function App() {
               pendingToolAction?.type === 'save' ? 'Save Session' : 'Unknown Action'}
         onConfirm={handleSelectorConfirm}
         onCancel={() => { setIsSelectorOpen(false); setPendingToolAction(null); }}
+      />
+
+      <QualitySelector
+        isOpen={isQualitySelectorOpen}
+        viewportCount={selectedViewportsForSnapshot.length}
+        onConfirm={handleQualityConfirm}
+        onCancel={() => {
+          setIsQualitySelectorOpen(false);
+          setPendingToolAction(null);
+          setSelectedViewportsForSnapshot([]);
+        }}
       />
       {/* End Main Content Flex Container */}
 
