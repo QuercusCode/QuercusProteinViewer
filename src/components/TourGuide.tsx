@@ -20,13 +20,7 @@ export const startOnboardingTour = (onComplete?: () => void, onHighlight?: (elem
                     : 'Search for proteins by PDB ID. You can also upload PDB/CIF files or choose from the library.'
             }
         },
-        {
-            element: '#viewport-controls',
-            popover: {
-                title: 'Multi-View Layouts',
-                description: 'Switch between Single, Dual, Triple, or Quad viewports to compare different structures or views side-by-side.'
-            }
-        },
+
         {
             element: '#metadata-box',
             popover: {
@@ -43,6 +37,13 @@ export const startOnboardingTour = (onComplete?: () => void, onHighlight?: (elem
                 description: isChemical
                     ? 'Change representations (Ball & Stick, Spacefill) and coloring to highlight atoms.'
                     : 'Change representations (Cartoon, Spacefill) and coloring schemes to highlight different features.'
+            }
+        },
+        {
+            element: '#viewport-controls',
+            popover: {
+                title: 'Multi-View Layouts',
+                description: 'Switch between Single, Dual, Triple, or Quad viewports to compare different structures or views side-by-side.'
             }
         },
         {

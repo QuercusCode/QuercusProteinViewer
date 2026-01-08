@@ -307,11 +307,27 @@ function App() {
 
   const handleStartTour = () => {
     // Determine context (simple check based on dataSource or explicit logic)
-    const isChemical = dataSource === 'pubchem';
+    const isChemicalContext = dataSource === 'pubchem';
+    const hasStructure = !!pdbId || !!file;
 
-    startOnboardingTour(() => {
-      localStorage.setItem('hasSeenViewerTour', 'true');
-    }, handleTourHighlight, isChemical);
+    if (hasStructure) {
+      startOnboardingTour(() => {
+        localStorage.setItem('hasSeenViewerTour', 'true');
+      }, handleTourHighlight, isChemicalContext);
+    } else {
+      // Load default structure explicitly if none loaded
+      const defaultId = isChemicalContext ? '2244' : '2B3P';
+      setPdbId(defaultId);
+      setFile(null); // Ensure no file conflict
+      setProteinTitle(null);
+
+      // Wait for load to propagate before starting tour
+      setTimeout(() => {
+        startOnboardingTour(() => {
+          localStorage.setItem('hasSeenViewerTour', 'true');
+        }, handleTourHighlight, isChemicalContext);
+      }, 2000); // 2s delay to allow fetching and rendering
+    }
   };
 
   // Custom Colors need to be initialized too
