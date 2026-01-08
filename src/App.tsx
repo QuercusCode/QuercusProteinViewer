@@ -113,8 +113,9 @@ function App() {
 
         case 'snapshot':
           if (ref.current) {
-            const factor = args?.factor || 1; // Quality factor from QualitySelector
-            const blob = await ref.current.getSnapshotBlob(factor);
+            const factor = args?.factor || 1; // Quality factor from SnapshotModal
+            const transparent = args?.transparent !== undefined ? args.transparent : true; // Default transparent
+            const blob = await ref.current.getSnapshotBlob(factor, transparent);
             if (blob) {
               const url = URL.createObjectURL(blob);
               const newSnapshot: Snapshot = {
@@ -169,9 +170,9 @@ function App() {
     }
   };
 
-  const handleSnapshotConfirm = (viewportIndices: number[], qualityFactor: number) => {
+  const handleSnapshotConfirm = (viewportIndices: number[], qualityFactor: number, transparent: boolean) => {
     setIsSnapshotModalOpen(false);
-    executeAction('snapshot', viewportIndices, { factor: qualityFactor });
+    executeAction('snapshot', viewportIndices, { factor: qualityFactor, transparent });
   };
 
 

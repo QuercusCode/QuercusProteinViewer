@@ -5,13 +5,14 @@ import clsx from 'clsx';
 interface SnapshotModalProps {
     isOpen: boolean;
     viewMode: 'single' | 'dual' | 'triple' | 'quad';
-    onConfirm: (viewportIndices: number[], qualityFactor: number) => void;
+    onConfirm: (viewportIndices: number[], qualityFactor: number, transparent: boolean) => void;
     onCancel: () => void;
 }
 
 export const SnapshotModal: React.FC<SnapshotModalProps> = ({ isOpen, viewMode, onConfirm, onCancel }) => {
     const [selectedViewports, setSelectedViewports] = useState<boolean[]>([true, true, true, true]);
     const [selectedQuality, setSelectedQuality] = useState(2); // Default to High (2x)
+    const [transparentBackground, setTransparentBackground] = useState(true); // Default to transparent
 
     const viewportCount = viewMode === 'single' ? 1 : viewMode === 'dual' ? 2 : viewMode === 'triple' ? 3 : 4;
     const isMultiView = viewMode !== 'single';
@@ -23,6 +24,7 @@ export const SnapshotModal: React.FC<SnapshotModalProps> = ({ isOpen, viewMode, 
             for (let i = 0; i < viewportCount; i++) newSelection[i] = true;
             setSelectedViewports(newSelection);
             setSelectedQuality(2); // Reset to High quality
+            setTransparentBackground(true); // Reset to transparent
         }
     }, [isOpen, viewportCount]);
 
@@ -37,7 +39,7 @@ export const SnapshotModal: React.FC<SnapshotModalProps> = ({ isOpen, viewMode, 
     const handleConfirm = () => {
         const indices = selectedViewports.map((isSelected, idx) => isSelected ? idx : -1).filter(idx => idx !== -1);
         if (indices.length === 0) return; // Prevent confirming with no viewports selected
-        onConfirm(indices, selectedQuality);
+        onConfirm(indices, selectedQuality, transparentBackground);
     };
 
     const qualityOptions = [
@@ -177,6 +179,39 @@ export const SnapshotModal: React.FC<SnapshotModalProps> = ({ isOpen, viewMode, 
                                 </button>
                             ))}
                         </div>
+                    </div>
+
+                    {/* Transparent Background Toggle */}
+                    <div className="space-y-3">
+                        <h4 className="text-sm font-bold text-white">Background</h4>
+                        <button
+                            onClick={() => setTransparentBackground(!transparentBackground)}
+                            className={clsx(
+                                "w-full p-4 rounded-lg border-2 transition-all text-left flex items-center justify-between",
+                                transparentBackground
+                                    ? "border-purple-500 bg-purple-500/10"
+                                    : "border-white/10 bg-black/40 hover:border-white/20"
+                            )}
+                        >
+                            <div>
+                                <div className={clsx(
+                                    "font-bold text-sm mb-1",
+                                    transparentBackground ? "text-purple-400" : "text-white"
+                                )}>
+                                    Transparent Background
+                                </div>
+                                <div className="text-[10px] text-gray-500">Removes background for compositing</div>
+                            </div>
+                            <div className={clsx(
+                                "w-12 h-6 rounded-full transition-colors relative",
+                                transparentBackground ? "bg-purple-500" : "bg-gray-600"
+                            )}>
+                                <div className={clsx(
+                                    "absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform",
+                                    transparentBackground ? "right-0.5" : "left-0.5"
+                                )} />
+                            </div>
+                        </button>
                     </div>
                 </div>
 
