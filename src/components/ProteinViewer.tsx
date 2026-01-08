@@ -1977,7 +1977,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         } catch (e) { }
 
                         component.addRepresentation('cartoon', {
-                            color: schemeId
+                            color: schemeId,
+                            aspectRatio: 5,
+                            subdiv: 12,
+                            radialSegments: 20
                         });
                     } else {
                         component.addRepresentation(repType, {
