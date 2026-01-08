@@ -1830,6 +1830,72 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     sele: 'not (ARG or LYS or HIS or ASP or GLU)',
                     name: 'charge_neutral'
                 });
+            } else if (currentColoring === 'custom') {
+                // --- CUSTOM COLORING MODE: Smooth Single-Mesh Rendering ---
+                // This mode uses a custom NGL color scheme for smooth transitions
+
+                const schemeId = 'custom_smooth_coloring';
+                const atomColorMap = new Map<number, number>();
+
+                // Build the color map from custom color rules
+                if (hasValidCustomRules) {
+                    customColors.forEach(rule => {
+                        if (rule.color && rule.target) {
+                            const colorHex = new window.NGL.Color(rule.color).getHex();
+                            try {
+                                component.structure.eachAtom((atom: any) => {
+                                    atomColorMap.set(atom.index, colorHex);
+                                }, new window.NGL.Selection(rule.target));
+                            } catch (e) {
+                                console.warn("Invalid custom color selection:", rule.target, e);
+                            }
+                        }
+                    });
+                }
+
+                // Register the custom color scheme
+                window.NGL.ColormakerRegistry.addScheme(function (this: any, params: any) {
+                    this.atomColor = function (atom: any) {
+                        // Check if this atom has a custom color
+                        const customColor = atomColorMap.get(atom.index);
+                        if (customColor !== undefined) {
+                            return customColor;
+                        }
+
+                        // Fallback to element coloring for undefined regions
+                        const ElementScheme = window.NGL.ColormakerRegistry.getScheme('element');
+                        if (ElementScheme) {
+                            const elementScheme = new ElementScheme(params);
+                            return elementScheme.atomColor(atom);
+                        }
+
+                        // Last resort: light gray
+                        return 0xCCCCCC;
+                    };
+                }, schemeId);
+
+                // Create single representation with custom scheme
+                if (repType === 'cartoon') {
+                    // Force recalculation for cartoons
+                    try {
+                        component.structure.eachModel((m: any) => {
+                            if (m.calculateSecondaryStructure) m.calculateSecondaryStructure();
+                        });
+                    } catch (e) { }
+
+                    component.addRepresentation('cartoon', {
+                        color: schemeId,
+                        aspectRatio: 5,
+                        subdiv: 12,
+                        radialSegments: 20,
+                    });
+                } else {
+                    component.addRepresentation(repType, {
+                        color: schemeId
+                    });
+                }
+
+                console.log(`Custom coloring mode: ${atomColorMap.size} atoms with custom colors`);
             } else {
                 // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL
                 // REVERTED to use 'color' property as previously working.

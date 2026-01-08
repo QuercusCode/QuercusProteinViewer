@@ -1186,6 +1186,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                                 {!isChemical && <option value="secondary-structure">Structure</option>}
                                                 {!isChemical && <option value="hydrophobicity">Hydrophobicity</option>}
                                                 <option value="bfactor">B-Factor</option>
+                                                <option value="custom">Custom</option>
                                                 <option value="uniform">Uniform</option>
                                                 <option value="element">Element (CPK)</option>
                                             </select>
