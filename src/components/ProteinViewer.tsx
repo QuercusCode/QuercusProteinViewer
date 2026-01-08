@@ -1831,166 +1831,31 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     name: 'charge_neutral'
                 });
             } else if (currentColoring === 'custom') {
-                // --- CUSTOM COLORING MODE: Smooth Gradient Rendering ---
-                // Improved robustness and fallback logic
+                // Revert to simple overlay visualization
 
-                // 1. If no custom rules, just use element coloring directly (simple & robust)
-                if (!hasValidCustomRules) {
-                    if (repType === 'cartoon') {
-                        component.addRepresentation('cartoon', {
-                            color: 'element',
-                            aspectRatio: 5,
-                            subdiv: 12,
-                            radialSegments: 20
-                        });
-                    } else {
-                        component.addRepresentation(repType, { color: 'element' });
-                    }
-                } else {
-                    // 2. We have rules - use the custom scheme with gradients
+                // 1. Add base representation (so the rest of the protein is visible)
+                component.addRepresentation(repType, {
+                    color: 'element',
+                    sele: '*',
+                    name: 'base_structure'
+                });
 
-                    // Use unique ID to prevent NGL caching stale schemes
-                    const schemeId = `custom_smooth_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
-
-                    const atomColorMap = new Map<number, number>();
-                    const residueColorMap = new Map<string, number>();
-
-                    // Build residue-level color map from custom rules
-                    customColors.forEach(rule => {
+                // 2. Add custom overlays
+                if (hasValidCustomRules) {
+                    customColors.forEach((rule, idx) => {
                         if (rule.color && rule.target) {
-                            const colorHex = new window.NGL.Color(rule.color).getHex();
                             try {
-                                component.structure.eachResidue((residue: any) => {
-                                    const resKey = `${residue.chainname}:${residue.resno}`;
-                                    residueColorMap.set(resKey, colorHex);
-                                }, new window.NGL.Selection(rule.target));
+                                component.addRepresentation(repType, {
+                                    color: rule.color,
+                                    sele: rule.target,
+                                    name: `custom_overlay_${idx}`
+                                });
                             } catch (e) {
-                                console.warn("Invalid custom color selection:", rule.target, e);
+                                console.warn("Failed to apply custom color rule:", rule, e);
                             }
                         }
                     });
-
-
-                    // --- GLOBAL CHAIN SMOOTHING ALGORITHM ---
-                    // Fixed: Uses 2-pass iteration to avoid ResidueProxy reference issues
-
-                    try {
-                        component.structure.eachChain((chain: any) => {
-                            const bgColors: number[] = [];
-
-                            // PASS 1: Collection
-                            chain.eachResidue((res: any) => {
-                                const key = `${res.chainname}:${res.resno}`;
-                                let col = residueColorMap.get(key);
-
-                                if (col === undefined) {
-                                    col = 0xCCCCCC;
-                                    try {
-                                        const firstAtom = Array.from(res.iterateAtom())[0];
-                                        const ElementScheme = window.NGL.ColormakerRegistry.getScheme('element');
-                                        if (ElementScheme) {
-                                            const es = new ElementScheme({});
-                                            col = es.atomColor(firstAtom);
-                                        }
-                                    } catch (e) { /* ignore */ }
-                                }
-
-                                bgColors.push(col || 0xCCCCCC);
-                            });
-
-                            // Smoothing Phase
-                            const len = bgColors.length;
-                            let rBuffer = new Float32Array(len);
-                            let gBuffer = new Float32Array(len);
-                            let bBuffer = new Float32Array(len);
-
-                            for (let i = 0; i < len; i++) {
-                                const c = bgColors[i] || 0xCCCCCC;
-                                rBuffer[i] = (c >> 16) & 0xFF;
-                                gBuffer[i] = (c >> 8) & 0xFF;
-                                bBuffer[i] = c & 0xFF;
-                            }
-
-                            const passes = 10;
-                            for (let p = 0; p < passes; p++) {
-                                const newR = new Float32Array(len);
-                                const newG = new Float32Array(len);
-                                const newB = new Float32Array(len);
-
-                                for (let i = 0; i < len; i++) {
-                                    let sumR = 0, sumG = 0, sumB = 0;
-                                    let count = 0;
-
-                                    if (i > 0) { sumR += rBuffer[i - 1]; sumG += gBuffer[i - 1]; sumB += bBuffer[i - 1]; count++; }
-                                    sumR += rBuffer[i] * 2; sumG += gBuffer[i] * 2; sumB += bBuffer[i] * 2; count += 2;
-                                    if (i < len - 1) { sumR += rBuffer[i + 1]; sumG += gBuffer[i + 1]; sumB += bBuffer[i + 1]; count++; }
-
-                                    newR[i] = sumR / count; newG[i] = sumG / count; newB[i] = sumB / count;
-                                }
-                                rBuffer = newR; gBuffer = newG; bBuffer = newB;
-                            }
-
-                            // PASS 2: Assignment (Re-iterate to get valid proxies)
-                            let resIdx = 0;
-                            chain.eachResidue((res: any) => {
-                                if (resIdx < len) {
-                                    const r = Math.round(rBuffer[resIdx]);
-                                    const g = Math.round(gBuffer[resIdx]);
-                                    const b = Math.round(bBuffer[resIdx]);
-                                    const finalColor = (r << 16) | (g << 8) | b;
-
-                                    res.eachAtom((atom: any) => {
-                                        atomColorMap.set(atom.index, finalColor);
-                                    });
-                                    resIdx++;
-                                }
-                            });
-                        });
-                    } catch (e) {
-                        console.warn("Global smoothing failed", e);
-                    }
-
-                    // Fallback: if atomColorMap is still empty (e.g. error above), force populate
-                    if (atomColorMap.size === 0) {
-                        try {
-                            const ElementScheme = window.NGL.ColormakerRegistry.getScheme('element');
-                            const es = ElementScheme ? new ElementScheme({}) : null;
-                            component.structure.eachAtom((atom: any) => {
-                                atomColorMap.set(atom.index, es ? es.atomColor(atom) : 0xCCCCCC);
-                            });
-                        } catch (e) { console.error("Fallback population failed", e); }
-                    }
-
-                    // Register the custom color scheme
-                    window.NGL.ColormakerRegistry.addScheme(function (this: any) {
-                        this.atomColor = function (atom: any) {
-                            return atomColorMap.get(atom.index) || 0xCCCCCC;
-                        };
-                    }, schemeId);
-
-                    // Create single representation with custom scheme
-                    if (repType === 'cartoon') {
-                        try {
-                            component.structure.eachModel((m: any) => {
-                                if (m.calculateSecondaryStructure) m.calculateSecondaryStructure();
-                            });
-                        } catch (e) { }
-
-                        component.addRepresentation('cartoon', {
-                            color: schemeId,
-                            aspectRatio: 5,
-                            subdiv: 12,
-                            radialSegments: 20
-                        });
-                    } else {
-                        component.addRepresentation(repType, {
-                            color: schemeId
-                        });
-                    }
-
-                    console.log(`Custom coloring applied: ${schemeId}`);
                 }
-
             } else {
                 // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL
                 // REVERTED to use 'color' property as previously working.
