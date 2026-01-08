@@ -1919,7 +1919,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             }
 
                             // Multi-pass smoothing (3 passes of [0.25, 0.5, 0.25] kernel approx)
-                            const passes = 3;
+                            const passes = 10;
                             for (let p = 0; p < passes; p++) {
                                 const newR = new Float32Array(len);
                                 const newG = new Float32Array(len);
@@ -1993,10 +1993,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         } catch (e) { }
 
                         component.addRepresentation('cartoon', {
-                            color: schemeId,
-                            aspectRatio: 5,
-                            subdiv: 12,
-                            radialSegments: 20,
+                            color: schemeId
                         });
                     } else {
                         component.addRepresentation(repType, {
