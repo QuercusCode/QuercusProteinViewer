@@ -72,8 +72,15 @@ export const startOnboardingTour = (onComplete?: () => void, onHighlight?: (elem
         {
             element: '#export-tools',
             popover: {
-                title: 'Export & Share',
-                description: 'Take high-quality snapshots, record movies, or share your session.'
+                title: 'Capture & Export',
+                description: 'Capture high-resolution transparent snapshots or record movies of your structure.'
+            }
+        },
+        {
+            element: '#media-gallery-btn',
+            popover: {
+                title: 'Media Gallery',
+                description: 'View, organize, and download all your captured snapshots and recordings in the specialized gallery.'
             }
         },
         {

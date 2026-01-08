@@ -1651,6 +1651,7 @@ export const Controls: React.FC<ControlsProps> = ({
                             {/* Galleries */}
                             <div className="pt-2 border-t border-white/5">
                                 <button
+                                    id="media-gallery-btn"
                                     onClick={() => setIsGalleryOpen(true)}
                                     className={`w-full flex items-center justify-between p-3 rounded-lg border transition-all group ${isLightMode ? 'bg-neutral-50 border-neutral-200 hover:bg-neutral-100' : 'bg-white/5 border-white/10 hover:bg-white/10'}`}
                                 >
