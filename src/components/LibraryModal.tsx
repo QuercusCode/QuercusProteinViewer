@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, X, BookOpen, Database, FlaskConical, Dna, Activity, Zap, Shield, Grid, Archive, Anchor, Layers, ArrowLeft, Syringe, Hexagon, Magnet, Pill, Leaf, Sun, Brain, HeartPulse, Puzzle, Globe } from 'lucide-react';
+import { Search, X, BookOpen, Database, FlaskConical, Dna, Activity, Zap, Shield, Grid, Archive, Anchor, Layers, ArrowLeft, Syringe, Hexagon, Magnet, Pill, Leaf, Sun, Brain, HeartPulse, Puzzle } from 'lucide-react';
 import clsx from 'clsx';
 import { OFFLINE_LIBRARY } from '../data/library';
 import { CHEMICAL_LIBRARY } from '../data/chemicalLibrary';
@@ -45,46 +45,23 @@ const CHEMICAL_CATEGORY_CONFIG: Record<string, { icon: React.ReactNode, style: s
 };
 
 const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }) => {
-    const [activeTab, setActiveTab] = useState<'proteins' | 'chemicals' | 'online'>('proteins');
+    const [activeTab, setActiveTab] = useState<'proteins' | 'chemicals'>('proteins');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string | 'All'>('All');
     const [viewMode, setViewMode] = useState<'categories' | 'list'>('categories');
-
-    // Online Import State
-    const [onlineSource, setOnlineSource] = useState<'rcsb' | 'alphafold' | 'pubchem'>('rcsb');
-    const [onlineId, setOnlineId] = useState('');
 
     // Select Data Source
     const currentLibrary = useMemo(() => activeTab === 'proteins' ? OFFLINE_LIBRARY : CHEMICAL_LIBRARY, [activeTab]);
     const currentConfig = activeTab === 'proteins' ? PROTEIN_CATEGORY_CONFIG : CHEMICAL_CATEGORY_CONFIG;
 
     // Reset view on tab change
-    const handleTabChange = (tab: 'proteins' | 'chemicals' | 'online') => {
+    const handleTabChange = (tab: 'proteins' | 'chemicals') => {
         setActiveTab(tab);
-        if (tab !== 'online') {
-            setViewMode('categories');
-            setSelectedCategory('All');
-            setSearchTerm('');
-        }
+        setViewMode('categories');
+        setSelectedCategory('All');
+        setSearchTerm('');
     };
 
-    // Handle Online Import
-    const handleOnlineImport = () => {
-        if (!onlineId.trim()) return;
-        const id = onlineId.trim();
-
-        switch (onlineSource) {
-            case 'rcsb':
-                onSelect(`rcsb://${id}`);
-                break;
-            case 'alphafold':
-                onSelect(`alphafold://${id}`);
-                break;
-            case 'pubchem':
-                onSelect(`pubchem://${id}`);
-                break;
-        }
-    };
 
     // Extract unique categories
     const categories = useMemo(() => {
@@ -187,31 +164,20 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
                             <FlaskConical size={16} />
                             Chemicals
                         </button>
-                        <button
-                            onClick={() => handleTabChange('online')}
-                            className={clsx(
-                                "flex-1 sm:flex-none px-3 py-2 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 whitespace-nowrap",
-                                activeTab === 'online' ? "bg-purple-500/20 text-purple-400 shadow-sm" : "text-gray-500 hover:text-gray-300"
-                            )}
-                        >
-                            <Globe size={16} />
-                            Online Import
-                        </button>
+
                     </div>
 
                     {/* Search Bar (Global) */}
-                    {activeTab !== 'online' && (
-                        <div className="relative w-full sm:w-auto sm:flex-1 sm:max-w-md hidden sm:block">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
-                            <input
-                                type="text"
-                                placeholder={activeTab === 'proteins' ? "Search..." : "Search..."}
-                                value={searchTerm}
-                                onChange={(e) => handleSearch(e.target.value)}
-                                className="w-full bg-black/40 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-sm"
-                            />
-                        </div>
-                    )}
+                    <div className="relative w-full sm:w-auto sm:flex-1 sm:max-w-md hidden sm:block">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+                        <input
+                            type="text"
+                            placeholder={activeTab === 'proteins' ? "Search..." : "Search..."}
+                            value={searchTerm}
+                            onChange={(e) => handleSearch(e.target.value)}
+                            className="w-full bg-black/40 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-sm"
+                        />
+                    </div>
 
                     <button onClick={onClose} className="hidden sm:block p-2 ml-4 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white shrink-0">
                         <X size={24} />
@@ -221,101 +187,10 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
                 {/* CONTENT AREA */}
                 <div className="flex-1 overflow-y-auto min-h-0 p-4 sm:p-6 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent bg-gradient-to-br from-gray-900 via-gray-900 to-black">
 
-                    {/* VIEW: ONLINE IMPORT */}
-                    {activeTab === 'online' && (
-                        <div className="flex flex-col items-center justify-center h-full animate-in fade-in slide-in-from-bottom-4 duration-300 max-w-2xl mx-auto w-full">
-                            <div className="p-8 rounded-3xl bg-black/40 border border-white/10 w-full backdrop-blur relative overflow-hidden">
-                                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-orange-500 opacity-50" />
 
-                                <div className="flex flex-col gap-6">
-                                    <div className="text-center">
-                                        <div className="inline-flex p-4 rounded-2xl bg-gradient-to-br from-purple-500/20 to-blue-500/20 border border-white/10 mb-4 shadow-lg shadow-purple-500/10">
-                                            <Globe size={32} className="text-white" />
-                                        </div>
-                                        <h2 className="text-2xl font-bold text-white mb-2">Fetch from Database</h2>
-                                        <p className="text-gray-400">Import structures directly from major scientific repositories.</p>
-                                    </div>
-
-                                    <div className="flex flex-col sm:flex-row gap-4">
-                                        {/* Source Selector */}
-                                        <div className="flex-1">
-                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">Source</label>
-                                            <div className="grid grid-cols-1 gap-2">
-                                                <button
-                                                    onClick={() => setOnlineSource('rcsb')}
-                                                    className={clsx("flex items-center gap-3 p-3 rounded-xl border text-sm transition-all", onlineSource === 'rcsb' ? "bg-blue-500/20 border-blue-500 text-white" : "bg-white/5 border-white/5 text-gray-400 hover:bg-white/10")}
-                                                >
-                                                    <Database size={18} className={onlineSource === 'rcsb' ? "text-blue-400" : ""} />
-                                                    <div className="text-left">
-                                                        <div className="font-bold">RCSB PDB</div>
-                                                        <div className="text-[10px] opacity-70">Official Protein Data Bank</div>
-                                                    </div>
-                                                </button>
-                                                <button
-                                                    onClick={() => setOnlineSource('alphafold')}
-                                                    className={clsx("flex items-center gap-3 p-3 rounded-xl border text-sm transition-all", onlineSource === 'alphafold' ? "bg-purple-500/20 border-purple-500 text-white" : "bg-white/5 border-white/5 text-gray-400 hover:bg-white/10")}
-                                                >
-                                                    <Brain size={18} className={onlineSource === 'alphafold' ? "text-purple-400" : ""} />
-                                                    <div className="text-left">
-                                                        <div className="font-bold">AlphaFold DB</div>
-                                                        <div className="text-[10px] opacity-70">Predicted Structures (UniProt)</div>
-                                                    </div>
-                                                </button>
-                                                <button
-                                                    onClick={() => setOnlineSource('pubchem')}
-                                                    className={clsx("flex items-center gap-3 p-3 rounded-xl border text-sm transition-all", onlineSource === 'pubchem' ? "bg-orange-500/20 border-orange-500 text-white" : "bg-white/5 border-white/5 text-gray-400 hover:bg-white/10")}
-                                                >
-                                                    <FlaskConical size={18} className={onlineSource === 'pubchem' ? "text-orange-400" : ""} />
-                                                    <div className="text-left">
-                                                        <div className="font-bold">PubChem</div>
-                                                        <div className="text-[10px] opacity-70">Chemical Compounds</div>
-                                                    </div>
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* Input Area */}
-                                        <div className="flex-[2] flex flex-col">
-                                            <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">
-                                                {onlineSource === 'rcsb' ? 'PDB ID' : onlineSource === 'alphafold' ? 'UniProt Accession' : 'Compound ID (CID)'}
-                                            </label>
-                                            <div className="relative">
-                                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
-                                                    {onlineSource === 'rcsb' ? <Dna size={18} /> : onlineSource === 'alphafold' ? <Activity size={18} /> : <Hexagon size={18} />}
-                                                </div>
-                                                <input
-                                                    type="text"
-                                                    value={onlineId}
-                                                    onChange={(e) => setOnlineId(e.target.value)}
-                                                    onKeyDown={(e) => e.key === 'Enter' && handleOnlineImport()}
-                                                    className="w-full bg-black/40 border border-white/10 rounded-xl pl-12 pr-4 py-4 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-lg font-mono"
-                                                    placeholder={onlineSource === 'rcsb' ? "e.g. 1CRN" : onlineSource === 'alphafold' ? "e.g. P00533" : "e.g. 2244"}
-                                                />
-                                            </div>
-                                            <div className="mt-4 flex justify-end">
-                                                <button
-                                                    onClick={handleOnlineImport}
-                                                    disabled={!onlineId.trim()}
-                                                    className="bg-white text-black font-bold py-3 px-8 rounded-xl hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:hover:scale-100 flex items-center gap-2"
-                                                >
-                                                    <Search size={18} />
-                                                    Import Structure
-                                                </button>
-                                            </div>
-                                            <p className="mt-4 text-xs text-center text-gray-500">
-                                                {onlineSource === 'rcsb' ? "Fetches directly from rcsb.org" :
-                                                    onlineSource === 'alphafold' ? "Fetches v4 predictions from alphafold.ebi.ac.uk" :
-                                                        "Fetches 3D conformers from pubchem.ncbi.nlm.nih.gov"}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
 
                     {/* VIEW: CATEGORY DASHBOARD */}
-                    {activeTab !== 'online' && viewMode === 'categories' && (
+                    {viewMode === 'categories' && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 animate-in fade-in zoom-in-95 duration-300">
                             {categories.map(cat => {
                                 const config = currentConfig[cat];
