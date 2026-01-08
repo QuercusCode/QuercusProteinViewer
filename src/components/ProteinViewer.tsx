@@ -1872,24 +1872,18 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
 
                     // --- GLOBAL CHAIN SMOOTHING ALGORITHM ---
-                    // 1. Linearize chain residues to array
-                    // 2. Assign base vs custom colors
-                    // 3. Apply floating-point moving average smoothing
-                    // 4. Map back to atoms
+                    // Fixed: Uses 2-pass iteration to avoid ResidueProxy reference issues
 
                     try {
                         component.structure.eachChain((chain: any) => {
-                            // Collection phase
-                            const residues: any[] = [];
-                            const bgColors: number[] = []; // Base colors (element/custom)
+                            const bgColors: number[] = [];
 
+                            // PASS 1: Collection
                             chain.eachResidue((res: any) => {
-                                residues.push(res);
                                 const key = `${res.chainname}:${res.resno}`;
                                 let col = residueColorMap.get(key);
 
                                 if (col === undefined) {
-                                    // Default to element color
                                     col = 0xCCCCCC;
                                     try {
                                         const firstAtom = Array.from(res.iterateAtom())[0];
@@ -1900,17 +1894,16 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                         }
                                     } catch (e) { /* ignore */ }
                                 }
+
                                 bgColors.push(col || 0xCCCCCC);
                             });
 
-                            // Smoothing Phase (RGB separation)
-                            // We use a floating point buffer for precision accumulation
+                            // Smoothing Phase
                             const len = bgColors.length;
                             let rBuffer = new Float32Array(len);
                             let gBuffer = new Float32Array(len);
                             let bBuffer = new Float32Array(len);
 
-                            // Initialize
                             for (let i = 0; i < len; i++) {
                                 const c = bgColors[i] || 0xCCCCCC;
                                 rBuffer[i] = (c >> 16) & 0xFF;
@@ -1918,7 +1911,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                 bBuffer[i] = c & 0xFF;
                             }
 
-                            // Multi-pass smoothing (3 passes of [0.25, 0.5, 0.25] kernel approx)
                             const passes = 10;
                             for (let p = 0; p < passes; p++) {
                                 const newR = new Float32Array(len);
@@ -1929,37 +1921,29 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                     let sumR = 0, sumG = 0, sumB = 0;
                                     let count = 0;
 
-                                    // Previous
-                                    if (i > 0) {
-                                        sumR += rBuffer[i - 1]; sumG += gBuffer[i - 1]; sumB += bBuffer[i - 1];
-                                        count++;
-                                    }
-                                    // Current (weight x2 for stability)
-                                    sumR += rBuffer[i] * 2; sumG += gBuffer[i] * 2; sumB += bBuffer[i] * 2;
-                                    count += 2;
-                                    // Next
-                                    if (i < len - 1) {
-                                        sumR += rBuffer[i + 1]; sumG += gBuffer[i + 1]; sumB += bBuffer[i + 1];
-                                        count++;
-                                    }
+                                    if (i > 0) { sumR += rBuffer[i - 1]; sumG += gBuffer[i - 1]; sumB += bBuffer[i - 1]; count++; }
+                                    sumR += rBuffer[i] * 2; sumG += gBuffer[i] * 2; sumB += bBuffer[i] * 2; count += 2;
+                                    if (i < len - 1) { sumR += rBuffer[i + 1]; sumG += gBuffer[i + 1]; sumB += bBuffer[i + 1]; count++; }
 
-                                    newR[i] = sumR / count;
-                                    newG[i] = sumG / count;
-                                    newB[i] = sumB / count;
+                                    newR[i] = sumR / count; newG[i] = sumG / count; newB[i] = sumB / count;
                                 }
                                 rBuffer = newR; gBuffer = newG; bBuffer = newB;
                             }
 
-                            // Assignment Phase
-                            residues.forEach((res, idx) => {
-                                const r = Math.round(rBuffer[idx]);
-                                const g = Math.round(gBuffer[idx]);
-                                const b = Math.round(bBuffer[idx]);
-                                const finalColor = (r << 16) | (g << 8) | b;
+                            // PASS 2: Assignment (Re-iterate to get valid proxies)
+                            let resIdx = 0;
+                            chain.eachResidue((res: any) => {
+                                if (resIdx < len) {
+                                    const r = Math.round(rBuffer[resIdx]);
+                                    const g = Math.round(gBuffer[resIdx]);
+                                    const b = Math.round(bBuffer[resIdx]);
+                                    const finalColor = (r << 16) | (g << 8) | b;
 
-                                res.eachAtom((atom: any) => {
-                                    atomColorMap.set(atom.index, finalColor);
-                                });
+                                    res.eachAtom((atom: any) => {
+                                        atomColorMap.set(atom.index, finalColor);
+                                    });
+                                    resIdx++;
+                                }
                             });
                         });
                     } catch (e) {
