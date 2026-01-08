@@ -1885,7 +1885,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         color: currentColoring,
                         sele: 'not (helix or sheet)',
                         aspectRatio: 1.0,  // Perfectly round
-                        scale: 0.25,       // CRITICAL: Much thinner to match PyMOL wire/tube look
+                        scale: 0.03,       // EXTREME: 10x thinner (Wire look)
                         subdiv: 12,
                         radialSegments: 20
                     };
