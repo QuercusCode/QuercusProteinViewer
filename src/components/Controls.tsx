@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Skeleton } from './Skeleton';
-import { ScreenshotModal } from './ScreenshotModal';
 import { GalleryModal } from './GalleryModal';
 import {
     Camera,
@@ -400,7 +399,6 @@ export const Controls: React.FC<ControlsProps> = ({
     isRecording,
     proteinTitle,
     snapshots,
-    onSnapshot,
     onDownloadSnapshot,
     onDeleteSnapshot,
     isSpinning,
@@ -448,7 +446,7 @@ export const Controls: React.FC<ControlsProps> = ({
     const [isSearchFocused, setIsSearchFocused] = useState(false);
 
     // State for Screenshot Modal
-    const [isScreenshotModalOpen, setIsScreenshotModalOpen] = useState(false);
+
 
 
     const handleSearch = () => {
@@ -619,12 +617,6 @@ export const Controls: React.FC<ControlsProps> = ({
 
     return (
         <>
-            <ScreenshotModal
-                isOpen={isScreenshotModalOpen}
-                onClose={() => setIsScreenshotModalOpen(false)}
-                onCapture={onSnapshot}
-                isLightMode={isLightMode}
-            />
 
             <button
                 onClick={onToggleMobileSidebar}
@@ -1614,9 +1606,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                         <button onClick={onResetView} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}>
                                             <RotateCcw className="w-3.5 h-3.5" /> <span className="text-xs">Reset</span>
                                         </button>
-                                        <button onClick={() => setIsScreenshotModalOpen(true)} className={`flex-1 flex items-center justify-center gap-1 border py-2 rounded-lg transition-all ${cardBg} hover:text-blue-500 hover:border-blue-500/50`}>
-                                            <Camera className="w-3.5 h-3.5" /> <span className="text-xs">Snapshot</span>
-                                        </button>
+
                                         <button onClick={onToggleShare} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:text-green-500 hover:border-green-500/50`}>
                                             <Share2 className="w-3.5 h-3.5" /> <span className="text-xs">Share</span>
                                         </button>
