@@ -41,6 +41,7 @@ export const GalleryModal: React.FC<GalleryModalProps> = ({
 }) => {
     const [activeTab, setActiveTab] = useState<'all' | 'snapshots' | 'movies'>('all');
     const [selectedId, setSelectedId] = useState<string | null>(null);
+    const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
     // Combine and sort items by timestamp (newest first)
     const items = useMemo(() => {
@@ -257,13 +258,7 @@ export const GalleryModal: React.FC<GalleryModalProps> = ({
                                     <Download className="w-3.5 h-3.5" /> Download
                                 </button>
                                 <button
-                                    onClick={() => {
-                                        if (confirm('Are you sure you want to delete this item?')) {
-                                            if (selectedItem.type === 'snapshot') onDeleteSnapshot(selectedItem.id);
-                                            else onDeleteMovie(selectedItem.id);
-                                            setSelectedId(null);
-                                        }
-                                    }}
+                                    onClick={() => setIsDeleteConfirmOpen(true)}
                                     className={clsx("px-3 py-2 rounded-lg border transition-colors hover:text-red-500 hover:border-red-500", borderColor, subtleText)}
                                 >
                                     <Trash2 className="w-4 h-4" />
@@ -273,6 +268,37 @@ export const GalleryModal: React.FC<GalleryModalProps> = ({
                     )}
                 </div>
             </div>
+
+            {/* Custom Delete Confirmation Modal */}
+            {isDeleteConfirmOpen && selectedItem && (
+                <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className={clsx("w-full max-w-sm rounded-xl p-6 shadow-2xl scale-100 animate-in zoom-in-95 duration-200 border", bgColor, borderColor)}>
+                        <h3 className={clsx("text-lg font-bold mb-2", textColor)}>Delete Item?</h3>
+                        <p className={clsx("text-sm mb-6", subtleText)}>
+                            Are you sure you want to delete this {selectedItem.type}? This action cannot be undone.
+                        </p>
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => setIsDeleteConfirmOpen(false)}
+                                className={clsx("px-4 py-2 rounded-lg text-sm font-medium transition-colors", isLightMode ? "hover:bg-neutral-100 text-neutral-600" : "hover:bg-white/10 text-neutral-400")}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => {
+                                    if (selectedItem.type === 'snapshot') onDeleteSnapshot(selectedItem.id);
+                                    else onDeleteMovie(selectedItem.id);
+                                    setSelectedId(null);
+                                    setIsDeleteConfirmOpen(false);
+                                }}
+                                className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm font-bold shadow-lg shadow-red-500/20"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
