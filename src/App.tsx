@@ -1420,6 +1420,12 @@ function App() {
           setDataSource('pdb'); // Ensure we are in PDB mode
           setProteinTitle(`Loading ${id}...`);
 
+          // Reset representation to cartoon for proteins
+          // This prevents ball+stick from persisting from chemical loads
+          if (representation === 'ball+stick') {
+            setRepresentation('cartoon');
+          }
+
           // Find metadata
           const libMeta = OFFLINE_LIBRARY.find(i => i.id === id);
           if (libMeta) {
