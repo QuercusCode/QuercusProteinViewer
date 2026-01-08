@@ -1868,7 +1868,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                     const params: any = {
                         color: currentColoring,
-                        aspectRatio: 5,          // Flat arrows for sheets
+                        aspectRatio: 1.5,        // PyMOL style: Rounder/Tubular (was 5.0 for Flat)
                         subdiv: 12,              // Smooth curves
                         radialSegments: 20,      // Smooth helix cylinders
                     };
@@ -1950,13 +1950,13 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         const params: any = {
             backgroundColor: backgroundColor,
             quality: quality, // 'medium' or 'high'
-            lightIntensity: 1.0, // Standard key light
+            lightIntensity: 1.4, // Increased brightness (PyMOL style)
         };
 
         if (enableAmbientOcclusion) {
             params.sampleLevel = 2; // -1/0 = off, 1 = low, 2 = medium, 4 = high
-            params.ambientColor = 0x202020; // Soft grey shadow rather than pitch black
-            params.ambientIntensity = 1.0;
+            params.ambientColor = 0x505050; // Brighter ambient shadows
+            params.ambientIntensity = 1.2;
         } else {
             params.sampleLevel = 0;
             params.ambientIntensity = 0.0;
