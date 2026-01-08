@@ -3,6 +3,8 @@ import { Star, Trash2, X, Clock, History } from 'lucide-react';
 import type { Favorite } from '../hooks/useFavorites';
 import type { HistoryItem } from '../hooks/useHistory';
 
+import { type DataSource } from '../utils/pdbUtils';
+
 interface FavoritesPanelProps {
     favorites: Favorite[];
     history?: HistoryItem[];
@@ -11,8 +13,8 @@ interface FavoritesPanelProps {
     initialTab?: 'favorites' | 'history';
     showTabs?: boolean;
     onClose: () => void;
-    onSelect: (id: string, dataSource: 'pdb' | 'pubchem') => void;
-    onRemove: (id: string, dataSource: 'pdb' | 'pubchem') => void;
+    onSelect: (id: string, dataSource: DataSource) => void;
+    onRemove: (id: string, dataSource: DataSource) => void;
     isLightMode: boolean;
 }
 
@@ -133,7 +135,7 @@ export const FavoritesPanel: React.FC<FavoritesPanelProps> = ({
                                                     {fav.title || fav.id}
                                                 </div>
                                                 <div className={`text-sm ${subtleText}`}>
-                                                    {fav.dataSource === 'pdb' ? 'PDB' : 'PubChem'}: {fav.id}
+                                                    {fav.dataSource === 'pdb' ? 'PDB' : fav.dataSource === 'alphafold' ? 'AlphaFold' : 'PubChem'}: {fav.id}
                                                     {' • '}
                                                     {new Date(fav.addedAt).toLocaleDateString()}
                                                 </div>
@@ -179,7 +181,7 @@ export const FavoritesPanel: React.FC<FavoritesPanelProps> = ({
                                                 </div>
                                                 <div className={`text-xs ${subtleText} flex items-center gap-2`}>
                                                     <span className={`px-1.5 rounded ${isLightMode ? 'bg-neutral-200' : 'bg-neutral-800'}`}>
-                                                        {item.dataSource === 'pdb' ? 'PDB' : 'CHEM'}
+                                                        {item.dataSource === 'pdb' ? 'PDB' : item.dataSource === 'alphafold' ? 'AF DB' : 'CHEM'}
                                                     </span>
                                                     {new Date(item.timestamp).toLocaleTimeString()}
                                                 </div>

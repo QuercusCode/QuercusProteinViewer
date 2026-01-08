@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
+import { type DataSource } from '../utils/pdbUtils';
 
 export interface HistoryItem {
     id: string;
-    dataSource: 'pdb' | 'pubchem';
+    dataSource: DataSource;
     timestamp: number;
 }
 
@@ -28,7 +29,7 @@ export function useHistory() {
         }
     }, [history]);
 
-    const addToHistory = useCallback((id: string, dataSource: 'pdb' | 'pubchem') => {
+    const addToHistory = useCallback((id: string, dataSource: DataSource) => {
         setHistory(prev => {
             // Remove existing entry for this ID/Source to prevent duplicates
             const filtered = prev.filter(item => !(item.id === id && item.dataSource === dataSource));
