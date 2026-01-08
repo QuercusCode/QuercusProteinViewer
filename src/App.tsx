@@ -294,7 +294,7 @@ function App() {
       newSections['appearance'] = true;
     } else if (elementId === '#analysis-tools') {
       newSections['analysis'] = true;
-    } else if (elementId === '#export-tools') {
+    } else if (elementId === '#export-tools' || elementId === '#media-gallery-btn') {
       newSections['tools'] = true;
     } else if (elementId === '#sequence-track') {
       newSections['analysis'] = true;
