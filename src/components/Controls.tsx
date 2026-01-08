@@ -1041,7 +1041,7 @@ export const Controls: React.FC<ControlsProps> = ({
 
                                         {/* Multi-View Mode Selector */}
                                         {onSetViewMode && (
-                                            <div className="space-y-1">
+                                            <div className="space-y-1" id="viewport-controls">
                                                 <label className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Layout</label>
                                                 <div className="grid grid-cols-2 gap-1.5">
                                                     <button

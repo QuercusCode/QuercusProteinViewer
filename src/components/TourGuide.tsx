@@ -21,6 +21,13 @@ export const startOnboardingTour = (onComplete?: () => void, onHighlight?: (elem
             }
         },
         {
+            element: '#viewport-controls',
+            popover: {
+                title: 'Multi-View Layouts',
+                description: 'Switch between Single, Dual, Triple, or Quad viewports to compare different structures or views side-by-side.'
+            }
+        },
+        {
             element: '#metadata-box',
             popover: {
                 title: 'Structure Metadata',
