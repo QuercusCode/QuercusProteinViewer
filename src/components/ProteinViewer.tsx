@@ -1830,32 +1830,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     sele: 'not (ARG or LYS or HIS or ASP or GLU)',
                     name: 'charge_neutral'
                 });
-            } else if (currentColoring === 'custom') {
-                // Revert to simple overlay visualization
-
-                // 1. Add base representation (so the rest of the protein is visible)
-                component.addRepresentation(repType, {
-                    color: 'element',
-                    sele: '*',
-                    name: 'base_structure'
-                });
-
-                // 2. Add custom overlays
-                if (hasValidCustomRules) {
-                    customColors.forEach((rule, idx) => {
-                        if (rule.color && rule.target) {
-                            try {
-                                component.addRepresentation(repType, {
-                                    color: rule.color,
-                                    sele: rule.target,
-                                    name: `custom_overlay_${idx}`
-                                });
-                            } catch (e) {
-                                console.warn("Failed to apply custom color rule:", rule, e);
-                            }
-                        }
-                    });
-                }
             } else {
                 // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL
                 // REVERTED to use 'color' property as previously working.
