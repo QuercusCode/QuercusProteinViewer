@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 import { startOnboardingTour } from './components/TourGuide';
 import { ViewportSelector } from './components/ViewportSelector';
-import { QualitySelector } from './components/QualitySelector';
+import { SnapshotModal } from './components/SnapshotModal';
 import { ToastContainer } from './components/Toast';
 import { useToast } from './hooks/useToast';
 import { FavoritesPanel } from './components/FavoritesPanel';
@@ -70,9 +70,8 @@ function App() {
     args?: any;
   } | null>(null);
 
-  // --- Snapshot Quality Selector State (for two-step workflow) ---
-  const [isQualitySelectorOpen, setIsQualitySelectorOpen] = useState(false);
-  const [selectedViewportsForSnapshot, setSelectedViewportsForSnapshot] = useState<number[]>([]);
+  // --- Snapshot Modal State (unified viewport + quality selection) ---
+  const [isSnapshotModalOpen, setIsSnapshotModalOpen] = useState(false);
 
   // --- Multi-View Tool Actions Implementation ---
 
@@ -83,18 +82,9 @@ function App() {
       return;
     }
 
-    // Special handling for snapshots: always show quality selector
+    // Special handling for snapshots: show unified snapshot modal
     if (type === 'snapshot') {
-      if (viewMode === 'single') {
-        // Single view: skip viewport selection, go straight to quality selection
-        setSelectedViewportsForSnapshot([0]);
-        setPendingToolAction({ type, args });
-        setIsQualitySelectorOpen(true);
-      } else {
-        // Multi-view: show viewport selector first
-        setPendingToolAction({ type, args });
-        setIsSelectorOpen(true);
-      }
+      setIsSnapshotModalOpen(true);
       return;
     }
 
@@ -174,31 +164,15 @@ function App() {
     setIsSelectorOpen(false);
 
     if (pendingToolAction && indices.length > 0) {
-      // For snapshots: show quality selector (Step 2)
-      if (pendingToolAction.type === 'snapshot') {
-        setSelectedViewportsForSnapshot(indices);
-        setIsQualitySelectorOpen(true);
-        // Don't clear pendingToolAction yet - we need it for the quality selector
-      } else {
-        // For other actions: execute immediately
-        executeAction(pendingToolAction.type, indices, pendingToolAction.args);
-        setPendingToolAction(null);
-      }
+      executeAction(pendingToolAction.type, indices, pendingToolAction.args);
+      setPendingToolAction(null);
     }
   };
 
-  const handleQualityConfirm = (factor: number) => {
-    setIsQualitySelectorOpen(false);
-
-    if (pendingToolAction && selectedViewportsForSnapshot.length > 0) {
-      executeAction(pendingToolAction.type, selectedViewportsForSnapshot, { factor });
-    }
-
-    setPendingToolAction(null);
-    setSelectedViewportsForSnapshot([]);
+  const handleSnapshotConfirm = (viewportIndices: number[], qualityFactor: number) => {
+    setIsSnapshotModalOpen(false);
+    executeAction('snapshot', viewportIndices, { factor: qualityFactor });
   };
-
-
 
 
 
@@ -1879,15 +1853,11 @@ function App() {
         onCancel={() => { setIsSelectorOpen(false); setPendingToolAction(null); }}
       />
 
-      <QualitySelector
-        isOpen={isQualitySelectorOpen}
-        viewportCount={selectedViewportsForSnapshot.length}
-        onConfirm={handleQualityConfirm}
-        onCancel={() => {
-          setIsQualitySelectorOpen(false);
-          setPendingToolAction(null);
-          setSelectedViewportsForSnapshot([]);
-        }}
+      <SnapshotModal
+        isOpen={isSnapshotModalOpen}
+        viewMode={viewMode}
+        onConfirm={handleSnapshotConfirm}
+        onCancel={() => setIsSnapshotModalOpen(false)}
       />
       {/* End Main Content Flex Container */}
 
