@@ -1870,7 +1870,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         color: currentColoring,
                         aspectRatio: 5,          // Flat arrows for sheets
                         subdiv: 12,              // Smooth curves
-                        radialSegments: 20,      // Smooth helix cylinders
+                        radialSegments: 100,      // Smooth helix cylinders
                     };
 
                     const scale = getColorScale(colorPalette);
