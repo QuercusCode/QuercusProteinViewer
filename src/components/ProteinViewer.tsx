@@ -1902,6 +1902,17 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         atomColorMap.set(atom.index, finalCol);
                     });
                 });
+                
+                // Fallback: if atomColorMap is empty, populate with element colors
+                if (atomColorMap.size === 0) {
+                    const ElementScheme = window.NGL.ColormakerRegistry.getScheme('element');
+                    const elementColorer = ElementScheme ? new ElementScheme({}) : null;
+                    component.structure.eachAtom((atom: any) => {
+                        const col = elementColorer ? elementColorer.atomColor(atom) : 0xCCCCCC;
+                        atomColorMap.set(atom.index, col);
+                    });
+                }
+
 
                 // Register the custom color scheme
                 window.NGL.ColormakerRegistry.addScheme(function (this: any) {
