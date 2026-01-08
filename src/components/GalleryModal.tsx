@@ -9,7 +9,8 @@ import {
     Layers,
     ChevronLeft,
     ChevronRight,
-    Grid
+    Grid,
+    Maximize
 } from 'lucide-react';
 import clsx from 'clsx';
 import type { Snapshot, Movie } from '../types';
@@ -42,6 +43,7 @@ export const GalleryModal: React.FC<GalleryModalProps> = ({
     const [activeTab, setActiveTab] = useState<'all' | 'snapshots' | 'movies'>('all');
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+    const [isFullscreen, setIsFullscreen] = useState(false);
 
     // Combine and sort items by timestamp (newest first)
     const items = useMemo(() => {
@@ -195,12 +197,12 @@ export const GalleryModal: React.FC<GalleryModalProps> = ({
                             {/* Large Preview */}
                             <div className="aspect-video bg-black/5 dark:bg-black/50 overflow-hidden relative group">
                                 {selectedItem.type === 'snapshot' ? (
-                                    <img src={selectedItem.url} className="w-full h-full object-contain" />
+                                    <img src={selectedItem.url} className="w-full h-full object-contain" alt="Preview" />
                                 ) : (
                                     <video src={selectedItem.url} controls className="w-full h-full object-contain" />
                                 )}
 
-                                {/* Navigation Overlay */}
+                                {/* Navigation & Fullscreen Overlay */}
                                 <div className="absolute inset-0 flex items-center justify-between p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                                     <button onClick={handlePrev} className="p-1.5 bg-black/50 text-white rounded-full hover:bg-black/70 pointer-events-auto">
                                         <ChevronLeft className="w-4 h-4" />
@@ -209,6 +211,15 @@ export const GalleryModal: React.FC<GalleryModalProps> = ({
                                         <ChevronRight className="w-4 h-4" />
                                     </button>
                                 </div>
+
+                                {/* Fullscreen Button */}
+                                <button
+                                    onClick={() => setIsFullscreen(true)}
+                                    className="absolute top-2 right-2 p-2 bg-black/50 text-white rounded-lg hover:bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity"
+                                    title="View fullscreen"
+                                >
+                                    <Maximize className="w-4 h-4" />
+                                </button>
                             </div>
 
                             {/* Metadata */}
@@ -296,6 +307,67 @@ export const GalleryModal: React.FC<GalleryModalProps> = ({
                                 Delete
                             </button>
                         </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Fullscreen View Modal */}
+            {isFullscreen && selectedItem && (
+                <div
+                    className="fixed inset-0 z-[90] bg-black flex items-center justify-center animate-in fade-in duration-200"
+                    onClick={() => setIsFullscreen(false)}
+                >
+                    {/* Close Button */}
+                    <button
+                        onClick={() => setIsFullscreen(false)}
+                        className="absolute top-4 right-4 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors z-10"
+                        title="Close fullscreen"
+                    >
+                        <X className="w-6 h-6" />
+                    </button>
+
+                    {/* Navigation Buttons */}
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handlePrev(e);
+                        }}
+                        className="absolute left-4 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors z-10 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={filteredItems.findIndex(i => i.id === selectedId) === 0}
+                    >
+                        <ChevronLeft className="w-6 h-6" />
+                    </button>
+
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleNext(e);
+                        }}
+                        className="absolute right-4 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors z-10 disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={filteredItems.findIndex(i => i.id === selectedId) === filteredItems.length - 1}
+                    >
+                        <ChevronRight className="w-6 h-6" />
+                    </button>
+
+                    {/* Fullscreen Content */}
+                    <div
+                        className="max-w-[95vw] max-h-[95vh] flex items-center justify-center"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {selectedItem.type === 'snapshot' ? (
+                            <img
+                                src={selectedItem.url}
+                                className="max-w-full max-h-[95vh] object-contain"
+                                alt="Fullscreen view"
+                            />
+                        ) : (
+                            <video
+                                src={selectedItem.url}
+                                controls
+                                autoPlay
+                                className="max-w-full max-h-[95vh] object-contain"
+                            />
+                        )}
                     </div>
                 </div>
             )}
