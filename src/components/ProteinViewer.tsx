@@ -74,7 +74,7 @@ export interface ProteinViewerProps {
 }
 
 export interface ProteinViewerRef {
-    getSnapshotBlob: () => Promise<Blob | null>;
+    getSnapshotBlob: (resolutionFactor?: number, transparent?: boolean) => Promise<Blob | null>;
     highlightResidue: (chain: string, resNo: number) => void;
     focusLigands: () => void;
     clearHighlight: () => void;
@@ -388,27 +388,54 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 console.warn("AutoView failed:", e);
             }
         },
-        getSnapshotBlob: async () => {
+        getSnapshotBlob: async (resolutionFactor: number = 3, transparent: boolean = true) => {
             if (!stageRef.current) return null;
+
+            const fixPngBlob = async (blob: Blob): Promise<Blob> => {
+                try {
+                    const arrayBuffer = await blob.arrayBuffer();
+                    const uint8Array = new Uint8Array(arrayBuffer);
+                    const pngSignature = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+                    let isMissingSignature = false;
+                    for (let i = 0; i < pngSignature.length; i++) {
+                        if (uint8Array[i] !== pngSignature[i]) {
+                            isMissingSignature = true;
+                            break;
+                        }
+                    }
+                    if (isMissingSignature) {
+                        const newBuffer = new Uint8Array(pngSignature.length + uint8Array.length);
+                        newBuffer.set(pngSignature, 0);
+                        newBuffer.set(uint8Array, pngSignature.length);
+                        return new Blob([newBuffer], { type: 'image/png' });
+                    }
+                    return blob;
+                } catch (e) {
+                    return blob;
+                }
+            };
+
             try {
-                // High Quality Export (3x)
-                return await stageRef.current.makeImage({
-                    factor: 3,
+                // High Quality Export
+                const blob = await stageRef.current.makeImage({
+                    factor: resolutionFactor,
                     type: 'png',
                     antialias: true,
                     trim: false,
-                    transparent: true
+                    transparent: transparent
                 });
+                return await fixPngBlob(blob);
             } catch (err) {
                 console.warn("High-res export failed, trying low-res fallback...", err);
                 try {
-                    return await stageRef.current.makeImage({
+                    const blob = await stageRef.current.makeImage({
                         factor: 1,
                         type: 'png',
                         antialias: true,
                         trim: false,
-                        transparent: true
+                        transparent: transparent
                     });
+                    return await fixPngBlob(blob);
                 } catch (err2) {
                     console.error("Snapshot failed:", err2);
                     return null;

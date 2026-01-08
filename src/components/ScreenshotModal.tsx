@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, X, Image as ImageIcon, Check } from 'lucide-react';
+import { X, Image as ImageIcon, Check, Camera } from 'lucide-react';
 import clsx from 'clsx';
 
 interface ScreenshotModalProps {
@@ -127,8 +127,8 @@ export const ScreenshotModal: React.FC<ScreenshotModalProps> = ({ isOpen, onClos
                         }}
                         className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold text-sm shadow-lg shadow-blue-500/20 active:scale-95 transition-all flex items-center gap-2"
                     >
-                        <Download className="w-4 h-4" />
-                        Download Image
+                        <Camera className="w-4 h-4" />
+                        Save to Gallery
                     </button>
                 </div>
             </div>
