@@ -36,7 +36,7 @@ import {
     Undo2,
     Redo2
 } from 'lucide-react';
-import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, PDBMetadata, SelectedResidue } from '../types';
+import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, PDBMetadata } from '../types';
 import type { DataSource } from '../utils/pdbUtils';
 import type { HistoryItem } from '../hooks/useHistory';
 import { formatChemicalId } from '../utils/pdbUtils';
@@ -360,11 +360,7 @@ interface ControlsProps {
     viewMode?: 'single' | 'dual' | 'triple' | 'quad';
     onSetViewMode?: (mode: 'single' | 'dual' | 'triple' | 'quad') => void;
 
-    // Residue-Specific Coloring
-    selectedResidues?: SelectedResidue[];
-    onAddResidue?: (chain: string, resNo: number, color: string) => void;
-    onRemoveResidue?: (chain: string, resNo: number) => void;
-    onUpdateResidueColor?: (chain: string, resNo: number, color: string) => void;
+
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -446,9 +442,6 @@ export const Controls: React.FC<ControlsProps> = ({
     onRedo,
     canUndo,
     canRedo,
-    selectedResidues = [],
-    onAddResidue,
-    onRemoveResidue
     // onUpdateResidueColor // Future: allow changing colors of existing residues
 }) => {
     // Motif Search State
@@ -458,9 +451,6 @@ export const Controls: React.FC<ControlsProps> = ({
     const [isSearchFocused, setIsSearchFocused] = useState(false);
 
     // State for Residue-Specific Coloring UI
-    const [newResidueChain, setNewResidueChain] = useState('');
-    const [newResidueNumber, setNewResidueNumber] = useState('');
-    const [newResidueColor, setNewResidueColor] = useState('#FF0000'); // Default red
 
     // State for Screenshot Modal
 
@@ -1205,7 +1195,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                                 {!isChemical && <option value="chainid">By Chain</option>}
                                                 {!isChemical && <option value="secondary-structure">Structure</option>}
                                                 {!isChemical && <option value="hydrophobicity">Hydrophobicity</option>}
-                                                {!isChemical && <option value="byresidue">By Residue</option>}
+                                                {!isChemical && <option value="hydrophobicity">Hydrophobicity</option>}
                                                 <option value="bfactor">B-Factor</option>
                                                 <option value="uniform">Uniform</option>
                                                 <option value="element">Element (CPK)</option>
@@ -1213,86 +1203,6 @@ export const Controls: React.FC<ControlsProps> = ({
                                         </div>
 
                                         {/* Residue-Specific Coloring UI */}
-                                        {coloring === 'byresidue' && (
-                                            <div className="pt-3 border-t border-white/10 space-y-3">
-                                                <label className={`text-[10px] font-bold uppercase tracking-wider block ${subtleText}`}>Select Residues</label>
-
-                                                {/* Add Residue Form */}
-                                                <div className="space-y-2">
-                                                    <div className="grid grid-cols-2 gap-2">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Chain (e.g. A)"
-                                                            value={newResidueChain}
-                                                            onChange={(e) => setNewResidueChain(e.target.value.toUpperCase())}
-                                                            className={`border rounded px-2 py-1.5 text-xs ${inputBg}`}
-                                                            maxLength={1}
-                                                        />
-                                                        <input
-                                                            type="number"
-                                                            placeholder="Residue #"
-                                                            value={newResidueNumber}
-                                                            onChange={(e) => setNewResidueNumber(e.target.value)}
-                                                            className={`border rounded px-2 py-1.5 text-xs ${inputBg}`}
-                                                        />
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        <input
-                                                            type="color"
-                                                            value={newResidueColor}
-                                                            onChange={(e) => setNewResidueColor(e.target.value)}
-                                                            className="w-12 h-8 rounded border cursor-pointer"
-                                                        />
-                                                        <button
-                                                            onClick={() => {
-                                                                if (newResidueChain && newResidueNumber && onAddResidue) {
-                                                                    onAddResidue(newResidueChain, parseInt(newResidueNumber), newResidueColor);
-                                                                    setNewResidueNumber('');
-                                                                }
-                                                            }}
-                                                            disabled={!newResidueChain || !newResidueNumber}
-                                                            className="flex-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded text-xs font-bold transition-colors"
-                                                        >
-                                                            Add Residue
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-                                                {/* List of Selected Residues */}
-                                                {selectedResidues && selectedResidues.length > 0 && (
-                                                    <div className="space-y-1">
-                                                        <label className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>
-                                                            {selectedResidues.length} Residue{selectedResidues.length > 1 ? 's' : ''} Colored
-                                                        </label>
-                                                        <div className="max-h-32 overflow-y-auto space-y-1">
-                                                            {selectedResidues.map((residue) => (
-                                                                <div
-                                                                    key={`${residue.chain}-${residue.resNo}`}
-                                                                    className={`flex items-center justify-between px-2 py-1.5 rounded text-xs ${cardBg}`}
-                                                                >
-                                                                    <div className="flex items-center gap-2">
-                                                                        <div
-                                                                            className="w-4 h-4 rounded border border-white/20"
-                                                                            style={{ backgroundColor: residue.color }}
-                                                                        />
-                                                                        <span>
-                                                                            {residue.chain}:{residue.resNo}
-                                                                        </span>
-                                                                    </div>
-                                                                    <button
-                                                                        onClick={() => onRemoveResidue?.(residue.chain, residue.resNo)}
-                                                                        className="text-red-500 hover:text-red-400 transition-colors"
-                                                                        title="Remove residue"
-                                                                    >
-                                                                        ✕
-                                                                    </button>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        )}
 
                                     </div>
 
