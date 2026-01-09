@@ -1477,6 +1477,24 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                 if (nucleicCount > proteinCount) chainType = 'nucleic';
                                 else if (proteinCount > 0) chainType = 'protein';
 
+                                // Extract Atoms for Small Molecules
+                                let atomList: any[] = [];
+                                if (chainType === 'unknown' && seq.length < 50) { // Limit to reasonable size
+                                    try {
+                                        c.eachResidue((r: any) => {
+                                            r.eachAtom((a: any) => {
+                                                atomList.push({
+                                                    serial: a.serial,
+                                                    name: a.atomname,
+                                                    element: a.element,
+                                                    resNo: r.resno,
+                                                    chain: c.chainname
+                                                });
+                                            });
+                                        });
+                                    } catch (eAtom) { console.warn("Atom iteration failed", eAtom); }
+                                }
+
                                 console.log(`Chain ${c.chainname}: Range ${minSeq}-${maxSeq}, SeqLen: ${seq.length}, Type: ${chainType}`);
                                 chains.push({
                                     name: c.chainname,
