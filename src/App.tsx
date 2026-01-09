@@ -208,7 +208,7 @@ function App() {
 
     representation, setRepresentation,
     coloring, setColoring,
-    customColors, setCustomColors,
+    setCustomColors,
     isSpinning, setIsSpinning,
     showSurface, setShowSurface,
     showLigands, setShowLigands,
