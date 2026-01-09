@@ -1943,14 +1943,12 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                 if (residues.size > 0) {
                     const sele = Array.from(residues).join(' or ');
-                    // Use 'licorice' (sticks only) to seamlessly blend with the cartoon
-                    // Use 'currentColoring' so it matches the surrounding structure style (e.g. By Chain)
-                    // This "fills the gap" to the atom without looking like a separate style
-                    component.addRepresentation('licorice', {
+                    // Use a subtle ball+stick that blends but shows the connection
+                    component.addRepresentation('ball+stick', {
                         sele: sele,
                         color: currentColoring,
                         scale: 1.0,
-                        aspectRatio: 1.0,
+                        aspectRatio: 1.5,
                         name: 'measurement-residues'
                     });
                 }
