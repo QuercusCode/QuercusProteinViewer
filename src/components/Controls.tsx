@@ -35,7 +35,7 @@ import {
     Undo2,
     Redo2
 } from 'lucide-react';
-import type { RepresentationType, ColoringType, ChainInfo, Snapshot, Movie, ColorPalette, PDBMetadata } from '../types';
+import type { RepresentationType, ColoringType, ChainInfo, Snapshot, Movie, ColorPalette, PDBMetadata, CustomColorRule } from '../types';
 import type { DataSource } from '../utils/pdbUtils';
 import type { HistoryItem } from '../hooks/useHistory';
 import { formatChemicalId } from '../utils/pdbUtils';
@@ -358,7 +358,9 @@ interface ControlsProps {
     viewMode?: 'single' | 'dual' | 'triple' | 'quad';
     onSetViewMode?: (mode: 'single' | 'dual' | 'triple' | 'quad') => void;
 
-
+    // Custom Coloring
+    customColors?: CustomColorRule[];
+    setCustomColors?: (colors: CustomColorRule[] | ((prev: CustomColorRule[]) => CustomColorRule[])) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({
@@ -440,6 +442,8 @@ export const Controls: React.FC<ControlsProps> = ({
     canUndo,
     canRedo,
     // onUpdateResidueColor // Future: allow changing colors of existing residues
+    customColors,
+    setCustomColors
 }) => {
     // Motif Search State
     const [searchPattern, setSearchPattern] = useState('');
@@ -488,7 +492,32 @@ export const Controls: React.FC<ControlsProps> = ({
     // Custom Color State
     const [viewSequenceChain, setViewSequenceChain] = useState('');
 
-    // Helper to get range of residues for selected chain
+    // Custom Color State
+    const [customSelection, setCustomSelection] = useState('');
+    const [customColorValue, setCustomColorValue] = useState('#ff0000');
+    const [isCustomColorExpanded, setIsCustomColorExpanded] = useState(false);
+
+    const handleAddCustomColor = () => {
+        if (!customSelection || !setCustomColors) return;
+
+        let sel = customSelection.trim();
+        // Heuristic: if input is just a number/range, assume first chain if available, or just send it (NGL handles it)
+        // Actually NGL needs explicit chain usually for safety, but "10-20" works if unique or for all.
+        // Let's just pass what user typed (or maybe prefix with ':' if they just typed 'A'?)
+
+        // Simple heuristic: if just single letter A-Z, treat as chain
+        if (/^[A-Za-z0-9]+$/.test(sel) && chains.some(c => c.name === sel)) {
+            sel = `:${sel}`;
+        }
+
+        setCustomColors(prev => [...prev, { selection: sel, color: customColorValue }]);
+        setCustomSelection('');
+    };
+
+    const handleRemoveCustomColor = (index: number) => {
+        if (!setCustomColors) return;
+        setCustomColors(prev => prev.filter((_, i) => i !== index));
+    };
 
     // Styles
     const cardBg = isLightMode ? 'bg-white' : 'bg-neutral-900';
@@ -1153,6 +1182,61 @@ export const Controls: React.FC<ControlsProps> = ({
                                         </div>
 
                                         {/* Residue-Specific Coloring UI */}
+                                        {setCustomColors && (
+                                            <div className="pt-2 border-t border-white/5 space-y-2">
+                                                <button
+                                                    onClick={() => setIsCustomColorExpanded(!isCustomColorExpanded)}
+                                                    className={`w-full flex items-center justify-between text-[10px] font-bold uppercase tracking-wider ${subtleText} hover:opacity-100 opacity-80`}
+                                                >
+                                                    <span>Custom Residue Colors</span>
+                                                    <ChevronDown className={`w-3 h-3 transition-transform ${isCustomColorExpanded ? 'rotate-180' : ''}`} />
+                                                </button>
+
+                                                {isCustomColorExpanded && (
+                                                    <div className={`p-2 rounded-lg border space-y-2 ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-black/20 border-white/5'}`}>
+                                                        <div className="flex gap-2">
+                                                            <input
+                                                                type="text"
+                                                                value={customSelection}
+                                                                onChange={(e) => setCustomSelection(e.target.value)}
+                                                                placeholder="e.g. 50-60 or :A"
+                                                                className={`flex-1 min-w-0 rounded px-2 py-1 text-xs border outline-none ${inputBg}`}
+                                                            />
+                                                            <input
+                                                                type="color"
+                                                                value={customColorValue}
+                                                                onChange={(e) => setCustomColorValue(e.target.value)}
+                                                                className="w-8 h-full rounded cursor-pointer border-none"
+                                                            />
+                                                            <button
+                                                                onClick={handleAddCustomColor}
+                                                                disabled={!customSelection}
+                                                                className="px-2 py-1 bg-blue-600 text-white rounded text-xs font-bold disabled:opacity-50"
+                                                            >
+                                                                +
+                                                            </button>
+                                                        </div>
+
+                                                        {/* List */}
+                                                        {customColors && customColors.length > 0 && (
+                                                            <div className="space-y-1 max-h-24 overflow-y-auto pr-1 scrollbar-thin">
+                                                                {customColors.map((rule, idx) => (
+                                                                    <div key={idx} className="flex items-center justify-between text-xs p-1 rounded hover:bg-black/5 dark:hover:bg-white/5">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <div className="w-3 h-3 rounded-full border border-black/10" style={{ background: rule.color }} />
+                                                                            <span className={isLightMode ? 'text-neutral-700' : 'text-neutral-300'}>{rule.selection}</span>
+                                                                        </div>
+                                                                        <button onClick={() => handleRemoveCustomColor(idx)} className="text-neutral-400 hover:text-red-500">
+                                                                            <X className="w-3 h-3" />
+                                                                        </button>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
 
                                     </div>
 

@@ -208,7 +208,7 @@ function App() {
 
     representation, setRepresentation,
     coloring, setColoring,
-    setCustomColors,
+    customColors, setCustomColors,
     isSpinning, setIsSpinning,
     showSurface, setShowSurface,
     showLigands, setShowLigands,
@@ -1624,6 +1624,10 @@ function App() {
               onRedo={redo}
               canUndo={canUndo}
               canRedo={canRedo}
+
+              // Custom Colors
+              customColors={customColors}
+              setCustomColors={setCustomColors}
 
               // Multi-View Mode
               viewMode={viewMode}

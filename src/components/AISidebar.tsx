@@ -112,7 +112,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         {
             id: 'welcome',
             sender: 'ai',
-            text: "🤖 **Dr. AI (Offline)**.\n\nI have access to the **Offline Biological Library**.\n\nAsk me 'What is this protein?' or 'Color by hydrophobicity'.",
+            text: "🤖 **Dr. AI (Offline)**.\n\nI can now **highlight specific residues**!\n\nTry:\n- 'Color residue 50 red'\n- 'Color chain A blue'\n- 'Color 10-20 green'",
             timestamp: new Date()
         }
     ]);
@@ -360,7 +360,7 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         if (q.match(/thank/)) return { text: "You are welcome. Science never sleeps! 🧬" };
 
         // 5. DEFAULT
-        return { text: "Refine your query. You can ask me to:\n- **Control View**: 'Color by hydrophobicity', 'Reset view'\n- **Mutate**: Select a residue and ask 'Change to Arg'\n- **Analyze**: 'What is this helix?'" };
+        return { text: "Refine your query. You can ask me to:\n- **Custom Color**: 'Color residue 50 red'\n- **Control View**: 'Color by hydrophobicity'\n- **Mutate**: 'Change to Arg'" };
     };
 
     // --- UI EVENTS ---
