@@ -1795,37 +1795,45 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 const schemeId = NGL.ColormakerRegistry.addScheme(function (this: any, params: any) {
                     this.parameters = params;
 
-                    // Create Base Maker
+                    // Create Base Maker with Safety Fallback
                     let BaseMaker;
+                    let baseMaker: any;
                     try {
                         BaseMaker = NGL.ColormakerRegistry.getScheme(baseSchemeId);
+                        if (!BaseMaker) throw new Error("Scheme not found");
+                        baseMaker = new BaseMaker(params);
                     } catch (e) {
                         BaseMaker = NGL.ColormakerRegistry.getScheme('uniform');
+                        baseMaker = new BaseMaker(params);
                     }
-                    const baseMaker = new BaseMaker(params);
 
                     // Pre-process Custom Rules (Optimized with BitSets)
                     const overrides: { bitSet: any, colorHex: number }[] = [];
-                    if (params.structure) {
+                    if (params.structure && rules) {
                         rules.forEach(rule => {
+                            if (!rule.selection || !rule.color) return;
                             try {
                                 const sel = new NGL.Selection(rule.selection);
                                 const bitSet = params.structure.getAtomSet(sel);
                                 const colorHex = new NGL.Color(rule.color).getHex();
                                 overrides.push({ bitSet, colorHex });
-                            } catch (e) { console.warn("Invalid Selection:", rule.selection); }
+                            } catch (e) { console.warn("Invalid Selection or Color:", rule); }
                         });
                     }
 
                     this.atomColor = function (atom: any) {
                         // Check Overrides
-                        for (const rule of overrides) {
+                        for (let i = 0; i < overrides.length; i++) {
+                            const rule = overrides[i];
                             if (rule.bitSet && rule.bitSet.isSet(atom.index)) {
                                 return rule.colorHex;
                             }
                         }
-                        // Fallback to Base
-                        return baseMaker.atomColor(atom);
+                        // Fallback to Base (Safe Call)
+                        if (baseMaker && typeof baseMaker.atomColor === 'function') {
+                            return baseMaker.atomColor(atom);
+                        }
+                        return 0xCCCCCC; // Default Grey
                     };
                 }, 'custom_wrapper');
                 return schemeId;
