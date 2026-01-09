@@ -1772,192 +1772,122 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
 
             let repType = representation || 'cartoon';
-            let currentColoring = coloring || 'chainid'; // SAFETY DEFAULT
+            let finalColor: any = coloring || 'chainid';
 
-            // Shared High-Quality Cartoon Parameters
-            const cartoonParams = {
-                aspectRatio: 6.0,        // Flat arrows for sheets
-                subdiv: 12,              // Smooth curves
-                radialSegments: 20,      // Smooth helix cylinders
-                smoothSheet: false,       // Smooth beta-sheets
-                quality: 'high'
-            };
-
-            // Handle special 1crn case
-            if (currentColoring === 'chainid' && pdbId && pdbId.toLowerCase().includes('1crn')) {
-                currentColoring = 'residue';
+            // --- 1. RESOLVE ALIASES & DEFAULTS ---
+            if (finalColor === 'structure') finalColor = 'sstruc';
+            if (pdbId && pdbId.toLowerCase().includes('1crn') && finalColor === 'chainid') {
+                finalColor = 'residue';
                 repType = 'licorice';
             }
 
-            if (coloring === 'structure' || (coloring as string) === 'sstruc' || (coloring as string) === 'secondary-structure') {
-                currentColoring = 'sstruc' as ColoringType;
+            // Handle "Force Element" for single chains/chemicals when default 'chainid' is picked
+            const chainCount = component.structure ? component.structure.chainStore.count : 0;
+            if (finalColor === 'chainid' && (chainCount <= 1 || dataSource === 'pubchem')) {
+                finalColor = 'element';
             }
 
-            // Check for VALID custom rules only
+            // --- 2. REGISTER DYNAMIC SCHEMES (Charge & Custom) ---
+            const NGL = window.NGL;
 
-            // --- STRATEGY: MULTI-REPRESENTATION OVERLAY (RESTORED & IMPROVED) ---
-            // NGL Custom Schemes proved fragile for this user.
-            // We implementation "High Contrast Chain Coloring" by EXPLICITLY adding a representation for each chain.
-            // This relies only on basic NGL primitives (addRepresentation with selection), which is 100% robust.
+            // Helper: Register a scheme that wraps a base scheme with custom overrides
+            const wrapSchemeWithCustom = (baseSchemeId: string, rules: CustomColorRule[]) => {
+                const id = `custom_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
 
-            if (currentColoring === 'chainid') {
-                // FALLBACK: If we have a chemical (single/no chain info) or source is pubchem, 'chainid' is meaningless.
-                // Force Element coloring to ensure visibility (e.g. Licorice needs atoms!).
-                const chainCount = component.structure.chainStore.count;
-                // If effective chain count is 0 or 1, or weird names, fallback to element.
-                // Or if user selected "chainid" but it's a chemical (implied by context or single chain).
+                NGL.ColormakerRegistry.addScheme(id, function (this: any, params: any) {
+                    this.parameters = params;
 
-                let forceElement = false;
-                if (chainCount <= 1 || dataSource === 'pubchem') {
-                    forceElement = true;
-                }
-
-                if (forceElement) {
-                    component.addRepresentation(repType, {
-                        color: 'element',
-                        sele: '*', // Select ALL
-                        name: 'base_chemical',
-                        ...cartoonParams
-                    });
-                } else {
-                    // Standard NGL chainid coloring
-                    const params: any = {
-                        color: 'chainid',
-                        quality: 'high'
-                    };
-
-                    // Only apply cartoon parameters if using cartoon representation
-                    if (repType === 'cartoon') {
-                        Object.assign(params, cartoonParams);
-                    }
-
-                    component.addRepresentation(repType, params);
-                }
-            } else if (currentColoring === 'charge') {
-                // CHARGE COLORING: Multi-representation approach
-                component.addRepresentation(repType, {
-                    color: 0x0000FF,
-                    sele: 'ARG or LYS or HIS',
-                    name: 'charge_positive',
-                    ...cartoonParams
-                });
-                component.addRepresentation(repType, {
-                    color: 0xFF0000,
-                    sele: 'ASP or GLU',
-                    name: 'charge_negative',
-                    ...cartoonParams
-                });
-                component.addRepresentation(repType, {
-                    color: 0xFFFFFF,
-                    sele: 'not (ARG or LYS or HIS or ASP or GLU)',
-                    name: 'charge_neutral',
-                    ...cartoonParams
-                });
-            } else {
-                // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL
-                // REVERTED to use 'color' property as previously working.
-
-                // Safety: Ensure structure is calculated if mode is sstruc
-                if ((currentColoring as string) === 'sstruc') {
+                    // Create Base Maker
+                    let BaseMaker;
                     try {
-                        component.structure.eachModel((m: any) => {
-                            if (m.calculateSecondaryStructure) m.calculateSecondaryStructure();
-                        });
-                    } catch (e) { }
-                }
-
-                // Custom Color Scales for NGL
-                const PALETTES: Record<string, string[]> = {
-                    'viridis': ['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725'],
-                    'magma': ['#000004', '#51127c', '#b73779', '#fc8961', '#fcfdbf'],
-                    'cividis': ['#00204d', '#002051', '#7c7b78', '#fdea45', '#fdea45'], // NGL interpolates 
-                    'plasma': ['#0d0887', '#7e03a8', '#cc4778', '#f89540', '#f0f921'],
-                    'standard': [] // NGL default (Blue-Red usually)
-                };
-
-                // Helper to get scale
-                const getColorScale = (p: string) => {
-                    return PALETTES[p] || undefined;
-                };
-
-                // Unified cartoon with optimized parameters for arrows and helices
-                if (repType === 'cartoon') {
-                    // Force recalculation of secondary structure
-                    try {
-                        component.structure.eachModel((m: any) => {
-                            if (m.calculateSecondaryStructure) m.calculateSecondaryStructure();
-                        });
-                    } catch (e) { }
-
-                    const params: any = {
-                        color: currentColoring,
-                        ...cartoonParams
-                    };
-
-                    const scale = getColorScale(colorPalette);
-                    if (scale && scale.length > 0) {
-                        params.colorScale = scale;
+                        BaseMaker = NGL.ColormakerRegistry.getScheme(baseSchemeId);
+                    } catch (e) {
+                        BaseMaker = NGL.ColormakerRegistry.getScheme('uniform');
                     }
-                    component.addRepresentation('cartoon', params);
-                } else {
-                    // Non-cartoon representations
-                    const params: any = {
-                        color: currentColoring
-                    };
-                    const scale = getColorScale(colorPalette);
-                    if (scale && scale.length > 0) {
-                        params.colorScale = scale;
+                    const baseMaker = new BaseMaker(params);
+
+                    // Pre-process Custom Rules (Optimized with BitSets)
+                    const overrides: { bitSet: any, colorHex: number }[] = [];
+                    if (params.structure) {
+                        rules.forEach(rule => {
+                            try {
+                                const sel = new NGL.Selection(rule.selection);
+                                const bitSet = params.structure.getAtomSet(sel);
+                                const colorHex = new NGL.Color(rule.color).getHex();
+                                overrides.push({ bitSet, colorHex });
+                            } catch (e) { console.warn("Invalid Selection:", rule.selection); }
+                        });
                     }
-                    component.addRepresentation(repType, params);
-                }
+
+                    this.atomColor = function (atom: any) {
+                        // Check Overrides
+                        for (const rule of overrides) {
+                            if (rule.bitSet && rule.bitSet.isSet(atom.index)) {
+                                return rule.colorHex;
+                            }
+                        }
+                        // Fallback to Base
+                        return baseMaker.atomColor(atom);
+                    };
+                });
+                return id;
+            };
+
+            // Helper: Register Charge Scheme (Dynamic)
+            if (finalColor === 'charge') {
+                const chargeId = 'charge_dynamic';
+                NGL.ColormakerRegistry.addScheme(chargeId, function (this: any, params: any) {
+                    this.parameters = params;
+                    this.atomColor = function (atom: any) {
+                        const r = atom.resname;
+                        if (['ARG', 'LYS', 'HIS'].includes(r)) return 0x0000FF; // Blue
+                        if (['ASP', 'GLU'].includes(r)) return 0xFF0000; // Red
+                        return 0xFFFFFF; // White
+                    };
+                });
+                finalColor = chargeId;
             }
 
-            // --- CUSTOM COLORING OVERRIDES ---
+            // --- 3. APPLY CUSTOM OVERRIDES ---
             if (customColors && customColors.length > 0) {
-                // 1. If 'custom' mode is selected, or just apply on top?
-                // Strategy: If coloring is 'custom', SUPPRESS base representation? 
-                // Or just OVERLAY. The user request implies "change color of...".
-                // Best: Overlay with specific selection.
-
-                customColors.forEach(rule => {
-                    if (!rule.selection || !rule.color) return;
-
-                    // Use the same representation type as base, or custom
-                    const ruleRep = rule.representation || repType;
-
-                    const params: any = {
-                        color: rule.color,
-                        sele: rule.selection,
-                        name: `custom-${rule.selection}` // Track for cleanup if needed
-                    };
-
-                    if (ruleRep === 'cartoon') {
-                        Object.assign(params, cartoonParams);
-                    }
-
-                    // Add representation ON TOP
-                    // Note regarding z-fighting: If we draw the same residue twice (once in base, once here),
-                    // we might get glitches. 
-                    // Ideally, 'updateRepresentation' should EXCLUDE these from the base selection.
-
-                    // However, editing the base loop above (lines 1801-1910) is complex via search/replace.
-                    // The robust "Overlay" approach usually works ok for Cartoon in NGL if parameters match exactly,
-                    // but to be perfect, we should have filtered the base selection.
-
-                    // Since I cannot rewrite the entire block above easily in one go, I will add it here.
-                    // A trick to avoid z-fighting is to use slightly larger radius? No.
-                    // Actually, if we use 'custom' coloring type, we might want ONLY these?
-                    // No, user likely wants "highlight X in red" on top of "white structure".
-
-                    try {
-                        component.addRepresentation(ruleRep, params);
-                    } catch (e) { console.warn("Failed to add custom color rep", e); }
-                });
-
-                // NOTE: To fix z-fighting, a full refactor of the "base" block to use a calculated "baseSelection" 
-                // (e.g. "not (10-20:A)") would be better. But "Overlay" is a good MVP.
-                // Actually, let's try to improve it.
+                finalColor = wrapSchemeWithCustom(finalColor, customColors);
             }
+
+            // --- 4. RENDER SINGLE REPRESENTATION ---
+            const PALETTES: Record<string, string[]> = {
+                'viridis': ['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725'],
+                'magma': ['#000004', '#51127c', '#b73779', '#fc8961', '#fcfdbf'],
+                'cividis': ['#00204d', '#002051', '#7c7b78', '#fdea45', '#fdea45'],
+                'plasma': ['#0d0887', '#7e03a8', '#cc4778', '#f89540', '#f0f921'],
+                'standard': []
+            };
+
+            const params: any = {
+                color: finalColor,
+                quality: 'high',
+                name: 'base_representation'
+            };
+
+            const scale = PALETTES[colorPalette];
+            if (scale && scale.length > 0) {
+                params.colorScale = scale;
+            }
+
+            const cartoonParams = {
+                aspectRatio: 6.0,
+                subdiv: 12,
+                radialSegments: 20,
+                smoothSheet: false,
+                quality: 'high'
+            };
+
+            if (repType === 'cartoon') {
+                Object.assign(params, cartoonParams);
+                try { component.structure.eachModel((m: any) => m.calculateSecondaryStructure?.()); } catch (e) { }
+            }
+
+            // Add the single, unified representation
+            component.addRepresentation(repType, params);
 
             // 2. Add Custom Representations (Overlay)
 
@@ -1972,8 +1902,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             // We should NOT apply the "Ball+Stick" overlay on top, as it hides the style of the base rep.
             const atomicReps = ['licorice', 'ball+stick', 'spacefill', 'line', 'point', 'hyperball'];
             const isBaseRepAtomic = atomicReps.includes(repType);
-            const chainCount = component.structure ? component.structure.chainStore.count : 0;
-            const isSmallMoleculeOrSingleChain = chainCount <= 1 || dataSource === 'pubchem';
+            const overlayChainCount = component.structure ? component.structure.chainStore.count : 0;
+            const isSmallMoleculeOrSingleChain = overlayChainCount <= 1 || dataSource === 'pubchem';
 
             const skipLigandOverlay = isBaseRepAtomic && isSmallMoleculeOrSingleChain;
 
