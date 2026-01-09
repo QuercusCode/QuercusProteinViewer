@@ -1872,11 +1872,13 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 // Then add colored representations for each selected residue
                 if (selectedResidues && selectedResidues.length > 0) {
                     selectedResidues.forEach((residue) => {
-                        // NGL selection syntax: :chain and residue_number
-                        const selection = `:${residue.chain} and ${residue.resNo}`;
+                        // NGL selection syntax: resNo:chain (e.g., "58:A")
+                        const selection = `${residue.resNo}:${residue.chain}`;
+                        // Convert hex color to integer (NGL requires integer format)
+                        const colorInt = parseInt(residue.color.replace('#', ''), 16);
                         try {
                             component.addRepresentation(repType, {
-                                color: residue.color,
+                                color: colorInt,
                                 sele: selection,
                                 name: `byresidue_${residue.chain}_${residue.resNo}`
                             });
