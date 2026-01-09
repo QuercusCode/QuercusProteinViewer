@@ -1792,9 +1792,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             // Helper: Register a scheme that wraps a base scheme with custom overrides
             const wrapSchemeWithCustom = (baseSchemeId: string, rules: CustomColorRule[]) => {
-                const id = `custom_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
-
-                NGL.ColormakerRegistry.addScheme(id, function (this: any, params: any) {
+                const schemeId = NGL.ColormakerRegistry.addScheme(function (this: any, params: any) {
                     this.parameters = params;
 
                     // Create Base Maker
@@ -1829,14 +1827,13 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         // Fallback to Base
                         return baseMaker.atomColor(atom);
                     };
-                });
-                return id;
+                }, 'custom_wrapper');
+                return schemeId;
             };
 
             // Helper: Register Charge Scheme (Dynamic)
             if (finalColor === 'charge') {
-                const chargeId = 'charge_dynamic';
-                NGL.ColormakerRegistry.addScheme(chargeId, function (this: any, params: any) {
+                finalColor = NGL.ColormakerRegistry.addScheme(function (this: any, params: any) {
                     this.parameters = params;
                     this.atomColor = function (atom: any) {
                         const r = atom.resname;
@@ -1844,8 +1841,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         if (['ASP', 'GLU'].includes(r)) return 0xFF0000; // Red
                         return 0xFFFFFF; // White
                     };
-                });
-                finalColor = chargeId;
+                }, 'charge_dynamic');
             }
 
             // --- 3. APPLY CUSTOM OVERRIDES ---
