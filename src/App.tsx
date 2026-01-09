@@ -1534,6 +1534,10 @@ function App() {
               setDataSource={setDataSource}
               isChemical={!!isChemical}
               onUpload={handleUpload}
+              representation={representation}
+              setRepresentation={setRepresentation}
+              coloring={coloring}
+              setColoring={setColoring}
               onResetView={() => handleToolAction('reset')}
               chains={chains}
               ligands={ligands}
@@ -1545,27 +1549,14 @@ function App() {
                 setMeasurements([]);
                 viewerRef.current?.clearMeasurements();
               }}
-              highlightedResidue={highlightedResidue}
-              onResidueClick={(chain, resNo, resName) => {
-                if (highlightedResidue && String(highlightedResidue.chain) === String(chain) && Number(highlightedResidue.resNo) === Number(resNo)) {
-                  setHighlightedResidue(null);
-                } else {
-                  setHighlightedResidue({ chain, resNo, resName });
-                }
-              }}
-              // Appearance
-              representation={activeController.representation}
-              setRepresentation={activeController.setRepresentation}
-              coloring={activeController.coloring}
-              setColoring={activeController.setColoring}
               isLightMode={isLightMode}
               setIsLightMode={setIsLightMode}
-              showSurface={activeController.showSurface}
-              setShowSurface={activeController.setShowSurface}
-              showLigands={activeController.showLigands}
-              setShowLigands={activeController.setShowLigands}
-              smoothSheet={activeController.smoothSheet}
-              setSmoothSheet={activeController.setSmoothSheet}
+              highlightedResidue={highlightedResidue}
+              onResidueClick={handleSequenceResidueClick}
+              showSurface={showSurface}
+              setShowSurface={setShowSurface}
+              showLigands={showLigands}
+              setShowLigands={setShowLigands}
               showIons={showIons}
               setShowIons={setShowIons}
               onFocusLigands={handleFocusLigands}
@@ -1770,10 +1761,9 @@ function App() {
                         showSurface={ctrl.showSurface}
                         showLigands={ctrl.showLigands}
                         showIons={ctrl.showIons}
-                        smoothSheet={ctrl.smoothSheet}
                         coloring={ctrl.coloring}
                         palette={colorPalette}
-                        backgroundColor={ctrl.customBackgroundColor || undefined}
+                        backgroundColor={ctrl.customBackgroundColor || (isLightMode ? 'white' : 'black')}
                         measurementTextColor={measurementTextColorMode}
                         enableAmbientOcclusion={true}
 

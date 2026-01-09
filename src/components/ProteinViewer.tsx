@@ -42,7 +42,6 @@ export interface ProteinViewerProps {
     showSurface: boolean;
     showLigands?: boolean;  // Optional, defaults to true
     showIons?: boolean;     // New prop
-    smoothSheet?: boolean;  // New prop
     coloring: ColoringType;
     palette: ColorPalette;
     backgroundColor: string;
@@ -121,7 +120,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     showSurface = false,
     showLigands = false,
     showIons = false,
-    smoothSheet = false, // Added prop
     isSpinning = false,
     isMeasurementMode = false,
     measurements,
@@ -1148,11 +1146,14 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 measurementRepsRef.current = [];
             }
 
-            stageRef.current.eachComponent((comp: any) => {
-                if (comp.name && (comp.name.startsWith("measure-") || comp.name.startsWith("sel-"))) {
-                    stageRef.current.removeComponent(comp);
-                }
-            });
+            // 2. Remove selection spheres (Shapes)
+            if (stageRef.current) {
+                stageRef.current.eachComponent((comp: any) => {
+                    if (comp.name && (comp.name.startsWith("measure-") || comp.name.startsWith("sel-"))) {
+                        stageRef.current.removeComponent(comp);
+                    }
+                });
+            }
         },
         getMeasurements: () => measurementsRef.current,
         restoreMeasurements: (list: { atom1: any, atom2: any }[]) => {
@@ -1776,7 +1777,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 aspectRatio: 6.0,        // Flat arrows for sheets
                 subdiv: 12,              // Smooth curves
                 radialSegments: 20,      // Smooth helix cylinders
-                smoothSheet: smoothSheet,       // Dynamic smooth beta-sheets
+                smoothSheet: true,       // Smooth beta-sheets
                 quality: 'high'
             };
 
@@ -1973,7 +1974,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     useEffect(() => {
         updateRepresentation();
-    }, [representation, coloring, showSurface, showLigands, showIons, colorPalette, smoothSheet]);
+    }, [representation, coloring, showSurface, showLigands, showIons, colorPalette]);
 
     useEffect(() => {
         if (stageRef.current) {
