@@ -544,8 +544,9 @@ function App() {
 
     // Smart Representation Switching for small molecules
     if (!hasPolymer || totalResidues < 5) {
-      console.log("App: Detected small molecule or non-polymer. Switching to Ball+Stick.");
+      console.log("App: Detected small molecule or non-polymer. Switching to Ball+Stick with Element coloring.");
       ctrl.setRepresentation('ball+stick');
+      ctrl.setColoring('element');
       ctrl.setShowLigands(true);
       if (info.chains.length > 0) ctrl.setShowIons(true);
     }
