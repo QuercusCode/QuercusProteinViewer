@@ -1533,7 +1533,6 @@ function App() {
               dataSource={dataSource}
               setDataSource={setDataSource}
               isChemical={!!isChemical}
-              isChemical={!!isChemical}
               onUpload={handleUpload}
               onResetView={() => handleToolAction('reset')}
               chains={chains}
@@ -1547,7 +1546,13 @@ function App() {
                 viewerRef.current?.clearMeasurements();
               }}
               highlightedResidue={highlightedResidue}
-              onResidueClick={(chain, resNo, resName) => activeController.onResidueClick(chain, resNo, resName)}
+              onResidueClick={(chain, resNo, resName) => {
+                if (highlightedResidue && String(highlightedResidue.chain) === String(chain) && Number(highlightedResidue.resNo) === Number(resNo)) {
+                  setHighlightedResidue(null);
+                } else {
+                  setHighlightedResidue({ chain, resNo, resName });
+                }
+              }}
               // Appearance
               representation={activeController.representation}
               setRepresentation={activeController.setRepresentation}
