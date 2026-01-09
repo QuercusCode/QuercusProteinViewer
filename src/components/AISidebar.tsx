@@ -11,7 +11,8 @@ export type AIAction =
     | { type: 'SET_REPRESENTATION', value: RepresentationType }
     | { type: 'TOGGLE_SURFACE', value: boolean }
     | { type: 'RESET_VIEW' }
-    | { type: 'HIGHLIGHT_REGION', selection: string, label: string }; // New Action
+    | { type: 'HIGHLIGHT_REGION', selection: string, label: string }
+    | { type: 'SET_CUSTOM_COLOR', selection: string, color: string }; // New Action
 
 interface AISidebarProps {
     isOpen: boolean;
@@ -219,6 +220,29 @@ export const AISidebar: React.FC<AISidebarProps> = ({
         }
         if (/color.*(b-factor|flexibility|heat)/i.test(q)) {
             return { text: "🎨 Coloring by **B-Factor** (Thermal Motion). Warmer colors = more flexible regions.", action: { type: 'SET_COLORING', value: 'bfactor' } };
+        }
+
+        // Custom Coloring (e.g. "Color residue 10 red", "Color chain A blue")
+        // Regex to capture: color [structure/residue] [selection] [color]
+        const customColorMatch = q.match(/color\s+(?:residue|s|chain)?\s*([0-9\-\:A-Z]+)\s+(red|green|blue|yellow|orange|purple|pink|cyan|magenta|white|black|grey|gray|#[0-9a-fA-F]{3,6})/i);
+        if (customColorMatch) {
+            let selection = customColorMatch[1];
+            const color = customColorMatch[2];
+
+            // Heuristic cleanup for selection
+            // If just "A", make it ":A" (Chain A)
+            if (/^[A-Z]$/.test(selection)) {
+                selection = `:${selection}`;
+            }
+
+            return {
+                text: `🎨 Applying custom color **${color}** to selection **${selection}**.`,
+                action: {
+                    type: 'SET_CUSTOM_COLOR',
+                    selection: selection,
+                    color: color
+                }
+            };
         }
 
         // Representation

@@ -208,6 +208,7 @@ function App() {
 
     representation, setRepresentation,
     coloring, setColoring,
+    customColors, setCustomColors,
     isSpinning, setIsSpinning,
     showSurface, setShowSurface,
     showLigands, setShowLigands,
@@ -903,6 +904,13 @@ function App() {
         if (viewerRef.current) {
           viewerRef.current.highlightRegion(action.selection, action.label);
         }
+        break;
+      case 'SET_CUSTOM_COLOR':
+        // Add to the list of custom colors
+        setCustomColors((prev: any) => [
+          ...prev,
+          { selection: action.selection, color: action.color }
+        ]);
         break;
     }
   };
@@ -1762,6 +1770,7 @@ function App() {
                         showLigands={ctrl.showLigands}
                         showIons={ctrl.showIons}
                         coloring={ctrl.coloring}
+                        customColors={ctrl.customColors}
                         palette={colorPalette}
                         backgroundColor={ctrl.customBackgroundColor || (isLightMode ? 'white' : 'black')}
                         measurementTextColor={measurementTextColorMode}

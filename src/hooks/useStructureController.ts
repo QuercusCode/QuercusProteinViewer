@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { RepresentationType, ColoringType, ResidueInfo, Measurement, PDBMetadata, ChainInfo } from '../types';
+import type { RepresentationType, ColoringType, ResidueInfo, Measurement, PDBMetadata, ChainInfo, CustomColorRule } from '../types';
 import type { DataSource } from '../utils/pdbUtils';
 
 // Types for the Controller Return Value
@@ -18,6 +18,8 @@ export interface StructureController {
     setRepresentation: (type: RepresentationType) => void;
     coloring: ColoringType;
     setColoring: (type: ColoringType) => void;
+    customColors: CustomColorRule[];
+    setCustomColors: (colors: CustomColorRule[] | ((prev: CustomColorRule[]) => CustomColorRule[])) => void;
     isSpinning: boolean;
     setIsSpinning: (spinning: boolean | ((prev: boolean) => boolean)) => void;
     showSurface: boolean;
@@ -63,6 +65,7 @@ export const useStructureController = (initialState: any = {}): StructureControl
     // Visuals
     const [representation, setRepresentation] = useState<RepresentationType>(initialState.representation || 'cartoon');
     const [coloring, setColoring] = useState<ColoringType>(initialState.coloring || 'chainid');
+    const [customColors, setCustomColors] = useState<CustomColorRule[]>([]);
     const [isSpinning, setIsSpinning] = useState(false);
     const [showSurface, setShowSurface] = useState(false);
     const [showLigands, setShowLigands] = useState(false);
@@ -138,6 +141,7 @@ export const useStructureController = (initialState: any = {}): StructureControl
         fileType,
         representation, setRepresentation,
         coloring, setColoring,
+        customColors, setCustomColors,
         isSpinning, setIsSpinning,
         showSurface, setShowSurface,
         showLigands, setShowLigands,
