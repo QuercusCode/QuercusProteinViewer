@@ -1817,11 +1817,19 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         ...cartoonParams
                     });
                 } else {
-                    // Standard NGL chainid coloring is reliable and handles selectors internally
-                    component.addRepresentation(repType, {
+                } else {
+                    // Standard NGL chainid coloring
+                    const params: any = {
                         color: 'chainid',
-                        ...cartoonParams
-                    });
+                        quality: 'high'
+                    };
+
+                    // Only apply cartoon parameters if using cartoon representation
+                    if (repType === 'cartoon') {
+                        Object.assign(params, cartoonParams);
+                    }
+
+                    component.addRepresentation(repType, params);
                 }
             } else if (currentColoring === 'charge') {
                 // CHARGE COLORING: Multi-representation approach
