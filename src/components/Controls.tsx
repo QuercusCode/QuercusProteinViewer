@@ -301,6 +301,8 @@ interface ControlsProps {
     setShowSurface: (show: boolean) => void;
     showLigands: boolean;
     setShowLigands: (show: boolean) => void;
+    smoothSheet: boolean;
+    setSmoothSheet: (smooth: boolean) => void;
     onFocusLigands: () => void;
     onRecordMovie: (duration: number) => void;
     isRecording: boolean;
@@ -1118,6 +1120,18 @@ export const Controls: React.FC<ControlsProps> = ({
                                         )}
                                     </div>
                                 </div>
+
+                                {!isChemical && (
+                                    <div className={`flex items-center justify-between p-2 rounded-lg border ${inputBg}`}>
+                                        <span className={`text-xs font-medium ${subtleText}`}>Smooth Sheet</span>
+                                        <button
+                                            onClick={() => setSmoothSheet(!smoothSheet)}
+                                            className={`relative w-8 h-4 rounded-full transition-colors ${smoothSheet ? 'bg-blue-500' : 'bg-neutral-600'}`}
+                                        >
+                                            <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform ${smoothSheet ? 'translate-x-4' : 'translate-x-0'}`} />
+                                        </button>
+                                    </div>
+                                )}
 
                                 <div className="space-y-2">
                                     <div className="grid grid-cols-2 gap-2">

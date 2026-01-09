@@ -1545,18 +1545,19 @@ function App() {
               setIsMeasurementMode={setIsMeasurementMode}
               isPublicationMode={isPublicationMode}
               onTogglePublicationMode={togglePublicationMode}
-              onClearMeasurements={() => {
-                setMeasurements([]);
-                viewerRef.current?.clearMeasurements();
-              }}
+              // Appearance
+              representation={activeController.representation}
+              setRepresentation={activeController.setRepresentation}
+              coloring={activeController.coloring}
+              setColoring={activeController.setColoring}
               isLightMode={isLightMode}
               setIsLightMode={setIsLightMode}
-              highlightedResidue={highlightedResidue}
-              onResidueClick={handleSequenceResidueClick}
-              showSurface={showSurface}
-              setShowSurface={setShowSurface}
-              showLigands={showLigands}
-              setShowLigands={setShowLigands}
+              showSurface={activeController.showSurface}
+              setShowSurface={activeController.setShowSurface}
+              showLigands={activeController.showLigands}
+              setShowLigands={activeController.setShowLigands}
+              smoothSheet={activeController.smoothSheet}
+              setSmoothSheet={activeController.setSmoothSheet}
               showIons={showIons}
               setShowIons={setShowIons}
               onFocusLigands={handleFocusLigands}
@@ -1761,9 +1762,10 @@ function App() {
                         showSurface={ctrl.showSurface}
                         showLigands={ctrl.showLigands}
                         showIons={ctrl.showIons}
+                        smoothSheet={ctrl.smoothSheet}
                         coloring={ctrl.coloring}
                         palette={colorPalette}
-                        backgroundColor={ctrl.customBackgroundColor || (isLightMode ? 'white' : 'black')}
+                        backgroundColor={ctrl.customBackgroundColor || undefined}
                         measurementTextColor={measurementTextColorMode}
                         enableAmbientOcclusion={true}
 

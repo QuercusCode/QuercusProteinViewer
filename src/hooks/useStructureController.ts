@@ -26,6 +26,8 @@ export interface StructureController {
     setShowLigands: (show: boolean | ((prev: boolean) => boolean)) => void;
     showIons: boolean;
     setShowIons: (show: boolean | ((prev: boolean) => boolean)) => void;
+    smoothSheet: boolean;
+    setSmoothSheet: (smooth: boolean | ((prev: boolean) => boolean)) => void;
     customBackgroundColor: string | null;
     setCustomBackgroundColor: (color: string | null) => void;
 
@@ -67,6 +69,7 @@ export const useStructureController = (initialState: any = {}): StructureControl
     const [showSurface, setShowSurface] = useState(false);
     const [showLigands, setShowLigands] = useState(false);
     const [showIons, setShowIons] = useState(false);
+    const [smoothSheet, setSmoothSheet] = useState(true);
     const [customBackgroundColor, setCustomBackgroundColor] = useState<string | null>(null);
     // Analysis
     const [chains, setChains] = useState<ChainInfo[]>([]);
@@ -142,6 +145,7 @@ export const useStructureController = (initialState: any = {}): StructureControl
         showSurface, setShowSurface,
         showLigands, setShowLigands,
         showIons, setShowIons,
+        smoothSheet, setSmoothSheet,
         customBackgroundColor, setCustomBackgroundColor,
         chains, setChains,
         ligands, setLigands,
