@@ -5,7 +5,7 @@ import { ContactMap } from './components/ContactMap';
 import { AISidebar, type AIAction } from './components/AISidebar';
 import { HelpGuide } from './components/HelpGuide';
 import { parseURLState, getShareableURL } from './utils/urlManager';
-import type { Snapshot, Movie, ColorPalette, ColoringType, ResidueInfo, StructureInfo, SelectedResidue } from './types';
+import type { Snapshot, Movie, ColorPalette, ColoringType, ResidueInfo, StructureInfo, CustomSelection } from './types';
 
 import LibraryModal from './components/LibraryModal';
 import { ShareModal } from './components/ShareModal';
@@ -73,8 +73,9 @@ function App() {
   // --- Snapshot Modal State (unified viewport + quality selection) ---
   const [isSnapshotModalOpen, setIsSnapshotModalOpen] = useState(false);
 
-  // --- Residue-Specific Coloring State ---
-  const [selectedResidues, setSelectedResidues] = useState<SelectedResidue[]>([]);
+  // --- Custom Selection State ---
+  const [customSelections, setCustomSelections] = useState<CustomSelection[]>([]);
+
 
   // --- Multi-View Tool Actions Implementation ---
 
@@ -880,23 +881,19 @@ function App() {
       setSnapshots(prev => prev.filter(s => s.id !== id));
     }
   };
-
-  // --- Residue-Specific Coloring Handlers ---
-  const addSelectedResidue = (chain: string, resNo: number, color: string) => {
-    const exists = selectedResidues.some(r => r.chain === chain && r.resNo === resNo);
-    if (!exists) {
-      setSelectedResidues(prev => [...prev, { chain, resNo, color }]);
-    }
+  // --- Custom Selection Handlers ---
+  const addCustomSelection = (selection: string, color: string) => {
+    // Generate simple ID
+    const id = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+    setCustomSelections(prev => [...prev, { id, selection, color }]);
   };
 
-  const removeSelectedResidue = (chain: string, resNo: number) => {
-    setSelectedResidues(prev => prev.filter(r => !(r.chain === chain && r.resNo === resNo)));
+  const removeCustomSelection = (id: string) => {
+    setCustomSelections(prev => prev.filter(s => s.id !== id));
   };
 
-  const updateResidueColor = (chain: string, resNo: number, color: string) => {
-    setSelectedResidues(prev => prev.map(r =>
-      r.chain === chain && r.resNo === resNo ? { ...r, color } : r
-    ));
+  const updateCustomSelection = (id: string, updates: Partial<CustomSelection>) => {
+    setCustomSelections(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
   };
 
   // --- AI ACTION HANDLER (Dr. AI V3) ---
@@ -1639,11 +1636,11 @@ function App() {
               viewMode={viewMode}
               onSetViewMode={setViewMode}
 
-              // Residue-Specific Coloring
-              selectedResidues={selectedResidues}
-              onAddResidue={addSelectedResidue}
-              onRemoveResidue={removeSelectedResidue}
-              onUpdateResidueColor={updateResidueColor}
+              // Custom Selections
+              customSelections={customSelections}
+              onAddCustomSelection={addCustomSelection}
+              onRemoveCustomSelection={removeCustomSelection}
+              onUpdateCustomSelection={updateCustomSelection}
             />
           );
         })()}
@@ -1802,8 +1799,8 @@ function App() {
 
                         quality={isPublicationMode ? 'high' : 'medium'}
                         resetCamera={ctrl.resetKey}
-                        customColors={ctrl.customColors}
-                        selectedResidues={selectedResidues}
+                        customSelections={customSelections}
+
                         className="w-full h-full"
                       />
                     )}

@@ -36,7 +36,7 @@ import {
     Undo2,
     Redo2
 } from 'lucide-react';
-import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, PDBMetadata, SelectedResidue } from '../types';
+import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, PDBMetadata, CustomSelection } from '../types';
 import type { DataSource } from '../utils/pdbUtils';
 import type { HistoryItem } from '../hooks/useHistory';
 import { formatChemicalId } from '../utils/pdbUtils';
@@ -359,13 +359,14 @@ interface ControlsProps {
     // Multi-View Mode
     viewMode?: 'single' | 'dual' | 'triple' | 'quad';
     onSetViewMode?: (mode: 'single' | 'dual' | 'triple' | 'quad') => void;
-
-    // Residue-Specific Coloring
-    selectedResidues?: SelectedResidue[];
-    onAddResidue?: (chain: string, resNo: number, color: string) => void;
-    onRemoveResidue?: (chain: string, resNo: number) => void;
-    onUpdateResidueColor?: (chain: string, resNo: number, color: string) => void;
+    // Custom Selections
+    customSelections?: CustomSelection[];
+    onAddCustomSelection?: (selection: string, color: string) => void;
+    onRemoveCustomSelection?: (id: string) => void;
+    onUpdateCustomSelection?: (id: string, updates: Partial<CustomSelection>) => void;
 }
+
+
 
 export const Controls: React.FC<ControlsProps> = ({
     pdbId,
@@ -446,10 +447,9 @@ export const Controls: React.FC<ControlsProps> = ({
     onRedo,
     canUndo,
     canRedo,
-    selectedResidues = [],
-    onAddResidue,
-    onRemoveResidue
-    // onUpdateResidueColor // Future: allow changing colors of existing residues
+    customSelections = [],
+    onAddCustomSelection,
+    onRemoveCustomSelection
 }) => {
     // Motif Search State
     const [searchPattern, setSearchPattern] = useState('');
@@ -457,10 +457,11 @@ export const Controls: React.FC<ControlsProps> = ({
     const [isSearching, setIsSearching] = useState(false);
     const [isSearchFocused, setIsSearchFocused] = useState(false);
 
-    // State for Residue-Specific Coloring UI
-    const [newResidueChain, setNewResidueChain] = useState('');
-    const [newResidueNumber, setNewResidueNumber] = useState('');
-    const [newResidueColor, setNewResidueColor] = useState('#FF0000'); // Default red
+    // Custom Selection State
+    const [newSelectionString, setNewSelectionString] = useState('');
+    const [newSelectionColor, setNewSelectionColor] = useState('#FF0000');
+
+
 
     // State for Screenshot Modal
 
@@ -481,7 +482,7 @@ export const Controls: React.FC<ControlsProps> = ({
             if (match.startResNo !== match.endResNo) {
                 range = `${match.startResNo}-${match.endResNo}`;
             }
-            const selection = `:${match.chain} and ${range}`;
+            const selection = `: ${match.chain} and ${range}`;
             onHighlightRegion(selection, `Motif: ${match.sequence}`);
         } else {
             // Fallback
@@ -592,11 +593,11 @@ export const Controls: React.FC<ControlsProps> = ({
         let target = '';
         if (targetType === 'chain') {
             if (!selectedChain) return;
-            target = `:${selectedChain}`;
+            target = `: ${selectedChain}`;
         } else {
             if (!residueRange.trim()) return;
             target = selectedChain
-                ? `${residueRange.trim()}:${selectedChain}`
+                ? `${residueRange.trim()}: ${selectedChain}`
                 : residueRange.trim();
         }
 
@@ -622,7 +623,7 @@ export const Controls: React.FC<ControlsProps> = ({
         return (
             <button
                 onClick={() => setIsCleanMode(false)}
-                className={`absolute bottom-6 right-6 z-50 p-3 rounded-full shadow-lg transition-transform hover:scale-110 ${isLightMode ? 'bg-white text-neutral-800' : 'bg-neutral-800 text-white'}`}
+                className={`absolute bottom-6 right-6 z-50 p-3 rounded-full shadow-lg transition-transform hover: scale-110 ${isLightMode ? 'bg-white text-neutral-800' : 'bg-neutral-800 text-white'}`}
                 title="Exit Presentation Mode"
             >
                 <Minimize className="w-5 h-5" />
@@ -637,26 +638,26 @@ export const Controls: React.FC<ControlsProps> = ({
 
             <button
                 onClick={onToggleMobileSidebar}
-                className={`absolute top-4 left-4 z-40 md:hidden p-2 rounded-lg backdrop-blur-md shadow-lg transition-opacity hover:opacity-80 border ${isLightMode ? 'bg-white border-neutral-900 text-black' : 'bg-neutral-900/90 border-white/10 text-white'}`}
+                className={`absolute top-4 left-4 z-40 md: hidden p-2 rounded-lg backdrop-blur-md shadow-lg transition-opacity hover: opacity-80 border ${isLightMode ? 'bg-white border-neutral-900 text-black' : 'bg-neutral-900/90 border-white/10 text-white'}`}
             >
                 <Menu className="w-6 h-6" />
             </button>
 
             <div className={`
-                absolute top-0 left-0 z-50
-                h-[100dvh] w-full sm:w-80 
-                backdrop-blur-xl border-r shadow-2xl
-                transition-transform duration-300 ease-in-out
-                flex flex-col
-                ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-                md:relative md:translate-x-0 md:h-full md:w-80 md:rounded-none md:z-10 md:shrink-0
-                ${isLightMode ? 'bg-white border-neutral-900 shadow-none' : 'bg-neutral-900/80 border-white/10 md:bg-neutral-900 md:shadow-none'}
-            `}>
+    absolute top-0 left-0 z-50
+    h-[100dvh]w-full sm: w-80
+    backdrop-blur-xl border-r shadow-2xl
+    transition-transform duration-300 ease-in-out
+    flex flex-col
+    ${isMobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+    md: relative md: translate-x-0 md: h-full md: w-80 md: rounded-none md: z-10 md: shrink-0
+    ${isLightMode ? 'bg-white border-neutral-900 shadow-none' : 'bg-neutral-900/80 border-white/10 md:bg-neutral-900 md:shadow-none'}
+    `}>
                 {/* Header - Fixed */}
                 <div className="flex-none p-4 pb-2 relative">
                     <button
                         onClick={onToggleMobileSidebar}
-                        className={`absolute top-4 right-4 p-1 md:hidden ${subtleText}`}
+                        className={`absolute top-4 right-4 p-1 md: hidden ${subtleText}`}
                     >
                         <X className="w-6 h-6" />
                     </button>
@@ -768,7 +769,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                     onClick={() => setDataSource('pdb')}
                                     className={`text-xs font-medium py-1.5 rounded-md transition-all ${dataSource === 'pdb'
                                         ? 'bg-blue-600 text-white shadow-sm'
-                                        : `${subtleText} hover:bg-black/5 dark:hover:bg-white/10`
+                                        : `${subtleText} hover: bg-black/5 dark: hover: bg-white/10`
                                         }`}
                                 >
                                     RCSB PDB
@@ -778,7 +779,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                     onClick={() => setDataSource('pubchem')}
                                     className={`text-xs font-medium py-1.5 rounded-md transition-all ${dataSource === 'pubchem'
                                         ? 'bg-blue-600 text-white shadow-sm'
-                                        : `${subtleText} hover:bg-black/5 dark:hover:bg-white/10`
+                                        : `${subtleText} hover: bg-black/5 dark: hover: bg-white/10`
                                         }`}
                                 >
                                     PubChem
@@ -851,7 +852,7 @@ export const Controls: React.FC<ControlsProps> = ({
                         <div className="grid grid-cols-2 gap-2">
                             <button
                                 onClick={() => fileInputRef.current?.click()}
-                                className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all group ${cardBg} hover:opacity-80`}
+                                className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all group ${cardBg} hover: opacity-80`}
                             >
                                 <Upload className="w-3.5 h-3.5 group-hover:text-blue-500 transition-colors" />
                                 <span className="text-xs font-medium">Upload File</span>
@@ -869,7 +870,7 @@ export const Controls: React.FC<ControlsProps> = ({
 
                             <button
                                 onClick={onToggleLibrary}
-                                className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all group ${cardBg} hover:opacity-80`}
+                                className={`w-full flex items-center justify-center gap-2 border py-2 rounded-lg transition-all group ${cardBg} hover: opacity-80`}
                             >
                                 <BookOpen className="w-3.5 h-3.5 group-hover:text-purple-500 transition-colors" />
                                 <span className="text-xs font-medium">Library</span>
@@ -885,7 +886,7 @@ export const Controls: React.FC<ControlsProps> = ({
                             {proteinTitle && (
                                 <div className="mb-2">
                                     <div className="flex items-center justify-between mb-0.5">
-                                        <h3 className={`text-[10px] font-bold uppercase tracking-wider ${subtleText}`}>Structure</h3>
+                                        <h3 className={`text-[10px]font-bold uppercase tracking-wider ${subtleText}`}>Structure</h3>
                                         <button
                                             onClick={onDownloadPDB}
                                             title="Download PDB Structure"
@@ -904,7 +905,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                 {!isChemical && (
                                     <>
                                         <div>
-                                            <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Residues</span>
+                                            <span className={`text-[9px]font-bold uppercase tracking-wider block ${subtleText}`}>Residues</span>
                                             <span className={`text-sm font-mono font-bold ${isLightMode ? 'text-neutral-700' : 'text-neutral-300'}`}>
                                                 {chains.reduce((acc, chain) => {
                                                     if (chain.sequence) return acc + chain.sequence.length;
@@ -914,7 +915,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                             </span>
                                         </div>
                                         <div className="pl-2 border-l border-neutral-200 dark:border-neutral-800">
-                                            <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Chains</span>
+                                            <span className={`text-[9px]font-bold uppercase tracking-wider block ${subtleText}`}>Chains</span>
                                             <span className={`text-sm font-mono font-bold ${isLightMode ? 'text-neutral-700' : 'text-neutral-300'}`}>
                                                 {chains.length}
                                             </span>
@@ -926,33 +927,33 @@ export const Controls: React.FC<ControlsProps> = ({
                                 {pdbMetadata && !isChemical && (
                                     <>
                                         <div>
-                                            <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Method</span>
-                                            <span className={`text-[10px] font-medium leading-tight block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                            <span className={`text-[9px]font-bold uppercase tracking-wider block ${subtleText}`}>Method</span>
+                                            <span className={`text-[10px]font-medium leading-tight block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
                                                 {pdbMetadata.method.length > 20 ? pdbMetadata.method.substring(0, 18) + '...' : pdbMetadata.method}
                                             </span>
                                         </div>
                                         <div className="pl-2 border-l border-neutral-200 dark:border-neutral-800">
-                                            <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Resolution</span>
-                                            <span className={`text-[10px] font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                            <span className={`text-[9px]font-bold uppercase tracking-wider block ${subtleText}`}>Resolution</span>
+                                            <span className={`text-[10px]font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
                                                 {pdbMetadata.resolution}
                                             </span>
                                         </div>
 
                                         {pdbMetadata.organism && pdbMetadata.organism !== 'Unknown source' && (
                                             <div className="pt-1 border-t border-neutral-200 dark:border-neutral-800" style={{ borderTopStyle: 'dashed' }}>
-                                                <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Organism</span>
-                                                <span className={`text-[10px] font-medium leading-tight block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                                <span className={`text-[9px]font-bold uppercase tracking-wider block ${subtleText}`}>Organism</span>
+                                                <span className={`text-[10px]font-medium leading-tight block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
                                                     {pdbMetadata.organism}
                                                 </span>
                                             </div>
                                         )}
 
                                         <div
-                                            className={`pt-1 border-t border-neutral-200 dark:border-neutral-800 ${pdbMetadata.organism && pdbMetadata.organism !== 'Unknown source' ? 'pl-2 border-l' : ''}`}
+                                            className={`pt-1 border-t border-neutral-200 dark: border-neutral-800 ${pdbMetadata.organism && pdbMetadata.organism !== 'Unknown source' ? 'pl-2 border-l' : ''}`}
                                             style={{ borderTopStyle: 'dashed' }}
                                         >
-                                            <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Deposited</span>
-                                            <span className={`text-[10px] font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                            <span className={`text-[9px]font-bold uppercase tracking-wider block ${subtleText}`}>Deposited</span>
+                                            <span className={`text-[10px]font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
                                                 {pdbMetadata.depositionDate}
                                             </span>
                                         </div>
@@ -964,16 +965,16 @@ export const Controls: React.FC<ControlsProps> = ({
                                     <>
                                         {pdbMetadata.formula && (
                                             <div>
-                                                <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Formula</span>
-                                                <span className={`text-[10px] font-medium leading-tight block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                                <span className={`text-[9px]font-bold uppercase tracking-wider block ${subtleText}`}>Formula</span>
+                                                <span className={`text-[10px]font-medium leading-tight block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
                                                     {pdbMetadata.formula}
                                                 </span>
                                             </div>
                                         )}
                                         {pdbMetadata.molecularWeight && (
                                             <div className="pl-2 border-l border-neutral-200 dark:border-neutral-800">
-                                                <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Mol. Weight</span>
-                                                <span className={`text-[10px] font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                                <span className={`text-[9px]font-bold uppercase tracking-wider block ${subtleText}`}>Mol. Weight</span>
+                                                <span className={`text-[10px]font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
                                                     {pdbMetadata.molecularWeight.toFixed(2)} g/mol
                                                 </span>
                                             </div>
@@ -981,17 +982,17 @@ export const Controls: React.FC<ControlsProps> = ({
 
                                         {/* Structure Image or Source */}
                                         <div
-                                            className={`pt-1 border-t border-neutral-200 dark:border-neutral-800 ${(pdbMetadata.formula || pdbMetadata.molecularWeight) ? 'pl-2 border-l' : ''}`}
+                                            className={`pt-1 border-t border-neutral-200 dark: border-neutral-800 ${(pdbMetadata.formula || pdbMetadata.molecularWeight) ? 'pl-2 border-l' : ''}`}
                                             style={{ borderTopStyle: 'dashed' }}
                                         >
-                                            <span className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>
+                                            <span className={`text-[9px]font-bold uppercase tracking-wider block ${subtleText}`}>
                                                 {pdbMetadata.cid ? 'Structure' : 'Source'}
                                             </span>
 
                                             {pdbMetadata.cid ? (
                                                 <StructureImageModal cid={pdbMetadata.cid} />
                                             ) : (
-                                                <span className={`text-[10px] font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
+                                                <span className={`text-[10px]font-medium block ${isLightMode ? 'text-neutral-800' : 'text-neutral-200'}`}>
                                                     {pdbMetadata.title}
                                                 </span>
                                             )}
@@ -1017,14 +1018,14 @@ export const Controls: React.FC<ControlsProps> = ({
                         <div className="space-y-3">
                             {/* Visual Style */}
                             <div className="space-y-2">
-                                <label className={`text-[10px] font-bold uppercase tracking-wider block ${subtleText}`}>Visualization</label>
+                                <label className={`text-[10px]font-bold uppercase tracking-wider block ${subtleText}`}>Visualization</label>
                                 <div className="space-y-3">
                                     {/* Toggles Row */}
                                     <div className="grid grid-cols-2 gap-2">
                                         {/* Surface Toggle */}
                                         <button
                                             onClick={() => setShowSurface(!showSurface)}
-                                            className={`flex flex-col items-center justify-center gap-1 px-1 py-2 rounded-lg border transition-all ${showSurface ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
+                                            className={`flex flex-col items-center justify-center gap-1 px-1 py-2 rounded-lg border transition-all ${showSurface ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover: opacity-100`}`}
                                         >
                                             <Layers className="w-3.5 h-3.5" />
                                             <span className="text-[10px] font-medium">Surface</span>
@@ -1032,7 +1033,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                         </button>
                                         <button
                                             onClick={() => setIsSpinning(!isSpinning)}
-                                            className={`flex flex-col items-center justify-center gap-1 px-1 py-2 rounded-lg border transition-all ${isSpinning ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
+                                            className={`flex flex-col items-center justify-center gap-1 px-1 py-2 rounded-lg border transition-all ${isSpinning ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover: opacity-100`}`}
                                         >
                                             <RefreshCw className={`w-3.5 h-3.5 ${isSpinning ? 'animate-spin' : ''}`} />
                                             <span className="text-[10px] font-medium">Spin</span>
@@ -1040,7 +1041,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                         </button>
                                         <button
                                             onClick={() => setIsDyslexicFont(!isDyslexicFont)}
-                                            className={`flex flex-col items-center justify-center gap-1 px-1 py-2 rounded-lg border transition-all ${isDyslexicFont ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
+                                            className={`flex flex-col items-center justify-center gap-1 px-1 py-2 rounded-lg border transition-all ${isDyslexicFont ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover: opacity-100`}`}
                                         >
                                             <span className="text-lg leading-none font-serif">Aa</span>
                                             <span className="text-[10px] font-medium">Dyslexic</span>
@@ -1051,18 +1052,18 @@ export const Controls: React.FC<ControlsProps> = ({
                                         {/* Multi-View Mode Selector */}
                                         {onSetViewMode && (
                                             <div className="space-y-1" id="viewport-controls">
-                                                <label className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>Layout</label>
+                                                <label className={`text-[9px]font-bold uppercase tracking-wider block ${subtleText}`}>Layout</label>
                                                 <div className="grid grid-cols-2 gap-1.5">
                                                     <button
                                                         onClick={() => onSetViewMode('single')}
-                                                        className={`flex flex-col items-center justify-center gap-0.5 px-1 py-1.5 rounded-lg border transition-all ${viewMode === 'single' ? 'bg-indigo-600/10 border-indigo-500 text-indigo-500' : `${cardBg} border-neutral-700 opacity-80 hover:opacity-100`}`}
+                                                        className={`flex flex-col items-center justify-center gap-0.5 px-1 py-1.5 rounded-lg border transition-all ${viewMode === 'single' ? 'bg-indigo-600/10 border-indigo-500 text-indigo-500' : `${cardBg} border-neutral-700 opacity-80 hover: opacity-100`}`}
                                                     >
                                                         <div className="w-3 h-3 border rounded" />
                                                         <span className="text-[9px] font-medium">Single</span>
                                                     </button>
                                                     <button
                                                         onClick={() => onSetViewMode('dual')}
-                                                        className={`flex flex-col items-center justify-center gap-0.5 px-1 py-1.5 rounded-lg border transition-all ${viewMode === 'dual' ? 'bg-indigo-600/10 border-indigo-500 text-indigo-500' : `${cardBg} border-neutral-700 opacity-80 hover:opacity-100`}`}
+                                                        className={`flex flex-col items-center justify-center gap-0.5 px-1 py-1.5 rounded-lg border transition-all ${viewMode === 'dual' ? 'bg-indigo-600/10 border-indigo-500 text-indigo-500' : `${cardBg} border-neutral-700 opacity-80 hover: opacity-100`}`}
                                                     >
                                                         <div className="flex gap-0.5">
                                                             <div className="w-1.5 h-3 border rounded" />
@@ -1072,7 +1073,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                                     </button>
                                                     <button
                                                         onClick={() => onSetViewMode('triple')}
-                                                        className={`flex flex-col items-center justify-center gap-0.5 px-1 py-1.5 rounded-lg border transition-all ${viewMode === 'triple' ? 'bg-indigo-600/10 border-indigo-500 text-indigo-500' : `${cardBg} border-neutral-700 opacity-80 hover:opacity-100`}`}
+                                                        className={`flex flex-col items-center justify-center gap-0.5 px-1 py-1.5 rounded-lg border transition-all ${viewMode === 'triple' ? 'bg-indigo-600/10 border-indigo-500 text-indigo-500' : `${cardBg} border-neutral-700 opacity-80 hover: opacity-100`}`}
                                                     >
                                                         <div className="flex flex-col gap-0.5">
                                                             <div className="w-3 h-1.5 border rounded" />
@@ -1085,7 +1086,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                                     </button>
                                                     <button
                                                         onClick={() => onSetViewMode('quad')}
-                                                        className={`flex flex-col items-center justify-center gap-0.5 px-1 py-1.5 rounded-lg border transition-all ${viewMode === 'quad' ? 'bg-indigo-600/10 border-indigo-500 text-indigo-500' : `${cardBg} border-neutral-700 opacity-80 hover:opacity-100`}`}
+                                                        className={`flex flex-col items-center justify-center gap-0.5 px-1 py-1.5 rounded-lg border transition-all ${viewMode === 'quad' ? 'bg-indigo-600/10 border-indigo-500 text-indigo-500' : `${cardBg} border-neutral-700 opacity-80 hover: opacity-100`}`}
                                                     >
                                                         <div className="grid grid-cols-2 gap-0.5">
                                                             <div className="w-1.5 h-1.5 border rounded" />
@@ -1115,7 +1116,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                                     onClick={() => setColorPalette(p.id as ColorPalette)}
                                                     className={`flex items-center gap-2 px-2 py-1.5 rounded border transition-all ${colorPalette === p.id
                                                         ? 'border-blue-500 bg-blue-500/10 text-blue-500'
-                                                        : `border-transparent ${isLightMode ? 'hover:bg-neutral-100' : 'hover:bg-white/5'} opacity-70 hover:opacity-100`}`}
+                                                        : `border-transparent ${isLightMode ? 'hover:bg-neutral-100' : 'hover:bg-white/5'} opacity-70 hover: opacity-100`}`}
                                                 >
                                                     <div className="h-3 w-12 rounded-sm border border-black/10 shadow-sm" style={{ background: p.gradient }} />
                                                     <span className="text-[10px] font-medium uppercase tracking-wider">{p.label}</span>
@@ -1170,7 +1171,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                         {customBackgroundColor && (
                                             <button
                                                 onClick={() => setCustomBackgroundColor?.(null)}
-                                                className={`px-3 py-1.5 rounded border text-[10px] font-bold uppercase transition-colors hover:bg-red-500/10 hover:text-red-500 ${isLightMode ? 'border-neutral-900 text-black bg-white' : 'border-neutral-700 text-neutral-400'}`}
+                                                className={`px-3 py-1.5 rounded border text-[10px]font-bold uppercase transition-colors hover: bg-red-500/10 hover: text-red-500 ${isLightMode ? 'border-neutral-900 text-black bg-white' : 'border-neutral-700 text-neutral-400'}`}
                                             >
                                                 Reset
                                             </button>
@@ -1181,7 +1182,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <div className="space-y-2">
                                     <div className="grid grid-cols-2 gap-2">
                                         <div>
-                                            <label className={`text-[10px] font-bold uppercase tracking-wider mb-1 block ${subtleText}`}>Style</label>
+                                            <label className={`text-[10px]font-bold uppercase tracking-wider mb-1 block ${subtleText}`}>Style</label>
                                             <select
                                                 value={representation}
                                                 onChange={(e) => setRepresentation(e.target.value as RepresentationType)}
@@ -1196,7 +1197,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                             </select>
                                         </div>
                                         <div>
-                                            <label className={`text-[10px] font-bold uppercase tracking-wider mb-1 block ${subtleText}`}>Colors</label>
+                                            <label className={`text-[10px]font-bold uppercase tracking-wider mb-1 block ${subtleText}`}>Colors</label>
                                             <select
                                                 value={coloring}
                                                 onChange={(e) => setColoring(e.target.value as ColoringType)}
@@ -1205,86 +1206,80 @@ export const Controls: React.FC<ControlsProps> = ({
                                                 {!isChemical && <option value="chainid">By Chain</option>}
                                                 {!isChemical && <option value="secondary-structure">Structure</option>}
                                                 {!isChemical && <option value="hydrophobicity">Hydrophobicity</option>}
-                                                {!isChemical && <option value="byresidue">By Residue</option>}
+                                                {!isChemical && <option value="custom-selection">Custom Selection</option>}
                                                 <option value="bfactor">B-Factor</option>
                                                 <option value="uniform">Uniform</option>
                                                 <option value="element">Element (CPK)</option>
                                             </select>
                                         </div>
 
-                                        {/* Residue-Specific Coloring UI */}
-                                        {coloring === 'byresidue' && (
+                                        {/* Custom Selection UI */}
+                                        {coloring === 'custom-selection' && (
                                             <div className="pt-3 border-t border-white/10 space-y-3">
-                                                <label className={`text-[10px] font-bold uppercase tracking-wider block ${subtleText}`}>Select Residues</label>
-
-                                                {/* Add Residue Form */}
-                                                <div className="space-y-2">
-                                                    <div className="grid grid-cols-2 gap-2">
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Chain (e.g. A)"
-                                                            value={newResidueChain}
-                                                            onChange={(e) => setNewResidueChain(e.target.value.toUpperCase())}
-                                                            className={`border rounded px-2 py-1.5 text-xs ${inputBg}`}
-                                                            maxLength={1}
-                                                        />
-                                                        <input
-                                                            type="number"
-                                                            placeholder="Residue #"
-                                                            value={newResidueNumber}
-                                                            onChange={(e) => setNewResidueNumber(e.target.value)}
-                                                            className={`border rounded px-2 py-1.5 text-xs ${inputBg}`}
-                                                        />
-                                                    </div>
-                                                    <div className="flex gap-2">
-                                                        <input
-                                                            type="color"
-                                                            value={newResidueColor}
-                                                            onChange={(e) => setNewResidueColor(e.target.value)}
-                                                            className="w-12 h-8 rounded border cursor-pointer"
-                                                        />
-                                                        <button
-                                                            onClick={() => {
-                                                                if (newResidueChain && newResidueNumber && onAddResidue) {
-                                                                    onAddResidue(newResidueChain, parseInt(newResidueNumber), newResidueColor);
-                                                                    setNewResidueNumber('');
-                                                                }
-                                                            }}
-                                                            disabled={!newResidueChain || !newResidueNumber}
-                                                            className="flex-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded text-xs font-bold transition-colors"
-                                                        >
-                                                            Add Residue
-                                                        </button>
+                                                <div className="space-y-1">
+                                                    <label className={`text-[10px] font-bold uppercase tracking-wider block ${subtleText}`}>NGL Selection</label>
+                                                    <div className="text-[9px] text-neutral-500 leading-tight">
+                                                        Use NGL syntax: <code className="bg-white/10 px-1 rounded">10-20:A</code> or <code className="bg-white/10 px-1 rounded">LEU</code>
                                                     </div>
                                                 </div>
 
-                                                {/* List of Selected Residues */}
-                                                {selectedResidues && selectedResidues.length > 0 && (
-                                                    <div className="space-y-1">
+                                                <div className="space-y-2">
+                                                    <div className="flex gap-2">
+                                                        <input
+                                                            type="text"
+                                                            placeholder="e.g. 10-20:A or :B"
+                                                            value={newSelectionString}
+                                                            onChange={(e) => setNewSelectionString(e.target.value)}
+                                                            className={`flex-1 min-w-0 border rounded px-2 py-1.5 text-xs ${inputBg} font-mono`}
+                                                        />
+                                                        <input
+                                                            type="color"
+                                                            value={newSelectionColor}
+                                                            onChange={(e) => setNewSelectionColor(e.target.value)}
+                                                            className="w-8 h-8 rounded border cursor-pointer shrink-0"
+                                                        />
+                                                    </div>
+                                                    <button
+                                                        onClick={() => {
+                                                            if (newSelectionString && onAddCustomSelection) {
+                                                                onAddCustomSelection(newSelectionString, newSelectionColor);
+                                                                setNewSelectionString('');
+                                                            }
+                                                        }}
+                                                        disabled={!newSelectionString}
+                                                        className="w-full px-3 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded text-xs font-bold transition-colors"
+                                                    >
+                                                        Add Selection
+                                                    </button>
+                                                </div>
+
+                                                {/* Active Selections List */}
+                                                {customSelections && customSelections.length > 0 && (
+                                                    <div className="space-y-2 pt-2 border-t border-white/5">
                                                         <label className={`text-[9px] font-bold uppercase tracking-wider block ${subtleText}`}>
-                                                            {selectedResidues.length} Residue{selectedResidues.length > 1 ? 's' : ''} Colored
+                                                            Active Selections ({customSelections.length})
                                                         </label>
-                                                        <div className="max-h-32 overflow-y-auto space-y-1">
-                                                            {selectedResidues.map((residue) => (
+                                                        <div className="max-h-32 overflow-y-auto space-y-1 pr-1">
+                                                            {customSelections.map((sel) => (
                                                                 <div
-                                                                    key={`${residue.chain}-${residue.resNo}`}
-                                                                    className={`flex items-center justify-between px-2 py-1.5 rounded text-xs ${cardBg}`}
+                                                                    key={sel.id}
+                                                                    className={`flex items-center justify-between px-2 py-1.5 rounded text-xs ${cardBg} group`}
                                                                 >
-                                                                    <div className="flex items-center gap-2">
+                                                                    <div className="flex items-center gap-2 min-w-0 flex-1">
                                                                         <div
-                                                                            className="w-4 h-4 rounded border border-white/20"
-                                                                            style={{ backgroundColor: residue.color }}
+                                                                            className="w-3 h-3 rounded-sm border border-white/20 shrink-0"
+                                                                            style={{ backgroundColor: sel.color }}
                                                                         />
-                                                                        <span>
-                                                                            {residue.chain}:{residue.resNo}
+                                                                        <span className="font-mono truncate" title={sel.selection}>
+                                                                            {sel.selection}
                                                                         </span>
                                                                     </div>
                                                                     <button
-                                                                        onClick={() => onRemoveResidue?.(residue.chain, residue.resNo)}
-                                                                        className="text-red-500 hover:text-red-400 transition-colors"
-                                                                        title="Remove residue"
+                                                                        onClick={() => onRemoveCustomSelection?.(sel.id)}
+                                                                        className="text-neutral-500 hover:text-red-500 transition-colors p-1"
+                                                                        title="Remove selection"
                                                                     >
-                                                                        ✕
+                                                                        <Trash2 className="w-3 h-3" />
                                                                     </button>
                                                                 </div>
                                                             ))}
@@ -1293,6 +1288,8 @@ export const Controls: React.FC<ControlsProps> = ({
                                                 )}
                                             </div>
                                         )}
+
+
 
                                     </div>
 
@@ -1315,7 +1312,7 @@ export const Controls: React.FC<ControlsProps> = ({
 
                             </div>
 
-                            <p className={`text-[9px] mt-1.5 opacity-70 leading-relaxed ${subtleText}`}>
+                            <p className={`text-[9px]mt-1.5 opacity-70 leading-relaxed ${subtleText}`}>
                                 {({
                                     chainid: "Distinct colors for each chain.",
                                     resname: "Standard amino acid colors (RasMol).",
@@ -1331,20 +1328,20 @@ export const Controls: React.FC<ControlsProps> = ({
                             {/* Custom Rules */}
                             {!isChemical && (
                                 <div className="pt-2 border-t border-white/5">
-                                    <label className={`text-[10px] font-bold uppercase tracking-wider mb-2 block ${subtleText}`}>Custom Rules</label>
+                                    <label className={`text-[10px]font-bold uppercase tracking-wider mb-2 block ${subtleText}`}>Custom Rules</label>
                                     <form onSubmit={addCustomRule} className="space-y-2">
                                         <div className="flex gap-1 bg-black/20 p-1 rounded-lg">
                                             <button
                                                 type="button"
                                                 onClick={() => setTargetType('chain')}
-                                                className={`flex-1 text-[10px] py-1 rounded-md transition-all ${targetType === 'chain' ? 'bg-blue-600 text-white shadow-sm' : 'text-neutral-400 hover:text-white'}`}
+                                                className={`flex-1 text-[10px]py-1 rounded-md transition-all ${targetType === 'chain' ? 'bg-blue-600 text-white shadow-sm' : 'text-neutral-400 hover:text-white'}`}
                                             >
                                                 Chain
                                             </button>
                                             <button
                                                 type="button"
                                                 onClick={() => setTargetType('residue')}
-                                                className={`flex-1 text-[10px] py-1 rounded-md transition-all ${targetType === 'residue' ? 'bg-blue-600 text-white shadow-sm' : 'text-neutral-400 hover:text-white'}`}
+                                                className={`flex-1 text-[10px]py-1 rounded-md transition-all ${targetType === 'residue' ? 'bg-blue-600 text-white shadow-sm' : 'text-neutral-400 hover:text-white'}`}
                                             >
                                                 Residue
                                             </button>
@@ -1364,7 +1361,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                                     <select
                                                         value={selectedChain}
                                                         onChange={(e) => setSelectedChain(e.target.value)}
-                                                        className={`w-full bg-transparent border-b ${isLightMode ? 'border-neutral-300' : 'border-neutral-700'} text-[10px] px-1 py-1 outline-none`}
+                                                        className={`w-full bg-transparent border-b ${isLightMode ? 'border-neutral-300' : 'border-neutral-700'} text-[10px]px-1 py-1 outline-none`}
                                                     >
                                                         {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
                                                     </select>
@@ -1382,7 +1379,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                                         className={`w-full bg-transparent border-b ${isLightMode ? 'border-neutral-300' : 'border-neutral-700'} text-xs px-1 py-1 outline-none`}
                                                     />
                                                     {getSelectedChainRange() && (
-                                                        <div className={`text-[9px] mt-0.5 ${subtleText} opacity-80`}>
+                                                        <div className={`text-[9px]mt-0.5 ${subtleText} opacity-80`}>
                                                             Range: {getSelectedChainRange()}
                                                         </div>
                                                     )}
@@ -1407,9 +1404,9 @@ export const Controls: React.FC<ControlsProps> = ({
                                     {customColors.length > 0 && (
                                         <div className="space-y-1 mt-2">
                                             {customColors.map(rule => (
-                                                <div key={rule.id} className={`flex justify-between items-center text-[10px] px-2 py-1 rounded border ${isLightMode ? 'bg-white border-neutral-200' : 'bg-black/20 border-white/5'}`}>
+                                                <div key={rule.id} className={`flex justify-between items-center text-[10px]px-2 py-1 rounded border ${isLightMode ? 'bg-white border-neutral-200' : 'bg-black/20 border-white/5'}`}>
                                                     <div className="flex items-center gap-2">
-                                                        <span className={`px-1 py-0.5 rounded text-[9px] uppercase font-bold ${isLightMode ? 'bg-neutral-100' : 'bg-white/10'}`}>{rule.type}</span>
+                                                        <span className={`px-1 py-0.5 rounded text-[9px]uppercase font-bold ${isLightMode ? 'bg-neutral-100' : 'bg-white/10'}`}>{rule.type}</span>
                                                         <span className="font-mono">{rule.target}</span>
                                                     </div>
                                                     <div className="flex items-center gap-2">
@@ -1453,8 +1450,8 @@ export const Controls: React.FC<ControlsProps> = ({
                                     <div className="grid grid-cols-2 gap-2 mb-2">
                                         <button
                                             onClick={() => setShowLigands(!showLigands)}
-                                            className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-md border text-[10px] font-medium transition-all
-                                                ${showLigands
+                                            className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-md border text-[10px]font-medium transition-all
+    ${showLigands
                                                     ? 'bg-blue-500/10 border-blue-500 text-blue-600 dark:text-blue-400'
                                                     : `${isLightMode ? 'bg-white border-neutral-200 text-neutral-600 hover:bg-neutral-50' : 'bg-white/5 border-white/10 text-neutral-400 hover:bg-white/10'}`
                                                 }`}
@@ -1464,8 +1461,8 @@ export const Controls: React.FC<ControlsProps> = ({
                                         </button>
                                         <button
                                             onClick={() => setShowIons && setShowIons(!showIons)}
-                                            className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-md border text-[10px] font-medium transition-all
-                                                ${showIons
+                                            className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-md border text-[10px]font-medium transition-all
+    ${showIons
                                                     ? 'bg-purple-500/10 border-purple-500 text-purple-600 dark:text-purple-400'
                                                     : `${isLightMode ? 'bg-white border-neutral-200 text-neutral-600 hover:bg-neutral-50' : 'bg-white/5 border-white/10 text-neutral-400 hover:bg-white/10'}`
                                                 }`}
@@ -1492,7 +1489,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                     setIsMeasurementMode(!isMeasurementMode);
                                     if (!isMeasurementMode && onToggleMeasurement) onToggleMeasurement();
                                 }}
-                                className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isMeasurementMode ? 'bg-amber-500/10 border-amber-500 text-amber-500' : `${cardBg} hover:opacity-80`} ${isChemical ? 'col-span-2' : ''}`}
+                                className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isMeasurementMode ? 'bg-amber-500/10 border-amber-500 text-amber-500' : `${cardBg} hover: opacity-80`} ${isChemical ? 'col-span-2' : ''}`}
                             >
                                 <span className="text-xs font-medium">Measure</span>
                                 <Ruler className="w-3.5 h-3.5" />
@@ -1501,7 +1498,7 @@ export const Controls: React.FC<ControlsProps> = ({
                             {!isChemical && (
                                 <button
                                     onClick={onToggleContactMap}
-                                    className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
+                                    className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover: opacity-80`}
                                 >
                                     <span className="text-xs font-medium">Contact Map</span>
                                     <Grid3X3 className="w-3.5 h-3.5" />
@@ -1511,7 +1508,7 @@ export const Controls: React.FC<ControlsProps> = ({
                             {isMeasurementMode && (
                                 <button
                                     onClick={onClearMeasurements}
-                                    className={`col-span-2 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border transition-all ${cardBg} hover:text-red-500 hover:border-red-500`}
+                                    className={`col-span-2 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border transition-all ${cardBg} hover: text-red-500 hover: border-red-500`}
                                 >
                                     <Trash2 className="w-3.5 h-3.5" />
                                     <span className="text-xs font-medium">Clear Measurements</span>
@@ -1542,17 +1539,17 @@ export const Controls: React.FC<ControlsProps> = ({
                                     <select
                                         value={viewSequenceChain}
                                         onChange={(e) => setViewSequenceChain(e.target.value)}
-                                        className={`bg-transparent border-none text-[10px] outline-none cursor-pointer text-right ${subtleText}`}
+                                        className={`bg-transparent border-none text-[10px]outline-none cursor-pointer text-right ${subtleText}`}
                                     >
                                         <option value="">All Chains</option>
                                         {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
                                     </select>
                                 </div>
                                 <div className={`h-24 p-1 overflow-y-auto scrollbar-thin ${isLightMode ? 'bg-neutral-50' : 'bg-neutral-800'} rounded`} ref={sequenceContainerRef}>
-                                    {chains.length === 0 ? <p className={`italic text-[10px] ${subtleText}`}>No sequence data</p> : (
+                                    {chains.length === 0 ? <p className={`italic text-[10px]${subtleText}`}>No sequence data</p> : (
                                         chains.filter(c => viewSequenceChain ? c.name === viewSequenceChain : true).map(c => (
                                             <div key={c.name} className="mb-3 relative">
-                                                <div className={`sticky top-0 z-10 py-1 px-1 mb-1 text-[10px] font-extrabold uppercase tracking-widest border-b shadow-sm ${isLightMode ? 'bg-neutral-100 border-neutral-200 text-neutral-800' : 'bg-neutral-800 border-neutral-700 text-white'}`}>
+                                                <div className={`sticky top-0 z-10 py-1 px-1 mb-1 text-[10px]font-extrabold uppercase tracking-widest border-b shadow-sm ${isLightMode ? 'bg-neutral-100 border-neutral-200 text-neutral-800' : 'bg-neutral-800 border-neutral-700 text-white'}`}>
                                                     Chain {c.name}
                                                 </div>
                                                 <div className="flex flex-wrap text-[10px] font-mono leading-none break-all">
@@ -1598,8 +1595,8 @@ export const Controls: React.FC<ControlsProps> = ({
                                             onChange={(e) => {
                                                 if (e.target.value) setSearchPattern(e.target.value);
                                             }}
-                                            className={`w-full mb-1 bg-transparent border rounded px-2 py-1 text-xs outline-none focus:border-blue-500
-                                            ${isLightMode
+                                            className={`w-full mb-1 bg-transparent border rounded px-2 py-1 text-xs outline-none focus: border-blue-500
+    ${isLightMode
                                                     ? 'border-neutral-300 text-black'
                                                     : 'border-white/20 text-white'}`}
                                             defaultValue=""
@@ -1617,8 +1614,8 @@ export const Controls: React.FC<ControlsProps> = ({
                                                 onChange={(e) => setSearchPattern(e.target.value)}
                                                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                                                 placeholder="e.g. R-G-D or H-x-x-H"
-                                                className={`flex-1 bg-transparent border rounded px-2 py-1 text-xs font-mono outline-none focus:border-blue-500
-                                            ${isLightMode
+                                                className={`flex-1 bg-transparent border rounded px-2 py-1 text-xs font-mono outline-none focus: border-blue-500
+    ${isLightMode
                                                         ? 'border-neutral-300 placeholder-neutral-400 text-black'
                                                         : 'border-white/20 placeholder-white/20 text-white'}`}
                                             />
@@ -1656,7 +1653,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                                     key={idx}
                                                     onClick={() => handleResultClick(match)}
                                                     className={`w-full text-left p-2 rounded flex justify-between items-center group transition-colors
-                                                ${isLightMode
+    ${isLightMode
                                                             ? 'hover:bg-neutral-100 border border-transparent hover:border-neutral-200'
                                                             : 'hover:bg-white/5 border border-transparent hover:border-white/10'}`}
                                                 >
@@ -1685,12 +1682,12 @@ export const Controls: React.FC<ControlsProps> = ({
                         <div className="space-y-3">
                             {/* Session Controls */}
                             <div>
-                                <label className={`text-[10px] font-bold uppercase tracking-wider block mb-2 ${subtleText}`}>Session</label>
+                                <label className={`text-[10px]font-bold uppercase tracking-wider block mb-2 ${subtleText}`}>Session</label>
                                 <div className="flex gap-2">
-                                    <button onClick={onSaveSession} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
+                                    <button onClick={onSaveSession} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover: bg-neutral-100 dark: hover: bg-neutral-800`}>
                                         <Download className="w-3.5 h-3.5" /> Save
                                     </button>
-                                    <button onClick={() => sessionInputRef.current?.click()} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover:bg-neutral-100 dark:hover:bg-neutral-800`}>
+                                    <button onClick={() => sessionInputRef.current?.click()} className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${cardBg} hover: bg-neutral-100 dark: hover: bg-neutral-800`}>
                                         <Upload className="w-3.5 h-3.5" /> Load
                                     </button>
 
@@ -1700,23 +1697,23 @@ export const Controls: React.FC<ControlsProps> = ({
 
                             {/* Actions & Recording */}
                             <div>
-                                <label className={`text-[10px] font-bold uppercase tracking-wider block mb-2 ${subtleText}`}>Actions & Recording</label>
+                                <label className={`text-[10px]font-bold uppercase tracking-wider block mb-2 ${subtleText}`}>Actions & Recording</label>
                                 <div className="space-y-2">
                                     <div className="flex gap-2">
-                                        <button onClick={onResetView} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:opacity-80`}>
+                                        <button onClick={onResetView} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover: opacity-80`}>
                                             <RotateCcw className="w-3.5 h-3.5" /> <span className="text-xs">Reset</span>
                                         </button>
-                                        <button onClick={onTakeSnapshot} className={`flex-1 flex items-center justify-center gap-1 border py-2 rounded-lg transition-all ${cardBg} hover:text-blue-500 hover:border-blue-500/50`}>
+                                        <button onClick={onTakeSnapshot} className={`flex-1 flex items-center justify-center gap-1 border py-2 rounded-lg transition-all ${cardBg} hover: text-blue-500 hover: border-blue-500/50`}>
                                             <Camera className="w-3.5 h-3.5" /> <span className="text-xs">Snapshot</span>
                                         </button>
-                                        <button onClick={onToggleShare} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover:text-green-500 hover:border-green-500/50`}>
+                                        <button onClick={onToggleShare} className={`flex-1 flex items-center justify-center gap-2 border py-2 rounded-lg transition-all ${cardBg} hover: text-green-500 hover: border-green-500/50`}>
                                             <Share2 className="w-3.5 h-3.5" /> <span className="text-xs">Share</span>
                                         </button>
                                     </div>
 
                                     <div className="flex items-center gap-2">
                                         <div className={`flex items-center gap-2 pl-2 pr-1 py-1.5 border rounded-lg ${cardBg}`}>
-                                            <span className={`text-[9px] font-bold ${subtleText}`}>SEC</span>
+                                            <span className={`text-[9px]font-bold ${subtleText}`}>SEC</span>
                                             <input
                                                 type="number"
                                                 min="1"
@@ -1730,7 +1727,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                         <button
                                             onClick={() => onRecordMovie(recordDuration)}
                                             disabled={isRecording}
-                                            className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${isRecording ? 'bg-red-500 text-white border-red-500' : `${cardBg} hover:text-red-500 hover:border-red-500/50`}`}
+                                            className={`flex-1 flex items-center justify-center gap-2 border py-1.5 rounded-lg transition-all text-xs font-medium ${isRecording ? 'bg-red-500 text-white border-red-500' : `${cardBg} hover: text-red-500 hover: border-red-500/50`}`}
                                         >
                                             {isRecording ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Video className="w-3.5 h-3.5" />}
                                             {isRecording ? 'Recording...' : 'Record'}
@@ -1753,7 +1750,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                         </div>
                                         <div className="text-left">
                                             <div className={`text-xs font-bold ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>Media Gallery</div>
-                                            <div className={`text-[9px] ${subtleText}`}>{snapshots.length} images • {movies.length} videos</div>
+                                            <div className={`text-[9px]${subtleText}`}>{snapshots.length} images • {movies.length} videos</div>
                                         </div>
                                     </div>
                                     <ChevronDown className="-rotate-90 w-3 h-3 opacity-50 group-hover:opacity-100 transition-opacity" />

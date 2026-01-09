@@ -10,7 +10,7 @@ import type {
     Measurement,
     StructureInfo,
     MeasurementTextColor,
-    SelectedResidue
+    CustomSelection
 } from '../types';
 import { type DataSource, getStructureUrl } from '../utils/pdbUtils';
 
@@ -46,7 +46,8 @@ export interface ProteinViewerProps {
     palette: ColorPalette;
     backgroundColor: string;
     customColors?: any[]; // Simplified type for now
-    selectedResidues?: SelectedResidue[]; // For byresidue coloring mode
+    customSelections?: CustomSelection[];
+
     measurementTextColor?: MeasurementTextColor; // Added prop
 
     // Quality
@@ -107,7 +108,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     representation = 'cartoon',
     coloring = 'chainid',
     customColors = [],
-    selectedResidues = [], // For byresidue coloring
+    customSelections = [],
+
     palette: colorPalette = 'standard', // Rename to matches internal usage
     className,
     onStructureLoaded,
@@ -1874,34 +1876,33 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     name: 'charge_neutral',
                     ...cartoonParams
                 });
-            } else if (currentColoring === 'byresidue') {
-                // BY-RESIDUE COLORING: Custom colors for specific residues
-                // First, add default gray for all residues
+
+            } else if (currentColoring === 'custom-selection') {
+                // CUSTOM SELECTION COLORING
+                // 1. Base (Gray)
                 component.addRepresentation(repType, {
-                    color: 0x999999,
-                    name: 'byresidue_default',
+                    color: 0xcccccc,
+                    name: 'custom_base',
                     ...cartoonParams
                 });
-
-                // Then add colored representations for each selected residue
-                if (selectedResidues && selectedResidues.length > 0) {
-                    selectedResidues.forEach((residue) => {
-                        // NGL selection syntax: resNo:chain (e.g., "58:A")
-                        const selection = `${residue.resNo}:${residue.chain}`;
-                        // Convert hex color to integer (NGL requires integer format)
-                        const colorInt = parseInt(residue.color.replace('#', ''), 16);
+                // 2. Overlay Selections
+                if (customSelections && customSelections.length > 0) {
+                    customSelections.forEach((sel) => {
+                        if (!sel.selection) return;
                         try {
+                            const colorInt = parseInt(sel.color.replace('#', ''), 16);
                             component.addRepresentation(repType, {
                                 color: colorInt,
-                                sele: selection,
-                                name: `byresidue_${residue.chain}_${residue.resNo}`,
+                                sele: sel.selection,
+                                name: `custom_sel_${sel.id}`,
                                 ...cartoonParams
                             });
                         } catch (e) {
-                            console.warn(`Failed to color residue ${selection}:`, e);
+                            console.warn('Failed to apply selection:', sel);
                         }
                     });
                 }
+
             } else {
                 // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL
                 // REVERTED to use 'color' property as previously working.
@@ -2040,7 +2041,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     useEffect(() => {
         updateRepresentation();
-    }, [representation, coloring, customColors, showSurface, showLigands, showIons, colorPalette, selectedResidues]);
+    }, [representation, coloring, customColors, showSurface, showLigands, showIons, colorPalette, customSelections]);
 
     useEffect(() => {
         if (stageRef.current) {
