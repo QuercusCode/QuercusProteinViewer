@@ -1790,53 +1790,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             // --- 2. REGISTER DYNAMIC SCHEMES (Charge & Custom) ---
             const NGL = window.NGL;
 
-            // Helper: Register a scheme that wraps a base scheme with custom overrides
-            const wrapSchemeWithCustom = (baseSchemeId: string, rules: CustomColorRule[]) => {
-                const schemeId = NGL.ColormakerRegistry.addScheme(function (this: any, params: any) {
-                    this.parameters = params;
-
-                    // Create Base Maker with Safety Fallback
-                    let BaseMaker;
-                    let baseMaker: any;
-                    try {
-                        BaseMaker = NGL.ColormakerRegistry.getScheme(baseSchemeId);
-                        if (!BaseMaker) throw new Error("Scheme not found");
-                        baseMaker = new BaseMaker(params);
-                    } catch (e) {
-                        BaseMaker = NGL.ColormakerRegistry.getScheme('uniform');
-                        baseMaker = new BaseMaker(params);
-                    }
-
-                    // Pre-process Custom Rules (Using direct Selection.test for robustness)
-                    const overrides: { selection: any, colorHex: number }[] = [];
-                    if (rules) {
-                        rules.forEach(rule => {
-                            if (!rule.selection || !rule.color) return;
-                            try {
-                                const sel = new NGL.Selection(rule.selection);
-                                const colorHex = new NGL.Color(rule.color).getHex();
-                                overrides.push({ selection: sel, colorHex });
-                            } catch (e) { console.warn("Invalid Selection or Color:", rule); }
-                        });
-                    }
-
-                    this.atomColor = function (atom: any) {
-                        // Check Overrides
-                        for (let i = 0; i < overrides.length; i++) {
-                            const rule = overrides[i];
-                            if (rule.selection.test && rule.selection.test(atom)) {
-                                return rule.colorHex;
-                            }
-                        }
-                        // Fallback to Base (Safe Call)
-                        if (baseMaker && typeof baseMaker.atomColor === 'function') {
-                            return baseMaker.atomColor(atom);
-                        }
-                        return 0xCCCCCC; // Default Grey
-                    };
-                }, 'custom_wrapper');
-                return schemeId;
-            };
+            // Custom Scheme Logic using Native NGL SelectionColormaker
+            // This is robust because it uses NGL's internal selection handling and fallback logic.
 
             // Helper: Register Charge Scheme (Dynamic)
             if (finalColor === 'charge') {
@@ -1851,9 +1806,36 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 }, 'charge_dynamic');
             }
 
-            // --- 3. APPLY CUSTOM OVERRIDES ---
-            if (customColors && customColors.length > 0) {
-                finalColor = wrapSchemeWithCustom(finalColor, customColors);
+            // --- 3. APPLY CUSTOM OVERRIDES USING SELECTION SCHEME ---
+            if (customColors && customColors.length > 0 && NGL.ColormakerRegistry.addSelectionScheme) {
+                const dataList: any[] = [];
+
+                // 1. Add Custom Rules [color, selection] with VALIDATION
+                customColors.forEach(rule => {
+                    if (rule.selection && rule.color) {
+                        try {
+                            // Validate selection string by attempting to create a Selection object
+                            // If this throws, skip the rule to prevent viewer crash
+                            const testSel = new NGL.Selection(rule.selection);
+                            if (testSel) {
+                                dataList.push([rule.color, rule.selection]);
+                            }
+                        } catch (e) {
+                            console.warn("Skipping invalid selection rule:", rule.selection);
+                        }
+                    }
+                });
+
+                // 2. Add Base Fallback [baseScheme, "*"]
+                dataList.push([finalColor, "*"]);
+
+                // 3. Register Selection Scheme
+                try {
+                    const compositeId = NGL.ColormakerRegistry.addSelectionScheme(dataList, "custom_composite");
+                    if (compositeId) finalColor = compositeId;
+                } catch (e) {
+                    console.error("Failed to register selection scheme", e);
+                }
             }
 
             // --- 4. RENDER SINGLE REPRESENTATION ---
