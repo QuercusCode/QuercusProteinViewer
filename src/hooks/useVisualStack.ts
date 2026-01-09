@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import type { RepresentationType, ColoringType, ColorPalette, ResidueInfo, Measurement } from '../types';
 
 export interface VisualState {
     representation: RepresentationType;
