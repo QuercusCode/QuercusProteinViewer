@@ -1478,7 +1478,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                 else if (proteinCount > 0) chainType = 'protein';
 
                                 // Extract Atoms for Small Molecules
-                                let atomList: any[] = [];
+                                let atomList: AtomInfo[] = [];
                                 if (chainType === 'unknown' && seq.length < 50) { // Limit to reasonable size
                                     try {
                                         c.eachResidue((r: any) => {
