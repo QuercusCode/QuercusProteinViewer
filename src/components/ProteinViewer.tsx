@@ -2023,7 +2023,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     useEffect(() => {
         updateRepresentation();
-    }, [representation, coloring, customColors, showSurface, showLigands, showIons, colorPalette]);
+    }, [representation, coloring, customColors, showSurface, showLigands, showIons, colorPalette, selectedResidues]);
 
     useEffect(() => {
         if (stageRef.current) {
