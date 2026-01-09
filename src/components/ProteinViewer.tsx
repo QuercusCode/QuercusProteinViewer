@@ -1817,7 +1817,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         ...cartoonParams
                     });
                 } else {
-                } else {
                     // Standard NGL chainid coloring
                     const params: any = {
                         color: 'chainid',
