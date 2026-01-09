@@ -136,10 +136,9 @@ export const parseURLState = (): MultiViewState => {
             try { state.orientation = JSON.parse(atob(cam)); } catch (e) { }
         }
 
-        const cust = params.get(p('cust'));
-        if (cust) {
-        }
-
+        const meas = params.get(p('meas'));
+        if (meas) {
+            try {
                 const minimalData = JSON.parse(atob(meas));
                 state.measurements = minimalData.map((m: any) => ({
                     atom1: { chain: m.a1.c, resNo: m.a1.r, atomName: m.a1.a },

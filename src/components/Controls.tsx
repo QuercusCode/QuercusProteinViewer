@@ -524,12 +524,10 @@ export const Controls: React.FC<ControlsProps> = ({
         setLocalPdbId(pdbId);
     }, [pdbId]);
 
-    // Update selected chain default logic
+    // Auto-scroll to highlighted residue
     useEffect(() => {
-        const chainNames = chains.map(c => c.name);
-        if (chains.length > 0 && selectedChain && !chainNames.includes(selectedChain)) {
-            if (chains.length > 0) setSelectedChain(chains[0].name);
-        } else if (chains.length > 0 && !selectedChain) {
+        if (highlightedResidue && residueRefs.current) {
+            if (viewSequenceChain && viewSequenceChain !== highlightedResidue.chain) {
                 setViewSequenceChain(highlightedResidue.chain);
             }
 
