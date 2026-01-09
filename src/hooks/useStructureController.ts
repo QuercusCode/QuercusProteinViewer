@@ -106,7 +106,6 @@ export const useStructureController = (initialState: any = {}): StructureControl
         // Reset analysis data
         setChains([]);
         setLigands([]);
-        setCustomColors([]);
         setMeasurements([]);
         setHighlightedResidue(null);
         // Set Title
