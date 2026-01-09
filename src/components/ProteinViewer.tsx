@@ -1777,7 +1777,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 aspectRatio: 6.0,        // Flat arrows for sheets
                 subdiv: 12,              // Smooth curves
                 radialSegments: 20,      // Smooth helix cylinders
-                smoothSheet: true,       // Smooth beta-sheets
+                smoothSheet: false,       // Smooth beta-sheets
                 quality: 'high'
             };
 
