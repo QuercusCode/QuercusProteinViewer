@@ -1152,8 +1152,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     stageRef.current.removeComponent(comp);
                 }
             });
-        }
-    },
+        },
         getMeasurements: () => measurementsRef.current,
         restoreMeasurements: (list: { atom1: any, atom2: any }[]) => {
             if (!componentRef.current || !list || list.length === 0) return;
@@ -1195,824 +1194,824 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         }
     }));
 
-useEffect(() => {
-    if (stageRef.current) {
-        stageRef.current.setSpin(isSpinning);
-    }
-}, [isSpinning]);
+    useEffect(() => {
+        if (stageRef.current) {
+            stageRef.current.setSpin(isSpinning);
+        }
+    }, [isSpinning]);
 
-// Handle Window Resize
-useEffect(() => {
-    if (stageRef.current) {
-        const bgColor = backgroundColor === 'transparent' ? 'rgba(0,0,0,0)' : backgroundColor;
-        stageRef.current.setParameters({ backgroundColor: bgColor });
-    }
-}, [backgroundColor]);
+    // Handle Window Resize
+    useEffect(() => {
+        if (stageRef.current) {
+            const bgColor = backgroundColor === 'transparent' ? 'rgba(0,0,0,0)' : backgroundColor;
+            stageRef.current.setParameters({ backgroundColor: bgColor });
+        }
+    }, [backgroundColor]);
 
-useEffect(() => {
-    isMounted.current = true;
-    return () => { isMounted.current = false; };
-}, []);
+    useEffect(() => {
+        isMounted.current = true;
+        return () => { isMounted.current = false; };
+    }, []);
 
-useEffect(() => {
-    if (!containerRef.current) return;
+    useEffect(() => {
+        if (!containerRef.current) return;
 
-    try {
-        const bgColor = backgroundColor === 'transparent' ? 'rgba(0,0,0,0)' : backgroundColor;
-        const stage = new window.NGL.Stage(containerRef.current, {
-            backgroundColor: bgColor,
-            tooltip: false, // Disable default NGL tooltip to use HUD
-            webglParams: {
-                preserveDrawingBuffer: true,
-                alpha: true // Enable transparency support
-            }
-        });
-        stageRef.current = stage;
+        try {
+            const bgColor = backgroundColor === 'transparent' ? 'rgba(0,0,0,0)' : backgroundColor;
+            const stage = new window.NGL.Stage(containerRef.current, {
+                backgroundColor: bgColor,
+                tooltip: false, // Disable default NGL tooltip to use HUD
+                webglParams: {
+                    preserveDrawingBuffer: true,
+                    alpha: true // Enable transparency support
+                }
+            });
+            stageRef.current = stage;
 
-        // --- MOUSE CONTROLS ---
-        stage.mouseControls.add("drag-left", window.NGL.MouseActions.rotateDrag);
-        stage.mouseControls.add("scroll", window.NGL.MouseActions.zoomScroll);
-        stage.mouseControls.add("drag-right", window.NGL.MouseActions.panDrag);
+            // --- MOUSE CONTROLS ---
+            stage.mouseControls.add("drag-left", window.NGL.MouseActions.rotateDrag);
+            stage.mouseControls.add("scroll", window.NGL.MouseActions.zoomScroll);
+            stage.mouseControls.add("drag-right", window.NGL.MouseActions.panDrag);
 
-        // --- HOVER HANDLING (HUD) ---
-        let hoveredAtomIndex = -1;
-        stage.signals.hovered.add((pickingProxy: any) => {
-            if (pickingProxy && (pickingProxy.atom || pickingProxy.bond)) {
-                const atom = pickingProxy.atom || (pickingProxy.bond ? pickingProxy.bond.atom1 : null);
+            // --- HOVER HANDLING (HUD) ---
+            let hoveredAtomIndex = -1;
+            stage.signals.hovered.add((pickingProxy: any) => {
+                if (pickingProxy && (pickingProxy.atom || pickingProxy.bond)) {
+                    const atom = pickingProxy.atom || (pickingProxy.bond ? pickingProxy.bond.atom1 : null);
 
-                if (atom && atom.index !== hoveredAtomIndex) {
-                    hoveredAtomIndex = atom.index;
-                    if (onHoverRef.current) {
-                        let displayResName = atom.resname;
-                        // Use Structure Title/Filename for generic HET residues (chemicals)
-                        if (['HET', 'UNL', 'LIG', 'UNK'].includes(displayResName) && atom.structure && atom.structure.name) {
-                            const cleanName = atom.structure.name.split('.')[0];
-                            if (cleanName) displayResName = cleanName;
+                    if (atom && atom.index !== hoveredAtomIndex) {
+                        hoveredAtomIndex = atom.index;
+                        if (onHoverRef.current) {
+                            let displayResName = atom.resname;
+                            // Use Structure Title/Filename for generic HET residues (chemicals)
+                            if (['HET', 'UNL', 'LIG', 'UNK'].includes(displayResName) && atom.structure && atom.structure.name) {
+                                const cleanName = atom.structure.name.split('.')[0];
+                                if (cleanName) displayResName = cleanName;
+                            }
+
+                            onHoverRef.current({
+                                chain: atom.chainname,
+                                resNo: atom.resno,
+                                resName: displayResName,
+                                atomIndex: atom.index,
+                                atomName: atom.atomname,
+                                atomSerial: atom.serial,
+                                element: atom.element
+                            });
                         }
-
-                        onHoverRef.current({
-                            chain: atom.chainname,
-                            resNo: atom.resno,
-                            resName: displayResName,
-                            atomIndex: atom.index,
-                            atomName: atom.atomname,
-                            atomSerial: atom.serial,
-                            element: atom.element
-                        });
+                    }
+                } else {
+                    if (hoveredAtomIndex !== -1) {
+                        hoveredAtomIndex = -1;
+                        if (onHoverRef.current) onHoverRef.current(null);
                     }
                 }
-            } else {
-                if (hoveredAtomIndex !== -1) {
-                    hoveredAtomIndex = -1;
-                    if (onHoverRef.current) onHoverRef.current(null);
-                }
+            });
+
+            // Handle Container Resize (Robust)
+            const resizeObserver = new ResizeObserver(() => {
+                stage.handleResize();
+            });
+            if (containerRef.current) {
+                resizeObserver.observe(containerRef.current);
             }
-        });
 
-        // Handle Container Resize (Robust)
-        const resizeObserver = new ResizeObserver(() => {
-            stage.handleResize();
-        });
-        if (containerRef.current) {
-            resizeObserver.observe(containerRef.current);
+            return () => {
+                resizeObserver.disconnect();
+                try { stage.dispose(); } catch (e) { }
+                stageRef.current = null;
+            };
+        } catch (err) {
+            console.error("Failed to init NGL Stage:", err);
+            setError("WebGL initialization failed.");
         }
+    }, []);
 
-        return () => {
-            resizeObserver.disconnect();
-            try { stage.dispose(); } catch (e) { }
-            stageRef.current = null;
+    useEffect(() => {
+        const loadStructure = async () => {
+            if (!stageRef.current) return;
+            const stage = stageRef.current;
+
+            try {
+                if (stage.viewer) {
+                    try { stage.removeAllComponents(); } catch (e) { }
+                }
+            } catch (e) { /* ignore */ }
+
+            componentRef.current = null;
+            if (isMounted.current) setError(null);
+            if (isMounted.current) setLoading(true);
+
+            const currentPdbId = pdbId;
+            const currentFile = file;
+
+            try {
+                // Generic Loader Function
+                const loadStructure = async () => {
+                    if (currentFile) {
+                        console.log("Loading from file:", currentFile.name);
+                        // Detect extension
+                        const rawExt = currentFile.name.split('.').pop()?.toLowerCase() || 'pdb';
+                        let ext = rawExt;
+
+                        // Normalize extensions
+                        if (ext === 'ent') {
+                            ext = 'pdb';
+                        }
+
+                        // We read as ArrayBuffer to handle all file types correctly (PDB/CIF/BinaryCIF)
+                        const fileContent = await new Promise<ArrayBuffer>((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = (e) => resolve(e.target?.result as ArrayBuffer);
+                            reader.onerror = (e) => reject(e);
+                            reader.readAsArrayBuffer(currentFile);
+                        });
+
+                        const blob = new Blob([fileContent], { type: 'application/octet-stream' });
+                        const objectUrl = URL.createObjectURL(blob);
+
+                        console.log(`Loading via Object URL: ${objectUrl} as ${ext}`);
+
+                        const safeName = `structure.${ext}`;
+                        try {
+                            return await stage.loadFile(objectUrl, {
+                                defaultRepresentation: false,
+                                ext,
+                                name: safeName
+                            });
+                        } finally {
+                            // URL.revokeObjectURL(objectUrl);
+                        }
+                    }
+
+
+                    if (currentPdbId) {
+                        const cleanId = String(currentPdbId).trim().toLowerCase();
+                        if (cleanId.length < 3) return null;
+
+                        let url = getStructureUrl(cleanId, dataSource);
+                        let loadParams: any = { defaultRepresentation: false };
+
+                        // Add extension hint for NGL if needed
+                        if (dataSource === 'pubchem') loadParams.ext = 'sdf';
+
+                        const AVAILABLE_LOCAL_PDBS = ['2b3p', '4hhb'];
+                        if (dataSource === 'pdb' && AVAILABLE_LOCAL_PDBS.includes(cleanId)) {
+                            url = `./${cleanId}.pdb`;
+                        }
+
+                        console.log(`Fetching from: ${url}`);
+                        return await stage.loadFile(url, loadParams);
+                    }
+                    return null;
+                };
+
+                const component = await loadStructure();
+                if (!component) {
+                    if (isMounted.current) setLoading(false);
+                    return;
+                }
+
+                if (component && isMounted.current) {
+                    console.log("Component loaded. Type:", component.type);
+                    componentRef.current = component;
+
+                    if (component.structure && onStructureLoaded) {
+                        try {
+                            const chains: ChainInfo[] = [];
+                            const seenChains = new Set<string>();
+
+                            console.log("Structure details:", {
+                                atomCount: component.structure.atomCount,
+                                modelCount: component.structure.modelStore.count,
+                                chainCount: component.structure.chainStore.count
+                            });
+
+                            if (component.structure.atomCount === 0) {
+                                console.warn("Loaded structure has 0 atoms.");
+                                if (currentFile) {
+                                    // Check if it might be a Structure Factors file
+                                    const fileContent = await currentFile.text(); // Re-read text safe here since it already loaded
+                                    if (!fileContent.includes('_atom_site')) {
+                                        const isSF = currentFile.name.includes('-sf') || fileContent.includes('_refln');
+                                        const msg = isSF
+                                            ? "This appears to be a Structure Factors file (diffraction data), not a coordinate model. Please upload the model file (usually .pdb or .cif without '-sf')."
+                                            : "The file was parsed but contains no atoms. Please check the file format.";
+
+                                        if (isMounted.current) setError(msg);
+                                        return;
+                                    }
+                                }
+                            }
+
+                            component.structure.eachChain((c: any) => {
+                                if (seenChains.has(c.chainname)) return;
+                                seenChains.add(c.chainname);
+
+                                let seq = "";
+                                let minSeq = Infinity;
+                                let maxSeq = -Infinity;
+                                let nucleicCount = 0;
+                                let proteinCount = 0;
+
+                                const resMap: number[] = [];
+                                const bFactors: number[] = [];
+
+                                try {
+                                    c.eachResidue((r: any) => {
+                                        let resNo = r.resno;
+                                        if (resNo === undefined && typeof r.getResno === 'function') {
+                                            resNo = r.getResno();
+                                        }
+
+                                        if (typeof resNo === 'number') {
+                                            if (resNo < minSeq) minSeq = resNo;
+                                            if (resNo > maxSeq) maxSeq = resNo;
+                                            resMap.push(resNo); // Valid residue number
+                                        } else {
+                                            // Fallback for weird cases
+                                            resMap.push((maxSeq > -Infinity ? maxSeq : 0) + 1);
+                                        }
+
+                                        // B-Factor Extraction (Average of atoms in residue)
+                                        let bSum = 0;
+                                        let bCount = 0;
+                                        r.eachAtom((a: any) => {
+                                            bSum += a.bfactor;
+                                            bCount++;
+                                        });
+                                        const avgB = bCount > 0 ? bSum / bCount : 0;
+                                        bFactors.push(avgB);
+
+                                        // Determine Type
+                                        if (r.isNucleic()) nucleicCount++;
+                                        else if (r.isProtein()) proteinCount++;
+
+                                        // Parse Residue Name
+                                        let resName = 'X';
+                                        if (r.isNucleic()) {
+                                            const rawName = r.resname.trim().toUpperCase();
+                                            // DNA: DA, DT, DC, DG
+                                            // RNA: A, U, C, G
+                                            if (rawName.length === 1) resName = rawName;
+                                            else if (rawName.length === 2 && rawName.startsWith('D')) resName = rawName[1];
+                                            else if (rawName.length === 2 && rawName.endsWith('A')) resName = 'A'; // Weird cases
+                                            else resName = rawName.substring(0, 1); // Best guess
+                                        } else {
+                                            // Protein
+                                            if (r.getResname1) resName = r.getResname1();
+                                            else if (r.resname) resName = r.resname[0];
+                                        }
+                                        seq += resName;
+                                    });
+                                } catch (eRes) {
+                                    console.warn(`Residue iteration failed for chain ${c.chainname}`, eRes);
+                                }
+
+                                if (minSeq === Infinity) minSeq = 0;
+                                if (maxSeq === -Infinity) maxSeq = 0;
+
+                                // Infer Chain Type
+                                let chainType: 'protein' | 'nucleic' | 'unknown' = 'unknown';
+                                if (nucleicCount > proteinCount) chainType = 'nucleic';
+                                else if (proteinCount > 0) chainType = 'protein';
+
+                                // Extract Atoms for Small Molecules
+                                let atomList: AtomInfo[] = [];
+                                if (chainType === 'unknown' && seq.length < 50) { // Limit to reasonable size
+                                    try {
+                                        c.eachResidue((r: any) => {
+                                            r.eachAtom((a: any) => {
+                                                atomList.push({
+                                                    serial: a.serial,
+                                                    name: a.atomname,
+                                                    element: a.element,
+                                                    resNo: r.resno,
+                                                    chain: c.chainname
+                                                });
+                                            });
+                                        });
+                                    } catch (eAtom) { console.warn("Atom iteration failed", eAtom); }
+                                }
+
+                                console.log(`Chain ${c.chainname}: Range ${minSeq}-${maxSeq}, SeqLen: ${seq.length}, Type: ${chainType}`);
+                                chains.push({
+                                    name: c.chainname,
+                                    min: minSeq,
+                                    max: maxSeq,
+                                    sequence: seq,
+                                    residueMap: resMap,
+                                    type: chainType,
+                                    atoms: atomList.length > 0 ? atomList : undefined,
+                                    bFactors: bFactors // Added
+                                });
+                            });
+
+                            // Extract Ligands
+                            const ligandSet = new Set<string>();
+                            component.structure.eachResidue((r: any) => {
+                                // Basic filter for ligands: isHetero and not Water/Ion (generic check)
+                                // NGL might mark waters as hetero. Typical water names: HOH, WAT, TIP
+                                const invalidLigands = ['HOH', 'WAT', 'TIP', 'SOL', 'DOD'];
+                                if (r.isHetero() && !invalidLigands.includes(r.resname)) {
+                                    ligandSet.add(r.resname);
+                                }
+                            });
+                            const ligands = Array.from(ligandSet).sort();
+
+                            if (onStructureLoaded) {
+                                onStructureLoaded({ chains, ligands });
+                            }
+                        } catch (e) { console.warn("Chain parsing error", e); }
+                    }
+
+                    console.log("Applying initial representation...");
+                    try {
+                        updateRepresentation(component);
+                    } catch (reprErr) {
+                        console.error("Initial representation failure:", reprErr);
+                    }
+
+                    setTimeout(() => {
+                        if (!isMounted.current) return;
+                        try {
+                            console.log("AutoView & Resize...");
+                            stage.handleResize();
+                            component.autoView();
+                            if (stage.viewer) stage.viewer.requestRender();
+                        } catch (e) { console.warn("AutoView failed", e); }
+                    }, 1000);
+                }
+            } catch (err) {
+                if (isMounted.current) {
+                    console.error("Load Error (caught):", err);
+                    setError(`Failed to load: ${err instanceof Error ? err.message : String(err)}`);
+                }
+            } finally {
+                if (isMounted.current) setLoading(false);
+            }
         };
-    } catch (err) {
-        console.error("Failed to init NGL Stage:", err);
-        setError("WebGL initialization failed.");
-    }
-}, []);
 
-useEffect(() => {
-    const loadStructure = async () => {
+        if (file || (pdbId && String(pdbId).length >= 3)) {
+            loadStructure();
+        } else {
+            if (stageRef.current) stageRef.current.removeAllComponents();
+            componentRef.current = null;
+        }
+    }, [pdbId, dataSource, file]);
+
+
+
+    // --- MEASUREMENT RENDERING ---
+    useEffect(() => {
         if (!stageRef.current) return;
         const stage = stageRef.current;
 
-        try {
-            if (stage.viewer) {
-                try { stage.removeAllComponents(); } catch (e) { }
-            }
-        } catch (e) { /* ignore */ }
+        // Clean up old measurement shapes
+        stage.getComponentsByName("measurement-shape").list.forEach((c: any) => stage.removeComponent(c));
 
-        componentRef.current = null;
-        if (isMounted.current) setError(null);
-        if (isMounted.current) setLoading(true);
+        measurements?.forEach((m: Measurement) => {
+            const shape = new window.NGL.Shape("measurement-shape");
+            const p1 = [m.atom1.position?.x || 0, m.atom1.position?.y || 0, m.atom1.position?.z || 0];
+            const p2 = [m.atom2.position?.x || 0, m.atom2.position?.y || 0, m.atom2.position?.z || 0];
 
-        const currentPdbId = pdbId;
-        const currentFile = file;
+            // Draw Line
+            // NGL colors are [r, g, b] 0-1. We need to convert hex string.
+            // For simplicity, let's use a standard color or parse the hex.
+            // Using a simple hash for now or default to orange [1, 0.5, 0]
+            // Ideally we parse m.color
 
-        try {
-            // Generic Loader Function
-            const loadStructure = async () => {
-                if (currentFile) {
-                    console.log("Loading from file:", currentFile.name);
-                    // Detect extension
-                    const rawExt = currentFile.name.split('.').pop()?.toLowerCase() || 'pdb';
-                    let ext = rawExt;
+            // Convert simple hex (e.g. #ff0000) to RGB array
+            const hexToRgb = (hex: string) => {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? [
+                    parseInt(result[1], 16) / 255,
+                    parseInt(result[2], 16) / 255,
+                    parseInt(result[3], 16) / 255
+                ] : [1, 1, 1];
+            };
+            const colorArr = hexToRgb(m.color);
 
-                    // Normalize extensions
-                    if (ext === 'ent') {
-                        ext = 'pdb';
-                    }
-
-                    // We read as ArrayBuffer to handle all file types correctly (PDB/CIF/BinaryCIF)
-                    const fileContent = await new Promise<ArrayBuffer>((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onload = (e) => resolve(e.target?.result as ArrayBuffer);
-                        reader.onerror = (e) => reject(e);
-                        reader.readAsArrayBuffer(currentFile);
-                    });
-
-                    const blob = new Blob([fileContent], { type: 'application/octet-stream' });
-                    const objectUrl = URL.createObjectURL(blob);
-
-                    console.log(`Loading via Object URL: ${objectUrl} as ${ext}`);
-
-                    const safeName = `structure.${ext}`;
-                    try {
-                        return await stage.loadFile(objectUrl, {
-                            defaultRepresentation: false,
-                            ext,
-                            name: safeName
-                        });
-                    } finally {
-                        // URL.revokeObjectURL(objectUrl);
-                    }
+            // Determine text color
+            let labelColor = [0, 0, 0];
+            const getBrightness = (color: string) => {
+                let r, g, b;
+                if (color.startsWith('#')) {
+                    const hex = color.substring(1);
+                    r = parseInt(hex.substring(0, 2), 16);
+                    g = parseInt(hex.substring(2, 4), 16);
+                    b = parseInt(hex.substring(4, 6), 16);
+                } else if (color === 'white') {
+                    return 255;
+                } else if (color === 'black') {
+                    return 0;
+                } else {
+                    return isLightMode ? 255 : 0;
                 }
-
-
-                if (currentPdbId) {
-                    const cleanId = String(currentPdbId).trim().toLowerCase();
-                    if (cleanId.length < 3) return null;
-
-                    let url = getStructureUrl(cleanId, dataSource);
-                    let loadParams: any = { defaultRepresentation: false };
-
-                    // Add extension hint for NGL if needed
-                    if (dataSource === 'pubchem') loadParams.ext = 'sdf';
-
-                    const AVAILABLE_LOCAL_PDBS = ['2b3p', '4hhb'];
-                    if (dataSource === 'pdb' && AVAILABLE_LOCAL_PDBS.includes(cleanId)) {
-                        url = `./${cleanId}.pdb`;
-                    }
-
-                    console.log(`Fetching from: ${url}`);
-                    return await stage.loadFile(url, loadParams);
-                }
-                return null;
+                return (r * 299 + g * 587 + b * 114) / 1000;
             };
 
-            const component = await loadStructure();
-            if (!component) {
-                if (isMounted.current) setLoading(false);
+            if (measurementTextColor !== 'auto' && measurementTextColor.startsWith('#')) {
+                // Custom Hex Color
+                const hex = measurementTextColor.substring(1);
+                labelColor = [
+                    parseInt(hex.substring(0, 2), 16) / 255,
+                    parseInt(hex.substring(2, 4), 16) / 255,
+                    parseInt(hex.substring(4, 6), 16) / 255
+                ];
+            } else if (measurementTextColor === 'black') {
+                labelColor = [0, 0, 0];
+            } else if (measurementTextColor === 'white') {
+                labelColor = [1.0, 0.8, 0.0]; // Keeping 'Gold' for legacy 'white'
+            } else {
+                // Auto mode
+                const bgBrightness = getBrightness(backgroundColor || (isLightMode ? 'white' : 'black'));
+                labelColor = bgBrightness > 128 ? [0, 0, 0] : [1.0, 0.8, 0.0];
+            }
+
+            shape.addCylinder(p1, p2, colorArr, 0.1);
+            shape.addSphere(p1, colorArr, 0.2);
+            shape.addSphere(p2, colorArr, 0.2);
+            shape.addText(
+                [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2, (p1[2] + p2[2]) / 2],
+                labelColor,
+                2.5, // Increased size from 0.8
+                m.distance.toFixed(2) + " A" // Use 'A' instead of symbol for compatibility
+            );
+
+            const comp = stage.addComponentFromObject(shape);
+            comp.addRepresentation("buffer", { depthTest: false });
+        });
+
+    }, [measurements, isLightMode, backgroundColor, measurementTextColor]);
+
+
+    useEffect(() => {
+        if (!stageRef.current) return;
+        const stage = stageRef.current;
+
+        const handleClick = (pickingProxy: any) => {
+            if (!pickingProxy || !pickingProxy.atom) {
+                if (onAtomClick) onAtomClick(null);
+                selectedAtomsRef.current = []; // Reset selection on background click
+                // Clear temp selection shapes?
+                stage.getComponentsByName("temp-selection").list.forEach((c: any) => stage.removeComponent(c));
+                return;
+            }
+            const atom = pickingProxy.atom;
+
+            // MEASUREMENT MODE LOGIC
+            if (isMeasurementMode) {
+                const atomData = {
+                    chain: atom.chainname,
+                    resNo: atom.resno,
+                    resName: atom.resname,
+                    atomIndex: atom.index,
+                    atomName: atom.atomname,
+                    position: { x: atom.x, y: atom.y, z: atom.z }
+                };
+
+                selectedAtomsRef.current.push(atomData);
+
+                // Highlight choice
+                const shape = new window.NGL.Shape("temp-selection");
+                shape.addSphere([atom.x, atom.y, atom.z], [1, 0.84, 0], 0.3); // Gold
+                const comp = stage.addComponentFromObject(shape);
+                comp.addRepresentation("buffer", { depthTest: false });
+
+                // Check for pair
+                if (selectedAtomsRef.current.length === 2) {
+                    const a1 = selectedAtomsRef.current[0];
+                    const a2 = selectedAtomsRef.current[1];
+
+                    // Calculate distance
+                    const dx = a1.position.x - a2.position.x;
+                    const dy = a1.position.y - a2.position.y;
+                    const dz = a1.position.z - a2.position.z;
+                    const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+                    // Generate measurement name
+                    let measurementName: string;
+                    const isChemical = a1.resName === 'HET' && a2.resName === 'HET';
+
+                    if (isChemical && a1.atomName && a2.atomName) {
+                        // For chemicals, show only atom names
+                        measurementName = `${a1.atomName}-${a2.atomName}`;
+                    } else {
+                        // For proteins or mixed, show full residue info
+                        measurementName = `${a1.resName} ${a1.resNo}${a1.atomName ? ` (${a1.atomName})` : ''}-${a2.resName} ${a2.resNo}${a2.atomName ? ` (${a2.atomName})` : ''}`;
+                    }
+
+                    const newMeasurement: Measurement = {
+                        id: crypto.randomUUID(),
+                        name: measurementName,
+                        distance: dist,
+                        color: '#3b82f6', // Default blue
+                        atom1: a1,
+                        atom2: a2
+                    };
+
+                    if (onAddMeasurement) onAddMeasurement(newMeasurement);
+
+                    // Reset selection
+                    selectedAtomsRef.current = [];
+                    stage.getComponentsByName("temp-selection").list.forEach((c: any) => stage.removeComponent(c));
+                }
                 return;
             }
 
-            if (component && isMounted.current) {
-                console.log("Component loaded. Type:", component.type);
-                componentRef.current = component;
+            console.log("DEBUG: Clicked Atom:", atom);
 
-                if (component.structure && onStructureLoaded) {
-                    try {
-                        const chains: ChainInfo[] = [];
-                        const seenChains = new Set<string>();
 
-                        console.log("Structure details:", {
-                            atomCount: component.structure.atomCount,
-                            modelCount: component.structure.modelStore.count,
-                            chainCount: component.structure.chainStore.count
-                        });
 
-                        if (component.structure.atomCount === 0) {
-                            console.warn("Loaded structure has 0 atoms.");
-                            if (currentFile) {
-                                // Check if it might be a Structure Factors file
-                                const fileContent = await currentFile.text(); // Re-read text safe here since it already loaded
-                                if (!fileContent.includes('_atom_site')) {
-                                    const isSF = currentFile.name.includes('-sf') || fileContent.includes('_refln');
-                                    const msg = isSF
-                                        ? "This appears to be a Structure Factors file (diffraction data), not a coordinate model. Please upload the model file (usually .pdb or .cif without '-sf')."
-                                        : "The file was parsed but contains no atoms. Please check the file format.";
-
-                                    if (isMounted.current) setError(msg);
-                                    return;
-                                }
-                            }
-                        }
-
-                        component.structure.eachChain((c: any) => {
-                            if (seenChains.has(c.chainname)) return;
-                            seenChains.add(c.chainname);
-
-                            let seq = "";
-                            let minSeq = Infinity;
-                            let maxSeq = -Infinity;
-                            let nucleicCount = 0;
-                            let proteinCount = 0;
-
-                            const resMap: number[] = [];
-                            const bFactors: number[] = [];
-
-                            try {
-                                c.eachResidue((r: any) => {
-                                    let resNo = r.resno;
-                                    if (resNo === undefined && typeof r.getResno === 'function') {
-                                        resNo = r.getResno();
-                                    }
-
-                                    if (typeof resNo === 'number') {
-                                        if (resNo < minSeq) minSeq = resNo;
-                                        if (resNo > maxSeq) maxSeq = resNo;
-                                        resMap.push(resNo); // Valid residue number
-                                    } else {
-                                        // Fallback for weird cases
-                                        resMap.push((maxSeq > -Infinity ? maxSeq : 0) + 1);
-                                    }
-
-                                    // B-Factor Extraction (Average of atoms in residue)
-                                    let bSum = 0;
-                                    let bCount = 0;
-                                    r.eachAtom((a: any) => {
-                                        bSum += a.bfactor;
-                                        bCount++;
-                                    });
-                                    const avgB = bCount > 0 ? bSum / bCount : 0;
-                                    bFactors.push(avgB);
-
-                                    // Determine Type
-                                    if (r.isNucleic()) nucleicCount++;
-                                    else if (r.isProtein()) proteinCount++;
-
-                                    // Parse Residue Name
-                                    let resName = 'X';
-                                    if (r.isNucleic()) {
-                                        const rawName = r.resname.trim().toUpperCase();
-                                        // DNA: DA, DT, DC, DG
-                                        // RNA: A, U, C, G
-                                        if (rawName.length === 1) resName = rawName;
-                                        else if (rawName.length === 2 && rawName.startsWith('D')) resName = rawName[1];
-                                        else if (rawName.length === 2 && rawName.endsWith('A')) resName = 'A'; // Weird cases
-                                        else resName = rawName.substring(0, 1); // Best guess
-                                    } else {
-                                        // Protein
-                                        if (r.getResname1) resName = r.getResname1();
-                                        else if (r.resname) resName = r.resname[0];
-                                    }
-                                    seq += resName;
-                                });
-                            } catch (eRes) {
-                                console.warn(`Residue iteration failed for chain ${c.chainname}`, eRes);
-                            }
-
-                            if (minSeq === Infinity) minSeq = 0;
-                            if (maxSeq === -Infinity) maxSeq = 0;
-
-                            // Infer Chain Type
-                            let chainType: 'protein' | 'nucleic' | 'unknown' = 'unknown';
-                            if (nucleicCount > proteinCount) chainType = 'nucleic';
-                            else if (proteinCount > 0) chainType = 'protein';
-
-                            // Extract Atoms for Small Molecules
-                            let atomList: AtomInfo[] = [];
-                            if (chainType === 'unknown' && seq.length < 50) { // Limit to reasonable size
-                                try {
-                                    c.eachResidue((r: any) => {
-                                        r.eachAtom((a: any) => {
-                                            atomList.push({
-                                                serial: a.serial,
-                                                name: a.atomname,
-                                                element: a.element,
-                                                resNo: r.resno,
-                                                chain: c.chainname
-                                            });
-                                        });
-                                    });
-                                } catch (eAtom) { console.warn("Atom iteration failed", eAtom); }
-                            }
-
-                            console.log(`Chain ${c.chainname}: Range ${minSeq}-${maxSeq}, SeqLen: ${seq.length}, Type: ${chainType}`);
-                            chains.push({
-                                name: c.chainname,
-                                min: minSeq,
-                                max: maxSeq,
-                                sequence: seq,
-                                residueMap: resMap,
-                                type: chainType,
-                                atoms: atomList.length > 0 ? atomList : undefined,
-                                bFactors: bFactors // Added
-                            });
-                        });
-
-                        // Extract Ligands
-                        const ligandSet = new Set<string>();
-                        component.structure.eachResidue((r: any) => {
-                            // Basic filter for ligands: isHetero and not Water/Ion (generic check)
-                            // NGL might mark waters as hetero. Typical water names: HOH, WAT, TIP
-                            const invalidLigands = ['HOH', 'WAT', 'TIP', 'SOL', 'DOD'];
-                            if (r.isHetero() && !invalidLigands.includes(r.resname)) {
-                                ligandSet.add(r.resname);
-                            }
-                        });
-                        const ligands = Array.from(ligandSet).sort();
-
-                        if (onStructureLoaded) {
-                            onStructureLoaded({ chains, ligands });
-                        }
-                    } catch (e) { console.warn("Chain parsing error", e); }
+            // Standard Interaction (Bi-directional Sync)
+            if (onAtomClick) {
+                // Try to get exact click position, or fall back to atom center
+                let pos = null;
+                if (pickingProxy.position) {
+                    pos = { x: pickingProxy.position.x, y: pickingProxy.position.y, z: pickingProxy.position.z };
+                } else if (atom) {
+                    pos = { x: atom.x, y: atom.y, z: atom.z };
                 }
 
-                console.log("Applying initial representation...");
-                try {
-                    updateRepresentation(component);
-                } catch (reprErr) {
-                    console.error("Initial representation failure:", reprErr);
-                }
+                console.log("DEBUG: Final Position for Click:", pos);
 
-                setTimeout(() => {
-                    if (!isMounted.current) return;
-                    try {
-                        console.log("AutoView & Resize...");
-                        stage.handleResize();
-                        component.autoView();
-                        if (stage.viewer) stage.viewer.requestRender();
-                    } catch (e) { console.warn("AutoView failed", e); }
-                }, 1000);
+                onAtomClick({
+                    chain: atom.chainname,
+                    resNo: atom.resno,
+                    resName: atom.resname,
+                    atomIndex: atom.index,
+                    position: pos || undefined
+                });
             }
-        } catch (err) {
-            if (isMounted.current) {
-                console.error("Load Error (caught):", err);
-                setError(`Failed to load: ${err instanceof Error ? err.message : String(err)}`);
-            }
-        } finally {
-            if (isMounted.current) setLoading(false);
-        }
-    };
-
-    if (file || (pdbId && String(pdbId).length >= 3)) {
-        loadStructure();
-    } else {
-        if (stageRef.current) stageRef.current.removeAllComponents();
-        componentRef.current = null;
-    }
-}, [pdbId, dataSource, file]);
-
-
-
-// --- MEASUREMENT RENDERING ---
-useEffect(() => {
-    if (!stageRef.current) return;
-    const stage = stageRef.current;
-
-    // Clean up old measurement shapes
-    stage.getComponentsByName("measurement-shape").list.forEach((c: any) => stage.removeComponent(c));
-
-    measurements?.forEach((m: Measurement) => {
-        const shape = new window.NGL.Shape("measurement-shape");
-        const p1 = [m.atom1.position?.x || 0, m.atom1.position?.y || 0, m.atom1.position?.z || 0];
-        const p2 = [m.atom2.position?.x || 0, m.atom2.position?.y || 0, m.atom2.position?.z || 0];
-
-        // Draw Line
-        // NGL colors are [r, g, b] 0-1. We need to convert hex string.
-        // For simplicity, let's use a standard color or parse the hex.
-        // Using a simple hash for now or default to orange [1, 0.5, 0]
-        // Ideally we parse m.color
-
-        // Convert simple hex (e.g. #ff0000) to RGB array
-        const hexToRgb = (hex: string) => {
-            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-            return result ? [
-                parseInt(result[1], 16) / 255,
-                parseInt(result[2], 16) / 255,
-                parseInt(result[3], 16) / 255
-            ] : [1, 1, 1];
-        };
-        const colorArr = hexToRgb(m.color);
-
-        // Determine text color
-        let labelColor = [0, 0, 0];
-        const getBrightness = (color: string) => {
-            let r, g, b;
-            if (color.startsWith('#')) {
-                const hex = color.substring(1);
-                r = parseInt(hex.substring(0, 2), 16);
-                g = parseInt(hex.substring(2, 4), 16);
-                b = parseInt(hex.substring(4, 6), 16);
-            } else if (color === 'white') {
-                return 255;
-            } else if (color === 'black') {
-                return 0;
-            } else {
-                return isLightMode ? 255 : 0;
-            }
-            return (r * 299 + g * 587 + b * 114) / 1000;
         };
 
-        if (measurementTextColor !== 'auto' && measurementTextColor.startsWith('#')) {
-            // Custom Hex Color
-            const hex = measurementTextColor.substring(1);
-            labelColor = [
-                parseInt(hex.substring(0, 2), 16) / 255,
-                parseInt(hex.substring(2, 4), 16) / 255,
-                parseInt(hex.substring(4, 6), 16) / 255
-            ];
-        } else if (measurementTextColor === 'black') {
-            labelColor = [0, 0, 0];
-        } else if (measurementTextColor === 'white') {
-            labelColor = [1.0, 0.8, 0.0]; // Keeping 'Gold' for legacy 'white'
-        } else {
-            // Auto mode
-            const bgBrightness = getBrightness(backgroundColor || (isLightMode ? 'white' : 'black'));
-            labelColor = bgBrightness > 128 ? [0, 0, 0] : [1.0, 0.8, 0.0];
-        }
+        stage.signals.clicked.add(handleClick);
 
-        shape.addCylinder(p1, p2, colorArr, 0.1);
-        shape.addSphere(p1, colorArr, 0.2);
-        shape.addSphere(p2, colorArr, 0.2);
-        shape.addText(
-            [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2, (p1[2] + p2[2]) / 2],
-            labelColor,
-            2.5, // Increased size from 0.8
-            m.distance.toFixed(2) + " A" // Use 'A' instead of symbol for compatibility
-        );
+        return () => {
+            stage.signals.clicked.remove(handleClick);
 
-        const comp = stage.addComponentFromObject(shape);
-        comp.addRepresentation("buffer", { depthTest: false });
-    });
-
-}, [measurements, isLightMode, backgroundColor, measurementTextColor]);
+        };
+    }, [onAtomClick, isMeasurementMode]);
 
 
-useEffect(() => {
-    if (!stageRef.current) return;
-    const stage = stageRef.current;
+    const updateRepresentation = (specificComponent?: any) => {
+        if (!isMounted.current) return;
+        const component = specificComponent || componentRef.current;
+        if (!component || !component.structure) return;
 
-    const handleClick = (pickingProxy: any) => {
-        if (!pickingProxy || !pickingProxy.atom) {
-            if (onAtomClick) onAtomClick(null);
-            selectedAtomsRef.current = []; // Reset selection on background click
-            // Clear temp selection shapes?
-            stage.getComponentsByName("temp-selection").list.forEach((c: any) => stage.removeComponent(c));
-            return;
-        }
-        const atom = pickingProxy.atom;
+        try {
+            component.removeAllRepresentations();
+            highlightComponentRef.current = null;
 
-        // MEASUREMENT MODE LOGIC
-        if (isMeasurementMode) {
-            const atomData = {
-                chain: atom.chainname,
-                resNo: atom.resno,
-                resName: atom.resname,
-                atomIndex: atom.index,
-                atomName: atom.atomname,
-                position: { x: atom.x, y: atom.y, z: atom.z }
+
+
+
+            let repType = representation || 'cartoon';
+            let currentColoring = coloring || 'chainid'; // SAFETY DEFAULT
+
+            // Shared High-Quality Cartoon Parameters
+            const cartoonParams = {
+                aspectRatio: 6.0,        // Flat arrows for sheets
+                subdiv: 12,              // Smooth curves
+                radialSegments: 20,      // Smooth helix cylinders
+                smoothSheet: smoothSheet,       // Dynamic smooth beta-sheets
+                quality: 'high'
             };
 
-            selectedAtomsRef.current.push(atomData);
+            // Handle special 1crn case
+            if (currentColoring === 'chainid' && pdbId && pdbId.toLowerCase().includes('1crn')) {
+                currentColoring = 'residue';
+                repType = 'licorice';
+            }
 
-            // Highlight choice
-            const shape = new window.NGL.Shape("temp-selection");
-            shape.addSphere([atom.x, atom.y, atom.z], [1, 0.84, 0], 0.3); // Gold
-            const comp = stage.addComponentFromObject(shape);
-            comp.addRepresentation("buffer", { depthTest: false });
+            if (coloring === 'structure' || (coloring as string) === 'sstruc' || (coloring as string) === 'secondary-structure') {
+                currentColoring = 'sstruc' as ColoringType;
+            }
 
-            // Check for pair
-            if (selectedAtomsRef.current.length === 2) {
-                const a1 = selectedAtomsRef.current[0];
-                const a2 = selectedAtomsRef.current[1];
+            // Check for VALID custom rules only
 
-                // Calculate distance
-                const dx = a1.position.x - a2.position.x;
-                const dy = a1.position.y - a2.position.y;
-                const dz = a1.position.z - a2.position.z;
-                const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+            // --- STRATEGY: MULTI-REPRESENTATION OVERLAY (RESTORED & IMPROVED) ---
+            // NGL Custom Schemes proved fragile for this user.
+            // We implementation "High Contrast Chain Coloring" by EXPLICITLY adding a representation for each chain.
+            // This relies only on basic NGL primitives (addRepresentation with selection), which is 100% robust.
 
-                // Generate measurement name
-                let measurementName: string;
-                const isChemical = a1.resName === 'HET' && a2.resName === 'HET';
+            if (currentColoring === 'chainid') {
+                // FALLBACK: If we have a chemical (single/no chain info) or source is pubchem, 'chainid' is meaningless.
+                // Force Element coloring to ensure visibility (e.g. Licorice needs atoms!).
+                const chainCount = component.structure.chainStore.count;
+                // If effective chain count is 0 or 1, or weird names, fallback to element.
+                // Or if user selected "chainid" but it's a chemical (implied by context or single chain).
 
-                if (isChemical && a1.atomName && a2.atomName) {
-                    // For chemicals, show only atom names
-                    measurementName = `${a1.atomName}-${a2.atomName}`;
-                } else {
-                    // For proteins or mixed, show full residue info
-                    measurementName = `${a1.resName} ${a1.resNo}${a1.atomName ? ` (${a1.atomName})` : ''}-${a2.resName} ${a2.resNo}${a2.atomName ? ` (${a2.atomName})` : ''}`;
+                let forceElement = false;
+                if (chainCount <= 1 || dataSource === 'pubchem') {
+                    forceElement = true;
                 }
 
-                const newMeasurement: Measurement = {
-                    id: crypto.randomUUID(),
-                    name: measurementName,
-                    distance: dist,
-                    color: '#3b82f6', // Default blue
-                    atom1: a1,
-                    atom2: a2
-                };
+                if (forceElement) {
+                    component.addRepresentation(repType, {
+                        color: 'element',
+                        sele: '*', // Select ALL
+                        name: 'base_chemical',
+                        ...cartoonParams
+                    });
+                } else {
+                    // Standard NGL chainid coloring
+                    const params: any = {
+                        color: 'chainid',
+                        quality: 'high'
+                    };
 
-                if (onAddMeasurement) onAddMeasurement(newMeasurement);
+                    // Only apply cartoon parameters if using cartoon representation
+                    if (repType === 'cartoon') {
+                        Object.assign(params, cartoonParams);
+                    }
 
-                // Reset selection
-                selectedAtomsRef.current = [];
-                stage.getComponentsByName("temp-selection").list.forEach((c: any) => stage.removeComponent(c));
-            }
-            return;
-        }
-
-        console.log("DEBUG: Clicked Atom:", atom);
-
-
-
-        // Standard Interaction (Bi-directional Sync)
-        if (onAtomClick) {
-            // Try to get exact click position, or fall back to atom center
-            let pos = null;
-            if (pickingProxy.position) {
-                pos = { x: pickingProxy.position.x, y: pickingProxy.position.y, z: pickingProxy.position.z };
-            } else if (atom) {
-                pos = { x: atom.x, y: atom.y, z: atom.z };
-            }
-
-            console.log("DEBUG: Final Position for Click:", pos);
-
-            onAtomClick({
-                chain: atom.chainname,
-                resNo: atom.resno,
-                resName: atom.resname,
-                atomIndex: atom.index,
-                position: pos || undefined
-            });
-        }
-    };
-
-    stage.signals.clicked.add(handleClick);
-
-    return () => {
-        stage.signals.clicked.remove(handleClick);
-
-    };
-}, [onAtomClick, isMeasurementMode]);
-
-
-const updateRepresentation = (specificComponent?: any) => {
-    if (!isMounted.current) return;
-    const component = specificComponent || componentRef.current;
-    if (!component || !component.structure) return;
-
-    try {
-        component.removeAllRepresentations();
-        highlightComponentRef.current = null;
-
-
-
-
-        let repType = representation || 'cartoon';
-        let currentColoring = coloring || 'chainid'; // SAFETY DEFAULT
-
-        // Shared High-Quality Cartoon Parameters
-        const cartoonParams = {
-            aspectRatio: 6.0,        // Flat arrows for sheets
-            subdiv: 12,              // Smooth curves
-            radialSegments: 20,      // Smooth helix cylinders
-            smoothSheet: smoothSheet,       // Dynamic smooth beta-sheets
-            quality: 'high'
-        };
-
-        // Handle special 1crn case
-        if (currentColoring === 'chainid' && pdbId && pdbId.toLowerCase().includes('1crn')) {
-            currentColoring = 'residue';
-            repType = 'licorice';
-        }
-
-        if (coloring === 'structure' || (coloring as string) === 'sstruc' || (coloring as string) === 'secondary-structure') {
-            currentColoring = 'sstruc' as ColoringType;
-        }
-
-        // Check for VALID custom rules only
-
-        // --- STRATEGY: MULTI-REPRESENTATION OVERLAY (RESTORED & IMPROVED) ---
-        // NGL Custom Schemes proved fragile for this user.
-        // We implementation "High Contrast Chain Coloring" by EXPLICITLY adding a representation for each chain.
-        // This relies only on basic NGL primitives (addRepresentation with selection), which is 100% robust.
-
-        if (currentColoring === 'chainid') {
-            // FALLBACK: If we have a chemical (single/no chain info) or source is pubchem, 'chainid' is meaningless.
-            // Force Element coloring to ensure visibility (e.g. Licorice needs atoms!).
-            const chainCount = component.structure.chainStore.count;
-            // If effective chain count is 0 or 1, or weird names, fallback to element.
-            // Or if user selected "chainid" but it's a chemical (implied by context or single chain).
-
-            let forceElement = false;
-            if (chainCount <= 1 || dataSource === 'pubchem') {
-                forceElement = true;
-            }
-
-            if (forceElement) {
+                    component.addRepresentation(repType, params);
+                }
+            } else if (currentColoring === 'charge') {
+                // CHARGE COLORING: Multi-representation approach
                 component.addRepresentation(repType, {
-                    color: 'element',
-                    sele: '*', // Select ALL
-                    name: 'base_chemical',
+                    color: 0x0000FF,
+                    sele: 'ARG or LYS or HIS',
+                    name: 'charge_positive',
+                    ...cartoonParams
+                });
+                component.addRepresentation(repType, {
+                    color: 0xFF0000,
+                    sele: 'ASP or GLU',
+                    name: 'charge_negative',
+                    ...cartoonParams
+                });
+                component.addRepresentation(repType, {
+                    color: 0xFFFFFF,
+                    sele: 'not (ARG or LYS or HIS or ASP or GLU)',
+                    name: 'charge_neutral',
                     ...cartoonParams
                 });
             } else {
-                // Standard NGL chainid coloring
-                const params: any = {
-                    color: 'chainid',
-                    quality: 'high'
+                // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL
+                // REVERTED to use 'color' property as previously working.
+
+                // Safety: Ensure structure is calculated if mode is sstruc
+                if ((currentColoring as string) === 'sstruc') {
+                    try {
+                        component.structure.eachModel((m: any) => {
+                            if (m.calculateSecondaryStructure) m.calculateSecondaryStructure();
+                        });
+                    } catch (e) { }
+                }
+
+                // Custom Color Scales for NGL
+                const PALETTES: Record<string, string[]> = {
+                    'viridis': ['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725'],
+                    'magma': ['#000004', '#51127c', '#b73779', '#fc8961', '#fcfdbf'],
+                    'cividis': ['#00204d', '#002051', '#7c7b78', '#fdea45', '#fdea45'], // NGL interpolates 
+                    'plasma': ['#0d0887', '#7e03a8', '#cc4778', '#f89540', '#f0f921'],
+                    'standard': [] // NGL default (Blue-Red usually)
                 };
 
-                // Only apply cartoon parameters if using cartoon representation
+                // Helper to get scale
+                const getColorScale = (p: string) => {
+                    return PALETTES[p] || undefined;
+                };
+
+                // Unified cartoon with optimized parameters for arrows and helices
                 if (repType === 'cartoon') {
-                    Object.assign(params, cartoonParams);
+                    // Force recalculation of secondary structure
+                    try {
+                        component.structure.eachModel((m: any) => {
+                            if (m.calculateSecondaryStructure) m.calculateSecondaryStructure();
+                        });
+                    } catch (e) { }
+
+                    const params: any = {
+                        color: currentColoring,
+                        ...cartoonParams
+                    };
+
+                    const scale = getColorScale(colorPalette);
+                    if (scale && scale.length > 0) {
+                        params.colorScale = scale;
+                    }
+                    component.addRepresentation('cartoon', params);
+                } else {
+                    // Non-cartoon representations
+                    const params: any = {
+                        color: currentColoring
+                    };
+                    const scale = getColorScale(colorPalette);
+                    if (scale && scale.length > 0) {
+                        params.colorScale = scale;
+                    }
+                    component.addRepresentation(repType, params);
                 }
-
-                component.addRepresentation(repType, params);
-            }
-        } else if (currentColoring === 'charge') {
-            // CHARGE COLORING: Multi-representation approach
-            component.addRepresentation(repType, {
-                color: 0x0000FF,
-                sele: 'ARG or LYS or HIS',
-                name: 'charge_positive',
-                ...cartoonParams
-            });
-            component.addRepresentation(repType, {
-                color: 0xFF0000,
-                sele: 'ASP or GLU',
-                name: 'charge_negative',
-                ...cartoonParams
-            });
-            component.addRepresentation(repType, {
-                color: 0xFFFFFF,
-                sele: 'not (ARG or LYS or HIS or ASP or GLU)',
-                name: 'charge_neutral',
-                ...cartoonParams
-            });
-        } else {
-            // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL
-            // REVERTED to use 'color' property as previously working.
-
-            // Safety: Ensure structure is calculated if mode is sstruc
-            if ((currentColoring as string) === 'sstruc') {
-                try {
-                    component.structure.eachModel((m: any) => {
-                        if (m.calculateSecondaryStructure) m.calculateSecondaryStructure();
-                    });
-                } catch (e) { }
             }
 
-            // Custom Color Scales for NGL
-            const PALETTES: Record<string, string[]> = {
-                'viridis': ['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725'],
-                'magma': ['#000004', '#51127c', '#b73779', '#fc8961', '#fcfdbf'],
-                'cividis': ['#00204d', '#002051', '#7c7b78', '#fdea45', '#fdea45'], // NGL interpolates 
-                'plasma': ['#0d0887', '#7e03a8', '#cc4778', '#f89540', '#f0f921'],
-                'standard': [] // NGL default (Blue-Red usually)
+            // 2. Add Custom Representations (Overlay)
+
+            // --- OVERLAYS ---
+            const tryApply = (r: string, c: string, sele: string, params: any = {}) => {
+                try { component.addRepresentation(r, { color: c, sele: sele, ...params }); } catch (e) { }
             };
 
-            // Helper to get scale
-            const getColorScale = (p: string) => {
-                return PALETTES[p] || undefined;
-            };
+            // Fix for "Licorice looks like Ball+Stick":
+            // If we are visualizing a chemical/small molecule (chainCount <= 1) AND using an atomic representation (licorice/spacefill),
+            // the Base Representation (which selects '*') already draws the ligands.
+            // We should NOT apply the "Ball+Stick" overlay on top, as it hides the style of the base rep.
+            const atomicReps = ['licorice', 'ball+stick', 'spacefill', 'line', 'point', 'hyperball'];
+            const isBaseRepAtomic = atomicReps.includes(repType);
+            const chainCount = component.structure ? component.structure.chainStore.count : 0;
+            const isSmallMoleculeOrSingleChain = chainCount <= 1 || dataSource === 'pubchem';
 
-            // Unified cartoon with optimized parameters for arrows and helices
-            if (repType === 'cartoon') {
-                // Force recalculation of secondary structure
-                try {
-                    component.structure.eachModel((m: any) => {
-                        if (m.calculateSecondaryStructure) m.calculateSecondaryStructure();
-                    });
-                } catch (e) { }
+            const skipLigandOverlay = isBaseRepAtomic && isSmallMoleculeOrSingleChain;
 
-                const params: any = {
-                    color: currentColoring,
-                    ...cartoonParams
-                };
+            if (showSurface) tryApply('surface', 'white', "*", { opacity: 0.4, depthWrite: false, side: 'front' });
+            if (showLigands && !skipLigandOverlay) tryApply('ball+stick', 'element', 'ligand and not (water or ion)', { scale: 2.0 });
+            if (showIons) tryApply('ball+stick', 'element', 'ion', { scale: 2.0 });
 
-                const scale = getColorScale(colorPalette);
-                if (scale && scale.length > 0) {
-                    params.colorScale = scale;
-                }
-                component.addRepresentation('cartoon', params);
-            } else {
-                // Non-cartoon representations
-                const params: any = {
-                    color: currentColoring
-                };
-                const scale = getColorScale(colorPalette);
-                if (scale && scale.length > 0) {
-                    params.colorScale = scale;
-                }
-                component.addRepresentation(repType, params);
+
+
+
+
+            if (stageRef.current?.viewer) {
+                stageRef.current.viewer.requestRender();
             }
+
+        } catch (e) {
+            console.error("Critical error in updateRepresentation:", e);
         }
-
-        // 2. Add Custom Representations (Overlay)
-
-        // --- OVERLAYS ---
-        const tryApply = (r: string, c: string, sele: string, params: any = {}) => {
-            try { component.addRepresentation(r, { color: c, sele: sele, ...params }); } catch (e) { }
-        };
-
-        // Fix for "Licorice looks like Ball+Stick":
-        // If we are visualizing a chemical/small molecule (chainCount <= 1) AND using an atomic representation (licorice/spacefill),
-        // the Base Representation (which selects '*') already draws the ligands.
-        // We should NOT apply the "Ball+Stick" overlay on top, as it hides the style of the base rep.
-        const atomicReps = ['licorice', 'ball+stick', 'spacefill', 'line', 'point', 'hyperball'];
-        const isBaseRepAtomic = atomicReps.includes(repType);
-        const chainCount = component.structure ? component.structure.chainStore.count : 0;
-        const isSmallMoleculeOrSingleChain = chainCount <= 1 || dataSource === 'pubchem';
-
-        const skipLigandOverlay = isBaseRepAtomic && isSmallMoleculeOrSingleChain;
-
-        if (showSurface) tryApply('surface', 'white', "*", { opacity: 0.4, depthWrite: false, side: 'front' });
-        if (showLigands && !skipLigandOverlay) tryApply('ball+stick', 'element', 'ligand and not (water or ion)', { scale: 2.0 });
-        if (showIons) tryApply('ball+stick', 'element', 'ion', { scale: 2.0 });
-
-
-
-
-
-        if (stageRef.current?.viewer) {
-            stageRef.current.viewer.requestRender();
-        }
-
-    } catch (e) {
-        console.error("Critical error in updateRepresentation:", e);
-    }
-};
-
-// --- VISUAL ECSTASY: Stage Parameters Update ---
-useEffect(() => {
-    if (!stageRef.current) return;
-    const stage = stageRef.current;
-
-    // NGL Stage Parameters for High Quality / Ambient Occlusion
-    const params: any = {
-        backgroundColor: backgroundColor,
-        quality: quality, // 'medium' or 'high'
-        lightIntensity: 1.0, // Standard key light
     };
 
-    if (enableAmbientOcclusion) {
-        params.sampleLevel = 2; // -1/0 = off, 1 = low, 2 = medium, 4 = high
-        params.ambientColor = 0x202020; // Soft grey shadow rather than pitch black
-        params.ambientIntensity = 1.0;
-    } else {
-        params.sampleLevel = 0;
-        params.ambientIntensity = 0.0;
-    }
+    // --- VISUAL ECSTASY: Stage Parameters Update ---
+    useEffect(() => {
+        if (!stageRef.current) return;
+        const stage = stageRef.current;
 
-    try {
-        stage.setParameters(params);
-    } catch (e) { console.warn("Failed to set stage params", e); }
+        // NGL Stage Parameters for High Quality / Ambient Occlusion
+        const params: any = {
+            backgroundColor: backgroundColor,
+            quality: quality, // 'medium' or 'high'
+            lightIntensity: 1.0, // Standard key light
+        };
 
-}, [backgroundColor, quality, enableAmbientOcclusion]);
+        if (enableAmbientOcclusion) {
+            params.sampleLevel = 2; // -1/0 = off, 1 = low, 2 = medium, 4 = high
+            params.ambientColor = 0x202020; // Soft grey shadow rather than pitch black
+            params.ambientIntensity = 1.0;
+        } else {
+            params.sampleLevel = 0;
+            params.ambientIntensity = 0.0;
+        }
 
-useEffect(() => {
-    updateRepresentation();
-}, [representation, coloring, showSurface, showLigands, showIons, colorPalette, smoothSheet]);
+        try {
+            stage.setParameters(params);
+        } catch (e) { console.warn("Failed to set stage params", e); }
 
-useEffect(() => {
-    if (stageRef.current) {
-        stageRef.current.setSpin(isSpinning);
-    }
-}, [isSpinning]);
+    }, [backgroundColor, quality, enableAmbientOcclusion]);
 
-useEffect(() => {
-    if (stageRef.current && resetCamera) {
-        try { stageRef.current.autoView(); } catch (e) { }
-    }
-}, [resetCamera]);
+    useEffect(() => {
+        updateRepresentation();
+    }, [representation, coloring, showSurface, showLigands, showIons, colorPalette, smoothSheet]);
 
-return (
-    <div className={clsx("relative w-full h-full", className)} style={backgroundColor === 'transparent' ? { background: 'transparent' } : {}}>
-        <div ref={containerRef} className="w-full h-full" style={backgroundColor === 'transparent' ? { background: 'transparent' } : {}} />
-        {loading && (
-            <div className="absolute inset-0 bg-neutral-900 z-50 flex flex-col items-center justify-center">
-                <div className="relative w-24 h-24 mb-6">
-                    <Skeleton variant="circular" className="absolute inset-0 border-4 border-neutral-800 bg-transparent animate-[spin_3s_linear_infinite]" />
-                    <Skeleton variant="circular" className="absolute inset-4 border-4 border-neutral-700 bg-transparent animate-[spin_2s_linear_infinite_reverse]" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                        <Skeleton variant="circular" className="w-4 h-4 bg-blue-500/50" />
+    useEffect(() => {
+        if (stageRef.current) {
+            stageRef.current.setSpin(isSpinning);
+        }
+    }, [isSpinning]);
+
+    useEffect(() => {
+        if (stageRef.current && resetCamera) {
+            try { stageRef.current.autoView(); } catch (e) { }
+        }
+    }, [resetCamera]);
+
+    return (
+        <div className={clsx("relative w-full h-full", className)} style={backgroundColor === 'transparent' ? { background: 'transparent' } : {}}>
+            <div ref={containerRef} className="w-full h-full" style={backgroundColor === 'transparent' ? { background: 'transparent' } : {}} />
+            {loading && (
+                <div className="absolute inset-0 bg-neutral-900 z-50 flex flex-col items-center justify-center">
+                    <div className="relative w-24 h-24 mb-6">
+                        <Skeleton variant="circular" className="absolute inset-0 border-4 border-neutral-800 bg-transparent animate-[spin_3s_linear_infinite]" />
+                        <Skeleton variant="circular" className="absolute inset-4 border-4 border-neutral-700 bg-transparent animate-[spin_2s_linear_infinite_reverse]" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <Skeleton variant="circular" className="w-4 h-4 bg-blue-500/50" />
+                        </div>
+                    </div>
+                    <div className="space-y-2 text-center">
+                        <Skeleton variant="text" className="w-32 h-4 mx-auto bg-neutral-800" />
+                        <Skeleton variant="text" className="w-24 h-3 mx-auto bg-neutral-800/50" />
                     </div>
                 </div>
-                <div className="space-y-2 text-center">
-                    <Skeleton variant="text" className="w-32 h-4 mx-auto bg-neutral-800" />
-                    <Skeleton variant="text" className="w-24 h-3 mx-auto bg-neutral-800/50" />
+            )}
+            {error && (
+                <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                    <div className="bg-red-900/80 text-white px-4 py-2 rounded-lg border border-red-500 backdrop-blur-sm shadow-xl">
+                        {error}
+                    </div>
                 </div>
-            </div>
-        )}
-        {error && (
-            <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                <div className="bg-red-900/80 text-white px-4 py-2 rounded-lg border border-red-500 backdrop-blur-sm shadow-xl">
-                    {error}
-                </div>
-            </div>
-        )}
-    </div>
-);
+            )}
+        </div>
+    );
 });
 ProteinViewer.displayName = 'ProteinViewer';
