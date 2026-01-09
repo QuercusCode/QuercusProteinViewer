@@ -1776,7 +1776,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 aspectRatio: 6.0,        // Flat arrows for sheets
                 subdiv: 12,              // Smooth curves
                 radialSegments: 20,      // Smooth helix cylinders
-                smoothSheet: false,      // Disabled to ensure measurements connect accurately to residues
+                smoothSheet: true,       // Smooth beta-sheets
                 quality: 'high'
             };
 
@@ -1931,6 +1931,29 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             if (showLigands && !skipLigandOverlay) tryApply('ball+stick', 'element', 'ligand and not (water or ion)', { scale: 2.0 });
             if (showIons) tryApply('ball+stick', 'element', 'ion', { scale: 2.0 });
 
+            // 3. Measurement Residues Overlay (Fix for "Floating Lines")
+            // When measuring, we draw lines between specific atoms. The Cartoon rep is smoothed and deviates from atom positions.
+            // To fix the "gap", we show the specific residues involved in measurements as Ball & Stick.
+            if (measurements && measurements.length > 0) {
+                const residues = new Set<string>();
+                measurements.forEach(m => {
+                    if (m.atom1) residues.add(`${m.atom1.resNo}:${m.atom1.chain}`);
+                    if (m.atom2) residues.add(`${m.atom2.resNo}:${m.atom2.chain}`);
+                });
+
+                if (residues.size > 0) {
+                    const sele = Array.from(residues).join(' or ');
+                    // Use a subtle ball+stick that blends but shows the connection
+                    component.addRepresentation('ball+stick', {
+                        sele: sele,
+                        color: 'element',
+                        scale: 1.0,
+                        aspectRatio: 1.5,
+                        name: 'measurement-residues'
+                    });
+                }
+            }
+
 
 
             if (stageRef.current?.viewer) {
@@ -1971,7 +1994,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     useEffect(() => {
         updateRepresentation();
-    }, [representation, coloring, showSurface, showLigands, showIons, colorPalette]);
+    }, [representation, coloring, showSurface, showLigands, showIons, colorPalette, measurements]);
 
     useEffect(() => {
         if (stageRef.current) {
