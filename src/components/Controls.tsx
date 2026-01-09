@@ -395,6 +395,8 @@ export const Controls: React.FC<ControlsProps> = ({
     setShowSurface,
     showLigands,
     setShowLigands,
+    smoothSheet,
+    setSmoothSheet,
     showIons,
     setShowIons,
     onRecordMovie,

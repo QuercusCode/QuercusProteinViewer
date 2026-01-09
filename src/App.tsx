@@ -1533,11 +1533,8 @@ function App() {
               dataSource={dataSource}
               setDataSource={setDataSource}
               isChemical={!!isChemical}
+              isChemical={!!isChemical}
               onUpload={handleUpload}
-              representation={representation}
-              setRepresentation={setRepresentation}
-              coloring={coloring}
-              setColoring={setColoring}
               onResetView={() => handleToolAction('reset')}
               chains={chains}
               ligands={ligands}
@@ -1545,6 +1542,12 @@ function App() {
               setIsMeasurementMode={setIsMeasurementMode}
               isPublicationMode={isPublicationMode}
               onTogglePublicationMode={togglePublicationMode}
+              onClearMeasurements={() => {
+                setMeasurements([]);
+                viewerRef.current?.clearMeasurements();
+              }}
+              highlightedResidue={highlightedResidue}
+              onResidueClick={(chain, resNo, resName) => activeController.onResidueClick(chain, resNo, resName)}
               // Appearance
               representation={activeController.representation}
               setRepresentation={activeController.setRepresentation}

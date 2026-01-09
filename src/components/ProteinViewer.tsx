@@ -42,6 +42,7 @@ export interface ProteinViewerProps {
     showSurface: boolean;
     showLigands?: boolean;  // Optional, defaults to true
     showIons?: boolean;     // New prop
+    smoothSheet?: boolean;  // New prop
     coloring: ColoringType;
     palette: ColorPalette;
     backgroundColor: string;
