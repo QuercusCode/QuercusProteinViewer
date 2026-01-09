@@ -61,10 +61,6 @@ export const getShareableURL = (viewMode: string, viewports: AppState[]): string
             } catch (e) { console.warn("Serialization warning", e); }
         }
 
-            try {
-                params.set(p('cust'), b64);
-            } catch (e) { }
-        }
 
         if (state.measurements && state.measurements.length > 0) {
             try {
@@ -144,9 +140,6 @@ export const parseURLState = (): MultiViewState => {
         if (cust) {
         }
 
-        const meas = params.get(p('meas'));
-        if (meas) {
-            try {
                 const minimalData = JSON.parse(atob(meas));
                 state.measurements = minimalData.map((m: any) => ({
                     atom1: { chain: m.a1.c, resNo: m.a1.r, atomName: m.a1.a },

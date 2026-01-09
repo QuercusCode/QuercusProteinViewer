@@ -440,6 +440,7 @@ function App() {
     isPublicationMode,
     highlightedResidue,
     measurements
+  }), [representation, coloring, colorPalette, showLigands, showIons, showSurface, customBackgroundColor, isSpinning, isCleanMode, showContactMap, isPublicationMode, highlightedResidue, measurements]);
 
   const handleVisualStateChange = useCallback((newState: VisualState) => {
     setRepresentation(newState.representation);
