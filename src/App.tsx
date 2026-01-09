@@ -5,7 +5,7 @@ import { ContactMap } from './components/ContactMap';
 import { AISidebar, type AIAction } from './components/AISidebar';
 import { HelpGuide } from './components/HelpGuide';
 import { parseURLState, getShareableURL } from './utils/urlManager';
-import type { Snapshot, Movie, ColorPalette, ColoringType, ResidueInfo, StructureInfo } from './types';
+import type { Snapshot, Movie, ColorPalette, ColoringType, ResidueInfo, StructureInfo, SelectedResidue } from './types';
 
 import LibraryModal from './components/LibraryModal';
 import { ShareModal } from './components/ShareModal';
@@ -72,6 +72,9 @@ function App() {
 
   // --- Snapshot Modal State (unified viewport + quality selection) ---
   const [isSnapshotModalOpen, setIsSnapshotModalOpen] = useState(false);
+
+  // --- Residue-Specific Coloring State ---
+  const [selectedResidues, setSelectedResidues] = useState<SelectedResidue[]>([]);
 
   // --- Multi-View Tool Actions Implementation ---
 
@@ -878,8 +881,23 @@ function App() {
     }
   };
 
+  // --- Residue-Specific Coloring Handlers ---
+  const addSelectedResidue = (chain: string, resNo: number, color: string) => {
+    const exists = selectedResidues.some(r => r.chain === chain && r.resNo === resNo);
+    if (!exists) {
+      setSelectedResidues(prev => [...prev, { chain, resNo, color }]);
+    }
+  };
 
+  const removeSelectedResidue = (chain: string, resNo: number) => {
+    setSelectedResidues(prev => prev.filter(r => !(r.chain === chain && r.resNo === resNo)));
+  };
 
+  const updateResidueColor = (chain: string, resNo: number, color: string) => {
+    setSelectedResidues(prev => prev.map(r =>
+      r.chain === chain && r.resNo === resNo ? { ...r, color } : r
+    ));
+  };
 
   // --- AI ACTION HANDLER (Dr. AI V3) ---
   const handleAIAction = (action: AIAction) => {
@@ -1620,6 +1638,12 @@ function App() {
               // Multi-View Mode
               viewMode={viewMode}
               onSetViewMode={setViewMode}
+
+              // Residue-Specific Coloring
+              selectedResidues={selectedResidues}
+              onAddResidue={addSelectedResidue}
+              onRemoveResidue={removeSelectedResidue}
+              onUpdateResidueColor={updateResidueColor}
             />
           );
         })()}
@@ -1779,6 +1803,7 @@ function App() {
                         quality={isPublicationMode ? 'high' : 'medium'}
                         resetCamera={ctrl.resetKey}
                         customColors={ctrl.customColors}
+                        selectedResidues={selectedResidues}
                         className="w-full h-full"
                       />
                     )}

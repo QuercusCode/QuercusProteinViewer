@@ -78,9 +78,17 @@ export interface ResidueInfo {
     position?: { x: number; y: number; z: number };
 }
 
+
 export type RepresentationType = 'cartoon' | 'licorice' | 'backbone' | 'spacefill' | 'surface' | 'ribbon' | 'ball+stick' | 'line';
-export type ColoringType = 'chainid' | 'residue' | 'secondary' | 'hydrophobicity' | 'structure' | 'bfactor' | 'charge' | 'residueindex';
+export type ColoringType = 'chainid' | 'residue' | 'secondary' | 'hydrophobicity' | 'structure' | 'bfactor' | 'charge' | 'residueindex' | 'byresidue';
 export type ColorPalette = 'standard' | 'viridis' | 'magma' | 'cividis' | 'plasma';
+
+export interface SelectedResidue {
+    chain: string;
+    resNo: number;
+    color: string; // hex color
+}
+
 
 export type MeasurementTextColor = 'auto' | string;
 

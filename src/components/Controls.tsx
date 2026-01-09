@@ -36,7 +36,7 @@ import {
     Undo2,
     Redo2
 } from 'lucide-react';
-import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, PDBMetadata } from '../types';
+import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, PDBMetadata, SelectedResidue } from '../types';
 import type { DataSource } from '../utils/pdbUtils';
 import type { HistoryItem } from '../hooks/useHistory';
 import { formatChemicalId } from '../utils/pdbUtils';
@@ -359,6 +359,12 @@ interface ControlsProps {
     // Multi-View Mode
     viewMode?: 'single' | 'dual' | 'triple' | 'quad';
     onSetViewMode?: (mode: 'single' | 'dual' | 'triple' | 'quad') => void;
+
+    // Residue-Specific Coloring
+    selectedResidues?: SelectedResidue[];
+    onAddResidue?: (chain: string, resNo: number, color: string) => void;
+    onRemoveResidue?: (chain: string, resNo: number) => void;
+    onUpdateResidueColor?: (chain: string, resNo: number, color: string) => void;
 }
 
 export const Controls: React.FC<ControlsProps> = ({

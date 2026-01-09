@@ -9,7 +9,8 @@ import type {
     ResidueInfo,
     Measurement,
     StructureInfo,
-    MeasurementTextColor
+    MeasurementTextColor,
+    SelectedResidue
 } from '../types';
 import { type DataSource, getStructureUrl } from '../utils/pdbUtils';
 
@@ -45,6 +46,7 @@ export interface ProteinViewerProps {
     palette: ColorPalette;
     backgroundColor: string;
     customColors?: any[]; // Simplified type for now
+    selectedResidues?: SelectedResidue[]; // For byresidue coloring mode
     measurementTextColor?: MeasurementTextColor; // Added prop
 
     // Quality
@@ -105,6 +107,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     representation = 'cartoon',
     coloring = 'chainid',
     customColors = [],
+    selectedResidues = [], // For byresidue coloring
     palette: colorPalette = 'standard', // Rename to matches internal usage
     className,
     onStructureLoaded,
@@ -1857,6 +1860,29 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     sele: 'not (ARG or LYS or HIS or ASP or GLU)',
                     name: 'charge_neutral'
                 });
+            } else if (currentColoring === 'byresidue') {
+                // BY-RESIDUE COLORING: Custom colors for specific residues
+                // First, add default gray for all residues
+                component.addRepresentation(repType, {
+                    color: 0x999999,
+                    name: 'byresidue_default'
+                });
+
+                // Then add colored representations for each selected residue
+                if (selectedResidues && selectedResidues.length > 0) {
+                    selectedResidues.forEach((residue) => {
+                        const selection = `[${residue.chain}]${residue.resNo}`;
+                        try {
+                            component.addRepresentation(repType, {
+                                color: residue.color,
+                                sele: selection,
+                                name: `byresidue_${residue.chain}_${residue.resNo}`
+                            });
+                        } catch (e) {
+                            console.warn(`Failed to color residue ${selection}:`, e);
+                        }
+                    });
+                }
             } else {
                 // Standard Coloring for other modes (sstruc, element, etc.) -> Robust Native NGL
                 // REVERTED to use 'color' property as previously working.
