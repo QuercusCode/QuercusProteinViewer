@@ -1776,6 +1776,15 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             let repType = representation || 'cartoon';
             let currentColoring = coloring || 'chainid'; // SAFETY DEFAULT
 
+            // Shared High-Quality Cartoon Parameters
+            const cartoonParams = {
+                aspectRatio: 6.0,        // Flat arrows for sheets
+                subdiv: 12,              // Smooth curves
+                radialSegments: 20,      // Smooth helix cylinders
+                smoothSheet: true,       // Smooth beta-sheets
+                quality: 'high'
+            };
+
             // Handle special 1crn case
             if (currentColoring === 'chainid' && pdbId && pdbId.toLowerCase().includes('1crn')) {
                 currentColoring = 'residue';
@@ -1812,7 +1821,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     component.addRepresentation(repType, {
                         color: 'element',
                         sele: '*', // Select ALL
-                        name: 'base_chemical'
+                        name: 'base_chemical',
+                        ...cartoonParams
                     });
                 } else {
                     const highContrastColors = [
@@ -1838,7 +1848,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         component.addRepresentation(repType, {
                             color: color,
                             sele: sele,
-                            name: `chain_base_${chain.chainname || 'unk'}`
+                            name: `chain_base_${chain.chainname || 'unk'}`,
+                            ...cartoonParams
                         });
                         chainIdx++;
                     });
@@ -1848,26 +1859,29 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 component.addRepresentation(repType, {
                     color: 0x0000FF,
                     sele: 'ARG or LYS or HIS',
-                    name: 'charge_positive'
+                    name: 'charge_positive',
+                    ...cartoonParams
                 });
                 component.addRepresentation(repType, {
                     color: 0xFF0000,
                     sele: 'ASP or GLU',
-                    name: 'charge_negative'
+                    name: 'charge_negative',
+                    ...cartoonParams
                 });
                 component.addRepresentation(repType, {
                     color: 0xFFFFFF,
                     sele: 'not (ARG or LYS or HIS or ASP or GLU)',
-                    name: 'charge_neutral'
+                    name: 'charge_neutral',
+                    ...cartoonParams
                 });
             } else if (currentColoring === 'byresidue') {
                 // BY-RESIDUE COLORING: Custom colors for specific residues
                 // First, add default gray for all residues
                 component.addRepresentation(repType, {
                     color: 0x999999,
-                    name: 'byresidue_default'
+                    name: 'byresidue_default',
+                    ...cartoonParams
                 });
-
 
                 // Then add colored representations for each selected residue
                 if (selectedResidues && selectedResidues.length > 0) {
@@ -1880,7 +1894,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             component.addRepresentation(repType, {
                                 color: colorInt,
                                 sele: selection,
-                                name: `byresidue_${residue.chain}_${residue.resNo}`
+                                name: `byresidue_${residue.chain}_${residue.resNo}`,
+                                ...cartoonParams
                             });
                         } catch (e) {
                             console.warn(`Failed to color residue ${selection}:`, e);
@@ -1925,10 +1940,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                     const params: any = {
                         color: currentColoring,
-                        aspectRatio: 5,          // Flat arrows for sheets
-                        subdiv: 12,              // Smooth curves
-                        radialSegments: 20,      // Smooth helix cylinders
-                        smoothSheet: true,       // Smooth beta-sheets
+                        ...cartoonParams
                     };
 
                     const scale = getColorScale(colorPalette);
