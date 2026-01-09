@@ -36,7 +36,7 @@ import {
     Undo2,
     Redo2
 } from 'lucide-react';
-import type { RepresentationType, ColoringType, ChainInfo, CustomColorRule, Snapshot, Movie, ColorPalette, PDBMetadata } from '../types';
+import type { RepresentationType, ColoringType, ChainInfo, Snapshot, Movie, ColorPalette, PDBMetadata } from '../types';
 import type { DataSource } from '../utils/pdbUtils';
 import type { HistoryItem } from '../hooks/useHistory';
 import { formatChemicalId } from '../utils/pdbUtils';
@@ -281,8 +281,7 @@ interface ControlsProps {
     onResetView: () => void;
     chains: ChainInfo[];
     ligands: string[];
-    customColors: CustomColorRule[];
-    setCustomColors: (colors: CustomColorRule[]) => void;
+
     isMeasurementMode: boolean;
     setIsMeasurementMode: (mode: boolean) => void;
     isPublicationMode: boolean;
@@ -379,8 +378,7 @@ export const Controls: React.FC<ControlsProps> = ({
     onResetView,
     chains,
     ligands,
-    customColors,
-    setCustomColors,
+
     isMeasurementMode,
     setIsMeasurementMode,
     onToggleMeasurement,
@@ -489,11 +487,7 @@ export const Controls: React.FC<ControlsProps> = ({
     const [recordDuration, setRecordDuration] = useState(4000);
 
     // Custom Color State
-    const [targetType, setTargetType] = useState<'chain' | 'residue'>('chain');
-    const [selectedChain, setSelectedChain] = useState(chains[0]?.name || '');
     const [viewSequenceChain, setViewSequenceChain] = useState('');
-    const [residueRange, setResidueRange] = useState('');
-    const [selectedColor, setSelectedColor] = useState('#ff0000');
 
     // Helper to get range of residues for selected chain
     const getSelectedChainRange = () => {
@@ -577,33 +571,6 @@ export const Controls: React.FC<ControlsProps> = ({
         setPdbId(localPdbId);
     };
 
-    const addCustomRule = (e: React.FormEvent) => {
-        e.preventDefault();
-        let target = '';
-        if (targetType === 'chain') {
-            if (!selectedChain) return;
-            target = `:${selectedChain}`;
-        } else {
-            if (!residueRange.trim()) return;
-            target = selectedChain
-                ? `${residueRange.trim()}:${selectedChain}`
-                : residueRange.trim();
-        }
-
-        const newRule: CustomColorRule = {
-            id: crypto.randomUUID(),
-            type: targetType,
-            target,
-            color: selectedColor
-        };
-
-        setCustomColors([...customColors, newRule]);
-        setResidueRange('');
-    };
-
-    const removeRule = (id: string) => {
-        setCustomColors(customColors.filter(r => r.id !== id));
-    };
 
 
 
@@ -1238,101 +1205,6 @@ export const Controls: React.FC<ControlsProps> = ({
                             </p>
 
                             {/* Custom Rules */}
-                            {!isChemical && (
-                                <div className="pt-2 border-t border-white/5">
-                                    <label className={`text-[10px] font-bold uppercase tracking-wider mb-2 block ${subtleText}`}>Custom Rules</label>
-                                    <form onSubmit={addCustomRule} className="space-y-2">
-                                        <div className="flex gap-1 bg-black/20 p-1 rounded-lg">
-                                            <button
-                                                type="button"
-                                                onClick={() => setTargetType('chain')}
-                                                className={`flex-1 text-[10px] py-1 rounded-md transition-all ${targetType === 'chain' ? 'bg-blue-600 text-white shadow-sm' : 'text-neutral-400 hover:text-white'}`}
-                                            >
-                                                Chain
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => setTargetType('residue')}
-                                                className={`flex-1 text-[10px] py-1 rounded-md transition-all ${targetType === 'residue' ? 'bg-blue-600 text-white shadow-sm' : 'text-neutral-400 hover:text-white'}`}
-                                            >
-                                                Residue
-                                            </button>
-                                        </div>
-
-                                        <div className="flex gap-2">
-                                            {targetType === 'chain' ? (
-                                                <select
-                                                    value={selectedChain}
-                                                    onChange={(e) => setSelectedChain(e.target.value)}
-                                                    className={`flex-1 min-w-0 bg-transparent border-b ${isLightMode ? 'border-neutral-300' : 'border-neutral-700'} text-xs px-1 py-1 outline-none`}
-                                                >
-                                                    {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
-                                                </select>
-                                            ) : (
-                                                <div className="flex-1 min-w-0 space-y-1.5">
-                                                    <select
-                                                        value={selectedChain}
-                                                        onChange={(e) => setSelectedChain(e.target.value)}
-                                                        className={`w-full bg-transparent border-b ${isLightMode ? 'border-neutral-300' : 'border-neutral-700'} text-[10px] px-1 py-1 outline-none`}
-                                                    >
-                                                        {chains.map(c => <option key={c.name} value={c.name}>Chain {c.name}</option>)}
-                                                    </select>
-                                                    <input
-                                                        type="text"
-                                                        value={residueRange}
-                                                        onChange={(e) => {
-                                                            const val = e.target.value;
-                                                            // Allow numbers, hyphens, and commas only
-                                                            if (/^[0-9,\-]*$/.test(val)) {
-                                                                setResidueRange(val);
-                                                            }
-                                                        }}
-                                                        placeholder="e.g. 10-20"
-                                                        className={`w-full bg-transparent border-b ${isLightMode ? 'border-neutral-300' : 'border-neutral-700'} text-xs px-1 py-1 outline-none`}
-                                                    />
-                                                    {getSelectedChainRange() && (
-                                                        <div className={`text-[9px] mt-0.5 ${subtleText} opacity-80`}>
-                                                            Range: {getSelectedChainRange()}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-                                            <input
-                                                type="color"
-                                                value={selectedColor}
-                                                onChange={(e) => setSelectedColor(e.target.value)}
-                                                className="w-6 h-6 rounded cursor-pointer bg-transparent border-none p-0"
-                                            />
-                                            <button
-                                                type="submit"
-                                                className="p-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors"
-                                                disabled={targetType === 'residue' && !residueRange}
-                                            >
-                                                <Plus className="w-3.5 h-3.5" />
-                                            </button>
-                                        </div>
-                                    </form>
-
-                                    {customColors.length > 0 && (
-                                        <div className="space-y-1 mt-2">
-                                            {customColors.map(rule => (
-                                                <div key={rule.id} className={`flex justify-between items-center text-[10px] px-2 py-1 rounded border ${isLightMode ? 'bg-white border-neutral-200' : 'bg-black/20 border-white/5'}`}>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className={`px-1 py-0.5 rounded text-[9px] uppercase font-bold ${isLightMode ? 'bg-neutral-100' : 'bg-white/10'}`}>{rule.type}</span>
-                                                        <span className="font-mono">{rule.target}</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="w-3 h-3 rounded-full border border-white/10" style={{ background: rule.color }} />
-                                                        <button onClick={() => removeRule(rule.id)} className="text-neutral-500 hover:text-red-500 transition-colors">
-                                                            <Trash2 className="w-3 h-3" />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            )}
                         </div>
                     </SidebarSection>
 

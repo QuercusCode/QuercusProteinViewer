@@ -1791,7 +1791,6 @@ function App() {
 
                         quality={isPublicationMode ? 'high' : 'medium'}
                         resetCamera={ctrl.resetKey}
-                        customColors={ctrl.customColors}
 
                         className="w-full h-full"
                       />

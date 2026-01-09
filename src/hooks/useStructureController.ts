@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { RepresentationType, ColoringType, ResidueInfo, Measurement, CustomColorRule, PDBMetadata, ChainInfo } from '../types';
+import type { RepresentationType, ColoringType, ResidueInfo, Measurement, PDBMetadata, ChainInfo } from '../types';
 import type { DataSource } from '../utils/pdbUtils';
 
 // Types for the Controller Return Value
@@ -26,8 +26,6 @@ export interface StructureController {
     setShowLigands: (show: boolean | ((prev: boolean) => boolean)) => void;
     showIons: boolean;
     setShowIons: (show: boolean | ((prev: boolean) => boolean)) => void;
-    customColors: CustomColorRule[];
-    setCustomColors: (colors: CustomColorRule[]) => void;
     customBackgroundColor: string | null;
     setCustomBackgroundColor: (color: string | null) => void;
 
@@ -71,7 +69,6 @@ export const useStructureController = (initialState: any = {}): StructureControl
     const [showIons, setShowIons] = useState(false);
     const [customColors, setCustomColors] = useState<CustomColorRule[]>([]);
     const [customBackgroundColor, setCustomBackgroundColor] = useState<string | null>(null);
-
     // Analysis
     const [chains, setChains] = useState<ChainInfo[]>([]);
     const [ligands, setLigands] = useState<string[]>([]);
@@ -113,7 +110,6 @@ export const useStructureController = (initialState: any = {}): StructureControl
         setCustomColors([]);
         setMeasurements([]);
         setHighlightedResidue(null);
-
         // Set Title
         const filenameTitle = uploadedFile.name.replace(/\.[^/.]+$/, "");
         setProteinTitle(filenameTitle);
@@ -148,10 +144,8 @@ export const useStructureController = (initialState: any = {}): StructureControl
         showSurface, setShowSurface,
         showLigands, setShowLigands,
         showIons, setShowIons,
-        customColors, setCustomColors,
         customBackgroundColor, setCustomBackgroundColor,
         chains, setChains,
-        ligands, setLigands,
         pdbMetadata, setPdbMetadata,
         proteinTitle, setProteinTitle,
         highlightedResidue, setHighlightedResidue,

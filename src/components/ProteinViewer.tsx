@@ -104,7 +104,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     file,
     representation = 'cartoon',
     coloring = 'chainid',
-    customColors = [],
+
     palette: colorPalette = 'standard', // Rename to matches internal usage
     className,
     onStructureLoaded,
@@ -1793,9 +1793,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             }
 
             // Check for VALID custom rules only
-            const hasValidCustomRules = customColors && customColors.length > 0 && customColors.some(r => r.target && r.color);
-
-            console.log("Coloring Debug:", { currentColoring, repType, hasValidCustomRules, rules: customColors });
 
             // --- STRATEGY: MULTI-REPRESENTATION OVERLAY (RESTORED & IMPROVED) ---
             // NGL Custom Schemes proved fragile for this user.
@@ -1931,23 +1928,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             }
 
             // 2. Add Custom Representations (Overlay)
-            if (hasValidCustomRules) {
-                console.log("Applying Custom Rules as Overlays:", customColors.length);
-                customColors.forEach((rule, idx) => {
-                    if (rule.color && rule.target) {
-                        try {
-                            // Add a separate representation for this rule
-                            component.addRepresentation(repType, {
-                                color: new NGL.Color(rule.color).getHex(),
-                                sele: rule.target,
-                                name: `custom_rule_${idx}`
-                            });
-                        } catch (e) {
-                            console.warn("Failed to apply custom rule:", rule, e);
-                        }
-                    }
-                });
-            }
 
             // --- OVERLAYS ---
             const tryApply = (r: string, c: string, sele: string, params: any = {}) => {
@@ -2009,7 +1989,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     useEffect(() => {
         updateRepresentation();
-    }, [representation, coloring, customColors, showSurface, showLigands, showIons, colorPalette]);
+    }, [representation, coloring, showSurface, showLigands, showIons, colorPalette]);
 
     useEffect(() => {
         if (stageRef.current) {
