@@ -1817,33 +1817,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         ...cartoonParams
                     });
                 } else {
-                    const highContrastColors = [
-                        0xFF0000, // Red
-                        0x0000FF, // Blue
-                        0x00CC00, // Green 
-                        0xFFD700, // Gold
-                        0xFF00FF, // Magenta
-                        0x00FFFF, // Cyan
-                        0xFF8C00, // Orange
-                        0x8A2BE2, // Purple
-                        0xA52A2A, // Brown
-                        0x7FFF00, // Chartreuse
-                    ];
-
-                    let chainIdx = 0;
-                    component.structure.eachChain((chain: any) => {
-                        const color = highContrastColors[chainIdx % highContrastColors.length];
-                        // Robust selector for empty chain names (common in MDF/SDF)
-                        const sele = chain.chainname ? `:${chain.chainname}` : '*';
-                        // If separate chains have empty names, they are indistinguishable by name selector.
-
-                        component.addRepresentation(repType, {
-                            color: color,
-                            sele: sele,
-                            name: `chain_base_${chain.chainname || 'unk'}`,
-                            ...cartoonParams
-                        });
-                        chainIdx++;
+                    // Standard NGL chainid coloring is reliable and handles selectors internally
+                    component.addRepresentation(repType, {
+                        color: 'chainid',
+                        ...cartoonParams
                     });
                 }
             } else if (currentColoring === 'charge') {
