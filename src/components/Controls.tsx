@@ -11,7 +11,6 @@ import {
     Minimize,
     Moon,
     HelpCircle,
-    Plus,
     RefreshCw,
     RotateCcw,
     Ruler,
