@@ -1,5 +1,4 @@
 import type { RepresentationType, ColoringType } from '../types';
-import type { CustomColorRule } from '../types';
 import type { DataSource } from '../utils/pdbUtils';
 
 export interface AppState {
@@ -10,7 +9,6 @@ export interface AppState {
     isSpinning: boolean;
     showLigands: boolean;
     showSurface: boolean;
-    customColors?: CustomColorRule[];
     measurements?: { atom1: any, atom2: any, distance: number }[];
     customBackgroundColor?: string | null;
     dataSource?: DataSource; // Added for chemical structures
@@ -63,9 +61,7 @@ export const getShareableURL = (viewMode: string, viewports: AppState[]): string
             } catch (e) { console.warn("Serialization warning", e); }
         }
 
-        if (state.customColors && state.customColors.length > 0) {
             try {
-                const b64 = btoa(JSON.stringify(state.customColors));
                 params.set(p('cust'), b64);
             } catch (e) { }
         }
@@ -146,7 +142,6 @@ export const parseURLState = (): MultiViewState => {
 
         const cust = params.get(p('cust'));
         if (cust) {
-            try { state.customColors = JSON.parse(atob(cust)); } catch (e) { }
         }
 
         const meas = params.get(p('meas'));

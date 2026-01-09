@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import type { RepresentationType, ColoringType, ColorPalette, CustomColorRule, ResidueInfo, Measurement } from '../types';
 
 export interface VisualState {
     representation: RepresentationType;
@@ -9,7 +8,6 @@ export interface VisualState {
     showIons: boolean;
     showSurface: boolean;
     customBackgroundColor: string;
-    customColors: CustomColorRule[];
     isSpinning: boolean;
     isCleanMode: boolean;
     showContactMap: boolean;
@@ -61,7 +59,6 @@ export function useVisualStack({ state, onChange, resetTrigger }: UseVisualStack
             prev.showIons !== state.showIons ||
             prev.showSurface !== state.showSurface ||
             prev.customBackgroundColor !== state.customBackgroundColor ||
-            prev.customColors !== state.customColors ||
             prev.isSpinning !== state.isSpinning ||
             prev.isCleanMode !== state.isCleanMode ||
             prev.showContactMap !== state.showContactMap ||

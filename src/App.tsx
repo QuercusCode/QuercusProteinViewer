@@ -212,7 +212,6 @@ function App() {
     showSurface, setShowSurface,
     showLigands, setShowLigands,
     showIons, setShowIons,
-    customColors, setCustomColors,
     customBackgroundColor, setCustomBackgroundColor,
     chains,
     ligands,
@@ -367,8 +366,6 @@ function App() {
   // ... (lines 53-343) ...
 
   // Actually, we should only clear if not restoring? 
-  // If we loaded from URL, customColors are set. 
-  // If we upload a file or change PDB manually, we reset customColors in handlePdbIdChange/handleUpload.
   // So here we should NOT clear them.
 
   // Removed legacy orientation restore effect
@@ -437,14 +434,12 @@ function App() {
     showIons,
     showSurface,
     customBackgroundColor: customBackgroundColor || '',
-    customColors,
     isSpinning,
     isCleanMode,
     showContactMap,
     isPublicationMode,
     highlightedResidue,
     measurements
-  }), [representation, coloring, colorPalette, showLigands, showIons, showSurface, customBackgroundColor, customColors, isSpinning, isCleanMode, showContactMap, isPublicationMode, highlightedResidue, measurements]);
 
   const handleVisualStateChange = useCallback((newState: VisualState) => {
     setRepresentation(newState.representation);
@@ -454,7 +449,6 @@ function App() {
     setShowIons(newState.showIons);
     setShowSurface(newState.showSurface);
     setCustomBackgroundColor(newState.customBackgroundColor || null);
-    setCustomColors(newState.customColors);
     setIsSpinning(newState.isSpinning);
     setIsCleanMode(newState.isCleanMode);
     setShowContactMap(newState.showContactMap);
@@ -579,7 +573,6 @@ function App() {
     activeController.setFile(null);
     activeController.setProteinTitle(null);
     activeController.setChains([]);
-    activeController.setCustomColors([]);
     activeController.setHighlightedResidue(null);
     activeController.setMeasurements([]);
 
@@ -685,7 +678,6 @@ function App() {
           showLigands: ctrl.showLigands,
           showIons: ctrl.showIons,
           isSpinning: ctrl.isSpinning,
-          customColors: ctrl.customColors,
           customBackgroundColor: ctrl.customBackgroundColor,
           isMeasurementMode: isMeasurementMode, // This is global for now, or per-viewport?
           measurements: ctrl.measurements,
@@ -702,7 +694,6 @@ function App() {
         isLightMode,
         isCleanMode,
         snapshots, // Global snapshots
-        customColors: controllers[0].customColors, // Keep legacy top-level for compat if needed, but V2 relies on viewports
         // The core data
         viewports: viewportsData
       };
@@ -757,7 +748,6 @@ function App() {
               if (vp.showLigands !== undefined) ctrl.setShowLigands(vp.showLigands);
               if (vp.showIons !== undefined) ctrl.setShowIons(vp.showIons);
               if (vp.isSpinning !== undefined) ctrl.setIsSpinning(vp.isSpinning);
-              if (vp.customColors) ctrl.setCustomColors(vp.customColors);
               if (vp.customBackgroundColor) ctrl.setCustomBackgroundColor(vp.customBackgroundColor);
               if (vp.measurements) ctrl.setMeasurements(vp.measurements);
 
@@ -788,7 +778,6 @@ function App() {
         if (session.isSpinning !== undefined) ctrl.setIsSpinning(session.isSpinning);
         if (session.isCleanMode !== undefined) setIsCleanMode(session.isCleanMode);
 
-        if (session.customColors) ctrl.setCustomColors(session.customColors);
         if (session.snapshots) setSnapshots(session.snapshots);
 
         if (session.orientation) {
@@ -1550,8 +1539,6 @@ function App() {
               onResetView={() => handleToolAction('reset')}
               chains={chains}
               ligands={ligands}
-              customColors={customColors}
-              setCustomColors={setCustomColors}
               isMeasurementMode={isMeasurementMode}
               setIsMeasurementMode={setIsMeasurementMode}
               isPublicationMode={isPublicationMode}
@@ -1907,7 +1894,6 @@ function App() {
             showLigands: ctrl.showLigands,
             showSurface: ctrl.showSurface,
             showIons: ctrl.showIons,
-            customColors: ctrl.customColors,
             customBackgroundColor: ctrl.customBackgroundColor,
             dataSource: ctrl.dataSource,
             orientation: viewerRefs[index].current?.getCameraOrientation()
@@ -1934,7 +1920,6 @@ function App() {
           showLigands: ctrl.showLigands,
           showSurface: ctrl.showSurface,
           showIons: ctrl.showIons,
-          customColors: ctrl.customColors,
           customBackgroundColor: ctrl.customBackgroundColor,
           dataSource: ctrl.dataSource,
           orientation: viewerRefs[index].current?.getCameraOrientation()

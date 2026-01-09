@@ -490,11 +490,6 @@ export const Controls: React.FC<ControlsProps> = ({
     const [viewSequenceChain, setViewSequenceChain] = useState('');
 
     // Helper to get range of residues for selected chain
-    const getSelectedChainRange = () => {
-        if (!selectedChain) return null;
-        const chain = chains.find(c => c.name === selectedChain);
-        return chain ? `${chain.min} - ${chain.max}` : null;
-    };
 
     // Styles
     const cardBg = isLightMode ? 'bg-white' : 'bg-neutral-900';
@@ -535,14 +530,6 @@ export const Controls: React.FC<ControlsProps> = ({
         if (chains.length > 0 && selectedChain && !chainNames.includes(selectedChain)) {
             if (chains.length > 0) setSelectedChain(chains[0].name);
         } else if (chains.length > 0 && !selectedChain) {
-            setSelectedChain(chains[0].name);
-        }
-    }, [chains, selectedChain]);
-
-    // Auto-scroll to highlighted residue
-    useEffect(() => {
-        if (highlightedResidue && residueRefs.current) {
-            if (viewSequenceChain && viewSequenceChain !== highlightedResidue.chain) {
                 setViewSequenceChain(highlightedResidue.chain);
             }
 

@@ -67,7 +67,6 @@ export const useStructureController = (initialState: any = {}): StructureControl
     const [showSurface, setShowSurface] = useState(false);
     const [showLigands, setShowLigands] = useState(false);
     const [showIons, setShowIons] = useState(false);
-    const [customColors, setCustomColors] = useState<CustomColorRule[]>([]);
     const [customBackgroundColor, setCustomBackgroundColor] = useState<string | null>(null);
     // Analysis
     const [chains, setChains] = useState<ChainInfo[]>([]);
@@ -146,6 +145,7 @@ export const useStructureController = (initialState: any = {}): StructureControl
         showIons, setShowIons,
         customBackgroundColor, setCustomBackgroundColor,
         chains, setChains,
+        ligands, setLigands,
         pdbMetadata, setPdbMetadata,
         proteinTitle, setProteinTitle,
         highlightedResidue, setHighlightedResidue,
