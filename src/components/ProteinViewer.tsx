@@ -1868,10 +1868,12 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     name: 'byresidue_default'
                 });
 
+
                 // Then add colored representations for each selected residue
                 if (selectedResidues && selectedResidues.length > 0) {
                     selectedResidues.forEach((residue) => {
-                        const selection = `[${residue.chain}]${residue.resNo}`;
+                        // NGL selection syntax: :chain and residue_number
+                        const selection = `:${residue.chain} and ${residue.resNo}`;
                         try {
                             component.addRepresentation(repType, {
                                 color: residue.color,
