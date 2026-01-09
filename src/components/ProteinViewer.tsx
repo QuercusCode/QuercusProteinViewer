@@ -9,7 +9,8 @@ import type {
     ResidueInfo,
     Measurement,
     StructureInfo,
-    MeasurementTextColor
+    MeasurementTextColor,
+    AtomInfo
 } from '../types';
 import { type DataSource, getStructureUrl } from '../utils/pdbUtils';
 
