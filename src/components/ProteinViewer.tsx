@@ -1807,16 +1807,15 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         baseMaker = new BaseMaker(params);
                     }
 
-                    // Pre-process Custom Rules (Optimized with BitSets)
-                    const overrides: { bitSet: any, colorHex: number }[] = [];
-                    if (params.structure && rules) {
+                    // Pre-process Custom Rules (Using direct Selection.test for robustness)
+                    const overrides: { selection: any, colorHex: number }[] = [];
+                    if (rules) {
                         rules.forEach(rule => {
                             if (!rule.selection || !rule.color) return;
                             try {
                                 const sel = new NGL.Selection(rule.selection);
-                                const bitSet = params.structure.getAtomSet(sel);
                                 const colorHex = new NGL.Color(rule.color).getHex();
-                                overrides.push({ bitSet, colorHex });
+                                overrides.push({ selection: sel, colorHex });
                             } catch (e) { console.warn("Invalid Selection or Color:", rule); }
                         });
                     }
@@ -1825,7 +1824,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         // Check Overrides
                         for (let i = 0; i < overrides.length; i++) {
                             const rule = overrides[i];
-                            if (rule.bitSet && rule.bitSet.isSet(atom.index)) {
+                            if (rule.selection.test && rule.selection.test(atom)) {
                                 return rule.colorHex;
                             }
                         }
