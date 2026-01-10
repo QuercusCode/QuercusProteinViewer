@@ -1775,7 +1775,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             let finalColor: any = coloring || 'chainid';
 
             // --- 1. RESOLVE ALIASES & DEFAULTS ---
-            if (finalColor === 'structure') finalColor = 'sstruc';
+            if (finalColor === 'structure' || finalColor === 'secondary-structure') finalColor = 'sstruc';
             if (pdbId && pdbId.toLowerCase().includes('1crn') && finalColor === 'chainid') {
                 finalColor = 'residue';
                 repType = 'licorice';
