@@ -65,7 +65,7 @@ export const useStructureController = (initialState: any = {}): StructureControl
     // Visuals
     const [representation, setRepresentation] = useState<RepresentationType>(initialState.representation || 'cartoon');
     const [coloring, setColoring] = useState<ColoringType>(initialState.coloring || 'chainid');
-    const [customColors, setCustomColors] = useState<CustomColorRule[]>([]);
+    const [customColors, setCustomColors] = useState<CustomColorRule[]>(initialState.customColors || []);
     const [isSpinning, setIsSpinning] = useState(false);
     const [showSurface, setShowSurface] = useState(false);
     const [showLigands, setShowLigands] = useState(false);
