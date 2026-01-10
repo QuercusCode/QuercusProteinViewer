@@ -1184,7 +1184,7 @@ export const Controls: React.FC<ControlsProps> = ({
 
                                         {/* Residue-Specific Coloring UI */}
                                         {setCustomColors && (
-                                            <div className="pt-2 border-t border-white/5 space-y-2">
+                                            <div className="col-span-2 pt-2 border-t border-white/5 space-y-2">
                                                 <button
                                                     onClick={() => setIsCustomColorExpanded(!isCustomColorExpanded)}
                                                     className={`w-full flex items-center justify-between text-[10px] font-bold uppercase tracking-wider ${subtleText} hover:opacity-100 opacity-80`}
