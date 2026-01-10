@@ -1194,11 +1194,11 @@ export const Controls: React.FC<ControlsProps> = ({
                                                 </button>
 
                                                 {isCustomColorExpanded && (
-                                                    <div className={`p-3 rounded-xl border space-y-3 ${isLightMode ? 'bg-neutral-50/50 border-neutral-200' : 'bg-black/40 border-white/5'}`}>
+                                                    <div className={`p-4 rounded-xl border space-y-4 ${isLightMode ? 'bg-neutral-50/50 border-neutral-200' : 'bg-black/40 border-white/5'}`}>
                                                         {/* Input Row */}
-                                                        <div className="space-y-1.5">
-                                                            <div className="flex justify-between items-center">
-                                                                <label className={`text-[9px] font-bold uppercase tracking-wider ${subtleText}`}>Selection</label>
+                                                        <div className="space-y-2">
+                                                            <div className="flex justify-between items-center px-1">
+                                                                <label className={`text-[10px] font-bold uppercase tracking-wider ${subtleText}`}>Selection</label>
                                                                 <span className="text-[9px] opacity-50 font-mono">NGL Syntax</span>
                                                             </div>
                                                             <input
@@ -1206,14 +1206,14 @@ export const Controls: React.FC<ControlsProps> = ({
                                                                 value={customSelection}
                                                                 onChange={(e) => setCustomSelection(e.target.value)}
                                                                 placeholder="e.g. 50-60, :A, or 10-20"
-                                                                className={`w-full rounded-lg px-3 py-2 text-xs border outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-mono ${inputBg}`}
+                                                                className={`w-full rounded-xl px-4 py-3 text-sm border outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-mono shadow-sm ${inputBg}`}
                                                             />
                                                         </div>
 
                                                         {/* Color & Action Row */}
-                                                        <div className="flex gap-2">
-                                                            <div className={`flex-1 flex items-center gap-2 px-2 py-1.5 rounded-lg border ${inputBg}`}>
-                                                                <div className="relative w-6 h-6 rounded-full overflow-hidden border border-black/10 shrink-0">
+                                                        <div className="grid grid-cols-1 gap-3">
+                                                            <div className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all ${inputBg}`}>
+                                                                <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-white/10 shrink-0 shadow-sm ring-1 ring-black/5">
                                                                     <input
                                                                         type="color"
                                                                         value={customColorValue}
@@ -1221,18 +1221,21 @@ export const Controls: React.FC<ControlsProps> = ({
                                                                         className="absolute inset-[-50%] w-[200%] h-[200%] cursor-pointer p-0 m-0"
                                                                     />
                                                                 </div>
-                                                                <span className="text-[10px] font-mono opacity-70 uppercase truncate">
-                                                                    {customColorValue}
-                                                                </span>
+                                                                <div className="flex flex-col">
+                                                                    <span className="text-[9px] font-bold uppercase tracking-wider opacity-50">Color</span>
+                                                                    <span className="text-xs font-mono uppercase">
+                                                                        {customColorValue}
+                                                                    </span>
+                                                                </div>
                                                             </div>
 
                                                             <button
                                                                 onClick={handleAddCustomColor}
                                                                 disabled={!customSelection}
-                                                                className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
+                                                                className="w-full py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl text-sm font-bold transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2"
                                                             >
-                                                                <Plus className="w-3.5 h-3.5" />
-                                                                <span>Add</span>
+                                                                <Plus className="w-4 h-4" />
+                                                                <span>Add Rule</span>
                                                             </button>
                                                         </div>
 
