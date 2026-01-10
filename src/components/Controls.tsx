@@ -1204,92 +1204,93 @@ export const Controls: React.FC<ControlsProps> = ({
                                                 </button>
 
                                                 {isCustomColorExpanded && (
-                                                    <div className={`p-4 rounded-xl border space-y-4 ${isLightMode ? 'bg-neutral-50/50 border-neutral-200' : 'bg-black/40 border-white/5'}`}>
-                                                        {/* Input Row */}
-                                                        <div className="space-y-2">
-                                                            <div className="flex justify-between items-center px-1">
-                                                                <label className={`text-[10px] font-bold uppercase tracking-wider ${subtleText}`}>Selection</label>
-                                                            </div>
-                                                            <div className="flex gap-2">
-                                                                {/* Chain Selector */}
-                                                                <div className="w-1/3">
-                                                                    <select
-                                                                        value={customChain}
-                                                                        onChange={(e) => setCustomChain(e.target.value)}
-                                                                        className={`w-full rounded-xl px-2 py-2.5 text-xs border outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-mono shadow-sm appearance-none ${inputBg}`}
-                                                                    >
-                                                                        <option value="">All</option>
-                                                                        {chains.map(c => (
-                                                                            <option key={c.name} value={c.name}>:{c.name}</option>
-                                                                        ))}
-                                                                    </select>
+                                                    <div className={`p-3 rounded-xl border space-y-3 ${isLightMode ? 'bg-neutral-50/50 border-neutral-200' : 'bg-black/20 border-white/5'}`}>
+                                                        {/* Row 1: Selection Inputs */}
+                                                        <div>
+                                                            <div className="flex items-center gap-2">
+                                                                <div className="w-24 shrink-0">
+                                                                    <label className={`text-[9px] font-bold uppercase tracking-wider mb-1 block ${subtleText} opacity-70`}>Chain</label>
+                                                                    <div className={`relative flex items-center rounded-lg border transition-all hover:border-blue-500/50 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500/20 ${inputBg}`}>
+                                                                        <select
+                                                                            value={customChain}
+                                                                            onChange={(e) => setCustomChain(e.target.value)}
+                                                                            className="w-full appearance-none bg-transparent py-1.5 pl-2 pr-6 text-xs font-mono outline-none"
+                                                                        >
+                                                                            <option value="">All</option>
+                                                                            {chains.map(c => (
+                                                                                <option key={c.name} value={c.name}>:{c.name}</option>
+                                                                            ))}
+                                                                        </select>
+                                                                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 opacity-50 pointer-events-none" />
+                                                                    </div>
                                                                 </div>
-
-                                                                {/* Range Input */}
                                                                 <div className="flex-1">
+                                                                    <label className={`text-[9px] font-bold uppercase tracking-wider mb-1 block ${subtleText} opacity-70`}>Residues</label>
                                                                     <input
                                                                         type="text"
                                                                         value={customSelection}
                                                                         onChange={(e) => setCustomSelection(e.target.value)}
                                                                         placeholder="e.g. 50-60"
-                                                                        className={`w-full rounded-xl px-4 py-2.5 text-xs border outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-mono shadow-sm ${inputBg}`}
+                                                                        className={`w-full rounded-lg px-3 py-1.5 text-xs border outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/20 transition-all font-mono placeholder:text-neutral-500 ${inputBg}`}
                                                                     />
                                                                 </div>
                                                             </div>
                                                         </div>
 
-                                                        {/* Color & Action Row */}
-                                                        <div className="grid grid-cols-1 gap-3">
-                                                            <div className={`flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all ${inputBg}`}>
-                                                                <div className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-white/10 shrink-0 shadow-sm ring-1 ring-black/5">
-                                                                    <input
-                                                                        type="color"
-                                                                        value={customColorValue}
-                                                                        onChange={(e) => setCustomColorValue(e.target.value)}
-                                                                        className="absolute inset-[-50%] w-[200%] h-[200%] cursor-pointer p-0 m-0"
-                                                                    />
-                                                                </div>
-                                                                <div className="flex flex-col">
-                                                                    <span className="text-[9px] font-bold uppercase tracking-wider opacity-50">Color</span>
-                                                                    <span className="text-xs font-mono uppercase">
+                                                        {/* Row 2: Color & Action */}
+                                                        <div>
+                                                            <label className={`text-[9px] font-bold uppercase tracking-wider mb-1 block ${subtleText} opacity-70`}>Color & Action</label>
+                                                            <div className="flex gap-2 h-9">
+                                                                {/* Color Picker */}
+                                                                <div className={`flex-1 flex items-center gap-2 px-3 rounded-lg border transition-all hover:border-neutral-400 dark:hover:border-neutral-600 ${inputBg}`}>
+                                                                    <div className="relative w-5 h-5 rounded-full overflow-hidden border border-white/10 ring-1 ring-black/5 shrink-0 shadow-sm">
+                                                                        <input
+                                                                            type="color"
+                                                                            value={customColorValue}
+                                                                            onChange={(e) => setCustomColorValue(e.target.value)}
+                                                                            className="absolute inset-[-50%] w-[200%] h-[200%] cursor-pointer p-0 m-0"
+                                                                        />
+                                                                    </div>
+                                                                    <span className="text-[10px] font-mono opacity-80 uppercase tracking-wide">
                                                                         {customColorValue}
                                                                     </span>
                                                                 </div>
+
+                                                                {/* Add Button */}
+                                                                <button
+                                                                    onClick={handleAddCustomColor}
+                                                                    disabled={(!customSelection && !customChain)}
+                                                                    className="px-6 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold transition-all shadow-sm active:scale-95 flex items-center justify-center gap-1.5"
+                                                                >
+                                                                    <Plus className="w-3.5 h-3.5" />
+                                                                    <span>Add</span>
+                                                                </button>
                                                             </div>
-
-                                                            <button
-                                                                onClick={handleAddCustomColor}
-                                                                disabled={!customSelection}
-                                                                className="w-full py-3 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl text-sm font-bold transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2"
-                                                            >
-                                                                <Plus className="w-4 h-4" />
-                                                                <span>Add Rule</span>
-                                                            </button>
                                                         </div>
-
-                                                        {/* Divider */}
-                                                        {customColors && customColors.length > 0 && (
-                                                            <div className="border-t border-black/5 dark:border-white/5 my-1" />
-                                                        )}
 
                                                         {/* Active Rules List */}
                                                         {customColors && customColors.length > 0 && (
-                                                            <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1 scrollbar-thin">
-                                                                {customColors.map((rule, idx) => (
-                                                                    <div key={idx} className={`group flex items-center justify-between text-xs p-2 rounded-lg border transition-all ${isLightMode ? 'bg-white border-neutral-200 hover:border-blue-300' : 'bg-white/5 border-transparent hover:bg-white/10'}`}>
-                                                                        <div className="flex items-center gap-3">
-                                                                            <div className="w-4 h-4 rounded-full shadow-sm border border-black/10 ring-1 ring-inset ring-black/5" style={{ background: rule.color }} />
-                                                                            <code className={`text-[10px] font-mono ${isLightMode ? 'text-neutral-600' : 'text-neutral-300'}`}>{rule.selection}</code>
+                                                            <div className="space-y-1 pt-2 border-t border-dashed border-neutral-200 dark:border-neutral-800">
+                                                                <div className="flex justify-between items-center mb-2">
+                                                                    <span className={`text-[9px] font-bold uppercase tracking-wider ${subtleText}`}>Active Rules ({customColors.length})</span>
+                                                                </div>
+                                                                <div className="space-y-1.5 max-h-32 overflow-y-auto pr-1 scrollbar-thin">
+                                                                    {customColors.map((rule, idx) => (
+                                                                        <div key={idx} className={`group flex items-center justify-between text-xs p-2 rounded-lg border transition-all ${isLightMode ? 'bg-white border-neutral-200 hover:border-blue-300' : 'bg-white/5 border-transparent hover:bg-white/10'}`}>
+                                                                            <div className="flex items-center gap-3">
+                                                                                <div className="w-3.5 h-3.5 rounded-full shadow-sm border border-black/10 ring-1 ring-inset ring-black/5" style={{ background: rule.color }} />
+                                                                                <code className={`text-[10px] font-mono ${isLightMode ? 'text-neutral-600' : 'text-neutral-300'}`}>{rule.selection}</code>
+                                                                            </div>
+                                                                            <button
+                                                                                onClick={() => handleRemoveCustomColor(idx)}
+                                                                                className="opacity-0 group-hover:opacity-100 text-neutral-400 hover:text-red-500 transition-all p-1 hover:bg-red-500/10 rounded"
+                                                                                title="Remove Rule"
+                                                                            >
+                                                                                <X className="w-3 h-3" />
+                                                                            </button>
                                                                         </div>
-                                                                        <button
-                                                                            onClick={() => handleRemoveCustomColor(idx)}
-                                                                            className="opacity-0 group-hover:opacity-100 text-neutral-400 hover:text-red-500 transition-all p-1 hover:bg-red-500/10 rounded"
-                                                                            title="Remove Rule"
-                                                                        >
-                                                                            <X className="w-3.5 h-3.5" />
-                                                                        </button>
-                                                                    </div>
-                                                                ))}
+                                                                    ))}
+                                                                </div>
                                                             </div>
                                                         )}
                                                     </div>
