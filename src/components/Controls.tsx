@@ -1219,7 +1219,14 @@ export const Controls: React.FC<ControlsProps> = ({
                                                                 </div>
                                                             </div>
                                                             <div className="flex-1">
-                                                                <label className={`text-[9px] font-bold uppercase tracking-wider mb-1 block ${subtleText} opacity-70`}>Residues</label>
+                                                                <div className="flex justify-between items-center mb-1">
+                                                                    <label className={`text-[9px] font-bold uppercase tracking-wider ${subtleText} opacity-70`}>Residues</label>
+                                                                    {customChain && chains.find(c => c.name === customChain)?.min !== undefined && (
+                                                                        <span className={`text-[9px] font-mono ${subtleText} opacity-50`}>
+                                                                            {chains.find(c => c.name === customChain)?.min}-{chains.find(c => c.name === customChain)?.max}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
                                                                 <input
                                                                     type="text"
                                                                     value={customSelection}
