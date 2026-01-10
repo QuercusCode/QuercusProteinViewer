@@ -495,24 +495,34 @@ export const Controls: React.FC<ControlsProps> = ({
 
     // Custom Color State
     const [customSelection, setCustomSelection] = useState('');
+    const [customChain, setCustomChain] = useState('');
     const [customColorValue, setCustomColorValue] = useState('#ff0000');
     const [isCustomColorExpanded, setIsCustomColorExpanded] = useState(false);
 
     const handleAddCustomColor = () => {
-        if (!customSelection || !setCustomColors) return;
+        if ((!customSelection && !customChain) || !setCustomColors) return;
 
         let sel = customSelection.trim();
-        // Heuristic: if input is just a number/range, assume first chain if available, or just send it (NGL handles it)
-        // Actually NGL needs explicit chain usually for safety, but "10-20" works if unique or for all.
-        // Let's just pass what user typed (or maybe prefix with ':' if they just typed 'A'?)
 
-        // Simple heuristic: if just single letter A-Z, treat as chain
-        if (/^[A-Za-z0-9]+$/.test(sel) && chains.some(c => c.name === sel)) {
-            sel = `:${sel}`;
+        // Combine Chain and Selection
+        if (customChain) {
+            if (sel) {
+                // If user typed a range (e.g. 10-20), combine with chain
+                sel = `:${customChain} and (${sel})`;
+            } else {
+                // Just the chain
+                sel = `:${customChain}`;
+            }
+        } else {
+            // Heuristic: if just single letter A-Z, treat as chain
+            if (/^[A-Za-z0-9]+$/.test(sel) && chains.some(c => c.name === sel)) {
+                sel = `:${sel}`;
+            }
         }
 
         setCustomColors(prev => [...prev, { selection: sel, color: customColorValue }]);
         setCustomSelection('');
+        setCustomChain('');
     };
 
     const handleRemoveCustomColor = (index: number) => {
@@ -1200,13 +1210,32 @@ export const Controls: React.FC<ControlsProps> = ({
                                                             <div className="flex justify-between items-center px-1">
                                                                 <label className={`text-[10px] font-bold uppercase tracking-wider ${subtleText}`}>Selection</label>
                                                             </div>
-                                                            <input
-                                                                type="text"
-                                                                value={customSelection}
-                                                                onChange={(e) => setCustomSelection(e.target.value)}
-                                                                placeholder="e.g. 50-60, :A, or 10-20"
-                                                                className={`w-full rounded-xl px-4 py-2.5 text-xs border outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-mono shadow-sm ${inputBg}`}
-                                                            />
+                                                            <div className="flex gap-2">
+                                                                {/* Chain Selector */}
+                                                                <div className="w-1/3">
+                                                                    <select
+                                                                        value={customChain}
+                                                                        onChange={(e) => setCustomChain(e.target.value)}
+                                                                        className={`w-full rounded-xl px-2 py-2.5 text-xs border outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-mono shadow-sm appearance-none ${inputBg}`}
+                                                                    >
+                                                                        <option value="">All</option>
+                                                                        {chains.map(c => (
+                                                                            <option key={c.name} value={c.name}>:{c.name}</option>
+                                                                        ))}
+                                                                    </select>
+                                                                </div>
+
+                                                                {/* Range Input */}
+                                                                <div className="flex-1">
+                                                                    <input
+                                                                        type="text"
+                                                                        value={customSelection}
+                                                                        onChange={(e) => setCustomSelection(e.target.value)}
+                                                                        placeholder="e.g. 50-60"
+                                                                        className={`w-full rounded-xl px-4 py-2.5 text-xs border outline-none focus:ring-2 focus:ring-blue-500/20 transition-all font-mono shadow-sm ${inputBg}`}
+                                                                    />
+                                                                </div>
+                                                            </div>
                                                         </div>
 
                                                         {/* Color & Action Row */}
