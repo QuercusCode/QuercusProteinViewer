@@ -1,10 +1,11 @@
-import type { RepresentationType, ColoringType } from '../types';
+import type { RepresentationType, ColoringType, CustomColorRule } from '../types';
 import type { DataSource } from '../utils/pdbUtils';
 
 export interface AppState {
     pdbId: string;
     representation: RepresentationType;
     coloring: ColoringType;
+    customColors?: CustomColorRule[];
     orientation?: any; // Matrix or Quaternion array
     isSpinning: boolean;
     showLigands: boolean;
@@ -40,6 +41,13 @@ export const getShareableURL = (viewMode: string, viewports: AppState[]): string
 
         if (state.dataSource && state.dataSource !== 'pdb') {
             params.set(p('src'), state.dataSource);
+        }
+
+        if (state.customColors && state.customColors.length > 0) {
+            try {
+                const b64 = btoa(JSON.stringify(state.customColors));
+                params.set(p('cc'), b64);
+            } catch (e) { }
         }
 
         if (state.isSpinning) params.set(p('spin'), '1');
@@ -118,6 +126,11 @@ export const parseURLState = (): MultiViewState => {
         state.pdbId = pdb;
         state.representation = (params.get(p('rep')) as any) || 'cartoon';
         state.coloring = (params.get(p('color')) as any) || 'chainid';
+
+        const cc = params.get(p('cc'));
+        if (cc) {
+            try { state.customColors = JSON.parse(atob(cc)); } catch (e) { }
+        }
 
         const src = params.get(p('src')) as DataSource | null;
         if (src === 'pubchem' || src === 'alphafold') {

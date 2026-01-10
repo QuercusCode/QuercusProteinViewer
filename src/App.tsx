@@ -1909,6 +1909,7 @@ function App() {
             showLigands: ctrl.showLigands,
             showSurface: ctrl.showSurface,
             showIons: ctrl.showIons,
+            customColors: ctrl.customColors,
             customBackgroundColor: ctrl.customBackgroundColor,
             dataSource: ctrl.dataSource,
             orientation: viewerRefs[index].current?.getCameraOrientation()
@@ -1935,6 +1936,7 @@ function App() {
           showLigands: ctrl.showLigands,
           showSurface: ctrl.showSurface,
           showIons: ctrl.showIons,
+          customColors: ctrl.customColors,
           customBackgroundColor: ctrl.customBackgroundColor,
           dataSource: ctrl.dataSource,
           orientation: viewerRefs[index].current?.getCameraOrientation()
