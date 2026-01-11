@@ -1850,7 +1850,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             const params: any = {
                 color: finalColor,
                 quality: 'high',
-                name: 'base_representation'
+                name: 'base_representation',
+                multipleBond: 'symmetric' // Enable Double/Triple Bond Rendering
             };
 
             const scale = PALETTES[colorPalette];

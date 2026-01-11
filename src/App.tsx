@@ -1928,6 +1928,15 @@ function App() {
       <ShareModal
         isOpen={showShareModal}
         onClose={() => setShowShareModal(false)}
+        warning={
+          // Check if any visible viewport relies on a local file (no PDB ID/PubChem CID but has a file)
+          // For single view:
+          (viewMode === 'single' && !activeController.pdbId && activeController.file) ||
+            // For multi view:
+            (viewMode !== 'single' && controllers.some(c => !c.pdbId && c.file))
+            ? "Sharing is not available for local files. Please use a PDB ID or PubChem Code to generate a shareable link."
+            : null
+        }
         shareUrl={getShareableURL(viewMode, controllers.map((ctrl, index) => ({
           pdbId: ctrl.pdbId,
           representation: ctrl.representation,
