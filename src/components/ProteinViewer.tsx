@@ -1897,6 +1897,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             if (showLigands && !skipLigandOverlay) tryApply('ball+stick', 'element', 'ligand and not (water or ion)', { scale: 2.0 });
             if (showIons) tryApply('ball+stick', 'element', 'ion', { scale: 2.0 });
 
+            // DNA/RNA Base Pairs (The "Steps" of the ladder)
+            // We use 'base' representation for all nucleic acids
+            tryApply('base', 'element', 'nucleic', { color: 'element', cylinderOnly: false });
+
 
 
 
