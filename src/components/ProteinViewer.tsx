@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
+import React, { useEffect, useRef, useImperativeHandle, forwardRef, useCallback } from 'react';
 import clsx from 'clsx';
 import { Skeleton } from './Skeleton';
 import type {
@@ -11,7 +11,8 @@ import type {
     StructureInfo,
     MeasurementTextColor,
     AtomInfo,
-    CustomColorRule
+    CustomColorRule,
+    Annotation // Added
 } from '../types';
 import { type DataSource, getStructureUrl } from '../utils/pdbUtils';
 
@@ -69,6 +70,11 @@ export interface ProteinViewerProps {
     isMeasurementMode?: boolean;
     measurements?: Measurement[];
     onAddMeasurement?: (m: Measurement) => void;
+
+    // Annotations
+    isAnnotationMode?: boolean;
+    annotations?: Annotation[];
+    onAddAnnotation?: (a: Annotation) => void;
 
     // Actions
     resetCamera?: number; // Increment to trigger reset
@@ -131,6 +137,11 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     quality = 'medium',
     enableAmbientOcclusion = false,
     measurementTextColor = 'auto',
+
+    // Annotations
+    isAnnotationMode = false,
+    annotations = [],
+    onAddAnnotation
 }: ProteinViewerProps, ref: React.Ref<ProteinViewerRef>) => {
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -151,6 +162,9 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     const regionHighlightRepRef = useRef<any>(null); // V6: Track region highlight
     const selectedAtomsRef = useRef<any[]>([]);
 
+    // Annotations State
+    const [annotationPositions, setAnnotationPositions] = React.useState<{ id: string, x: number, y: number }[]>([]);
+
     // Helper to find atom
     const findAtom = (chain: string, resNo: number, atomName: string) => {
         if (!componentRef.current) return null;
@@ -164,6 +178,48 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         }
         return found;
     };
+
+
+    // --- ANNOTATION POSITION SYNC ---
+    const updateAnnotationPositions = useCallback(() => {
+        if (!stageRef.current || !annotations || annotations.length === 0) return;
+
+        const defaults = stageRef.current.viewerControls;
+        const positions = annotations.map(ann => {
+            // NGL getCanvasPosition returns {x, y}
+            // We need to pass a Vector3
+            const v = new window.NGL.Vector3(ann.position.x, ann.position.y, ann.position.z);
+            const canvasPos = defaults.getCanvasPosition(v);
+            return {
+                id: ann.id,
+                x: canvasPos.x,
+                y: canvasPos.y
+            };
+        });
+
+        // Batch update to avoid flickering (React 18 handles this well)
+        setAnnotationPositions(positions);
+    }, [annotations]);
+
+    useEffect(() => {
+        if (!stageRef.current) return;
+        const stage = stageRef.current;
+
+        // Listen to camera changes
+        const onCameraChange = () => {
+            // Use requestAnimationFrame for smoothness if needed, or throttle
+            requestAnimationFrame(updateAnnotationPositions);
+        };
+
+        stage.viewerControls.signals.changed.add(onCameraChange);
+        // Initial sync
+        updateAnnotationPositions();
+
+        return () => {
+            stage.viewerControls.signals.changed.remove(onCameraChange);
+        };
+    }, [updateAnnotationPositions]);
+
 
     const drawMeasurement = (m: MeasurementData) => {
         // Legacy internal measurement drawing - kept for compatibility if needed,
@@ -1665,6 +1721,19 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             const atom = pickingProxy.atom;
 
             // MEASUREMENT MODE LOGIC
+            if (isAnnotationMode) {
+                const label = prompt("Enter label for this atom:", `${atom.resname} ${atom.resno}`);
+                if (label && onAddAnnotation) {
+                    onAddAnnotation({
+                        id: crypto.randomUUID(),
+                        position: { x: atom.x, y: atom.y, z: atom.z },
+                        text: label,
+                        // color: 'rgba(0, 0, 0, 0.6)' // Default black-ish bg (removed as type doesn't have it yet, or add to type)
+                    });
+                }
+                return;
+            }
+
             if (isMeasurementMode) {
                 const atomData = {
                     chain: atom.chainname,
@@ -1982,6 +2051,27 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     </div>
                 </div>
             )}
+
+            {/* Annotations Overlay */}
+            {annotationPositions.map(pos => {
+                const ann = annotations?.find(a => a.id === pos.id);
+                if (!ann) return null;
+                // Don't render if off-screen (simple check)
+                if (pos.x < 0 || pos.y < 0) return null;
+
+                return (
+                    <div
+                        key={pos.id}
+                        className="absolute px-2 py-1 rounded bg-black/70 text-white text-[10px] font-sans pointer-events-none transform -translate-x-1/2 -translate-y-full whitespace-nowrap z-10 border border-white/20 select-none backdrop-blur-sm shadow-md"
+                        style={{
+                            left: pos.x,
+                            top: pos.y - 10 // Offset slightly up
+                        }}
+                    >
+                        {ann.text}
+                    </div>
+                );
+            })}
         </div>
     );
 });

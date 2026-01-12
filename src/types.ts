@@ -57,13 +57,12 @@ export interface Movie {
     duration: number; // in seconds
     format: string; // 'webm' or 'mp4'
     pdbId?: string;
+    customBackgroundColor?: string | null;
     description?: string;
 }
 
 export interface Annotation {
     id: string;
-    chain: string;
-    resNo: number;
     text: string;
     position: { x: number; y: number; z: number };
 }

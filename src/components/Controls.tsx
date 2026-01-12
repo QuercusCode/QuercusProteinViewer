@@ -34,7 +34,8 @@ import {
     Clock,
     Undo2,
     Redo2,
-    Plus
+    Plus,
+    MessageSquarePlus
 } from 'lucide-react';
 import type { RepresentationType, ColoringType, ChainInfo, Snapshot, Movie, ColorPalette, PDBMetadata, CustomColorRule } from '../types';
 import type { DataSource } from '../utils/pdbUtils';
@@ -312,6 +313,11 @@ interface ControlsProps {
     onDeleteSnapshot: (id: string) => void;
     isSpinning: boolean;
     setIsSpinning: (spinning: boolean) => void;
+
+    // Annotations
+    isAnnotationMode?: boolean;
+    onToggleAnnotationMode?: () => void; // Toggle handler
+
     isCleanMode: boolean;
     setIsCleanMode: (clean: boolean) => void;
     onSaveSession: () => void;
@@ -385,6 +391,8 @@ export const Controls: React.FC<ControlsProps> = ({
     setIsMeasurementMode,
     onToggleMeasurement,
     onClearMeasurements,
+    isAnnotationMode,
+    onToggleAnnotationMode,
     isPublicationMode,
     onTogglePublicationMode,
     pdbMetadata,
@@ -1406,6 +1414,15 @@ export const Controls: React.FC<ControlsProps> = ({
                             >
                                 <span className="text-xs font-medium">Measure</span>
                                 <Ruler className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                                onClick={() => {
+                                    if (onToggleAnnotationMode) onToggleAnnotationMode();
+                                }}
+                                className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${isAnnotationMode ? 'bg-purple-500/10 border-purple-500 text-purple-500' : `${cardBg} hover:opacity-80`} ${isChemical ? 'col-span-2' : ''}`}
+                            >
+                                <span className="text-xs font-medium">Annotate</span>
+                                <MessageSquarePlus className="w-3.5 h-3.5" />
                             </button>
                             {/* Contact Map - Only for Proteins */}
                             {!isChemical && (
