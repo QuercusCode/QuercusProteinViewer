@@ -531,6 +531,7 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
                                 <div className="mt-12 pt-6 border-t border-neutral-800/50 flex flex-col sm:flex-row justify-between items-center opacity-50 hover:opacity-100 transition-opacity gap-4">
                                     <div className="flex gap-4 text-[10px] text-neutral-500">
                                         <a href="https://www.rcsb.org/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">RCSB PDB</a>
+                                        <a href="https://pubchem.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">PubChem</a>
                                         <a href="http://nglviewer.org/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">NGL Viewer</a>
                                     </div>
                                     <div className="text-[10px] text-neutral-600">
