@@ -1944,7 +1944,16 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             // Construct Exclusion Query for Transparent Regions
             // We DONT exclude if we just have color overrides, only if we have transparency that needs separate drawing
             if (opacityRules.length > 0) {
-                const exclusionParts = opacityRules.map(r => `(${r.selection})`);
+                // Optimization: Only exclude WHOLE CHAINS (e.g. ":A") to prevent "Gaps" in ribbons.
+                // NGL/Molecular viewers cannot interpolate splines across missing segments, creating ugly breaks.
+                // For ranges (e.g. "10-20"), we will just Overlay the transparent shell on top of the opaque base.
+                // It's a trade-off: Overlay = No Gap but mixed color; Exclusion = True Transparency but Gap.
+                // Most users prefer No Gap.
+                const wholeChainRegex = /^:[A-Za-z0-9]+$/;
+                const exclusionParts = opacityRules
+                    .filter(r => wholeChainRegex.test(r.selection))
+                    .map(r => `(${r.selection})`);
+
                 if (exclusionParts.length > 0) {
                     params.sele = `not (${exclusionParts.join(' or ')})`;
                 }
