@@ -12,7 +12,7 @@ type FeatureSection = {
     content: React.ReactNode;
 };
 
-export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true }) => {
+export const HelpGuide: React.FC<{ isVisible?: boolean, onStartDemo?: () => void }> = ({ isVisible = true, onStartDemo }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [activeTab, setActiveTab] = useState('start');
     const [showMobileList, setShowMobileList] = useState(true);
@@ -83,10 +83,23 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
                             <Sparkles className="w-4 h-4 text-neutral-300" />
                         </div>
                         <div>
-                            <h4 className="text-xs font-bold text-white mb-0.5">Interactive Tour</h4>
-                            <p className="text-[11px] text-neutral-400">
-                                Click "Start Tour" in the sidebar for a guided walkthrough of all features.
+                            <h4 className="text-xs font-bold text-white mb-0.5">Interactive Demo</h4>
+                            <p className="text-[11px] text-neutral-400 mb-2">
+                                Watch a live, auto-playing demonstration of key features.
                             </p>
+                            <div className="flex gap-2">
+                                {onStartDemo && (
+                                    <button
+                                        onClick={() => {
+                                            setIsOpen(false); // Close help modal
+                                            onStartDemo();
+                                        }}
+                                        className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded text-xs font-bold transition-colors flex items-center gap-1.5"
+                                    >
+                                        <Sparkles className="w-3 h-3" /> Watch Demo
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     </div>
 
