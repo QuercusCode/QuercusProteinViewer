@@ -1243,11 +1243,12 @@ export const Controls: React.FC<ControlsProps> = ({
                                                     </div>
 
                                                     {/* Row 2: Color & Action */}
-                                                    <div>
-                                                        <label className={`text-[9px] font-bold uppercase tracking-wider mb-1 block ${subtleText} opacity-70`}>Color & Action</label>
-                                                        <div className="flex gap-2 h-9">
-                                                            {/* Color Picker */}
-                                                            <div className={`flex-1 flex items-center gap-2 px-3 rounded-lg border transition-all hover:border-neutral-400 dark:hover:border-neutral-600 ${inputBg}`}>
+                                                    {/* Row 2: Color & Opacity */}
+                                                    <div className="grid grid-cols-5 gap-2">
+                                                        {/* Color Picker (2/5 width) */}
+                                                        <div className="col-span-2">
+                                                            <label className={`text-[9px] font-bold uppercase tracking-wider mb-1 block ${subtleText} opacity-70`}>Color</label>
+                                                            <div className={`flex items-center gap-2 px-2 py-1.5 rounded-lg border transition-all hover:border-neutral-400 dark:hover:border-neutral-600 ${inputBg} h-9`}>
                                                                 <div className="relative w-5 h-5 rounded-full overflow-hidden border border-white/10 ring-1 ring-black/5 shrink-0 shadow-sm">
                                                                     <input
                                                                         type="color"
@@ -1256,17 +1257,19 @@ export const Controls: React.FC<ControlsProps> = ({
                                                                         className="absolute inset-[-50%] w-[200%] h-[200%] cursor-pointer p-0 m-0"
                                                                     />
                                                                 </div>
-                                                                <span className="text-[10px] font-mono opacity-80 uppercase tracking-wide">
+                                                                <span className="text-[10px] font-mono opacity-80 uppercase tracking-wide truncate">
                                                                     {customColorValue}
                                                                 </span>
                                                             </div>
+                                                        </div>
 
-                                                            {/* Opacity Slider */}
-                                                            <div className={`w-24 px-2 py-1 flex flex-col justify-center rounded-lg border ${inputBg}`}>
-                                                                <div className="flex justify-between text-[8px] font-bold uppercase tracking-wider mb-0.5 opacity-70">
-                                                                    <span>Opacity</span>
-                                                                    <span>{Math.round(customOpacity * 100)}%</span>
-                                                                </div>
+                                                        {/* Opacity Slider (3/5 width) */}
+                                                        <div className="col-span-3">
+                                                            <div className="flex justify-between items-baseline mb-1">
+                                                                <label className={`text-[9px] font-bold uppercase tracking-wider ${subtleText} opacity-70`}>Opacity</label>
+                                                                <span className={`text-[9px] font-mono ${subtleText}`}>{Math.round(customOpacity * 100)}%</span>
+                                                            </div>
+                                                            <div className={`px-2 py-0 flex items-center rounded-lg border ${inputBg} h-9`}>
                                                                 <input
                                                                     type="range"
                                                                     min="0"
@@ -1274,21 +1277,21 @@ export const Controls: React.FC<ControlsProps> = ({
                                                                     step="0.1"
                                                                     value={customOpacity}
                                                                     onChange={(e) => setCustomOpacity(parseFloat(e.target.value))}
-                                                                    className="w-full h-1 bg-neutral-400/30 rounded-full appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2 [&::-webkit-slider-thumb]:h-2 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-500"
+                                                                    className="w-full h-1.5 bg-neutral-400/30 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:hover:scale-110 [&::-webkit-slider-thumb]:transition-transform"
                                                                 />
                                                             </div>
-
-                                                            {/* Add Button */}
-                                                            <button
-                                                                onClick={handleAddCustomColor}
-                                                                disabled={(!customSelection && !customChain)}
-                                                                className="px-6 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold transition-all shadow-sm active:scale-95 flex items-center justify-center gap-1.5"
-                                                            >
-                                                                <Plus className="w-3.5 h-3.5" />
-                                                                <span>Add</span>
-                                                            </button>
                                                         </div>
                                                     </div>
+
+                                                    {/* Row 3: Action Button */}
+                                                    <button
+                                                        onClick={handleAddCustomColor}
+                                                        disabled={(!customSelection && !customChain)}
+                                                        className="w-full py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2"
+                                                    >
+                                                        <Plus className="w-4 h-4" />
+                                                        <span>Add Coloring Rule</span>
+                                                    </button>
 
                                                     {/* Active Rules List */}
                                                     {customColors && customColors.length > 0 && (
