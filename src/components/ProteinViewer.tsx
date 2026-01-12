@@ -212,8 +212,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             const x = (v.x + 1) * clientWidth / 2;
             const y = -(v.y - 1) * clientHeight / 2;
 
-            // Check if behind camera (z > 1 in NDC usually clipped, but safe check)
-            // if (v.z > 1) ...
+            // Debug Log
+            console.log(`Ann ${ann.id}: World(${ann.position.x}, ${ann.position.y}, ${ann.position.z}) -> NDC(${v.x}, ${v.y}) -> Screen(${x}, ${y})`);
 
             return {
                 id: ann.id,
@@ -223,7 +223,13 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         });
 
         // Batch update to avoid flickering (React 18 handles this well)
+        console.log("Annot positions updated:", positions);
         setAnnotationPositions(positions);
+    }, [annotations]);
+
+    // Debug Log for Props
+    useEffect(() => {
+        console.log("ProteinViewer received annotations:", annotations);
     }, [annotations]);
 
     useEffect(() => {
@@ -2087,7 +2093,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 return (
                     <div
                         key={pos.id}
-                        className="absolute px-2 py-1 rounded bg-black/70 text-white text-[10px] font-sans pointer-events-none transform -translate-x-1/2 -translate-y-full whitespace-nowrap z-10 border border-white/20 select-none backdrop-blur-sm shadow-md"
+                        className="absolute px-2 py-1 rounded bg-black/70 text-white text-[10px] font-sans pointer-events-none transform -translate-x-1/2 -translate-y-full whitespace-nowrap z-50 border border-white/20 select-none backdrop-blur-sm shadow-md"
                         style={{
                             left: pos.x,
                             top: pos.y - 10 // Offset slightly up
