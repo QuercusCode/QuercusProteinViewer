@@ -184,16 +184,41 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     const updateAnnotationPositions = useCallback(() => {
         if (!stageRef.current || !annotations || annotations.length === 0) return;
 
-        const defaults = stageRef.current.viewerControls;
+        const stage = stageRef.current;
+        const viewer = stage.viewer;
+        if (!viewer) return;
+
+        const canvas = viewer.renderer.domElement;
+        const width = canvas.width;
+        const height = canvas.height;
+
         const positions = annotations.map(ann => {
-            // NGL getCanvasPosition returns {x, y}
-            // We need to pass a Vector3
+            if (!ann.position) return { id: ann.id, x: -1000, y: -1000 };
+
+            // Manual 3D to 2D Projection
+            // NGL uses standard Three.js math
             const v = new window.NGL.Vector3(ann.position.x, ann.position.y, ann.position.z);
-            const canvasPos = defaults.getCanvasPosition(v);
+
+            // Project vector: World -> NDC
+            v.project(viewer.camera);
+
+            // Convert NDC to Screen Coordinates
+            // Correct for retina display/DPI if needed, but usually clientWidth is enough for overlay.
+            // However, NGL canvas width might be scaled by pixelRatio.
+            // Using container/canvas client dimensions is safer for CSS overlay.
+            const clientWidth = containerRef.current?.clientWidth || width;
+            const clientHeight = containerRef.current?.clientHeight || height;
+
+            const x = (v.x + 1) * clientWidth / 2;
+            const y = -(v.y - 1) * clientHeight / 2;
+
+            // Check if behind camera (z > 1 in NDC usually clipped, but safe check)
+            // if (v.z > 1) ...
+
             return {
                 id: ann.id,
-                x: canvasPos.x,
-                y: canvasPos.y
+                x: x,
+                y: y
             };
         });
 
