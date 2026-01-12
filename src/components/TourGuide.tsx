@@ -36,7 +36,7 @@ export const startOnboardingTour = (onComplete?: () => void, onHighlight?: (elem
                 title: 'Customize Appearance',
                 description: isChemical
                     ? 'Change representations (Ball & Stick, Spacefill) and coloring to highlight atoms.'
-                    : 'Change representations (Cartoon, Spacefill) and coloring schemes to highlight different features.'
+                    : 'Change representations (Cartoon, Surface) and use Smart Coloring or Custom Colors to highlight specific residues.'
             }
         },
         {
@@ -52,7 +52,7 @@ export const startOnboardingTour = (onComplete?: () => void, onHighlight?: (elem
                 title: isChemical ? 'Analysis & Properties' : 'Analysis Tools',
                 description: isChemical
                     ? 'Inspect calculated chemical properties (Lipophilicity, H-Bonds) and measure atomic distances.'
-                    : 'Measure distances, view contact maps, or inspect specific properties.'
+                    : 'Analyze structures with Superposition, Contact Maps, and precise Distance Measurements.'
             }
         },
         // Sequence Track (Atom List) - Desktop Only

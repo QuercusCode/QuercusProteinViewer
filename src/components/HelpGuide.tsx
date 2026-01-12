@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     CircleHelp, X, MousePointer2, Keyboard, Sparkles,
-    BookOpen, Layers, Activity, Share2, FileUp, ArrowLeft
+    BookOpen, Layers, Activity, Share2, FileUp, ArrowLeft, Wrench, Palette
 } from 'lucide-react';
 
 type FeatureSection = {
@@ -216,8 +216,9 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
                             <ul className="text-xs space-y-1.5 text-neutral-400">
                                 <li><strong className="text-neutral-300">Cartoon:</strong> Best for secondary structure.</li>
                                 <li><strong className="text-neutral-300">Surface:</strong> visualizing pockets/volume.</li>
-                                <li><strong className="text-neutral-300">Ball & Stick:</strong> Atomic details.</li>
+                                <li><strong className="text-neutral-300">Ball & Stick:</strong> Atomics & Bond Orders.</li>
                                 <li><strong className="text-neutral-300">Licorice:</strong> Ligand interactions.</li>
+                                <li><strong className="text-neutral-300">Base:</strong> DNA/RNA Nucleotides.</li>
                             </ul>
                         </div>
 
@@ -229,6 +230,86 @@ export const HelpGuide: React.FC<{ isVisible?: boolean }> = ({ isVisible = true 
                                 <li><strong className="text-neutral-300">Chain ID:</strong> Distinct chain colors.</li>
                                 <li><strong className="text-neutral-300">Element:</strong> CPK standard.</li>
                             </ul>
+                        </div>
+                    </div>
+                </div>
+            )
+        },
+        {
+            id: 'coloring',
+            title: 'Custom Coloring',
+            icon: Palette,
+            description: 'Highlight specific residues and chains.',
+            content: (
+                <div className="space-y-6">
+                    <div className="bg-neutral-800/50 p-4 rounded-xl border border-neutral-700/50">
+                        <h4 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                            <Palette className="w-4 h-4 text-pink-400" /> Custom Selection
+                        </h4>
+                        <p className="text-xs text-neutral-300 mb-4">
+                            Create custom color schemes to highlight specific regions of interest.
+                        </p>
+                        <ul className="space-y-3 text-xs text-neutral-300">
+                            <li className="flex gap-3">
+                                <span className="text-neutral-500 font-mono">01</span>
+                                <span>
+                                    <strong className="text-white block">Select Chain</strong>
+                                    Choose which chain to apply the coloring to (e.g., Chain A).
+                                </span>
+                            </li>
+                            <li className="flex gap-3">
+                                <span className="text-neutral-500 font-mono">02</span>
+                                <span>
+                                    <strong className="text-white block">Define Range</strong>
+                                    Enter residue numbers (e.g., <code className="bg-neutral-800 px-1 rounded">10-50</code>) or comma-separated lists.
+                                </span>
+                            </li>
+                            <li className="flex gap-3">
+                                <span className="text-neutral-500 font-mono">03</span>
+                                <span>
+                                    <strong className="text-white block">Apply Color</strong>
+                                    Pick a distinct color to make your selection stand out against the rest of the structure.
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            )
+        },
+        {
+            id: 'tools',
+            title: 'Analysis & Tools',
+            icon: Wrench,
+            description: 'Advanced structural analysis tools.',
+            content: (
+                <div className="space-y-6">
+                    <div className="bg-neutral-800/50 p-4 rounded-xl border border-neutral-700/50">
+                        <h4 className="text-sm font-bold text-white mb-3">Structural Tools</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-black/20 p-3 rounded-lg border border-white/5">
+                                <strong className="text-white text-xs block mb-1">Structure Superposition</strong>
+                                <p className="text-[11px] text-neutral-400">
+                                    Align multiple protein structures (by PDB ID or file) onto the main view to compare conformations and binding sites.
+                                </p>
+                            </div>
+                            <div className="bg-black/20 p-3 rounded-lg border border-white/5">
+                                <strong className="text-white text-xs block mb-1">Measurements</strong>
+                                <p className="text-[11px] text-neutral-400">
+                                    Click any two atoms to calculate the precise distance (Å) between them. Ideal for active site analysis.
+                                </p>
+                            </div>
+                            <div className="bg-black/20 p-3 rounded-lg border border-white/5">
+                                <strong className="text-white text-xs block mb-1">Contact Map</strong>
+                                <p className="text-[11px] text-neutral-400">
+                                    Generate a 2D matrix representation of residue-residue contacts (Cα-Cα distance &lt; 8Å).
+                                </p>
+                            </div>
+                            <div className="bg-black/20 p-3 rounded-lg border border-white/5">
+                                <strong className="text-white text-xs block mb-1">Motif Search</strong>
+                                <p className="text-[11px] text-neutral-400">
+                                    Find specific bioactive sequences (e.g., <code className="bg-neutral-800 px-1 rounded">RGD</code>) instantly.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
