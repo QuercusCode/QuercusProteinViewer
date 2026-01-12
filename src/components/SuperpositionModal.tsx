@@ -116,14 +116,14 @@ export const SuperpositionModal: React.FC<SuperpositionModalProps> = ({
                             <div className="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
                                 {overlays.map(item => (
                                     <div key={item.id} className="flex items-center justify-between bg-neutral-800/40 border border-neutral-700/50 rounded-lg p-3">
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex items-center gap-3 min-w-0 overflow-hidden flex-1 mr-2">
                                             <div
-                                                className="w-3 h-3 rounded-full shadow-sm"
+                                                className="w-3 h-3 rounded-full shadow-sm flex-shrink-0"
                                                 style={{ backgroundColor: item.color }}
                                             />
-                                            <div className="flex flex-col">
-                                                <span className="text-sm font-medium text-neutral-200">{item.description || 'Unknown Structure'}</span>
-                                                <span className="text-[10px] text-neutral-500 font-mono">{item.id}</span>
+                                            <div className="flex flex-col min-w-0 overflow-hidden">
+                                                <span className="text-sm font-medium text-neutral-200 truncate" title={item.description}>{item.description || 'Unknown Structure'}</span>
+                                                <span className="text-[10px] text-neutral-500 font-mono truncate" title={item.id}>{item.id}</span>
                                             </div>
                                         </div>
 
