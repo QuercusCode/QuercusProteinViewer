@@ -1619,9 +1619,7 @@ function App() {
               }}
               history={history}
 
-              // Annotations
-              isAnnotationMode={activeController.isAnnotationMode}
-              onToggleAnnotationMode={() => activeController.setIsAnnotationMode(!activeController.isAnnotationMode)}
+
 
               // Undo/Redo
               onUndo={undo}
@@ -1795,10 +1793,7 @@ function App() {
                         }}
                         onHover={setHoveredResidue}
 
-                        // Annotations
-                        annotations={ctrl.annotations}
-                        isAnnotationMode={ctrl.isAnnotationMode}
-                        onAddAnnotation={(ann) => ctrl.setAnnotations((prev) => [...prev, ann])}
+
 
                         // Action bindings for this viewport
                         quality={isPublicationMode ? 'high' : 'medium'}

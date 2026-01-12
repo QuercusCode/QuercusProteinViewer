@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { RepresentationType, ColoringType, ResidueInfo, Measurement, PDBMetadata, ChainInfo, CustomColorRule, Annotation } from '../types';
+import type { RepresentationType, ColoringType, ResidueInfo, Measurement, PDBMetadata, ChainInfo, CustomColorRule } from '../types';
 import type { DataSource } from '../utils/pdbUtils';
 
 // Types for the Controller Return Value
@@ -28,10 +28,7 @@ export interface StructureController {
     setShowLigands: (show: boolean | ((prev: boolean) => boolean)) => void;
     showIons: boolean;
     setShowIons: (show: boolean | ((prev: boolean) => boolean)) => void;
-    annotations: Annotation[];
-    setAnnotations: React.Dispatch<React.SetStateAction<Annotation[]>>;
-    isAnnotationMode: boolean;
-    setIsAnnotationMode: (mode: boolean) => void;
+
     customBackgroundColor: string | null;
     setCustomBackgroundColor: (color: string | null) => void;
 
@@ -74,8 +71,7 @@ export const useStructureController = (initialState: any = {}): StructureControl
     const [showSurface, setShowSurface] = useState(false);
     const [showLigands, setShowLigands] = useState(false);
     const [showIons, setShowIons] = useState(initialState.showIons ?? false);
-    const [annotations, setAnnotations] = useState<Annotation[]>([]);
-    const [isAnnotationMode, setIsAnnotationMode] = useState(false);
+
     const [customBackgroundColor, setCustomBackgroundColor] = useState<string | null>(null);
     // Analysis
     const [chains, setChains] = useState<ChainInfo[]>([]);
@@ -153,10 +149,7 @@ export const useStructureController = (initialState: any = {}): StructureControl
         showLigands, setShowLigands,
         showIons,
         setShowIons,
-        annotations,
-        setAnnotations,
-        isAnnotationMode,
-        setIsAnnotationMode,
+
         customBackgroundColor, setCustomBackgroundColor,
         chains, setChains,
         ligands, setLigands,

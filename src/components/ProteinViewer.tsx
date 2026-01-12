@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useImperativeHandle, forwardRef, useCallback } from 'react';
+import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import clsx from 'clsx';
 import { Skeleton } from './Skeleton';
 import type {
@@ -11,8 +11,7 @@ import type {
     StructureInfo,
     MeasurementTextColor,
     AtomInfo,
-    CustomColorRule,
-    Annotation // Added
+    CustomColorRule
 } from '../types';
 import { type DataSource, getStructureUrl } from '../utils/pdbUtils';
 
@@ -70,11 +69,6 @@ export interface ProteinViewerProps {
     isMeasurementMode?: boolean;
     measurements?: Measurement[];
     onAddMeasurement?: (m: Measurement) => void;
-
-    // Annotations
-    isAnnotationMode?: boolean;
-    annotations?: Annotation[];
-    onAddAnnotation?: (a: Annotation) => void;
 
     // Actions
     resetCamera?: number; // Increment to trigger reset
@@ -137,11 +131,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     quality = 'medium',
     enableAmbientOcclusion = false,
     measurementTextColor = 'auto',
-
-    // Annotations
-    isAnnotationMode = false,
-    annotations = [],
-    onAddAnnotation
 }: ProteinViewerProps, ref: React.Ref<ProteinViewerRef>) => {
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -162,9 +151,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     const regionHighlightRepRef = useRef<any>(null); // V6: Track region highlight
     const selectedAtomsRef = useRef<any[]>([]);
 
-    // Annotations State
-    const [annotationPositions, setAnnotationPositions] = React.useState<{ id: string, x: number, y: number }[]>([]);
-
     // Helper to find atom
     const findAtom = (chain: string, resNo: number, atomName: string) => {
         if (!componentRef.current) return null;
@@ -180,76 +166,9 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     };
 
 
-    // --- ANNOTATION POSITION SYNC ---
-    const updateAnnotationPositions = useCallback(() => {
-        if (!stageRef.current || !annotations || annotations.length === 0) return;
 
-        const stage = stageRef.current;
-        const viewer = stage.viewer;
-        if (!viewer) return;
 
-        const canvas = viewer.renderer.domElement;
-        const width = canvas.width;
-        const height = canvas.height;
 
-        const positions = annotations.map(ann => {
-            if (!ann.position) return { id: ann.id, x: -1000, y: -1000 };
-
-            // Manual 3D to 2D Projection
-            // NGL uses standard Three.js math
-            const v = new window.NGL.Vector3(ann.position.x, ann.position.y, ann.position.z);
-
-            // Project vector: World -> NDC
-            v.project(viewer.camera);
-
-            // Convert NDC to Screen Coordinates
-            // Correct for retina display/DPI if needed, but usually clientWidth is enough for overlay.
-            // However, NGL canvas width might be scaled by pixelRatio.
-            // Using container/canvas client dimensions is safer for CSS overlay.
-            const clientWidth = containerRef.current?.clientWidth || width;
-            const clientHeight = containerRef.current?.clientHeight || height;
-
-            const x = (v.x + 1) * clientWidth / 2;
-            const y = -(v.y - 1) * clientHeight / 2;
-
-            // Debug Log
-            console.log(`Ann ${ann.id}: World(${ann.position.x}, ${ann.position.y}, ${ann.position.z}) -> NDC(${v.x}, ${v.y}) -> Screen(${x}, ${y})`);
-
-            return {
-                id: ann.id,
-                x: x,
-                y: y
-            };
-        });
-
-        // Batch update to avoid flickering (React 18 handles this well)
-        console.log("Annot positions updated:", positions);
-        setAnnotationPositions(positions);
-    }, [annotations]);
-
-    // Debug Log for Props
-    useEffect(() => {
-        console.log("ProteinViewer received annotations:", annotations);
-    }, [annotations]);
-
-    useEffect(() => {
-        if (!stageRef.current) return;
-        const stage = stageRef.current;
-
-        // Listen to camera changes
-        const onCameraChange = () => {
-            // Use requestAnimationFrame for smoothness if needed, or throttle
-            requestAnimationFrame(updateAnnotationPositions);
-        };
-
-        stage.viewerControls.signals.changed.add(onCameraChange);
-        // Initial sync
-        updateAnnotationPositions();
-
-        return () => {
-            stage.viewerControls.signals.changed.remove(onCameraChange);
-        };
-    }, [updateAnnotationPositions]);
 
 
     const drawMeasurement = (m: MeasurementData) => {
@@ -1753,23 +1672,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             // MEASUREMENT MODE LOGIC
             // MEASUREMENT MODE LOGIC
-            if (isAnnotationMode) {
-                // Get exact click position if available
-                const clickPos = pickingProxy.position ?
-                    { x: pickingProxy.position.x, y: pickingProxy.position.y, z: pickingProxy.position.z } :
-                    { x: atom.x, y: atom.y, z: atom.z };
 
-                const label = prompt("Enter label for this atom:", `${atom.resname} ${atom.resno}`);
-                if (label && onAddAnnotation) {
-                    onAddAnnotation({
-                        id: crypto.randomUUID(),
-                        position: clickPos,
-                        text: label,
-                        // color: 'rgba(0, 0, 0, 0.6)' // Default black-ish bg (removed as type doesn't have it yet, or add to type)
-                    });
-                }
-                return;
-            }
 
             if (isMeasurementMode) {
                 const atomData = {
@@ -2089,26 +1992,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 </div>
             )}
 
-            {/* Annotations Overlay */}
-            {annotationPositions.map(pos => {
-                const ann = annotations?.find(a => a.id === pos.id);
-                if (!ann) return null;
-                // Don't render if off-screen (simple check)
-                if (pos.x < 0 || pos.y < 0) return null;
-
-                return (
-                    <div
-                        key={pos.id}
-                        className="absolute px-2 py-1 rounded bg-black/70 text-white text-[10px] font-sans pointer-events-none transform -translate-x-1/2 -translate-y-full whitespace-nowrap z-50 border border-white/20 select-none backdrop-blur-sm shadow-md"
-                        style={{
-                            left: pos.x,
-                            top: pos.y - 10 // Offset slightly up
-                        }}
-                    >
-                        {ann.text}
-                    </div>
-                );
-            })}
         </div>
     );
 });

@@ -61,11 +61,7 @@ export interface Movie {
     description?: string;
 }
 
-export interface Annotation {
-    id: string;
-    text: string;
-    position: { x: number; y: number; z: number };
-}
+
 
 export interface ResidueInfo {
     chain: string;
