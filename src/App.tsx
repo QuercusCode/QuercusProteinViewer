@@ -4,7 +4,6 @@ import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
 import { AISidebar, type AIAction } from './components/AISidebar';
 import { HelpGuide } from './components/HelpGuide';
-import { useDemoController } from './hooks/useDemoController';
 import { parseURLState, getShareableURL } from './utils/urlManager';
 
 import LibraryModal from './components/LibraryModal';
@@ -428,13 +427,6 @@ function App() {
 
 
   // ... (fetchTitle logic) ... 
-
-  // --- DEMO CONTROLLER ---
-  const { startDemo } = useDemoController({
-    controller: activeController,
-    setOpenSections,
-    setIsPublicationMode: togglePublicationMode
-  });
 
   // Undo/Redo Stack (Moved here to access all state variables)
   const visualState: VisualState = useMemo(() => ({
@@ -1984,7 +1976,7 @@ function App() {
 
       <ToastContainer toasts={toasts} onRemove={removeToast} />
 
-      <HelpGuide isVisible={!isCleanMode} onStartDemo={startDemo} />
+      <HelpGuide isVisible={!isCleanMode} />
 
       {/* Background Gradient */}
       <div className={`absolute inset-0 pointer-events-none transition-opacity duration-300 ${isLightMode ? 'opacity-0' : 'opacity-100 bg-[radial-gradient(circle_at_50%_50%,rgba(50,50,80,0.2),rgba(0,0,0,0))]'}`} />
