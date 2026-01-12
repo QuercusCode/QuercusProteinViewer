@@ -499,6 +499,7 @@ export const Controls: React.FC<ControlsProps> = ({
     // Custom Color State
     const [customSelection, setCustomSelection] = useState('');
     const [customChain, setCustomChain] = useState('');
+    const [customOpacity, setCustomOpacity] = useState(1.0); // New Opacity State
     const [customColorValue, setCustomColorValue] = useState('#ff0000');
 
     const handleAddCustomColor = () => {
@@ -522,7 +523,7 @@ export const Controls: React.FC<ControlsProps> = ({
             }
         }
 
-        setCustomColors(prev => [...prev, { selection: sel, color: customColorValue }]);
+        setCustomColors(prev => [...prev, { selection: sel, color: customColorValue, opacity: customOpacity }]);
         setCustomSelection('');
         setCustomChain('');
     };
@@ -1260,6 +1261,23 @@ export const Controls: React.FC<ControlsProps> = ({
                                                                 </span>
                                                             </div>
 
+                                                            {/* Opacity Slider */}
+                                                            <div className={`w-24 px-2 py-1 flex flex-col justify-center rounded-lg border ${inputBg}`}>
+                                                                <div className="flex justify-between text-[8px] font-bold uppercase tracking-wider mb-0.5 opacity-70">
+                                                                    <span>Opacity</span>
+                                                                    <span>{Math.round(customOpacity * 100)}%</span>
+                                                                </div>
+                                                                <input
+                                                                    type="range"
+                                                                    min="0"
+                                                                    max="1"
+                                                                    step="0.1"
+                                                                    value={customOpacity}
+                                                                    onChange={(e) => setCustomOpacity(parseFloat(e.target.value))}
+                                                                    className="w-full h-1 bg-neutral-400/30 rounded-full appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-2 [&::-webkit-slider-thumb]:h-2 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-500"
+                                                                />
+                                                            </div>
+
                                                             {/* Add Button */}
                                                             <button
                                                                 onClick={handleAddCustomColor}
@@ -1282,8 +1300,10 @@ export const Controls: React.FC<ControlsProps> = ({
                                                                 {customColors.map((rule, idx) => (
                                                                     <div key={idx} className={`group flex items-center justify-between text-xs p-2 rounded-lg border transition-all ${isLightMode ? 'bg-white border-neutral-200 hover:border-blue-300' : 'bg-white/5 border-transparent hover:bg-white/10'}`}>
                                                                         <div className="flex items-center gap-3">
-                                                                            <div className="w-3.5 h-3.5 rounded-full shadow-sm border border-black/10 ring-1 ring-inset ring-black/5" style={{ background: rule.color }} />
-                                                                            <code className={`text-[10px] font-mono ${isLightMode ? 'text-neutral-600' : 'text-neutral-300'}`}>{rule.selection}</code>
+                                                                            <div className="w-3.5 h-3.5 rounded-full shadow-sm border border-black/10 ring-1 ring-inset ring-black/5" style={{ background: rule.color, opacity: rule.opacity ?? 1 }} />
+                                                                            <code className={`text-[10px] font-mono ${isLightMode ? 'text-neutral-600' : 'text-neutral-300'}`}>
+                                                                                {rule.selection} <span className="text-neutral-400">({Math.round((rule.opacity ?? 1) * 100)}%)</span>
+                                                                            </code>
                                                                         </div>
                                                                         <button
                                                                             onClick={() => handleRemoveCustomColor(idx)}

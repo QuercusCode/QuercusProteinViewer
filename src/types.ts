@@ -13,6 +13,7 @@ export interface CustomColorRule {
     selection: string;
     color: string;
     representation?: RepresentationType;
+    opacity?: number;
 }
 
 export interface AtomInfo {

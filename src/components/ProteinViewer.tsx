@@ -1890,39 +1890,42 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 }, 'charge_dynamic');
             }
 
-            // --- 3. APPLY CUSTOM OVERRIDES USING SELECTION SCHEME ---
-            if (customColors && customColors.length > 0 && NGL.ColormakerRegistry.addSelectionScheme) {
-                const dataList: any[] = [];
+            // --- 3. SPLIT CUSTOM RULES: TRANSPARENCY VS. COLOR ONLY ---
+            const opacityRules: CustomColorRule[] = [];
+            const colorOnlyRules: CustomColorRule[] = [];
 
-                // 1. Add Custom Rules [color, selection] with VALIDATION
+            if (customColors && customColors.length > 0) {
                 customColors.forEach(rule => {
-                    if (rule.selection && rule.color) {
-                        try {
-                            // Validate selection string by attempting to create a Selection object
-                            // If this throws, skip the rule to prevent viewer crash
-                            const testSel = new NGL.Selection(rule.selection);
-                            if (testSel) {
-                                dataList.push([rule.color, rule.selection]);
-                            }
-                        } catch (e) {
-                            console.warn("Skipping invalid selection rule:", rule.selection);
-                        }
+                    if (rule.opacity !== undefined && rule.opacity < 1.0) {
+                        opacityRules.push(rule);
+                    } else {
+                        colorOnlyRules.push(rule);
                     }
                 });
+            }
 
-                // 2. Add Base Fallback [baseScheme, "*"]
+            // --- 4. APPLY "COLOR ONLY" OVERRIDES VIA SELECTION SCHEME ---
+            if ((colorOnlyRules.length > 0 || opacityRules.length > 0) && NGL.ColormakerRegistry.addSelectionScheme) {
+                const dataList: any[] = [];
+
+                // Add Color-Only Rules
+                colorOnlyRules.forEach(rule => {
+                    try {
+                        const testSel = new NGL.Selection(rule.selection);
+                        if (testSel) dataList.push([rule.color, rule.selection]);
+                    } catch (e) { }
+                });
+
+                // Add Base Fallback
                 dataList.push([finalColor, "*"]);
 
-                // 3. Register Selection Scheme
                 try {
                     const compositeId = NGL.ColormakerRegistry.addSelectionScheme(dataList, "custom_composite");
                     if (compositeId) finalColor = compositeId;
-                } catch (e) {
-                    console.error("Failed to register selection scheme", e);
-                }
+                } catch (e) { }
             }
 
-            // --- 4. RENDER SINGLE REPRESENTATION ---
+            // --- 5. RENDER BASE REPRESENTATION (With Exclusions) ---
             const PALETTES: Record<string, string[]> = {
                 'viridis': ['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725'],
                 'magma': ['#000004', '#51127c', '#b73779', '#fc8961', '#fcfdbf'],
@@ -1935,8 +1938,17 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 color: finalColor,
                 quality: 'high',
                 name: 'base_representation',
-                multipleBond: 'symmetric' // Enable Double/Triple Bond Rendering
+                multipleBond: 'symmetric'
             };
+
+            // Construct Exclusion Query for Transparent Regions
+            // We DONT exclude if we just have color overrides, only if we have transparency that needs separate drawing
+            if (opacityRules.length > 0) {
+                const exclusionParts = opacityRules.map(r => `(${r.selection})`);
+                if (exclusionParts.length > 0) {
+                    params.sele = `not (${exclusionParts.join(' or ')})`;
+                }
+            }
 
             const scale = PALETTES[colorPalette];
             if (scale && scale.length > 0) {
@@ -1956,8 +1968,26 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 try { component.structure.eachModel((m: any) => m.calculateSecondaryStructure?.()); } catch (e) { }
             }
 
-            // Add the single, unified representation
+            // Add the Base Representation
             component.addRepresentation(repType, params);
+
+
+            // --- 6. RENDER TRANSPARENT LAYERS ---
+            opacityRules.forEach((rule, idx) => {
+                const transParams = {
+                    ...params, // Inherit base style (cartoon/ball+stick etc)
+                    name: `custom_transparency_${idx}`,
+                    color: rule.color, // Force specific color
+                    opacity: rule.opacity,
+                    sele: rule.selection,
+                    side: 'front', // Optimization + Visuals
+                    depthWrite: false // Important for transparency
+                };
+                // Remove colorScale if we are forcing color
+                delete transParams.colorScale;
+
+                component.addRepresentation(repType, transParams);
+            });
 
             // 2. Add Custom Representations (Overlay)
 
