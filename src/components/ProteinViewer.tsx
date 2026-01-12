@@ -2009,14 +2009,22 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 const transParams = {
                     ...params, // Inherit base style (cartoon/ball+stick etc)
                     name: `custom_transparency_${idx}`,
-                    color: rule.color, // Color the whole underlay this color. 
-                    // Hidden parts are covered by Opaque Base, so their color doesn't matter (zi-fighting hidden by opaque depth).
+                    color: finalColor, // Use the GLOBAL scheme so smooth/hidden parts match the base color
                     opacity: rule.opacity,
                     sele: wholeChainSelection,
                     side: 'front',
                     depthWrite: false
                 };
-                delete transParams.colorScale;
+
+                // If using a scheme, we need to respect the color scale if present
+                // (params already has colorScale if needed)
+                // We do NOT delete colorScale because finalColor might rely on it if it's not a scheme ID
+                // Actually, if finalColor is a scheme ID, colorScale is ignored usually, but good to keep structure consistent.
+
+                // Exception: If finalColor was a direct color string (e.g. 'element'), reusing it is fine.
+                // If finalColor was a simple string (e.g. 'chainid'), reusing it is fine.
+                // The Composite Scheme we built handles the Custom Color overrides for us!
+
 
                 component.addRepresentation(repType, transParams);
             });
