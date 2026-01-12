@@ -1974,12 +1974,54 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             // --- 6. RENDER TRANSPARENT LAYERS ---
             opacityRules.forEach((rule, idx) => {
+                // SMOOTHING LOGIC:
+                // To prevent gaps between opaque and transparent segments in Cartoon representation,
+                // we extend the transparent selection by +/- 1 residue.
+                // This ensures the spline has valid tangents at the boundary.
+                let smoothSelection = rule.selection;
+                try {
+                    // We need to parse which residues are in the selection to find neighbors
+                    const sel = new NGL.Selection(rule.selection);
+                    const atomSet = component.structure.getAtomSet(sel);
+                    if (atomSet.atomCount > 0) {
+                        // Robust approach: Map residues in selection
+                        const chainRanges = new Map<string, { min: number, max: number, neighbors: number[] }>();
+
+                        component.structure.eachResidue((r: any) => {
+                            const c = r.chainname;
+                            const n = r.resno;
+                            if (!chainRanges.has(c)) {
+                                chainRanges.set(c, { min: n, max: n, neighbors: [] });
+                            }
+                            const range = chainRanges.get(c)!;
+                            if (n < range.min) range.min = n;
+                            if (n > range.max) range.max = n;
+                            range.neighbors.push(n); // Store all valid residues to be safe if discontinuous
+                        }, sel);
+
+                        const extensions: string[] = [];
+                        chainRanges.forEach((range, chain) => {
+                            // Simple heuristic: Add min-1 and max+1
+                            // We construct a specific selection for the neighbors
+                            // Note: We don't check if they exist here; NGL ignores empty selections
+                            extensions.push(`${range.min - 1}:${chain}`);
+                            extensions.push(`${range.max + 1}:${chain}`);
+                        });
+
+                        if (extensions.length > 0) {
+                            smoothSelection = `(${rule.selection}) or (${extensions.join(' or ')})`;
+                        }
+                    }
+                } catch (e) {
+                    console.warn("Failed to calculate smooth selection, falling back to strict", e);
+                }
+
                 const transParams = {
                     ...params, // Inherit base style (cartoon/ball+stick etc)
                     name: `custom_transparency_${idx}`,
                     color: rule.color, // Force specific color
                     opacity: rule.opacity,
-                    sele: rule.selection,
+                    sele: smoothSelection, // Use expanded selection
                     side: 'front', // Optimization + Visuals
                     depthWrite: false // Important for transparency
                 };
