@@ -1973,59 +1973,49 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
 
             // --- 6. RENDER TRANSPARENT LAYERS ---
+            // --- 6. RENDER TRANSPARENT LAYERS (WHOLE-CHAIN UNDERLAY) ---
             opacityRules.forEach((rule, idx) => {
-                // SMOOTHING LOGIC:
-                // To prevent gaps between opaque and transparent segments in Cartoon representation,
-                // we extend the transparent selection by +/- 1 residue.
-                // This ensures the spline has valid tangents at the boundary.
-                let smoothSelection = rule.selection;
+                // WHOLE-CHAIN UNDERLAY STRATEGY:
+                // Instead of extending the selection by just 1 residue, we render the ENTIRE chain as a transparent ghost.
+                // The Opaque Base representation (which sits on top) covers the parts of the chain that shouldn't be transparent.
+                // This guarantees that the spline geometry is identical to the full structure, creating a perfectly seamless transition
+                // where the Opaque layer ends and reveals the Transparent layer underneath.
+
+                let wholeChainSelection = rule.selection;
                 try {
-                    // We need to parse which residues are in the selection to find neighbors
+                    // Parse selection to find the chain logic
+                    // Heuristic: specific chain selector?
+                    // We find which chain this rule belongs to by inspecting the atoms in the selection
                     const sel = new NGL.Selection(rule.selection);
                     const atomSet = component.structure.getAtomSet(sel);
-                    if (atomSet.atomCount > 0) {
-                        // Robust approach: Map residues in selection
-                        const chainRanges = new Map<string, { min: number, max: number, neighbors: number[] }>();
 
+                    if (atomSet.atomCount > 0) {
+                        const chains = new Set<string>();
                         component.structure.eachResidue((r: any) => {
-                            const c = r.chainname;
-                            const n = r.resno;
-                            if (!chainRanges.has(c)) {
-                                chainRanges.set(c, { min: n, max: n, neighbors: [] });
-                            }
-                            const range = chainRanges.get(c)!;
-                            if (n < range.min) range.min = n;
-                            if (n > range.max) range.max = n;
-                            range.neighbors.push(n); // Store all valid residues to be safe if discontinuous
+                            chains.add(r.chainname);
                         }, sel);
 
-                        const extensions: string[] = [];
-                        chainRanges.forEach((range, chain) => {
-                            // Simple heuristic: Add min-1 and max+1
-                            // We construct a specific selection for the neighbors
-                            // Note: We don't check if they exist here; NGL ignores empty selections
-                            extensions.push(`${range.min - 1}:${chain}`);
-                            extensions.push(`${range.max + 1}:${chain}`);
-                        });
-
-                        if (extensions.length > 0) {
-                            smoothSelection = `(${rule.selection}) or (${extensions.join(' or ')})`;
+                        // If the rule spans multiple chains, we include all of them
+                        // Usually it's one chain (e.g. :A)
+                        if (chains.size > 0) {
+                            const chainList = Array.from(chains).map(c => `:${c}`);
+                            wholeChainSelection = chainList.join(' or ');
                         }
                     }
                 } catch (e) {
-                    console.warn("Failed to calculate smooth selection, falling back to strict", e);
+                    console.warn("Failed to expand transparency to whole chain", e);
                 }
 
                 const transParams = {
                     ...params, // Inherit base style (cartoon/ball+stick etc)
                     name: `custom_transparency_${idx}`,
-                    color: rule.color, // Force specific color
+                    color: rule.color, // Color the whole underlay this color. 
+                    // Hidden parts are covered by Opaque Base, so their color doesn't matter (zi-fighting hidden by opaque depth).
                     opacity: rule.opacity,
-                    sele: smoothSelection, // Use expanded selection
-                    side: 'front', // Optimization + Visuals
-                    depthWrite: false // Important for transparency
+                    sele: wholeChainSelection,
+                    side: 'front',
+                    depthWrite: false
                 };
-                // Remove colorScale if we are forcing color
                 delete transParams.colorScale;
 
                 component.addRepresentation(repType, transParams);
