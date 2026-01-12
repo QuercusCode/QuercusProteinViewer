@@ -61,6 +61,16 @@ export interface Movie {
     description?: string;
 }
 
+export interface SuperposedStructure {
+    id: string;
+    pdbId?: string;
+    file?: File;
+    color: string;
+    description?: string;
+    isVisible: boolean;
+    opacity?: number;
+}
+
 
 
 export interface ResidueInfo {

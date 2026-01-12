@@ -13,6 +13,7 @@ import { DragDropOverlay } from './components/DragDropOverlay';
 import { CommandPalette, type CommandAction } from './components/CommandPalette';
 import { HUD } from './components/HUD';
 import { MeasurementPanel } from './components/MeasurementPanel';
+import { SuperpositionModal } from './components/SuperpositionModal'; // Added
 import { OFFLINE_LIBRARY } from './data/library';
 import { fetchPubChemMetadata } from './utils/pdbUtils';
 import type {
@@ -81,6 +82,7 @@ function App() {
 
   // --- Snapshot Modal State (unified viewport + quality selection) ---
   const [isSnapshotModalOpen, setIsSnapshotModalOpen] = useState(false);
+  const [isSuperpositionModalOpen, setIsSuperpositionModalOpen] = useState(false); // Added state
 
   // --- Residue-Specific Coloring State ---
 
@@ -1526,6 +1528,16 @@ function App() {
         />
       )}
 
+      {/* Superposition Modal - Linked to Active Controller */}
+      <SuperpositionModal
+        isOpen={isSuperpositionModalOpen}
+        onClose={() => setIsSuperpositionModalOpen(false)}
+        overlays={controllers[activeViewIndex].overlays}
+        onAddOverlay={controllers[activeViewIndex].addOverlay}
+        onRemoveOverlay={controllers[activeViewIndex].removeOverlay}
+        onToggleOverlay={controllers[activeViewIndex].toggleOverlay}
+      />
+
       {/* Main Content: Flex Container for Sidebars and Viewports */}
       <div className="flex flex-1 w-full h-full overflow-hidden">
 
@@ -1592,6 +1604,7 @@ function App() {
               onToggleShare={() => handleToolAction('share')}
               onToggleLibrary={() => setIsLibraryOpen(!isLibraryOpen)}
               onToggleMeasurement={() => setIsMeasurementMode(!isMeasurementMode)}
+              onOpenSuperposition={() => setIsSuperpositionModalOpen(true)} // Added prop
               colorPalette={colorPalette}
               setColorPalette={setColorPalette}
               isDyslexicFont={isDyslexicFont}
@@ -1781,6 +1794,7 @@ function App() {
                         backgroundColor={ctrl.customBackgroundColor || (isLightMode ? 'white' : 'black')}
                         measurementTextColor={measurementTextColorMode}
                         enableAmbientOcclusion={true}
+                        overlays={ctrl.overlays} // Added prop
 
                         onStructureLoaded={(info) => handleLoad(info, ctrl)}
                         onAtomClick={(info) => handleAtomClick(info, index)}

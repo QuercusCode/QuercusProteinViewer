@@ -289,6 +289,7 @@ interface ControlsProps {
     onShare: () => void;
     onToggleMeasurement?: () => void;
     onClearMeasurements: () => void;
+    onOpenSuperposition?: () => void; // Added prop
     pdbMetadata: PDBMetadata | null;
 
     isLightMode: boolean;
@@ -386,6 +387,7 @@ export const Controls: React.FC<ControlsProps> = ({
     setIsMeasurementMode,
     onToggleMeasurement,
     onClearMeasurements,
+    onOpenSuperposition,
     isPublicationMode,
     onTogglePublicationMode,
     pdbMetadata,
@@ -1416,6 +1418,17 @@ export const Controls: React.FC<ControlsProps> = ({
                                 >
                                     <span className="text-xs font-medium">Contact Map</span>
                                     <Grid3X3 className="w-3.5 h-3.5" />
+                                </button>
+                            )}
+
+                            {/* Superposition - Only for Proteins */}
+                            {!isChemical && (
+                                <button
+                                    onClick={onOpenSuperposition}
+                                    className={`flex items-center justify-between px-3 py-2 rounded-lg border transition-all ${cardBg} hover:opacity-80`}
+                                >
+                                    <span className="text-xs font-medium">Superpose</span>
+                                    <Layers className="w-3.5 h-3.5" />
                                 </button>
                             )}
 

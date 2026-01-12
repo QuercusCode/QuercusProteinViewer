@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import type { RepresentationType, ColoringType, ResidueInfo, Measurement, PDBMetadata, ChainInfo, CustomColorRule } from '../types';
+import type { RepresentationType, ColoringType, ResidueInfo, Measurement, PDBMetadata, ChainInfo, CustomColorRule, SuperposedStructure } from '../types';
 import type { DataSource } from '../utils/pdbUtils';
 
 // Types for the Controller Return Value
@@ -50,6 +50,13 @@ export interface StructureController {
     isMeasurementPanelOpen: boolean;
     setIsMeasurementPanelOpen: (isOpen: boolean | ((prev: boolean) => boolean)) => void;
 
+    // Superposition
+    overlays: SuperposedStructure[];
+    setOverlays: React.Dispatch<React.SetStateAction<SuperposedStructure[]>>;
+    addOverlay: (structure: SuperposedStructure) => void;
+    removeOverlay: (id: string) => void;
+    toggleOverlay: (id: string) => void;
+
     // Actions
     handleUpload: (file: File, isCif?: boolean, preservePdbId?: boolean) => void;
     handleResetView: () => void;
@@ -82,7 +89,10 @@ export const useStructureController = (initialState: any = {}): StructureControl
     // Interaction
     const [highlightedResidue, setHighlightedResidue] = useState<ResidueInfo | null>(null);
     const [measurements, setMeasurements] = useState<Measurement[]>([]);
+
     const [isMeasurementPanelOpen, setIsMeasurementPanelOpen] = useState(false);
+
+    const [overlays, setOverlays] = useState<SuperposedStructure[]>([]);
 
     // View Control
     const [resetKey, setResetKey] = useState(0);
@@ -136,6 +146,18 @@ export const useStructureController = (initialState: any = {}): StructureControl
         }
     }, []);
 
+    const addOverlay = useCallback((structure: SuperposedStructure) => {
+        setOverlays(prev => [...prev, structure]);
+    }, []);
+
+    const removeOverlay = useCallback((id: string) => {
+        setOverlays(prev => prev.filter(o => o.id !== id));
+    }, []);
+
+    const toggleOverlay = useCallback((id: string) => {
+        setOverlays(prev => prev.map(o => o.id === id ? { ...o, isVisible: !o.isVisible } : o));
+    }, []);
+
     return {
         pdbId, setPdbId,
         dataSource, setDataSource,
@@ -157,7 +179,9 @@ export const useStructureController = (initialState: any = {}): StructureControl
         proteinTitle, setProteinTitle,
         highlightedResidue, setHighlightedResidue,
         measurements, setMeasurements,
+
         isMeasurementPanelOpen, setIsMeasurementPanelOpen,
+        overlays, setOverlays, addOverlay, removeOverlay, toggleOverlay,
         handleUpload,
         handleResetView,
         resetKey

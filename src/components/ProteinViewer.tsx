@@ -11,7 +11,8 @@ import type {
     StructureInfo,
     MeasurementTextColor,
     AtomInfo,
-    CustomColorRule
+    CustomColorRule,
+    SuperposedStructure
 } from '../types';
 import { type DataSource, getStructureUrl } from '../utils/pdbUtils';
 
@@ -48,6 +49,7 @@ export interface ProteinViewerProps {
     backgroundColor: string;
     customColors?: CustomColorRule[];
     measurementTextColor?: MeasurementTextColor; // Added prop
+    overlays?: SuperposedStructure[];
 
     // Quality
     quality?: 'low' | 'medium' | 'high';
@@ -107,6 +109,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     representation = 'cartoon',
     coloring = 'chainid',
     customColors,
+    overlays,
 
     palette: colorPalette = 'standard', // Rename to matches internal usage
     className,
@@ -149,6 +152,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     const measurementRepsRef = useRef<any[]>([]); // Track NGL Representations for cleanup
     const contactLineRepRef = useRef<any>(null); // Track single contact line representation
     const regionHighlightRepRef = useRef<any>(null); // V6: Track region highlight
+    const overlayComponentsRef = useRef<Map<string, any>>(new Map()); // Track overlay components
     const selectedAtomsRef = useRef<any[]>([]);
 
     // Helper to find atom
@@ -1569,6 +1573,77 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             componentRef.current = null;
         }
     }, [pdbId, dataSource, file]);
+
+
+    // --- OVERLAY SUPERPOSITION ---
+    useEffect(() => {
+        if (!stageRef.current) return;
+        const stage = stageRef.current;
+        const mainComponent = componentRef.current;
+
+        // If no main component, we can't superpose, but maybe we can still load?
+        // For now, assume superposition requires a base.
+        if (!mainComponent) return;
+
+        // 1. Handle Removals
+        const currentIds = new Set(overlays?.map(o => o.id) || []);
+        overlayComponentsRef.current.forEach((comp, id) => {
+            if (!currentIds.has(id)) {
+                stage.removeComponent(comp);
+                overlayComponentsRef.current.delete(id);
+            }
+        });
+
+        // 2. Handle Additions/Updates
+        overlays?.forEach(async (overlay) => {
+            let comp = overlayComponentsRef.current.get(overlay.id);
+
+            if (!comp) {
+                // Load New Overlay
+                console.log(`Loading overlay: ${overlay.id} (${overlay.pdbId || overlay.file?.name})`);
+                try {
+                    if (overlay.file) {
+                        const blob = overlay.file; // File object is a Blob
+                        // NGL might need extension hint
+                        const ext = overlay.file.name.split('.').pop()?.toLowerCase() || 'pdb';
+                        comp = await stage.loadFile(blob, { ext, defaultRepresentation: false });
+                    } else if (overlay.pdbId) {
+                        const url = getStructureUrl(overlay.pdbId, 'pdb');
+                        // Handle local 2b3p/4hhb special case if needed, but getStructureUrl handles RCSB mostly
+                        comp = await stage.loadFile(url, { defaultRepresentation: false });
+                    }
+
+                    if (comp) {
+                        // SUPERPOSE
+                        console.log(`Superposing ${overlay.id} onto main structure...`);
+                        try {
+                            // align=true moves the component
+                            comp.superpose(mainComponent, true, "CA");
+                        } catch (e) {
+                            console.warn("Superposition failed:", e);
+                        }
+
+                        // Add Representation
+                        comp.addRepresentation('cartoon', {
+                            color: overlay.color || 'lightgrey',
+                            opacity: overlay.opacity ?? 0.7,
+                            side: 'front'
+                        });
+
+                        overlayComponentsRef.current.set(overlay.id, comp);
+                    }
+                } catch (e) {
+                    console.error(`Failed to load overlay ${overlay.id}`, e);
+                }
+            } else {
+                // Update Existing
+                comp.setVisibility(overlay.isVisible);
+                // Update opacity/color if changed?
+                // Re-superposing every render is expensive/jumpy. Assume static once aligned.
+            }
+        });
+
+    }, [overlays]); // Dependency on overlays array. Note: Deep compare might be better if frequent updates.
 
 
 
