@@ -1752,12 +1752,18 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             const atom = pickingProxy.atom;
 
             // MEASUREMENT MODE LOGIC
+            // MEASUREMENT MODE LOGIC
             if (isAnnotationMode) {
+                // Get exact click position if available
+                const clickPos = pickingProxy.position ?
+                    { x: pickingProxy.position.x, y: pickingProxy.position.y, z: pickingProxy.position.z } :
+                    { x: atom.x, y: atom.y, z: atom.z };
+
                 const label = prompt("Enter label for this atom:", `${atom.resname} ${atom.resno}`);
                 if (label && onAddAnnotation) {
                     onAddAnnotation({
                         id: crypto.randomUUID(),
-                        position: { x: atom.x, y: atom.y, z: atom.z },
+                        position: clickPos,
                         text: label,
                         // color: 'rgba(0, 0, 0, 0.6)' // Default black-ish bg (removed as type doesn't have it yet, or add to type)
                     });
