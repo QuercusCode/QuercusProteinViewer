@@ -640,7 +640,7 @@ export const Controls: React.FC<ControlsProps> = ({
                     <div className="flex flex-col gap-4 pt-8 md:pt-0">
                         <div>
                             <img
-                                src={isLightMode ? `${import.meta.env.BASE_URL}logo/full-black.svg` : `${import.meta.env.BASE_URL}logo/full-white.svg`}
+                                src={isLightMode ? `${import.meta.env.BASE_URL}logo/full-black.png` : `${import.meta.env.BASE_URL}logo/full-white.png`}
                                 alt="Quercus Viewer"
                                 className="h-12 w-auto mb-1"
                             />
