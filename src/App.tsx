@@ -484,11 +484,14 @@ function App() {
           if (canUndo) undo();
         }
       }
+      if (e.key === 'Escape' && isPublicationMode) {
+        togglePublicationMode(false);
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [undo, redo, canUndo, canRedo]);
+  }, [undo, redo, canUndo, canRedo, isPublicationMode, togglePublicationMode]);
 
   // --- DERIVED STATE (Dr. AI V4) ---
   const structureStats = useMemo(() => {
