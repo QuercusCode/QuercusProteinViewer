@@ -16,7 +16,6 @@ import {
     Layers,
     Loader2,
     Menu,
-    MessageSquare,
     Minimize,
     Moon,
     Plus,
@@ -290,7 +289,6 @@ interface ControlsProps {
     onToggleMeasurement?: () => void;
     onClearMeasurements: () => void;
     onOpenSuperposition?: () => void; // Added prop
-    onOpenContact?: () => void;
     pdbMetadata: PDBMetadata | null;
 
     isLightMode: boolean;
@@ -389,7 +387,6 @@ export const Controls: React.FC<ControlsProps> = ({
     onToggleMeasurement,
     onClearMeasurements,
     onOpenSuperposition,
-    onOpenContact,
     isPublicationMode,
     onTogglePublicationMode,
     pdbMetadata,

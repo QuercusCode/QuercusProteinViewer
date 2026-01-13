@@ -1949,8 +1949,10 @@ function App() {
       />
 
 
-      <SuperpositionModal
-        isOpen={isSuperpositionModalOpen}
+
+
+      <ShareModal
+        isOpen={showShareModal}
         onClose={() => setShowShareModal(false)}
         warning={
           // Check if any visible viewport relies on a local file (no PDB ID/PubChem CID but has a file)
