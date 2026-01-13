@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     CircleHelp, X, MousePointer2, Keyboard, Sparkles,
-    BookOpen, Layers, Activity, Share2, FileUp, ArrowLeft, Wrench, Palette, Mail, Github, MessageSquare, ExternalLink
+    BookOpen, Layers, Activity, Share2, FileUp, ArrowLeft, Wrench, Palette, Mail, Github, MessageSquare, ExternalLink, Linkedin
 } from 'lucide-react';
 
 type FeatureSection = {
@@ -479,6 +479,25 @@ export const HelpGuide: React.FC<{ isVisible?: boolean, isLightMode?: boolean }>
                                     </p>
                                 </div>
                                 <ExternalLink className="w-3.5 h-3.5 text-neutral-600 group-hover:text-purple-400 transition-colors" />
+                            </a>
+
+                            {/* LinkedIn Option */}
+                            <a
+                                href="https://www.linkedin.com/in/amir-m-cheraghali-195b23207/"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="group flex items-center gap-4 p-3 rounded-xl border border-neutral-700/50 hover:border-sky-600/50 hover:bg-sky-600/5 transition-all duration-200"
+                            >
+                                <div className="p-2.5 rounded-lg bg-sky-900/20 text-sky-400 group-hover:scale-110 transition-transform">
+                                    <Linkedin className="w-5 h-5" />
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="font-semibold text-sm text-neutral-200 group-hover:text-white">LinkedIn Profile</h3>
+                                    <p className="text-[11px] mt-0.5 text-neutral-500 group-hover:text-neutral-400">
+                                        Connect professionally
+                                    </p>
+                                </div>
+                                <ExternalLink className="w-3.5 h-3.5 text-neutral-600 group-hover:text-sky-400 transition-colors" />
                             </a>
                         </div>
                     </div>
