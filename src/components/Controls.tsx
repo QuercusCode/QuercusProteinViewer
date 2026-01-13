@@ -642,7 +642,7 @@ export const Controls: React.FC<ControlsProps> = ({
                             <img
                                 src={isLightMode ? `${import.meta.env.BASE_URL}logo/full-black.png` : `${import.meta.env.BASE_URL}logo/full-white.png`}
                                 alt="Quercus Viewer"
-                                className="h-12 w-auto mb-1"
+                                className="h-16 w-auto mb-2 object-contain"
                             />
                             <p className={`text-xs ${subtleText}`}>Visualize 3D structures</p>
                         </div>
