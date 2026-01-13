@@ -47,10 +47,10 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode }: HUDProp
                             // PROTEIN / NUCLEIC ACID VIEW
                             <>
                                 <span className={`font-semibold ${textColor}`}>
-                                    {hoveredResidue.resName} <span className="opacity-70">{hoveredResidue.resNo}</span>
+                                    {hoveredResidue.resName} <span className="opacity-90">{hoveredResidue.resNo}</span>
                                 </span>
                                 <div className={`h-3 w-px ${isLightMode ? 'bg-black/10' : 'bg-white/20'}`} />
-                                <span className={`text-xs uppercase tracking-wide opacity-60 ${textColor}`}>
+                                <span className={`text-xs uppercase tracking-wide opacity-80 ${textColor}`}>
                                     Chain {hoveredResidue.chain}
                                 </span>
                             </>
@@ -59,7 +59,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode }: HUDProp
                             // Show only atom info relative to the chemical
                             (hoveredResidue.atomName) ? (
                                 <span className={`font-mono font-semibold ${textColor}`}>
-                                    {hoveredResidue.atomName} <span className="text-xs opacity-60">#{hoveredResidue.atomSerial}</span>
+                                    {hoveredResidue.atomName} <span className="text-xs opacity-80">#{hoveredResidue.atomSerial}</span>
                                 </span>
                             ) : (
                                 // Fallback if no atom info (unlikely for NGL hover)
@@ -70,7 +70,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode }: HUDProp
                         )}
                     </div>
                 ) : (
-                    <div className={`text-xs font-medium tracking-wider opacity-50 ${textColor} uppercase`}>
+                    <div className={`text-xs font-medium tracking-wider ${textColor} uppercase`}>
                         {structTitle}
                     </div>
                 )}
