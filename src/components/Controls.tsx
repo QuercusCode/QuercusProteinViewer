@@ -2,39 +2,45 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Skeleton } from './Skeleton';
 import { GalleryModal } from './GalleryModal';
 import {
+    Activity,
+    BookOpen,
     Camera,
+    ChevronDown,
+    Clock,
     Download,
     Eye,
+    FolderOpen,
+    Grid3X3,
+    HelpCircle,
     Hexagon,
+    ImageIcon,
     Layers,
+    Loader2,
+    Maximize2,
     Menu,
+    MessageSquare,
     Minimize,
     Moon,
-    HelpCircle,
+    Palette,
+    Plus,
+    Redo2,
     RefreshCw,
     RotateCcw,
     Ruler,
+    Save,
+    ScanSearch,
     Search,
+    Settings,
+    Share2,
+    Star,
     Sun,
     Trash2,
+    Undo2,
     Upload,
     Video,
-    X,
-    Loader2,
-    ImageIcon,
-    Grid3X3,
-    // Bot,
-    BookOpen,
-    ChevronDown,
-    Activity,
     Wrench,
-    Share2,
-    ScanSearch,
-    Star,
-    Clock,
-    Undo2,
-    Redo2,
-    Plus
+    X,
+    Zap
 } from 'lucide-react';
 import type { RepresentationType, ColoringType, ChainInfo, Snapshot, Movie, ColorPalette, PDBMetadata, CustomColorRule } from '../types';
 import type { DataSource } from '../utils/pdbUtils';
@@ -290,6 +296,7 @@ interface ControlsProps {
     onToggleMeasurement?: () => void;
     onClearMeasurements: () => void;
     onOpenSuperposition?: () => void; // Added prop
+    onOpenContact?: () => void;
     pdbMetadata: PDBMetadata | null;
 
     isLightMode: boolean;
@@ -388,6 +395,7 @@ export const Controls: React.FC<ControlsProps> = ({
     onToggleMeasurement,
     onClearMeasurements,
     onOpenSuperposition,
+    onOpenContact,
     isPublicationMode,
     onTogglePublicationMode,
     pdbMetadata,
@@ -999,7 +1007,21 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <div className="space-y-3">
                                     {/* Toggles Row */}
                                     <div className="grid grid-cols-2 gap-2">
-                                        {/* Surface Toggle */}
+                                        {/* 5. Contact / Feedback */}
+                                        {onOpenContact && (
+                                            <button
+                                                onClick={onOpenContact}
+                                                className={`p-2 rounded-lg transition-all ${isLightMode
+                                                    ? 'bg-neutral-100 hover:bg-neutral-200 text-neutral-600 hover:text-black'
+                                                    : 'bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white'
+                                                    }`}
+                                                title="Contact & Feedback"
+                                            >
+                                                <MessageSquare className="w-5 h-5" />
+                                            </button>
+                                        )}
+
+                                        {/* 6. Theme Toggle */}
                                         <button
                                             onClick={() => setShowSurface(!showSurface)}
                                             className={`flex flex-col items-center justify-center gap-1 px-1 py-2 rounded-lg border transition-all ${showSurface ? 'bg-blue-500/10 border-blue-500 text-blue-500' : `${cardBg} opacity-80 hover:opacity-100`}`}
