@@ -1976,7 +1976,7 @@ function App() {
 
       <ToastContainer toasts={toasts} onRemove={removeToast} />
 
-      <HelpGuide isVisible={!isCleanMode} />
+      <HelpGuide isVisible={!isCleanMode} isLightMode={isLightMode} />
 
       {/* Background Gradient */}
       <div className={`absolute inset-0 pointer-events-none transition-opacity duration-300 ${isLightMode ? 'opacity-0' : 'opacity-100 bg-[radial-gradient(circle_at_50%_50%,rgba(50,50,80,0.2),rgba(0,0,0,0))]'}`} />
