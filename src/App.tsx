@@ -14,7 +14,6 @@ import { CommandPalette, type CommandAction } from './components/CommandPalette'
 import { HUD } from './components/HUD';
 import { MeasurementPanel } from './components/MeasurementPanel';
 import { SuperpositionModal } from './components/SuperpositionModal';
-import { ContactModal } from './components/ContactModal'; // Added
 import { OFFLINE_LIBRARY } from './data/library';
 import { fetchPubChemMetadata } from './utils/pdbUtils';
 import type {
@@ -83,8 +82,7 @@ function App() {
 
   // --- Snapshot Modal State (unified viewport + quality selection) ---
   const [isSnapshotModalOpen, setIsSnapshotModalOpen] = useState(false);
-  const [isSuperpositionModalOpen, setIsSuperpositionModalOpen] = useState(false);
-  const [isContactModalOpen, setIsContactModalOpen] = useState(false); // Contact/Feedback Modal
+  const [isSuperpositionModalOpen, setIsSuperpositionModalOpen] = useState(false); // Contact/Feedback Modal
 
   // --- Residue-Specific Coloring State ---
 
@@ -1612,7 +1610,6 @@ function App() {
               onToggleLibrary={() => setIsLibraryOpen(!isLibraryOpen)}
               onToggleMeasurement={() => setIsMeasurementMode(!isMeasurementMode)}
               onOpenSuperposition={() => setIsSuperpositionModalOpen(true)} // Added prop
-              onOpenContact={() => setIsContactModalOpen(true)}
               colorPalette={colorPalette}
               setColorPalette={setColorPalette}
               isDyslexicFont={isDyslexicFont}
@@ -1952,14 +1949,8 @@ function App() {
       />
 
 
-      <ContactModal
-        isOpen={isContactModalOpen}
-        onClose={() => setIsContactModalOpen(false)}
-        isLightMode={isLightMode}
-      />
-
-      <ShareModal
-        isOpen={showShareModal}
+      <SuperpositionModal
+        isOpen={isSuperpositionModalOpen}
         onClose={() => setShowShareModal(false)}
         warning={
           // Check if any visible viewport relies on a local file (no PDB ID/PubChem CID but has a file)

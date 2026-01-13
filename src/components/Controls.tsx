@@ -1001,20 +1001,6 @@ export const Controls: React.FC<ControlsProps> = ({
                                 <div className="space-y-3">
                                     {/* Toggles Row */}
                                     <div className="grid grid-cols-2 gap-2">
-                                        {/* 5. Contact / Feedback */}
-                                        {onOpenContact && (
-                                            <button
-                                                onClick={onOpenContact}
-                                                className={`p-2 rounded-lg transition-all ${isLightMode
-                                                    ? 'bg-neutral-100 hover:bg-neutral-200 text-neutral-600 hover:text-black'
-                                                    : 'bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white'
-                                                    }`}
-                                                title="Contact & Feedback"
-                                            >
-                                                <MessageSquare className="w-5 h-5" />
-                                            </button>
-                                        )}
-
                                         {/* 6. Theme Toggle */}
                                         <button
                                             onClick={() => setShowSurface(!showSurface)}

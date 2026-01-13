@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     CircleHelp, X, MousePointer2, Keyboard, Sparkles,
-    BookOpen, Layers, Activity, Share2, FileUp, ArrowLeft, Wrench, Palette
+    BookOpen, Layers, Activity, Share2, FileUp, ArrowLeft, Wrench, Palette, Mail, Github, MessageSquare, ExternalLink
 } from 'lucide-react';
 
 type FeatureSection = {
@@ -431,119 +431,176 @@ export const HelpGuide: React.FC<{ isVisible?: boolean, isLightMode?: boolean }>
                 </div>
             )
         }
+                </div >
+            )
+        },
+{
+    id: 'contact',
+        title: 'Contact & Feedback',
+            icon: MessageSquare,
+                description: 'Get in touch with the developer.',
+                    content: (
+                        <div className="space-y-6">
+                            <div className="bg-neutral-800/50 p-4 rounded-xl border border-neutral-700/50">
+                                <h4 className="text-sm font-bold text-white mb-3">We'd love to hear from you!</h4>
+                                <p className="text-xs text-neutral-300 mb-6">
+                                    Have a suggestion, found a bug, or just want to say hi? Reach out through any of the channels below.
+                                </p>
+
+                                <div className="space-y-3">
+                                    {/* Email Option */}
+                                    <a
+                                        href="mailto:amir.cheraghali@example.com"
+                                        className="group flex items-center gap-4 p-3 rounded-xl border border-neutral-700/50 hover:border-blue-500/50 hover:bg-blue-500/5 transition-all duration-200"
+                                    >
+                                        <div className="p-2.5 rounded-lg bg-blue-900/20 text-blue-400 group-hover:scale-110 transition-transform">
+                                            <Mail className="w-5 h-5" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="font-semibold text-sm text-neutral-200 group-hover:text-white">Send an Email</h3>
+                                            <p className="text-[11px] mt-0.5 text-neutral-500 group-hover:text-neutral-400">
+                                                Reach out directly for questions
+                                            </p>
+                                        </div>
+                                        <ExternalLink className="w-3.5 h-3.5 text-neutral-600 group-hover:text-blue-400 transition-colors" />
+                                    </a>
+
+                                    {/* GitHub Option */}
+                                    <a
+                                        href="https://github.com/QuercusCode/QuercusProteinViewer"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="group flex items-center gap-4 p-3 rounded-xl border border-neutral-700/50 hover:border-purple-500/50 hover:bg-purple-500/5 transition-all duration-200"
+                                    >
+                                        <div className="p-2.5 rounded-lg bg-purple-900/20 text-purple-400 group-hover:scale-110 transition-transform">
+                                            <Github className="w-5 h-5" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <h3 className="font-semibold text-sm text-neutral-200 group-hover:text-white">GitHub Issues</h3>
+                                            <p className="text-[11px] mt-0.5 text-neutral-500 group-hover:text-neutral-400">
+                                                Report bugs or request features
+                                            </p>
+                                        </div>
+                                        <ExternalLink className="w-3.5 h-3.5 text-neutral-600 group-hover:text-purple-400 transition-colors" />
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    )
+}
     ];
 
-    const activeFeature = features.find(f => f.id === activeTab) || features[0];
+const activeFeature = features.find(f => f.id === activeTab) || features[0];
 
-    return (
-        <>
-            {/* Trigger Button */}
-            <button
-                onClick={() => setIsOpen(true)}
-                className={`fixed top-4 right-[27px] z-40 p-2 rounded-full border shadow-lg backdrop-blur-md transition-all hover:scale-105 group ${isLightMode ? 'bg-white/80 text-neutral-600 hover:text-blue-600 border-black/10 hover:bg-white' : 'bg-neutral-900/80 text-neutral-400 hover:text-white border-white/10'}`}
-                title="Viewer Controls & Help"
-            >
-                <CircleHelp className="w-6 h-6 group-hover:rotate-12 transition-transform" />
-            </button>
+return (
+    <>
+        {/* Trigger Button */}
+        <button
+            onClick={() => setIsOpen(true)}
+            className={`fixed top-4 right-[27px] z-40 p-2 rounded-full border shadow-lg backdrop-blur-md transition-all hover:scale-105 group ${isLightMode ? 'bg-white/80 text-neutral-600 hover:text-blue-600 border-black/10 hover:bg-white' : 'bg-neutral-900/80 text-neutral-400 hover:text-white border-white/10'}`}
+            title="Viewer Controls & Help"
+        >
+            <CircleHelp className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+        </button>
 
-            {/* Modal Overlay */}
-            {isOpen && (
-                <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="relative w-full max-w-5xl h-[85vh] flex flex-col md:flex-row bg-neutral-950 border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+        {/* Modal Overlay */}
+        {isOpen && (
+            <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                <div className="relative w-full max-w-5xl h-[85vh] flex flex-col md:flex-row bg-neutral-950 border border-neutral-800 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
 
-                        {/* Sidebar */}
-                        <div className={`w-full md:w-64 flex-shrink-0 border-b md:border-b-0 md:border-r border-neutral-800 bg-neutral-900/50 flex-col min-h-0 ${showMobileList ? 'flex' : 'hidden md:flex'}`}>
-                            <div className="p-5 border-b border-neutral-800">
-                                <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                                    <CircleHelp className="w-5 h-5 text-blue-500" />
-                                    User Manual
-                                </h2>
-                                <p className="text-[10px] text-neutral-500 mt-1 uppercase tracking-wider font-semibold">Quercus Viewer v1.0</p>
-                            </div>
-                            <div className="flex-1 overflow-y-auto p-3 space-y-1 scrollbar-thin scrollbar-thumb-neutral-800">
-                                {features.map(feature => (
-                                    <button
-                                        key={feature.id}
-                                        onClick={() => {
-                                            setActiveTab(feature.id);
-                                            setShowMobileList(false);
-                                        }}
-                                        className={`w-full flex items-center gap-3 p-3 rounded-lg text-sm font-medium transition-all ${activeTab === feature.id && !showMobileList
-                                            ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
-                                            : activeTab === feature.id
-                                                ? 'bg-blue-600/10 text-blue-400 md:bg-blue-600 md:text-white md:shadow-lg'
-                                                : 'text-neutral-400 hover:text-white hover:bg-white/5'
-                                            }`}
-                                    >
-                                        <feature.icon className={`w-4 h-4 ${activeTab === feature.id ? 'text-blue-400 md:text-white' : 'text-neutral-500'}`} />
-                                        {feature.title}
-                                        <div className="flex-1" />
-                                        <div className="md:hidden text-neutral-600">→</div>
-                                    </button>
-                                ))}
-                            </div>
-                            <div className="p-4 border-t border-neutral-800 text-center flex justify-between md:justify-center items-center">
-                                <button onClick={() => setIsOpen(false)} className="md:hidden text-xs text-neutral-400 flex items-center gap-1">
-                                    <X className="w-3 h-3" /> Close
-                                </button>
-                                <p className="text-[10px] text-neutral-600 hidden md:block">
-                                    Press <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">Esc</kbd> to close
-                                </p>
-                            </div>
+                    {/* Sidebar */}
+                    <div className={`w-full md:w-64 flex-shrink-0 border-b md:border-b-0 md:border-r border-neutral-800 bg-neutral-900/50 flex-col min-h-0 ${showMobileList ? 'flex' : 'hidden md:flex'}`}>
+                        <div className="p-5 border-b border-neutral-800">
+                            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                                <CircleHelp className="w-5 h-5 text-blue-500" />
+                                User Manual
+                            </h2>
+                            <p className="text-[10px] text-neutral-500 mt-1 uppercase tracking-wider font-semibold">Quercus Viewer v1.0</p>
                         </div>
-
-                        {/* Content Area */}
-                        <div className={`flex-1 flex-col min-w-0 min-h-0 bg-neutral-900/30 ${showMobileList ? 'hidden md:flex' : 'flex'}`}>
-                            {/* Header */}
-                            <div className="h-16 flex items-center justify-between px-4 md:px-8 border-b border-neutral-800 bg-neutral-900/50 backdrop-blur-xl shrink-0">
-                                <div className="flex items-center gap-3">
-                                    <button
-                                        onClick={() => setShowMobileList(true)}
-                                        className="md:hidden p-1.5 -ml-2 text-neutral-400 hover:text-white rounded-lg hover:bg-white/5 active:scale-95 transition-all"
-                                    >
-                                        <ArrowLeft className="w-5 h-5" />
-                                    </button>
-                                    <div>
-                                        <h3 className="text-xl font-bold text-white">{activeFeature.title}</h3>
-                                        <p className="text-xs text-neutral-400 hidden sm:block">{activeFeature.description}</p>
-                                    </div>
-                                </div>
+                        <div className="flex-1 overflow-y-auto p-3 space-y-1 scrollbar-thin scrollbar-thumb-neutral-800">
+                            {features.map(feature => (
                                 <button
-                                    onClick={() => setIsOpen(false)}
-                                    className="p-2 -mr-2 text-neutral-500 hover:text-white hover:bg-white/5 rounded-full transition-colors"
+                                    key={feature.id}
+                                    onClick={() => {
+                                        setActiveTab(feature.id);
+                                        setShowMobileList(false);
+                                    }}
+                                    className={`w-full flex items-center gap-3 p-3 rounded-lg text-sm font-medium transition-all ${activeTab === feature.id && !showMobileList
+                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20'
+                                        : activeTab === feature.id
+                                            ? 'bg-blue-600/10 text-blue-400 md:bg-blue-600 md:text-white md:shadow-lg'
+                                            : 'text-neutral-400 hover:text-white hover:bg-white/5'
+                                        }`}
                                 >
-                                    <X className="w-5 h-5" />
+                                    <feature.icon className={`w-4 h-4 ${activeTab === feature.id ? 'text-blue-400 md:text-white' : 'text-neutral-500'}`} />
+                                    {feature.title}
+                                    <div className="flex-1" />
+                                    <div className="md:hidden text-neutral-600">→</div>
                                 </button>
+                            ))}
+                        </div>
+                        <div className="p-4 border-t border-neutral-800 text-center flex justify-between md:justify-center items-center">
+                            <button onClick={() => setIsOpen(false)} className="md:hidden text-xs text-neutral-400 flex items-center gap-1">
+                                <X className="w-3 h-3" /> Close
+                            </button>
+                            <p className="text-[10px] text-neutral-600 hidden md:block">
+                                Press <kbd className="font-mono bg-neutral-800 px-1 rounded text-neutral-400">Esc</kbd> to close
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Content Area */}
+                    <div className={`flex-1 flex-col min-w-0 min-h-0 bg-neutral-900/30 ${showMobileList ? 'hidden md:flex' : 'flex'}`}>
+                        {/* Header */}
+                        <div className="h-16 flex items-center justify-between px-4 md:px-8 border-b border-neutral-800 bg-neutral-900/50 backdrop-blur-xl shrink-0">
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={() => setShowMobileList(true)}
+                                    className="md:hidden p-1.5 -ml-2 text-neutral-400 hover:text-white rounded-lg hover:bg-white/5 active:scale-95 transition-all"
+                                >
+                                    <ArrowLeft className="w-5 h-5" />
+                                </button>
+                                <div>
+                                    <h3 className="text-xl font-bold text-white">{activeFeature.title}</h3>
+                                    <p className="text-xs text-neutral-400 hidden sm:block">{activeFeature.description}</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setIsOpen(false)}
+                                className="p-2 -mr-2 text-neutral-500 hover:text-white hover:bg-white/5 rounded-full transition-colors"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* Scrollable Body */}
+                        <div className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-thin scrollbar-thumb-neutral-700">
+                            <div className="max-w-3xl mx-auto">
+                                <p className="sm:hidden text-xs text-neutral-500 mb-6 pb-4 border-b border-neutral-800/50">
+                                    {activeFeature.description}
+                                </p>
+                                <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+                                    {activeFeature.content}
+                                </div>
                             </div>
 
-                            {/* Scrollable Body */}
-                            <div className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-thin scrollbar-thumb-neutral-700">
-                                <div className="max-w-3xl mx-auto">
-                                    <p className="sm:hidden text-xs text-neutral-500 mb-6 pb-4 border-b border-neutral-800/50">
-                                        {activeFeature.description}
-                                    </p>
-                                    <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-                                        {activeFeature.content}
-                                    </div>
+                            {/* Shared Footer Attribution */}
+                            <div className="mt-12 pt-6 border-t border-neutral-800/50 flex flex-col sm:flex-row justify-between items-center opacity-50 hover:opacity-100 transition-opacity gap-4">
+                                <div className="flex gap-4 text-[10px] text-neutral-500">
+                                    <a href="https://www.rcsb.org/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">RCSB PDB</a>
+                                    <a href="https://pubchem.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">PubChem</a>
+                                    <a href="http://nglviewer.org/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">NGL Viewer</a>
                                 </div>
-
-                                {/* Shared Footer Attribution */}
-                                <div className="mt-12 pt-6 border-t border-neutral-800/50 flex flex-col sm:flex-row justify-between items-center opacity-50 hover:opacity-100 transition-opacity gap-4">
-                                    <div className="flex gap-4 text-[10px] text-neutral-500">
-                                        <a href="https://www.rcsb.org/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">RCSB PDB</a>
-                                        <a href="https://pubchem.ncbi.nlm.nih.gov/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">PubChem</a>
-                                        <a href="http://nglviewer.org/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-400">NGL Viewer</a>
-                                    </div>
-                                    <div className="text-[10px] text-neutral-600">
-                                        Powered by React & NGL
-                                    </div>
+                                <div className="text-[10px] text-neutral-600">
+                                    Powered by React & NGL
                                 </div>
                             </div>
                         </div>
-
                     </div>
+
                 </div>
-            )}
-        </>
-    );
+            </div>
+        )}
+    </>
+);
 };
