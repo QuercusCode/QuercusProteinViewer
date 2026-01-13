@@ -9,28 +9,23 @@ import {
     Clock,
     Download,
     Eye,
-    FolderOpen,
     Grid3X3,
     HelpCircle,
     Hexagon,
     ImageIcon,
     Layers,
     Loader2,
-    Maximize2,
     Menu,
     MessageSquare,
     Minimize,
     Moon,
-    Palette,
     Plus,
     Redo2,
     RefreshCw,
     RotateCcw,
     Ruler,
-    Save,
     ScanSearch,
     Search,
-    Settings,
     Share2,
     Star,
     Sun,
@@ -39,8 +34,7 @@ import {
     Upload,
     Video,
     Wrench,
-    X,
-    Zap
+    X
 } from 'lucide-react';
 import type { RepresentationType, ColoringType, ChainInfo, Snapshot, Movie, ColorPalette, PDBMetadata, CustomColorRule } from '../types';
 import type { DataSource } from '../utils/pdbUtils';

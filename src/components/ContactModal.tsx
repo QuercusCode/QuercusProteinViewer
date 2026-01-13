@@ -1,5 +1,4 @@
-import React from 'react';
-import { X, Mail, Github, MessageSquare, ExternalLink } from 'lucide-react';
+import { X, Mail, Github, ExternalLink } from 'lucide-react';
 
 interface ContactModalProps {
     isOpen: boolean;
@@ -44,8 +43,8 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose, isL
                     <a
                         href={`mailto:${CONTACT_EMAIL}`}
                         className={`group flex items-center gap-4 p-4 rounded-xl border transition-all duration-200 ${isLightMode
-                                ? 'border-neutral-200 hover:border-blue-500 hover:bg-blue-50/50'
-                                : 'border-neutral-800 hover:border-blue-500 hover:bg-blue-900/10'
+                            ? 'border-neutral-200 hover:border-blue-500 hover:bg-blue-50/50'
+                            : 'border-neutral-800 hover:border-blue-500 hover:bg-blue-900/10'
                             }`}
                     >
                         <div className={`p-3 rounded-lg ${isLightMode ? 'bg-blue-100 text-blue-600' : 'bg-blue-900/30 text-blue-400'
@@ -68,8 +67,8 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose, isL
                         target="_blank"
                         rel="noopener noreferrer"
                         className={`group flex items-center gap-4 p-4 rounded-xl border transition-all duration-200 ${isLightMode
-                                ? 'border-neutral-200 hover:border-purple-500 hover:bg-purple-50/50'
-                                : 'border-neutral-800 hover:border-purple-500 hover:bg-purple-900/10'
+                            ? 'border-neutral-200 hover:border-purple-500 hover:bg-purple-50/50'
+                            : 'border-neutral-800 hover:border-purple-500 hover:bg-purple-900/10'
                             }`}
                     >
                         <div className={`p-3 rounded-lg ${isLightMode ? 'bg-purple-100 text-purple-600' : 'bg-purple-900/30 text-purple-400'
