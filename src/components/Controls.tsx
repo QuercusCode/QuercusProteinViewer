@@ -638,13 +638,13 @@ export const Controls: React.FC<ControlsProps> = ({
                     </button>
 
                     <div className="flex flex-col gap-4 pt-8 md:pt-0">
-                        <div>
+                        <div className="flex flex-col items-center text-center w-full px-4">
                             <img
                                 src={isLightMode ? `${import.meta.env.BASE_URL}logo/full-black.png` : `${import.meta.env.BASE_URL}logo/full-white.png`}
                                 alt="Quercus Viewer"
-                                className="h-16 w-auto mb-2 object-contain"
+                                className="h-20 w-auto mb-2 object-contain"
                             />
-                            <p className={`text-xs ${subtleText}`}>Visualize 3D structures</p>
+                            <p className={`text-xs ${subtleText} tracking-wider`}>Visualize 3D structures</p>
                         </div>
 
                         <div className="flex items-center gap-3">
