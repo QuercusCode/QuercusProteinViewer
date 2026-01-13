@@ -8,8 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "download": "node scripts/download_models.js",
-    "deploy": "gh-pages -d dist"
+    "download": "node scripts/download_models.js"
   },
   "dependencies": {
     "@types/qrcode": "^1.5.6",
