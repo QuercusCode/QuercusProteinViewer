@@ -647,7 +647,7 @@ export const Controls: React.FC<ControlsProps> = ({
                             <p className={`text-xs ${subtleText} tracking-wider`}>Visualize 3D structures</p>
                         </div>
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-between w-full px-2 gap-2">
                             {/* Group 1: Visual History */}
                             {onUndo && onRedo && (
                                 <div className="flex items-center gap-0.5 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-0.5 border border-black/5 dark:border-white/5">
