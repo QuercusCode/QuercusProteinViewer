@@ -639,9 +639,11 @@ export const Controls: React.FC<ControlsProps> = ({
 
                     <div className="flex flex-col gap-4 pt-8 md:pt-0">
                         <div>
-                            <h1 className="text-xl font-bold bg-gradient-to-r from-blue-500 to-teal-500 bg-clip-text text-transparent mb-1">
-                                Quercus Viewer
-                            </h1>
+                            <img
+                                src={isLightMode ? "/logo/full-black.svg" : "/logo/full-white.svg"}
+                                alt="Quercus Viewer"
+                                className="h-12 w-auto mb-1"
+                            />
                             <p className={`text-xs ${subtleText}`}>Visualize 3D structures</p>
                         </div>
 
