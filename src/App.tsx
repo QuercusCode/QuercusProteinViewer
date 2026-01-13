@@ -484,13 +484,15 @@ function App() {
           if (canUndo) undo();
         }
       }
-      if (e.key === 'Escape' && isPublicationMode) {
+      if ((e.key === 'Escape' || e.code === 'Escape') && isPublicationMode) {
+        e.preventDefault();
+        e.stopPropagation(); // Ensure we consume it
         togglePublicationMode(false);
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown, true);
+    return () => window.removeEventListener('keydown', handleKeyDown, true);
   }, [undo, redo, canUndo, canRedo, isPublicationMode, togglePublicationMode]);
 
   // --- DERIVED STATE (Dr. AI V4) ---
