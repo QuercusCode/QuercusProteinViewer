@@ -650,13 +650,13 @@ export const Controls: React.FC<ControlsProps> = ({
                         <div className="flex items-center justify-between w-full px-2 gap-2">
                             {/* Group 1: Visual History */}
                             {onUndo && onRedo && (
-                                <div className="flex items-center gap-0.5 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-0.5 border border-black/5 dark:border-white/5">
+                                <div className={`flex items-center gap-0.5 rounded-lg p-0.5 border ${isLightMode ? 'bg-neutral-100 border-black/5' : 'bg-neutral-800 border-white/5'}`}>
                                     <button
                                         onClick={onUndo}
                                         disabled={!canUndo}
                                         className={`p-1.5 rounded-md transition-all ${!canUndo
                                             ? 'opacity-30 cursor-not-allowed'
-                                            : 'hover:bg-white dark:hover:bg-neutral-700 hover:shadow-sm text-neutral-600 dark:text-neutral-300'
+                                            : `hover:bg-white hover:shadow-sm ${isLightMode ? 'text-neutral-600' : 'hover:bg-neutral-700 text-neutral-300'}`
                                             }`}
                                         title="Undo (Ctrl+Z)"
                                     >
@@ -667,7 +667,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                         disabled={!canRedo}
                                         className={`p-1.5 rounded-md transition-all ${!canRedo
                                             ? 'opacity-30 cursor-not-allowed'
-                                            : 'hover:bg-white dark:hover:bg-neutral-700 hover:shadow-sm text-neutral-600 dark:text-neutral-300'
+                                            : `hover:bg-white hover:shadow-sm ${isLightMode ? 'text-neutral-600' : 'hover:bg-neutral-700 text-neutral-300'}`
                                             }`}
                                         title="Redo (Ctrl+Y)"
                                     >
@@ -813,7 +813,7 @@ export const Controls: React.FC<ControlsProps> = ({
                                         onClick={onToggleFavorite}
                                         className={`px-3 py-2 rounded-lg transition-all ${isFavorite
                                             ? 'bg-yellow-500 hover:bg-yellow-400 text-white'
-                                            : 'bg-neutral-200 dark:bg-neutral-700 hover:bg-neutral-300 dark:hover:bg-neutral-600'
+                                            : `${isLightMode ? 'bg-neutral-200 hover:bg-neutral-300' : 'bg-neutral-700 hover:bg-neutral-600'}`
                                             }`}
                                         title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                                     >
