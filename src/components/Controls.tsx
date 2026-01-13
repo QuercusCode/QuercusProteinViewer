@@ -779,8 +779,8 @@ export const Controls: React.FC<ControlsProps> = ({
                                         className={`w-full rounded-lg pl-9 pr-3 py-2 border outline-none transition-all ${inputBg}`}
                                     />
                                     {isSearchFocused && history && history.length > 0 && !localPdbId && (
-                                        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-neutral-800 rounded-lg shadow-xl border border-neutral-200 dark:border-neutral-700 z-50 overflow-hidden">
-                                            <div className="px-3 py-2 text-xs font-semibold text-neutral-500 uppercase tracking-wider bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 flex items-center gap-2">
+                                        <div className={`absolute top-full left-0 right-0 mt-2 rounded-lg shadow-xl border z-50 overflow-hidden ${isLightMode ? 'bg-white border-neutral-200' : 'bg-neutral-800 border-neutral-700'}`}>
+                                            <div className={`px-3 py-2 text-xs font-semibold uppercase tracking-wider border-b flex items-center gap-2 ${isLightMode ? 'bg-neutral-50 text-neutral-500 border-neutral-200' : 'bg-neutral-900 text-neutral-500 border-neutral-700'}`}>
                                                 <Clock className="w-3 h-3" />
                                                 Recent History
                                             </div>
@@ -795,10 +795,10 @@ export const Controls: React.FC<ControlsProps> = ({
                                                             setPdbId(item.id);
                                                             setIsSearchFocused(false);
                                                         }}
-                                                        className="w-full text-left px-3 py-2 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-700 flex items-center justify-between group border-b border-neutral-100 dark:border-neutral-800 last:border-0"
+                                                        className={`w-full text-left px-3 py-2 text-sm flex items-center justify-between group border-b last:border-0 transition-colors ${isLightMode ? 'hover:bg-neutral-100 border-neutral-100 text-neutral-900' : 'hover:bg-neutral-700 border-neutral-800 text-neutral-200'}`}
                                                     >
                                                         <span className="font-mono font-medium">{item.id}</span>
-                                                        <span className="text-[10px] text-neutral-400 group-hover:text-neutral-500 bg-neutral-100 dark:bg-neutral-900 px-1.5 py-0.5 rounded border border-neutral-200 dark:border-neutral-700">
+                                                        <span className={`text-[10px] px-1.5 py-0.5 rounded border ${isLightMode ? 'text-neutral-400 group-hover:text-neutral-500 bg-neutral-100 border-neutral-200' : 'text-neutral-400 group-hover:text-neutral-500 bg-neutral-900 border-neutral-700'}`}>
                                                             {item.dataSource === 'pdb' ? 'PDB' : 'CHEM'}
                                                         </span>
                                                     </button>
