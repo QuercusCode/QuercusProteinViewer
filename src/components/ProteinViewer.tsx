@@ -1240,6 +1240,9 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     alpha: true // Enable transparency support
                 }
             });
+            // Increase picking radius to help with mobile/touch selection
+            stage.setParameters({ pickingRadius: 5 });
+
             stageRef.current = stage;
 
             // --- MOUSE CONTROLS ---
