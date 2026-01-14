@@ -1648,7 +1648,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             }
         };
 
-        if (file || (pdbId && String(pdbId).length >= 3)) {
+        // Allow short IDs for PubChem (or non-PDB sources)
+        const isIdValid = pdbId && (String(pdbId).length >= 3 || dataSource !== 'pdb');
+
+        if (file || isIdValid) {
             loadStructure();
         } else {
             if (stageRef.current) stageRef.current.removeAllComponents();
