@@ -1418,7 +1418,9 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         console.log(`Fetching from: ${url}`);
 
                         try {
-                            return await stage.loadFile(url, loadParams);
+                            const comp = await stage.loadFile(url, loadParams);
+                            if (!comp) throw new Error("NGL returned null component");
+                            return comp;
                         } catch (primaryErr) {
                             console.warn(`Primary load failed for ${url}`, primaryErr);
 
