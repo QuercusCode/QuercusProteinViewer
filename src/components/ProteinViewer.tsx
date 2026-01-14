@@ -1402,7 +1402,9 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                     if (currentPdbId) {
                         const cleanId = String(currentPdbId).trim().toLowerCase();
-                        if (cleanId.length < 3) return null;
+                        // PDB IDs are 4 chars. PubChem CIDs can be 1+ digits.
+                        if (dataSource === 'pdb' && cleanId.length < 3) return null;
+                        if (dataSource === 'pubchem' && cleanId.length < 1) return null;
 
                         let url = getStructureUrl(cleanId, dataSource);
                         let loadParams: any = { defaultRepresentation: false };
