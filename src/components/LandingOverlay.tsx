@@ -119,7 +119,7 @@ export const LandingOverlay: React.FC<LandingOverlayProps> = ({ isVisible, onDis
                                 }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-5">
-                                <p className="text-white text-lg font-bold truncate w-full shadow-black drop-shadow-md leading-tight">{moleculeOfTheDay.title}</p>
+                                <p className="text-white text-lg font-bold w-full shadow-black drop-shadow-md leading-tight line-clamp-2">{moleculeOfTheDay.title}</p>
                             </div>
                         </div>
 
