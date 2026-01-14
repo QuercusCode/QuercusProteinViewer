@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ArrowRight, Upload, Play, BookOpen, Star, Dna, Activity } from 'lucide-react';
+import { ArrowRight, Upload, Play, BookOpen, Dna, Activity } from 'lucide-react';
 import clsx from 'clsx';
 import { OFFLINE_LIBRARY } from '../data/library';
 
@@ -46,10 +46,6 @@ export const LandingOverlay: React.FC<LandingOverlayProps> = ({ isVisible, onDis
 
                 {/* HERO SECTION (Left) */}
                 <div className="flex-1 text-center md:text-left pointer-events-auto space-y-6 max-w-2xl">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider mb-2 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
-                        <Star size={12} fill="currentColor" />
-                        v2.0 Now Live
-                    </div>
 
                     <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight leading-none animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
                         Visualize Life <br />
@@ -57,7 +53,7 @@ export const LandingOverlay: React.FC<LandingOverlayProps> = ({ isVisible, onDis
                     </h1>
 
                     <p className="text-lg md:text-xl text-gray-300 max-w-lg mx-auto md:mx-0 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-                        Explore proteins, DNA, and molecular structures directly in your browser. No installation required.
+                        Explore proteins, DNA, and molecular structures directly in your browser. Install as an app or use online.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 pt-4 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-400">
@@ -83,8 +79,8 @@ export const LandingOverlay: React.FC<LandingOverlayProps> = ({ isVisible, onDis
                             <Upload size={16} /> Upload File
                         </button>
                         <span className="w-1 h-1 rounded-full bg-gray-700" />
-                        <button onClick={() => onLoadPdb('1crn')} className="hover:text-white transition-colors flex items-center gap-2">
-                            <Dna size={16} /> Load Example
+                        <button onClick={() => onLoadPdb('2B3P')} className="hover:text-white transition-colors flex items-center gap-2">
+                            <Dna size={16} /> Load Example (2B3P)
                         </button>
                     </div>
                 </div>
@@ -107,11 +103,18 @@ export const LandingOverlay: React.FC<LandingOverlayProps> = ({ isVisible, onDis
                             </span>
                         </div>
 
-                        <div className="h-32 mb-4 rounded-xl bg-gradient-to-br from-blue-500/10 to-emerald-500/10 border border-white/5 flex items-center justify-center relative overflow-hidden">
-                            {/* Placeholder visual - in a real app could be a static image */}
-                            <Dna size={48} className="text-white/20" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-3">
-                                <p className="text-white text-sm font-bold truncate w-full">{moleculeOfTheDay.title}</p>
+                        <div className="h-48 mb-4 rounded-xl bg-black/50 border border-white/5 flex items-center justify-center relative overflow-hidden group-hover:border-white/20 transition-colors">
+                            <img
+                                src={`https://cdn.rcsb.org/images/structures/${moleculeOfTheDay.id.toLowerCase()}_assembly-1.jpeg`}
+                                alt={moleculeOfTheDay.title}
+                                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                                onError={(e) => {
+                                    (e.target as HTMLImageElement).style.display = 'none';
+                                    (e.target as HTMLImageElement).parentElement!.classList.add('bg-gradient-to-br', 'from-blue-500/20', 'to-purple-500/20');
+                                }}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-4">
+                                <p className="text-white text-sm font-bold truncate w-full shadow-black drop-shadow-md">{moleculeOfTheDay.title}</p>
                             </div>
                         </div>
 

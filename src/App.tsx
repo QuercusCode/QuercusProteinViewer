@@ -2034,6 +2034,26 @@ function App() {
         }}
       />
 
+      {/* Hidden File Input for Landing Overlay Upload Action */}
+      <input
+        type="file"
+        id="file-upload"
+        className="hidden"
+        accept=".pdb,.cif,.mmcif,.ent,.gro,.mol2,.sdf"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file && activeController) {
+            // Determine format
+            // We use setFile to load local files
+            activeController.setFile(file);
+            // Also update title
+            activeController.setProteinTitle(file.name);
+            // Remove PDB ID/URL to ensure we render the file
+            activeController.setPdbId('');
+          }
+        }}
+      />
+
       <ToastContainer toasts={toasts} onRemove={removeToast} />
 
       {!isEmbedMode && (
