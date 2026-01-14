@@ -3,8 +3,7 @@ import { Search, X, BookOpen, Database, FlaskConical, Dna, Activity, Zap, Shield
 import clsx from 'clsx';
 import { OFFLINE_LIBRARY } from '../data/library';
 import { CHEMICAL_LIBRARY } from '../data/chemicalLibrary';
-import { searchPdb, fetchPdbMetadata } from '../services/rcsbSearch';
-import type { LibraryEntry } from '../data/library';
+
 
 // --- TYPES ---
 
@@ -52,10 +51,6 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
     const [selectedCategory, setSelectedCategory] = useState<string | 'All'>('All');
     const [viewMode, setViewMode] = useState<'categories' | 'list'>('categories');
 
-    // Online Search State
-    const [isSearchingOnline, setIsSearchingOnline] = useState(false);
-    const [onlineResults, setOnlineResults] = useState<LibraryEntry[]>([]);
-
     // Select Data Source
     const currentLibrary = useMemo(() => activeTab === 'proteins' ? OFFLINE_LIBRARY : CHEMICAL_LIBRARY, [activeTab]);
     const currentConfig = activeTab === 'proteins' ? PROTEIN_CATEGORY_CONFIG : CHEMICAL_CATEGORY_CONFIG;
@@ -66,7 +61,6 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
         setViewMode('categories');
         setSelectedCategory('All');
         setSearchTerm('');
-        setOnlineResults([]);
     };
 
 
@@ -76,7 +70,7 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
         return Array.from(cats).sort();
     }, [currentLibrary]);
 
-    // Filter items (Local)
+    // Filter items (Local Only)
     const filteredItems = useMemo(() => {
         const lowerTerm = searchTerm.toLowerCase().trim();
         return currentLibrary.filter(item => {
@@ -98,7 +92,6 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
         setSelectedCategory(category);
         setViewMode('list');
         setSearchTerm(''); // Clear search when picking a category for purity
-        setOnlineResults([]);
     };
 
     // Handle Back to Home
@@ -106,86 +99,22 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
         setViewMode('categories');
         setSelectedCategory('All');
         setSearchTerm('');
-        setOnlineResults([]);
     };
 
-    // Handle Search Input with Debounce for Online Search
-    const searchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-
+    // Handle Search Input (Simple)
     const handleSearch = (term: string) => {
         setSearchTerm(term);
-
         // Switch to list view immediately on typing
         if (term.trim().length > 0 && viewMode === 'categories') {
             setViewMode('list');
             setSelectedCategory('All');
         }
-
-        // Clear previous timeout
-        if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
-
-        // Reset online results if search is cleared
-        if (term.trim().length < 3) {
-            setOnlineResults([]);
-            return;
-        }
-
-        // Only search online for Proteins
-        if (activeTab === 'proteins') {
-            searchTimeoutRef.current = setTimeout(async () => {
-                setIsSearchingOnline(true);
-                try {
-                    const onlineIds = await searchPdb(term);
-                    // Filter out IDs that are already in our local filteredItems to avoid duplicates
-                    // (Simple check, could be optimized)
-                    const existingIds = new Set(currentLibrary.map(i => i.id));
-                    const newIds = onlineIds.filter(id => !existingIds.has(id));
-
-                    if (newIds.length > 0) {
-                        const metadata = await fetchPdbMetadata(newIds);
-                        setOnlineResults(metadata);
-                    } else {
-                        setOnlineResults([]);
-                    }
-                } catch (e) {
-                    console.error("Online search failed", e);
-                } finally {
-                    setIsSearchingOnline(false);
-                }
-            }, 600); // 600ms debounce
-        }
     };
 
-    // Handle Item Selection
+    // Handle Item Selection (Simple Local)
     const handleItemSelect = (item: any) => {
         if (activeTab === 'proteins') {
-            // Check if it's a "standard" ID (4 chars) or URL
-            // For simple implementation, we assume standard IDs load from models/ or RCSB
-            // But since we want to support online results, we might need to direct them to RCSB URL if not local
-            // However, the ProteinViewer controller likely handles raw IDs by checking local first, then RCSB.
-            // Let's pass the ID. The App logic (activeController.setPdbId) usually constructs the URL.
-            // If the App logic specifically requires a 'models/...' URL for local files, we might need a distinction.
-            // Assuming `onSelect` takes a strict URL or `setPdbId` logic handles IDs.
-            // Looking at App.tsx interaction, onSelect calls `activeController.setPdbId(id)` if it detects an ID-like string, or loads a file.
-            // Actually LibraryModal passes `models/${item.id}.pdb`.
-            // FOR ONLINE ITEMS: We should pass the RCSB URL or just the ID if the controller handles it.
-            // Let's rely on the controller's ability to fetch from RCSB if given an ID that isn't a local path?
-            // Wait, previous code was: `onSelect('models/' + item.id + '.pdb')`.
-            // We need to change this behavior for Online items.
-
-            // HACK: We pass just the ID for online items, and let App.tsx/Controller decide.
-            // But `onSelect` expects a simplified flow.
-            // Let's assume if it's in OFFLINE_LIBRARY, it has a local file.
-            const isLocal = OFFLINE_LIBRARY.some(local => local.id === item.id);
-            if (isLocal) {
-                onSelect(`models/${item.id}.pdb`);
-            } else {
-                // Trigger RCSB load. In App.tsx `loadPdb(id)` handles fetching? 
-                // Actually `onSelect` in App.tsx maps to `activeController.load(url)` usually.
-                // We should pass the direct RCSB URL: `https://files.rcsb.org/download/${item.id}.pdb`
-                onSelect(`https://files.rcsb.org/download/${item.id}.pdb`);
-            }
-
+            onSelect(`models/${item.id}.pdb`);
         } else {
             // Pass special PubChem URL format that App.tsx will recognize
             onSelect(`pubchem://${item.id}`);
@@ -245,16 +174,11 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
                         <input
                             type="text"
-                            placeholder={activeTab === 'proteins' ? "Search PDB (e.g. Insulin)..." : "Search Chemicals..."}
+                            placeholder={activeTab === 'proteins' ? "Search Library..." : "Search Chemicals..."}
                             value={searchTerm}
                             onChange={(e) => handleSearch(e.target.value)}
                             className="w-full bg-black/40 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-sm"
                         />
-                        {isSearchingOnline && (
-                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                            </div>
-                        )}
                     </div>
 
                     <button onClick={onClose} className="hidden sm:block p-2 ml-4 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white shrink-0">
@@ -366,63 +290,12 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
                                     </div>
                                 )}
 
-                                {/* 2. ONLINE RESULTS */}
-                                {onlineResults.length > 0 && (
-                                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                        <div className="flex items-center gap-2 mb-3">
-                                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                            <h3 className="text-sm font-bold text-gray-400 uppercase tracking-wider">Results from RCSB PDB</h3>
-                                        </div>
-
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
-                                            {onlineResults.map(item => {
-                                                // Use Structural as fallback type, but we don't strictly need config here for now since styling is hardcoded for online items
-                                                // const config = PROTEIN_CATEGORY_CONFIG[item.category] || PROTEIN_CATEGORY_CONFIG['Structural'];
-                                                return (
-                                                    <button
-                                                        key={`online-${item.id}`}
-                                                        onClick={() => handleItemSelect(item)}
-                                                        className="group relative flex flex-col items-start text-left bg-gray-900 hover:bg-gray-800 border border-white/10 hover:border-blue-500/50 rounded-xl p-4 transition-all hover:shadow-xl hover:-translate-y-1 overflow-hidden"
-                                                    >
-                                                        {/* Online Badge */}
-                                                        <div className="absolute top-0 right-0 p-2 opacity-5 scale-150 transition-transform group-hover:scale-[2] group-hover:opacity-10 text-white">
-                                                            <Database size={20} />
-                                                        </div>
-
-                                                        <div className="flex items-center justify-between w-full mb-3 z-10">
-                                                            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30 group-hover:bg-blue-500/40 transition-colors">
-                                                                {item.id}
-                                                            </span>
-                                                            <span className="text-[10px] px-2 py-0.5 rounded-full border border-white/10 flex items-center gap-1 font-medium text-gray-400 bg-white/5">
-                                                                RCSB Online
-                                                            </span>
-                                                        </div>
-                                                        <h3 className="font-bold text-white mb-1 group-hover:text-blue-300 transition-colors text-sm leading-snug w-full" title={item.title}>
-                                                            {item.title}
-                                                        </h3>
-                                                        <p className="text-[11px] text-gray-400 line-clamp-2 leading-relaxed h-8 w-full">
-                                                            {item.details || item.description}
-                                                        </p>
-                                                    </button>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* 3. NO RESULTS STATE */}
-                                {filteredItems.length === 0 && onlineResults.length === 0 && !isSearchingOnline && (
+                                {/* NO RESULTS STATE */}
+                                {filteredItems.length === 0 && (
                                     <div className="text-center py-20 text-gray-500">
                                         <Database size={48} className="mx-auto mb-4 opacity-50" />
                                         <p className="text-lg">No items found matching "{searchTerm}".</p>
-                                        <p className="text-sm opacity-60">Try searching for "Hemoglobin", "Virus", or a PDB ID.</p>
-                                    </div>
-                                )}
-
-                                {isSearchingOnline && onlineResults.length === 0 && filteredItems.length === 0 && (
-                                    <div className="text-center py-20 text-gray-500 animate-pulse">
-                                        <div className="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full mx-auto mb-4 animate-spin"></div>
-                                        <p className="text-lg">Searching the PDB Universe...</p>
+                                        <p className="text-sm opacity-60">Try a different category or search term.</p>
                                     </div>
                                 )}
 
@@ -434,7 +307,7 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
 
                 {/* FOOTER */}
                 <div className="p-3 sm:p-4 border-t border-white/10 bg-gray-950 text-right text-[10px] sm:text-xs text-gray-500 font-mono shrink-0 z-30">
-                    Library v2.0 • {OFFLINE_LIBRARY.length} offline • RCSB Connected 🟢
+                    Library v2.0 • {OFFLINE_LIBRARY.length} offline
                 </div>
             </div>
         </div>
