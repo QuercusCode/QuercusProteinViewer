@@ -509,15 +509,27 @@ export const HelpGuide: React.FC<{ isVisible?: boolean, isLightMode?: boolean }>
                                 Quercus Viewer is an open-source project. If you find it useful for your research or education, consider supporting its continued development.
                             </p>
 
-                            <a
-                                href="https://buymeacoffee.com/amirmcheraghali"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-pink-900/20 transition-all hover:scale-105"
-                            >
-                                <Heart className="w-3.5 h-3.5 fill-white/20" />
-                                Donate to Support
-                            </a>
+                            <div className="flex flex-wrap gap-3">
+                                <a
+                                    href="https://buymeacoffee.com/amirmcheraghali"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#FFDD00] hover:bg-[#FFDD00]/90 text-black text-xs font-bold rounded-lg shadow-lg shadow-yellow-900/10 transition-all hover:scale-105"
+                                >
+                                    <Heart className="w-3.5 h-3.5 fill-black/20" />
+                                    Buy Me a Coffee
+                                </a>
+
+                                <a
+                                    href="https://github.com/sponsors"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#24292e] hover:bg-[#2f363d] text-white text-xs font-bold rounded-lg shadow-lg shadow-black/20 transition-all hover:scale-105 border border-white/10"
+                                >
+                                    <Github className="w-3.5 h-3.5" />
+                                    GitHub Sponsors
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
