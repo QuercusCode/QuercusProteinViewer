@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     CircleHelp, X, MousePointer2, Keyboard, Sparkles,
-    BookOpen, Layers, Activity, Share2, FileUp, ArrowLeft, Wrench, Palette, Mail, Github, MessageSquare, ExternalLink, Linkedin
+    BookOpen, Layers, Activity, Share2, FileUp, ArrowLeft, Wrench, Palette, Mail, Github, MessageSquare, ExternalLink, Linkedin, Heart
 } from 'lucide-react';
 
 type FeatureSection = {
@@ -498,6 +498,24 @@ export const HelpGuide: React.FC<{ isVisible?: boolean, isLightMode?: boolean }>
                                     </p>
                                 </div>
                                 <ExternalLink className="w-3.5 h-3.5 text-neutral-600 group-hover:text-sky-400 transition-colors" />
+                            </a>
+                        </div>
+
+                        <div className="mt-8 pt-6 border-t border-neutral-700/50">
+                            <h4 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                                <Heart className="w-4 h-4 text-pink-500 fill-pink-500/20" /> Support Development
+                            </h4>
+                            <p className="text-xs text-neutral-300 mb-4">
+                                Quercus Viewer is an open-source project. If you find it useful for your research or education, consider supporting its continued development.
+                            </p>
+
+                            <a
+                                href="#"
+                                onClick={(e) => { e.preventDefault(); alert("Please update this link with your actual donation URL (GitHub Sponsors, Patreon, Buy Me a Coffee, etc.)"); }}
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-pink-900/20 transition-all hover:scale-105"
+                            >
+                                <Heart className="w-3.5 h-3.5 fill-white/20" />
+                                Donate to Support
                             </a>
                         </div>
                     </div>
