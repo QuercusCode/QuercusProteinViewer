@@ -2006,15 +2006,15 @@ function App() {
         <HelpGuide isVisible={!isCleanMode} isLightMode={isLightMode} hasSequence={chains.length > 0} />
       )}
 
-      {/* Embed Mode Attribution - Viral Loop */}
+      {/* Embed Mode Attribution - Viral Loop - Mobile Optimized */}
       {isEmbedMode && (
         <a
           href="https://quercuscode.github.io/QuercusViewer/"
           target="_blank"
           rel="noopener noreferrer"
-          className="fixed bottom-3 right-3 z-50 px-3 py-1.5 bg-black/80 backdrop-blur-md text-white text-xs font-bold rounded-full shadow-lg border border-white/20 hover:scale-105 transition-transform flex items-center gap-1.5"
+          className="fixed bottom-2 right-2 md:bottom-3 md:right-3 z-50 px-2 py-1 md:px-3 md:py-1.5 bg-black/80 backdrop-blur-md text-white text-[10px] md:text-xs font-bold rounded-full shadow-lg border border-white/20 hover:scale-105 transition-transform flex items-center gap-1 md:gap-1.5"
         >
-          <span className="text-lg leading-none">🧬</span>
+          <span className="text-sm md:text-lg leading-none">🧬</span>
           Powered by Quercus
         </a>
       )}

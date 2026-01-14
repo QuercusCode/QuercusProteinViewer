@@ -66,9 +66,10 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
     // Generate Embed Code
     const embedCode = `<iframe
   src="${shareUrl.replace('?', '?embed=true&')}"
-  width="800"
+  src="${shareUrl.replace('?', '?embed=true&')}"
+  width="100%"
   height="600"
-  style="border:none; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);"
+  style="border:none; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); max-width: 100%;"
   title="Quercus Viewer"
   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
   allowfullscreen
