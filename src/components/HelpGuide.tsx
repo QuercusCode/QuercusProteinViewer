@@ -529,6 +529,18 @@ export const HelpGuide: React.FC<{ isVisible?: boolean, isLightMode?: boolean }>
 
     return (
         <>
+            {/* Donation Button (Floating next to Help) */}
+            <a
+                href="https://buymeacoffee.com/amirmcheraghali"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`fixed top-4 right-[80px] z-40 p-2 rounded-full border shadow-lg backdrop-blur-md transition-all hover:scale-105 group flex items-center gap-2 pr-4 ${isLightMode ? 'bg-white/80 text-pink-600 border-black/10 hover:bg-white' : 'bg-neutral-900/80 text-pink-500 border-white/10 hover:text-pink-400'}`}
+                title="Support Development"
+            >
+                <Heart className={`w-5 h-5 ${isLightMode ? 'fill-pink-100' : 'fill-pink-900/30'}`} />
+                <span className="text-xs font-bold hidden sm:block">Donate</span>
+            </a>
+
             {/* Trigger Button */}
             <button
                 onClick={() => setIsOpen(true)}
