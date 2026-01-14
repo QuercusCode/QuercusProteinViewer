@@ -160,7 +160,7 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
             flex-col overflow-hidden`}>
 
             {/* Header / Tabs - Compact Vertical */}
-            <div className={`flex flex-col items-center pt-20 pb-2 gap-6 border-b ${isLightMode ? 'border-neutral-200 bg-white/50' : 'border-neutral-800 bg-black/50'} z-10 flex-shrink-0 backdrop-blur-md`}>
+            <div className={`flex flex-col items-center pt-4 pb-2 gap-6 border-b ${isLightMode ? 'border-neutral-200 bg-white/50' : 'border-neutral-800 bg-black/50'} z-10 flex-shrink-0 backdrop-blur-md`}>
                 <div className="flex items-center justify-center w-full" title={isAtomView ? "Atoms" : "Sequence"}>
                     {isAtomView ? (
                         <Atom size={16} className="text-yellow-500" />
