@@ -529,17 +529,50 @@ export const HelpGuide: React.FC<{ isVisible?: boolean, isLightMode?: boolean }>
 
     return (
         <>
-            {/* Donation Button (Floating next to Help) */}
-            <a
-                href="https://buymeacoffee.com/amirmcheraghali"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`fixed top-4 right-[80px] z-40 h-10 px-4 rounded-full border shadow-lg backdrop-blur-md transition-all hover:scale-105 group flex items-center gap-2 ${isLightMode ? 'bg-white/80 text-pink-600 border-black/10 hover:bg-white' : 'bg-neutral-900/80 text-pink-500 border-white/10 hover:text-pink-400'}`}
-                title="Support Development"
-            >
-                <Heart className={`w-4 h-4 ${isLightMode ? 'fill-pink-100' : 'fill-pink-900/30'}`} />
-                <span className="text-xs font-bold hidden sm:block">Donate</span>
-            </a>
+            {/* Donation Dropdown (Floating next to Help) */}
+            <div className="fixed top-4 right-[80px] z-40 group">
+                <button
+                    className={`h-10 px-4 rounded-full border shadow-lg backdrop-blur-md transition-all group-hover:bg-neutral-800 group-hover:text-white flex items-center gap-2 ${isLightMode ? 'bg-white/80 text-pink-600 border-black/10' : 'bg-neutral-900/80 text-pink-500 border-white/10'}`}
+                >
+                    <Heart className={`w-4 h-4 ${isLightMode ? 'fill-pink-100' : 'fill-pink-900/30'}`} />
+                    <span className="text-xs font-bold hidden sm:block">Donate</span>
+                </button>
+
+                {/* Dropdown Menu */}
+                <div className="absolute right-0 top-12 w-48 py-2 bg-neutral-900/90 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-[-10px] group-hover:translate-y-0 flex flex-col overflow-hidden">
+                    {/* Buy Me A Coffee */}
+                    <a
+                        href="https://buymeacoffee.com/amirmcheraghali"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors"
+                    >
+                        <div className="p-1.5 bg-yellow-500/20 rounded-lg text-yellow-400">
+                            <Heart className="w-4 h-4" />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-xs font-bold text-white">Buy Me a Coffee</span>
+                            <span className="text-[10px] text-neutral-400">Support widely</span>
+                        </div>
+                    </a>
+
+                    {/* GitHub Sponsors */}
+                    <a
+                        href="https://github.com/sponsors"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-white/10 transition-colors border-t border-white/5"
+                    >
+                        <div className="p-1.5 bg-purple-500/20 rounded-lg text-purple-400">
+                            <Github className="w-4 h-4" />
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-xs font-bold text-white">GitHub Sponsors</span>
+                            <span className="text-[10px] text-neutral-400">Official support</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
 
             {/* Trigger Button */}
             <button
