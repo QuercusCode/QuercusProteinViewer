@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { ProteinViewer, type ProteinViewerRef } from './components/ProteinViewer';
+import { LandingOverlay } from './components/LandingOverlay';
 import { Controls } from './components/Controls';
 import { ContactMap } from './components/ContactMap';
 import { AISidebar, type AIAction } from './components/AISidebar';
@@ -287,6 +288,15 @@ function App() {
   const [showContactMap, setShowContactMap] = useState(false);
   const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
+
+  // Landing Overlay State
+  const [showLanding, setShowLanding] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const hasPdb = params.has('pdb') || params.has('url') || params.has('file');
+    const isEmbed = params.get('embed') === 'true';
+    // Show only if no deep link and not embedded
+    return !hasPdb && !isEmbed;
+  });
 
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [favoritesTab, setFavoritesTab] = useState<'favorites' | 'history'>('favorites');
@@ -1999,6 +2009,30 @@ function App() {
       />
 
 
+
+      <LandingOverlay
+        isVisible={showLanding}
+        onDismiss={() => setShowLanding(false)}
+        onUpload={() => {
+          setShowLanding(false);
+          document.getElementById('file-upload')?.click();
+        }}
+        onStartTour={() => {
+          setShowLanding(false);
+          setTimeout(() => startOnboardingTour(() => { }), 500);
+        }}
+        onLoadPdb={(id, fileUrl) => {
+          if (activeController) {
+            // If a manual file URL is provided (local library), load it
+            if (fileUrl) {
+              activeController.setPdbId(id);
+            } else {
+              activeController.setPdbId(id);
+            }
+          }
+          setShowLanding(false);
+        }}
+      />
 
       <ToastContainer toasts={toasts} onRemove={removeToast} />
 
