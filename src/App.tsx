@@ -577,11 +577,20 @@ function App() {
     const hasPolymer = info.chains.some(c => c.type === 'protein' || c.type === 'nucleic');
     const totalResidues = info.chains.reduce((acc, c) => acc + c.sequence.length, 0);
 
-    // Smart Representation Switching for small molecules
+    // Smart Representation Switching
     if (!hasPolymer || totalResidues < 5) {
-      console.log("App: Detected small molecule or non-polymer. Switching to Ball+Stick with Element coloring.");
-      ctrl.setRepresentation('ball+stick');
-      ctrl.setColoring('element');
+      // Small Molecule Logic
+      if (totalResidues > 200) {
+        // "Large" Chemical (e.g. complex natural product or supramolecular assembly)
+        console.log("App: Detected large non-polymer. Switching to Licorice for performance.");
+        ctrl.setRepresentation('line'); // 'line' is fastest, 'licorice' is nicer but heavier
+        ctrl.setColoring('element');
+      } else {
+        console.log("App: Detected small molecule. Switching to Ball+Stick.");
+        ctrl.setRepresentation('ball+stick');
+        ctrl.setColoring('element');
+      }
+
       ctrl.setShowLigands(true);
       if (info.chains.length > 0) ctrl.setShowIons(true);
     }

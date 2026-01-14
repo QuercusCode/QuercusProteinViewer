@@ -14,6 +14,28 @@ export const usePlaylist = ({ onLoadStructure }: UsePlaylistProps) => {
     const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
 
     // --- TTS HELPERS ---
+    const getPreferredVoice = useCallback(() => {
+        if (!('speechSynthesis' in window)) return null;
+
+        const voices = window.speechSynthesis.getVoices();
+        // Priority list for more natural-sounding English voices
+        const preferredVoices = [
+            'Google US English',
+            'Samantha',
+            'Daniel',
+            'Microsoft Zira',
+            'Microsoft David'
+        ];
+
+        for (const name of preferredVoices) {
+            const found = voices.find(v => v.name.includes(name));
+            if (found) return found;
+        }
+
+        // Fallback to any English voice
+        return voices.find(v => v.lang.startsWith('en')) || null;
+    }, []);
+
     const speak = useCallback((text: string, onEnd: () => void) => {
         if (!('speechSynthesis' in window)) {
             // Fallback if no TTS
@@ -25,6 +47,13 @@ export const usePlaylist = ({ onLoadStructure }: UsePlaylistProps) => {
         window.speechSynthesis.cancel();
 
         const utterance = new SpeechSynthesisUtterance(text);
+
+        // Voice Selection
+        const voice = getPreferredVoice();
+        if (voice) {
+            utterance.voice = voice;
+        }
+
         utterance.rate = 0.9; // Slightly slower for clarity
         utterance.pitch = 1.0;
 
@@ -39,7 +68,7 @@ export const usePlaylist = ({ onLoadStructure }: UsePlaylistProps) => {
 
         speechRef.current = utterance;
         window.speechSynthesis.speak(utterance);
-    }, []);
+    }, [getPreferredVoice]);
 
     const stopSpeaking = useCallback(() => {
         if ('speechSynthesis' in window) {
