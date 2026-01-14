@@ -42,8 +42,8 @@ export const LandingOverlay: React.FC<LandingOverlayProps> = ({ isVisible, onDis
             <div className="absolute inset-0 z-0" onClick={onDismiss} />
 
             {/* Logo */}
-            <div className="absolute top-6 left-6 md:top-12 md:left-12 z-20 animate-in fade-in slide-in-from-top-4 duration-1000">
-                <img src="logo/full-white.png" alt="Quercus Viewer" className="h-10 md:h-12 opacity-90 hover:opacity-100 transition-opacity" />
+            <div className="absolute top-8 left-1/2 -translate-x-1/2 z-20 animate-in fade-in slide-in-from-top-4 duration-1000">
+                <img src="logo/full-white.png" alt="Quercus Viewer" className="h-16 md:h-20 opacity-90 hover:opacity-100 transition-opacity" />
             </div>
 
             {/* Content Container */}
