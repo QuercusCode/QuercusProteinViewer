@@ -1240,9 +1240,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     alpha: true // Enable transparency support
                 }
             });
-            // Increase picking radius significantly for robust mobile selection
-            stage.setParameters({ pickingRadius: 10 });
-
             stageRef.current = stage;
 
             // --- MOUSE CONTROLS ---
@@ -2043,7 +2040,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     }, [resetCamera]);
 
     return (
-        <div className={clsx("relative w-full h-full", className)} style={{ ...(backgroundColor === 'transparent' ? { background: 'transparent' } : {}), touchAction: 'none' }}>
+        <div className={clsx("relative w-full h-full", className)} style={backgroundColor === 'transparent' ? { background: 'transparent' } : {}}>
             <div ref={containerRef} className="w-full h-full" style={backgroundColor === 'transparent' ? { background: 'transparent' } : {}} />
             {loading && (
                 <div className="absolute inset-0 bg-neutral-900 z-50 flex flex-col items-center justify-center">
