@@ -1416,7 +1416,30 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         }
 
                         console.log(`Fetching from: ${url}`);
-                        return await stage.loadFile(url, loadParams);
+
+                        try {
+                            return await stage.loadFile(url, loadParams);
+                        } catch (primaryErr) {
+                            console.warn(`Primary load failed for ${url}`, primaryErr);
+
+                            // Fallback Logic for PubChem (Try 2D SDF if 3D fails)
+                            if (dataSource === 'pubchem') {
+                                console.log("Attempting PubChem 2D Fallback...");
+                                const fallbackUrl = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cleanId}/record/SDF/?record_type=2d`;
+                                try {
+                                    const component = await stage.loadFile(fallbackUrl, { ...loadParams, name: `structure-2d.sdf` });
+                                    return component;
+                                } catch (secondaryErr) {
+                                    console.error("Fallback load failed", secondaryErr);
+                                    if (isMounted.current) setError("Failed to load structure (3D and 2D unavailable).");
+                                    return null;
+                                }
+                            }
+
+                            // Propagate error for PDB
+                            if (isMounted.current) setError("Failed to fetch structure.");
+                            return null;
+                        }
                     }
                     return null;
                 };
