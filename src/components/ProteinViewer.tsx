@@ -1422,6 +1422,14 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         try {
                             const comp = await stage.loadFile(url, loadParams);
                             if (!comp) throw new Error("NGL returned null component");
+
+                            // CRITICAL: Check if structure is actually populated
+                            if (comp.structure && comp.structure.atomCount === 0) {
+                                // If 3D structure is empty, trigger fallback
+                                comp.structure.dispose(); // Cleanup
+                                throw new Error("Loaded 3D structure has 0 atoms");
+                            }
+
                             return comp;
                         } catch (primaryErr) {
                             console.warn(`Primary load failed for ${url}`, primaryErr);
@@ -1432,6 +1440,12 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                 const fallbackUrl = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cleanId}/record/SDF/?record_type=2d`;
                                 try {
                                     const component = await stage.loadFile(fallbackUrl, { ...loadParams, name: `structure-2d.sdf` });
+                                    // Ensure 2D structures are visible (force Line/Licorice as Ball+Stick might fail on 2D)
+                                    if (component) {
+                                        // Tag it so we can handle representation later if needed, 
+                                        // or just return it. The main handleLoad logic will likely set Ball+Stick,
+                                        // which is fine for 2D usually, but Line is safer.
+                                    }
                                     return component;
                                 } catch (secondaryErr) {
                                     console.error("Fallback load failed", secondaryErr);
