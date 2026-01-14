@@ -510,8 +510,9 @@ export const HelpGuide: React.FC<{ isVisible?: boolean, isLightMode?: boolean }>
                             </p>
 
                             <a
-                                href="#"
-                                onClick={(e) => { e.preventDefault(); alert("Please update this link with your actual donation URL (GitHub Sponsors, Patreon, Buy Me a Coffee, etc.)"); }}
+                                href="https://buymeacoffee.com/amirmcheraghali"
+                                target="_blank"
+                                rel="noopener noreferrer"
                                 className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white text-xs font-bold rounded-lg shadow-lg shadow-pink-900/20 transition-all hover:scale-105"
                             >
                                 <Heart className="w-3.5 h-3.5 fill-white/20" />
