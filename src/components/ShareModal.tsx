@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, Copy, Download, Check } from 'lucide-react';
+import { X, Copy, Download, Check, Linkedin } from 'lucide-react';
 import QRCode from 'qrcode';
 
 interface ShareModalProps {
@@ -134,25 +134,55 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                 </button>
                             </div>
                         </div>
+
+                        {/* Social Sharing */}
+                        <div className="space-y-3 mb-6">
+                            <label className={`text-sm font-medium ${isLightMode ? 'text-neutral-700' : 'text-neutral-300'}`}>
+                                Post to Socials
+                            </label>
+                            <div className="flex gap-2">
+                                <a
+                                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent("Check out this protein structure I visualized with Quercus Viewer! 🧬✨")}&url=${encodeURIComponent(shareUrl)}&hashtags=StructuralBiology,ProteinDesign,QuercusViewer`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-bold bg-black text-white hover:bg-neutral-800 transition-colors border border-white/10"
+                                >
+                                    <span className="text-xl">𝕏</span>
+                                    <span className="text-xs">Post</span>
+                                </a>
+                                <a
+                                    href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-bold bg-[#0077b5] text-white hover:bg-[#006396] transition-colors"
+                                >
+                                    <Linkedin className="w-4 h-4" />
+                                    <span className="text-xs">Share</span>
+                                </a>
+                            </div>
+                        </div>
+
                     </>
                 )}
 
-                {/* Actions */}
-                <div className="flex gap-2 mt-6">
-                    <button
-                        onClick={handleDownloadQR}
-                        className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${isLightMode ? 'bg-neutral-100 hover:bg-neutral-200 text-neutral-900' : 'bg-neutral-800 hover:bg-neutral-700 text-white'}`}
-                    >
-                        <Download className="w-4 h-4" />
-                        Download QR
-                    </button>
-                    <button
-                        onClick={onClose}
-                        className="flex-1 px-4 py-2 rounded-lg font-medium bg-blue-600 hover:bg-blue-500 text-white transition-colors"
-                    >
-                        Done
-                    </button>
-                </div>
+                {/* Actions - Bottom Fixed relative to modal if needed, or just flow */}
+                {!warning && (
+                    <div className="flex gap-2 mt-2">
+                        <button
+                            onClick={handleDownloadQR}
+                            className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${isLightMode ? 'bg-neutral-100 hover:bg-neutral-200 text-neutral-900' : 'bg-neutral-800 hover:bg-neutral-700 text-white'}`}
+                        >
+                            <Download className="w-4 h-4" />
+                            Download QR
+                        </button>
+                        <button
+                            onClick={onClose}
+                            className="flex-1 px-4 py-2 rounded-lg font-medium bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+                        >
+                            Done
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
