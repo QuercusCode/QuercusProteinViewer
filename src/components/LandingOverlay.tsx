@@ -41,11 +41,16 @@ export const LandingOverlay: React.FC<LandingOverlayProps> = ({ isVisible, onDis
             {/* Background Interaction Layer (Click to dismiss if clicking empty space) */}
             <div className="absolute inset-0 z-0" onClick={onDismiss} />
 
+            {/* Logo */}
+            <div className="absolute top-6 left-6 md:top-12 md:left-12 z-20 animate-in fade-in slide-in-from-top-4 duration-1000">
+                <img src="logo/full-white.png" alt="Quercus Viewer" className="h-10 md:h-12 opacity-90 hover:opacity-100 transition-opacity" />
+            </div>
+
             {/* Content Container */}
             <div className="relative z-10 w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center md:items-end justify-between gap-12 pointer-events-none">
 
                 {/* HERO SECTION (Left) */}
-                <div className="flex-1 text-center md:text-left pointer-events-auto space-y-6 max-w-2xl">
+                <div className="flex-1 text-center md:text-left pointer-events-auto space-y-6 max-w-2xl mt-12 md:mt-0">
 
                     <h1 className="text-5xl md:text-7xl font-bold text-white tracking-tight leading-none animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
                         Visualize Life <br />
@@ -86,16 +91,16 @@ export const LandingOverlay: React.FC<LandingOverlayProps> = ({ isVisible, onDis
                 </div>
 
                 {/* FEATURED CARD (Right) */}
-                <div className="relative pointer-events-auto w-full max-w-sm animate-in fade-in slide-in-from-right-8 duration-1000 delay-500 hidden md:block">
-                    {/* Glass Card */}
-                    <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-6 rounded-3xl shadow-2xl relative overflow-hidden group hover:border-white/20 transition-colors">
+                <div className="relative pointer-events-auto w-full max-w-md animate-in fade-in slide-in-from-right-8 duration-1000 delay-500 hidden md:block">
+                    {/* Glass Card - Enlarged */}
+                    <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-8 rounded-3xl shadow-2xl relative overflow-hidden group hover:border-white/20 transition-colors transform hover:-translate-y-2 duration-500">
                         <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity scale-150">
-                            <Activity size={120} />
+                            <Activity size={180} />
                         </div>
 
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-white font-bold flex items-center gap-2">
-                                <Activity size={16} className="text-blue-400" />
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="text-white font-bold flex items-center gap-2 text-lg">
+                                <Activity size={20} className="text-blue-400" />
                                 Molecule of the Day
                             </h3>
                             <span className="text-xs font-mono text-blue-400 px-2 py-1 rounded bg-blue-500/10 border border-blue-500/20">
@@ -103,22 +108,22 @@ export const LandingOverlay: React.FC<LandingOverlayProps> = ({ isVisible, onDis
                             </span>
                         </div>
 
-                        <div className="h-48 mb-4 rounded-xl bg-black/50 border border-white/5 flex items-center justify-center relative overflow-hidden group-hover:border-white/20 transition-colors">
+                        <div className="h-64 mb-6 rounded-2xl bg-black/50 border border-white/5 flex items-center justify-center relative overflow-hidden group-hover:border-white/20 transition-colors shadow-inner">
                             <img
                                 src={`https://cdn.rcsb.org/images/structures/${moleculeOfTheDay.id.toLowerCase()}_assembly-1.jpeg`}
                                 alt={moleculeOfTheDay.title}
-                                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                                className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-700 group-hover:scale-105"
                                 onError={(e) => {
                                     (e.target as HTMLImageElement).style.display = 'none';
                                     (e.target as HTMLImageElement).parentElement!.classList.add('bg-gradient-to-br', 'from-blue-500/20', 'to-purple-500/20');
                                 }}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end p-4">
-                                <p className="text-white text-sm font-bold truncate w-full shadow-black drop-shadow-md">{moleculeOfTheDay.title}</p>
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-5">
+                                <p className="text-white text-lg font-bold truncate w-full shadow-black drop-shadow-md leading-tight">{moleculeOfTheDay.title}</p>
                             </div>
                         </div>
 
-                        <p className="text-gray-400 text-sm line-clamp-2 mb-4">
+                        <p className="text-gray-400 text-sm line-clamp-3 mb-6 leading-relaxed">
                             {moleculeOfTheDay.description}
                         </p>
 
@@ -127,19 +132,15 @@ export const LandingOverlay: React.FC<LandingOverlayProps> = ({ isVisible, onDis
                                 onLoadPdb(moleculeOfTheDay.id, `models/${moleculeOfTheDay.id}.pdb`);
                                 onDismiss();
                             }}
-                            className="w-full py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/5 text-white font-semibold text-sm transition-all flex items-center justify-center gap-2 group-hover:border-white/20"
+                            className="w-full py-4 rounded-xl bg-white text-black font-bold text-sm transition-all flex items-center justify-center gap-2 hover:bg-gray-200 hover:scale-[1.02]"
                         >
-                            <BookOpen size={16} />
+                            <BookOpen size={18} />
                             View Structure
                         </button>
                     </div>
                 </div>
             </div>
 
-            {/* Scroll Indicator (optional) */}
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/20 animate-bounce hidden md:block">
-                <div className="w-1 h-12 rounded-full bg-gradient-to-b from-white to-transparent" />
-            </div>
         </div>
     );
 };
