@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { PLAYLISTS, Playlist, PlaylistTrack } from '../data/playlists';
+import { PLAYLISTS } from '../data/playlists';
+import type { Playlist } from '../data/playlists';
 
 interface UsePlaylistProps {
     onLoadStructure: (id: string, source: 'pdb' | 'pubchem') => void;
@@ -9,12 +10,8 @@ export const usePlaylist = ({ onLoadStructure }: UsePlaylistProps) => {
     const [currentPlaylist, setCurrentPlaylist] = useState<Playlist | null>(null);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [progress, setProgress] = useState(0); // 0 to 100
 
     const speechRef = useRef<SpeechSynthesisUtterance | null>(null);
-    const timerRef = useRef<NodeJS.Timeout | null>(null);
-    const startTimeRef = useRef<number>(0);
-    const durationRef = useRef<number>(10000); // Default 10s per track if TTS fails/shorter
 
     // --- TTS HELPERS ---
     const speak = useCallback((text: string, onEnd: () => void) => {
@@ -151,7 +148,6 @@ export const usePlaylist = ({ onLoadStructure }: UsePlaylistProps) => {
         stopPlaylist,
         togglePlay,
         nextTrack,
-        prevTrack,
-        progress // Optional: implement progress bar based on speech duration estimate
+        prevTrack
     };
 };

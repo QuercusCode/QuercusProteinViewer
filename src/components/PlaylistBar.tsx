@@ -1,6 +1,6 @@
 import React from 'react';
 import { Play, Pause, SkipForward, SkipBack, Hexagon, X } from 'lucide-react';
-import { cn } from '../utils/cn'; // Assuming utils/cn exists, or use clsx directly if not
+import clsx from 'clsx';
 import type { Playlist, PlaylistTrack } from '../data/playlists';
 
 interface PlaylistBarProps {
@@ -34,7 +34,7 @@ export const PlaylistBar: React.FC<PlaylistBarProps> = ({
                 </div>
 
                 {/* Cover/Icon */}
-                <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-lg text-white", currentPlaylist.coverColor)}>
+                <div className={clsx("w-12 h-12 rounded-xl flex items-center justify-center shrink-0 shadow-lg text-white", currentPlaylist.coverColor)}>
                     <Hexagon size={24} className={isPlaying ? "animate-pulse" : ""} />
                 </div>
 
