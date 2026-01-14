@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { X, Copy, Download, Check, Linkedin } from 'lucide-react';
 import QRCode from 'qrcode';
+import { logEvent } from '../utils/analytics';
 
 interface ShareModalProps {
     isOpen: boolean;
@@ -14,6 +15,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
     const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
     const [generationError, setGenerationError] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<'link' | 'embed'>('link');
 
     // Generate QR Code
     useEffect(() => {
@@ -43,6 +45,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
         try {
             await navigator.clipboard.writeText(shareUrl);
             setCopied(true);
+            logEvent('copy_share_link', { url: shareUrl });
             setTimeout(() => setCopied(false), 2000);
         } catch (err) {
             console.error('Failed to copy', err);
@@ -51,6 +54,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
 
     const handleDownloadQR = () => {
         if (!qrCodeDataUrl) return;
+        logEvent('download_qr');
         const link = document.createElement('a');
         link.href = qrCodeDataUrl;
         link.download = 'protein-viewer-qr-code.png';
@@ -59,11 +63,33 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
         document.body.removeChild(link);
     };
 
+    // Generate Embed Code
+    const embedCode = `<iframe
+  src="${shareUrl.replace('?', '?embed=true&')}"
+  width="800"
+  height="600"
+  style="border:none; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);"
+  title="Quercus Viewer"
+  allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+  allowfullscreen
+></iframe>`;
+
+    const handleCopyEmbed = async () => {
+        try {
+            await navigator.clipboard.writeText(embedCode);
+            setCopied(true);
+            logEvent('copy_embed_code');
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            console.error('Failed to copy', err);
+        }
+    };
+
     if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm animate-in fade-in">
-            <div className={`relative w-full max-w-md rounded-xl shadow-2xl p-6 ${isLightMode ? 'bg-white text-neutral-900' : 'bg-neutral-900 text-white'}`}>
+            <div className={`relative w-full max-w-lg rounded-xl shadow-2xl p-6 ${isLightMode ? 'bg-white text-neutral-900' : 'bg-neutral-900 text-white'}`}>
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold">Share Visualization</h2>
@@ -89,84 +115,125 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                     </div>
                 ) : (
                     <>
-                        {/* QR Code */}
-                        <div className="flex flex-col items-center gap-4 mb-6">
-                            {qrCodeDataUrl ? (
-                                <div className={`p-4 rounded-lg border-2 ${isLightMode ? 'bg-white border-neutral-200' : 'bg-neutral-950 border-neutral-700'}`}>
-                                    <img src={qrCodeDataUrl} alt="QR Code" className="w-64 h-64" />
-                                </div>
-                            ) : (
-                                <div className="w-64 h-64 flex flex-col items-center justify-center text-center p-4">
-                                    {generationError ? (
-                                        <>
-                                            <div className="text-red-500 mb-2">⚠️</div>
-                                            <p className="text-sm text-red-400">{generationError}</p>
-                                            <p className="text-xs text-neutral-500 mt-2">Try shortening the URL or using fewer viewports.</p>
-                                        </>
+                        {/* Tabs */}
+                        <div className={`flex p-1 mb-6 rounded-lg ${isLightMode ? 'bg-neutral-100' : 'bg-neutral-800'}`}>
+                            <button
+                                onClick={() => setActiveTab('link')}
+                                className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'link'
+                                    ? (isLightMode ? 'bg-white shadow-sm text-neutral-900' : 'bg-neutral-700 shadow-sm text-white')
+                                    : (isLightMode ? 'text-neutral-500 hover:text-neutral-900' : 'text-neutral-400 hover:text-white')
+                                    }`}
+                            >
+                                Share Link
+                            </button>
+                            <button
+                                onClick={() => setActiveTab('embed')}
+                                className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'embed'
+                                    ? (isLightMode ? 'bg-white shadow-sm text-neutral-900' : 'bg-neutral-700 shadow-sm text-white')
+                                    : (isLightMode ? 'text-neutral-500 hover:text-neutral-900' : 'text-neutral-400 hover:text-white')
+                                    }`}
+                            >
+                                Embed Widget
+                            </button>
+                        </div>
+
+                        {activeTab === 'link' ? (
+                            <>
+                                {/* QR Code */}
+                                <div className="flex flex-col items-center gap-4 mb-6">
+                                    {qrCodeDataUrl ? (
+                                        <div className={`p-4 rounded-lg border-2 ${isLightMode ? 'bg-white border-neutral-200' : 'bg-neutral-950 border-neutral-700'}`}>
+                                            <img src={qrCodeDataUrl} alt="QR Code" className="w-48 h-48" />
+                                        </div>
                                     ) : (
-                                        <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full" />
+                                        <div className="w-48 h-48 flex flex-col items-center justify-center text-center p-4">
+                                            {generationError ? (
+                                                <>
+                                                    <div className="text-red-500 mb-2">⚠️</div>
+                                                    <p className="text-sm text-red-400">{generationError}</p>
+                                                    <p className="text-xs text-neutral-500 mt-2">Try shortening the URL or using fewer viewports.</p>
+                                                </>
+                                            ) : (
+                                                <div className="animate-spin w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full" />
+                                            )}
+                                        </div>
                                     )}
                                 </div>
-                            )}
-                            <p className={`text-sm text-center ${isLightMode ? 'text-neutral-600' : 'text-neutral-400'}`}>
-                                Scan to view this visualization
-                            </p>
-                        </div>
 
-                        {/* Link */}
-                        <div className="space-y-3">
-                            <label className={`text-sm font-medium ${isLightMode ? 'text-neutral-700' : 'text-neutral-300'}`}>
-                                Shareable Link
-                            </label>
-                            <div className={`flex items-center gap-2 p-3 rounded-lg border ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-950 border-neutral-700'}`}>
-                                <input
-                                    type="text"
-                                    value={shareUrl}
-                                    readOnly
-                                    className={`flex-1 bg-transparent text-sm outline-none ${isLightMode ? 'text-neutral-900' : 'text-neutral-100'}`}
-                                />
+                                {/* Link */}
+                                <div className="space-y-3 mb-6">
+                                    <label className={`text-sm font-medium ${isLightMode ? 'text-neutral-700' : 'text-neutral-300'}`}>
+                                        Shareable Link
+                                    </label>
+                                    <div className={`flex items-center gap-2 p-3 rounded-lg border ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-950 border-neutral-700'}`}>
+                                        <input
+                                            type="text"
+                                            value={shareUrl}
+                                            readOnly
+                                            className={`flex-1 bg-transparent text-sm outline-none ${isLightMode ? 'text-neutral-900' : 'text-neutral-100'}`}
+                                        />
+                                        <button
+                                            onClick={handleCopy}
+                                            className={`p-2 rounded-lg transition-colors ${copied ? 'bg-green-500 text-white' : (isLightMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white')}`}
+                                            title="Copy to clipboard"
+                                        >
+                                            {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Social Sharing */}
+                                <div className="space-y-3 mb-6">
+                                    <label className={`text-sm font-medium ${isLightMode ? 'text-neutral-700' : 'text-neutral-300'}`}>
+                                        Post to Socials
+                                    </label>
+                                    <div className="flex gap-2">
+                                        <a
+                                            href={`https://twitter.com/intent/tweet?text=${encodeURIComponent("Check out this protein structure I visualized with Quercus Viewer! 🧬✨")}&url=${encodeURIComponent(shareUrl)}&hashtags=StructuralBiology,ProteinDesign,QuercusViewer`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            onClick={() => logEvent('share_twitter')}
+                                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-bold bg-black text-white hover:bg-neutral-800 transition-colors border border-white/10"
+                                        >
+                                            <span className="text-xl">𝕏</span>
+                                            <span className="text-xs">Post</span>
+                                        </a>
+                                        <a
+                                            href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            onClick={() => logEvent('share_linkedin')}
+                                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-bold bg-[#0077b5] text-white hover:bg-[#006396] transition-colors"
+                                        >
+                                            <Linkedin className="w-4 h-4" />
+                                            <span className="text-xs">Share</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            /* Embed Tab */
+                            <div className="space-y-4 mb-6">
+                                <div className={`p-4 rounded-lg border leading-relaxed font-mono text-xs overflow-x-auto ${isLightMode ? 'bg-neutral-50 border-neutral-200 text-neutral-600' : 'bg-neutral-950 border-neutral-800 text-neutral-400'}`}>
+                                    {embedCode}
+                                </div>
                                 <button
-                                    onClick={handleCopy}
-                                    className={`p-2 rounded-lg transition-colors ${copied ? 'bg-green-500 text-white' : (isLightMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white')}`}
-                                    title="Copy to clipboard"
+                                    onClick={handleCopyEmbed}
+                                    className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-bold transition-colors ${copied ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white'}`}
                                 >
                                     {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                    {copied ? 'Copied!' : 'Copy Embed Code'}
                                 </button>
+                                <p className={`text-xs text-center ${isLightMode ? 'text-neutral-500' : 'text-neutral-500'}`}>
+                                    Paste this code into your website or blog to display an interactive 3D viewer.
+                                </p>
                             </div>
-                        </div>
-
-                        {/* Social Sharing */}
-                        <div className="space-y-3 mb-6">
-                            <label className={`text-sm font-medium ${isLightMode ? 'text-neutral-700' : 'text-neutral-300'}`}>
-                                Post to Socials
-                            </label>
-                            <div className="flex gap-2">
-                                <a
-                                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent("Check out this protein structure I visualized with Quercus Viewer! 🧬✨")}&url=${encodeURIComponent(shareUrl)}&hashtags=StructuralBiology,ProteinDesign,QuercusViewer`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-bold bg-black text-white hover:bg-neutral-800 transition-colors border border-white/10"
-                                >
-                                    <span className="text-xl">𝕏</span>
-                                    <span className="text-xs">Post</span>
-                                </a>
-                                <a
-                                    href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-bold bg-[#0077b5] text-white hover:bg-[#006396] transition-colors"
-                                >
-                                    <Linkedin className="w-4 h-4" />
-                                    <span className="text-xs">Share</span>
-                                </a>
-                            </div>
-                        </div>
-
+                        )}
                     </>
                 )}
 
-                {/* Actions - Bottom Fixed relative to modal if needed, or just flow */}
-                {!warning && (
+                {/* Actions - Link Mode Only (Download QR) */}
+                {!warning && activeTab === 'link' && (
                     <div className="flex gap-2 mt-2">
                         <button
                             onClick={handleDownloadQR}

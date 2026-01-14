@@ -44,7 +44,15 @@ import { useVisualStack, type VisualState } from './hooks/useVisualStack';
 import { useStructureController, type StructureController } from './hooks/useStructureController';
 import { useStructureMetadata } from './hooks/useStructureMetadata';
 
+import { initGA, logPageView, logEvent } from './utils/analytics';
+
 function App() {
+  // Initialize Analytics
+  useEffect(() => {
+    initGA();
+    logPageView(window.location.pathname + window.location.search);
+  }, []);
+
   // Refs for Multi-View Viewers (supports 1-4 viewports)
   const viewerRefs = [
     useRef<ProteinViewerRef>(null),
@@ -138,6 +146,7 @@ function App() {
                 timestamp: Date.now()
               };
               setSnapshots(prev => [newSnapshot, ...prev]);
+              logEvent('take_snapshot', { factor: factor, transparent: transparent });
             }
           }
           break;
@@ -263,6 +272,12 @@ function App() {
   useEffect(() => {
     localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
   }, [isLightMode]);
+
+  // Embed Mode State
+  const [isEmbedMode] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('embed') === 'true';
+  });
 
   // Presentation State
   // isSpinning extracted to hook
@@ -1493,16 +1508,18 @@ function App() {
       />
 
 
-      <AISidebar
-        isOpen={isAISidebarOpen}
-        onClose={() => setIsAISidebarOpen(false)}
-        pdbId={pdbId}
-        proteinTitle={proteinTitle}
-        highlightedResidue={highlightedResidue}
-        stats={structureStats}
-        chains={chains}
-        onAction={handleAIAction}
-      />
+      {!isEmbedMode && (
+        <AISidebar
+          isOpen={isAISidebarOpen}
+          onClose={() => setIsAISidebarOpen(false)}
+          pdbId={pdbId}
+          proteinTitle={proteinTitle}
+          highlightedResidue={highlightedResidue}
+          stats={structureStats}
+          chains={chains}
+          onAction={handleAIAction}
+        />
+      )}
       {/* HUD - Positioned at bottom to avoid viewport interference */}
       <HUD
         hoveredResidue={hoveredResidue}
@@ -1548,6 +1565,8 @@ function App() {
 
         {/* Logic to determine if we are looking at a Chemical */}
         {(() => {
+          if (isEmbedMode) return null; // Hide Sidebar in Embed Mode
+
           const isChemical = dataSource === 'pubchem' ||
             (file && /\.(sdf|mol|cif)$/i.test(file.name));
 
@@ -1983,7 +2002,22 @@ function App() {
 
       <ToastContainer toasts={toasts} onRemove={removeToast} />
 
-      <HelpGuide isVisible={!isCleanMode} isLightMode={isLightMode} hasSequence={chains.length > 0} />
+      {!isEmbedMode && (
+        <HelpGuide isVisible={!isCleanMode} isLightMode={isLightMode} hasSequence={chains.length > 0} />
+      )}
+
+      {/* Embed Mode Attribution - Viral Loop */}
+      {isEmbedMode && (
+        <a
+          href="https://quercuscode.github.io/QuercusViewer/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-3 right-3 z-50 px-3 py-1.5 bg-black/80 backdrop-blur-md text-white text-xs font-bold rounded-full shadow-lg border border-white/20 hover:scale-105 transition-transform flex items-center gap-1.5"
+        >
+          <span className="text-lg leading-none">🧬</span>
+          Powered by Quercus
+        </a>
+      )}
 
       {/* Background Gradient */}
       <div className={`absolute inset-0 pointer-events-none transition-opacity duration-300 ${isLightMode ? 'opacity-0' : 'opacity-100 bg-[radial-gradient(circle_at_50%_50%,rgba(50,50,80,0.2),rgba(0,0,0,0))]'}`} />

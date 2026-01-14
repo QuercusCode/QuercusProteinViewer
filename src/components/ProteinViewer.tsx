@@ -428,33 +428,74 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 }
             };
 
-            try {
-                // High Quality Export
-                const blob = await stageRef.current.makeImage({
-                    factor: resolutionFactor,
-                    type: 'png',
-                    antialias: true,
-                    trim: false,
-                    transparent: transparent
-                });
-                return await fixPngBlob(blob);
-            } catch (err) {
-                console.warn("High-res export failed, trying low-res fallback...", err);
+            return new Promise<Blob | null>(async (resolve) => {
                 try {
-                    const blob = await stageRef.current.makeImage({
-                        factor: 1,
-                        type: 'png',
+                    const blob = await stageRef.current!.makeImage({
+                        factor: resolutionFactor,
                         antialias: true,
                         trim: false,
                         transparent: transparent
                     });
-                    return await fixPngBlob(blob);
-                } catch (err2) {
-                    console.error("Snapshot failed:", err2);
-                    return null;
+
+                    // Fix potentially broken NGL blob
+                    const fixedBlob = await fixPngBlob(blob);
+
+                    // Add Watermark via Canvas
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        if (!ctx) {
+                            resolve(fixedBlob);
+                            return;
+                        }
+
+                        // Draw Structure
+                        ctx.drawImage(img, 0, 0);
+
+                        // Draw Watermark
+                        // 3% of height or max 40px, min 20px
+                        const fontSize = Math.max(20, Math.min(40, Math.floor(img.height * 0.025)));
+                        ctx.font = `700 ${fontSize}px "Inter", sans-serif`; // Use project font
+                        ctx.textAlign = 'right';
+                        ctx.textBaseline = 'bottom';
+
+                        // Drop Shadow for legibility on any background
+                        ctx.shadowColor = 'rgba(0,0,0,0.6)';
+                        ctx.shadowBlur = 4;
+                        ctx.shadowOffsetX = 1;
+                        ctx.shadowOffsetY = 1;
+
+                        // Add "QuercusViewer" Logo text
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+
+                        const margin = Math.floor(img.width * 0.02);
+                        ctx.fillText("Powered by QuercusViewer", img.width - margin, img.height - margin);
+
+                        // Convert back to blob
+                        canvas.toBlob((finalBlob) => {
+                            URL.revokeObjectURL(img.src); // Cleanup
+                            resolve(finalBlob || fixedBlob);
+                        }, 'image/png');
+                    };
+
+                    img.onerror = (e) => {
+                        console.error("Watermark generation failed", e);
+                        resolve(fixedBlob);
+                    };
+
+                    img.src = URL.createObjectURL(fixedBlob);
+
+                } catch (e) {
+                    console.error("Snapshot generation failed", e);
+                    resolve(null);
                 }
-            }
+            });
         },
+
+
         getAtomPosition: (chain: string, resNo: number, atomName: string = 'CA') => {
             // Helper to get 3D coordinates for a residue
             if (!componentRef.current) return null;
