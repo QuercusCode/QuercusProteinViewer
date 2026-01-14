@@ -534,20 +534,20 @@ export const HelpGuide: React.FC<{ isVisible?: boolean, isLightMode?: boolean }>
                 href="https://buymeacoffee.com/amirmcheraghali"
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`fixed top-4 right-[80px] z-40 p-2 rounded-full border shadow-lg backdrop-blur-md transition-all hover:scale-105 group flex items-center gap-2 pr-4 ${isLightMode ? 'bg-white/80 text-pink-600 border-black/10 hover:bg-white' : 'bg-neutral-900/80 text-pink-500 border-white/10 hover:text-pink-400'}`}
+                className={`fixed top-4 right-[80px] z-40 h-10 px-4 rounded-full border shadow-lg backdrop-blur-md transition-all hover:scale-105 group flex items-center gap-2 ${isLightMode ? 'bg-white/80 text-pink-600 border-black/10 hover:bg-white' : 'bg-neutral-900/80 text-pink-500 border-white/10 hover:text-pink-400'}`}
                 title="Support Development"
             >
-                <Heart className={`w-5 h-5 ${isLightMode ? 'fill-pink-100' : 'fill-pink-900/30'}`} />
+                <Heart className={`w-4 h-4 ${isLightMode ? 'fill-pink-100' : 'fill-pink-900/30'}`} />
                 <span className="text-xs font-bold hidden sm:block">Donate</span>
             </a>
 
             {/* Trigger Button */}
             <button
                 onClick={() => setIsOpen(true)}
-                className={`fixed top-4 right-[27px] z-40 p-2 rounded-full border shadow-lg backdrop-blur-md transition-all hover:scale-105 group ${isLightMode ? 'bg-white/80 text-neutral-600 hover:text-blue-600 border-black/10 hover:bg-white' : 'bg-neutral-900/80 text-neutral-400 hover:text-white border-white/10'}`}
+                className={`fixed top-4 right-[27px] z-40 h-10 w-10 flex items-center justify-center rounded-full border shadow-lg backdrop-blur-md transition-all hover:scale-105 group ${isLightMode ? 'bg-white/80 text-neutral-600 hover:text-blue-600 border-black/10 hover:bg-white' : 'bg-neutral-900/80 text-neutral-400 hover:text-white border-white/10'}`}
                 title="Viewer Controls & Help"
             >
-                <CircleHelp className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+                <CircleHelp className="w-5 h-5 group-hover:rotate-12 transition-transform" />
             </button>
 
             {/* Modal Overlay */}
