@@ -44,6 +44,8 @@ import { useHistory } from './hooks/useHistory';
 import { useVisualStack, type VisualState } from './hooks/useVisualStack';
 import { useStructureController, type StructureController } from './hooks/useStructureController';
 import { useStructureMetadata } from './hooks/useStructureMetadata';
+import { usePlaylist } from './hooks/usePlaylist';
+import { PlaylistBar } from './components/PlaylistBar';
 
 import { initGA, logPageView, logEvent } from './utils/analytics';
 
@@ -1033,6 +1035,7 @@ function App() {
         setIsCommandPaletteOpen(false);
         setIsLibraryOpen(false);
         setShowContactMap(false);
+        setShowLanding(false); // Close landing if open
         return;
       }
 
@@ -1046,7 +1049,7 @@ function App() {
           if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen().catch((err) => console.error(err));
           } else {
-            document.exitFullscreen();
+            try { document.exitFullscreen(); } catch (e) { console.error(e) }
           }
           break;
         case 't':
@@ -1356,11 +1359,35 @@ function App() {
         if (!document.fullscreenElement) {
           document.documentElement.requestFullscreen();
         } else {
-          document.exitFullscreen();
+          try { document.exitFullscreen(); } catch (e) { console.error(e) }
         }
       }
     },
   ], [isPublicationMode, isSpinning, isLightMode, isMeasurementMode, showContactMap, handleSaveSession, handleSnapshot, handleResetView]);
+
+  // --- PLAYLIST HOOK ---
+  const {
+    currentPlaylist,
+    currentTrack,
+    isPlaying: isPlaylistPlaying,
+    startPlaylist,
+    stopPlaylist,
+    togglePlay: togglePlaylistPlay,
+    nextTrack,
+    prevTrack
+  } = usePlaylist({
+    onLoadStructure: (id, source) => {
+      // Reset view to avoid carry-over artifacts
+      activeController.handleResetView();
+      setFile(null);
+
+      // Force update
+      activeController.setDataSource(source);
+      activeController.setPdbId(id);
+      setIsSpinning(true); // Always spin during playlists
+      setRepresentation('cartoon'); // Default
+    }
+  });
 
 
   return (
@@ -1395,6 +1422,7 @@ function App() {
         onClose={() => setIsLibraryOpen(false)}
         onSelect={(url) => {
           setIsLibraryOpen(false);
+          setShowLanding(false); // Close landing if open
 
           // Handle Chemical Library Selection
           if (url.startsWith('pubchem://')) {
@@ -1495,6 +1523,11 @@ function App() {
               }
             });
         }}
+        onStartPlaylist={(id) => {
+          startPlaylist(id);
+          setIsLibraryOpen(false);
+          setShowLanding(false);
+        }}
       />
 
       <FavoritesPanel
@@ -1570,6 +1603,21 @@ function App() {
         onToggleOverlay={controllers[activeViewIndex].toggleOverlay}
       />
 
+      {/* BACKGROUND (Dark Mode) */}
+      {!isLightMode && !customBackgroundColor && activeViewIndex === 0 && viewMode === 'single' && (
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-950 -z-10" />
+      )}
+
+      {/* --- PLAYLIST BAR (Overlay) --- */}
+      <PlaylistBar
+        currentPlaylist={currentPlaylist}
+        currentTrack={currentTrack}
+        isPlaying={isPlaylistPlaying}
+        onTogglePlay={togglePlaylistPlay}
+        onNext={nextTrack}
+        onPrev={prevTrack}
+        onStop={stopPlaylist}
+      />
       {/* Main Content: Flex Container for Sidebars and Viewports */}
       <div className="flex flex-1 w-full h-full overflow-hidden">
 
