@@ -542,7 +542,7 @@ export const HelpGuide: React.FC<{ isVisible?: boolean, isLightMode?: boolean }>
     return (
         <>
             {/* Donation Dropdown (Floating next to Help) */}
-            <div className="fixed top-4 right-[80px] z-40 group">
+            <div className="fixed top-4 right-[80px] md:right-[176px] z-40 group">
                 <button
                     className={`h-10 px-4 rounded-full border shadow-lg backdrop-blur-md transition-all group-hover:bg-neutral-800 group-hover:text-white flex items-center gap-2 ${isLightMode ? 'bg-white/80 text-pink-600 border-black/10' : 'bg-neutral-900/80 text-pink-500 border-white/10'}`}
                 >
@@ -589,7 +589,7 @@ export const HelpGuide: React.FC<{ isVisible?: boolean, isLightMode?: boolean }>
             {/* Trigger Button */}
             <button
                 onClick={() => setIsOpen(true)}
-                className={`fixed top-4 right-[27px] z-40 h-10 w-10 flex items-center justify-center rounded-full border shadow-lg backdrop-blur-md transition-all hover:scale-105 group ${isLightMode ? 'bg-white/80 text-neutral-600 hover:text-blue-600 border-black/10 hover:bg-white' : 'bg-neutral-900/80 text-neutral-400 hover:text-white border-white/10'}`}
+                className={`fixed top-4 right-[27px] md:right-[123px] z-40 h-10 w-10 flex items-center justify-center rounded-full border shadow-lg backdrop-blur-md transition-all hover:scale-105 group ${isLightMode ? 'bg-white/80 text-neutral-600 hover:text-blue-600 border-black/10 hover:bg-white' : 'bg-neutral-900/80 text-neutral-400 hover:text-white border-white/10'}`}
                 title="Viewer Controls & Help"
             >
                 <CircleHelp className="w-5 h-5 group-hover:rotate-12 transition-transform" />
