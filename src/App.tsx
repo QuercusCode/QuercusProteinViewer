@@ -223,7 +223,7 @@ function App() {
     coloring, setColoring,
     customColors, setCustomColors,
     isSpinning, setIsSpinning,
-    isRocking, setIsRocking, // New: Gentle Rocking
+    setIsRocking, // New: Gentle Rocking
     showSurface, setShowSurface,
     showLigands, setShowLigands,
     showIons, setShowIons,
