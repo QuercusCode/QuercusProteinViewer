@@ -1707,22 +1707,27 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             // align=true moves the component
                             // align=true moves the component
                             let s = comp.superpose(mainComponent, true, "CA");
+                            console.log(`[Superpose] '${overlay.id}' CA result:`, s);
 
                             // Fallback if CA superposition fails (or returns bad RMSD)
                             if (!s || (typeof s.rmsd !== 'number' && typeof s.mean2 !== 'number')) {
-                                console.log("CA superposition failed or invalid, retrying with all atoms...");
+                                console.log(`[Superpose] '${overlay.id}' CA failed (atoms: ${comp.structure.atomCount}). Retrying global...`);
                                 s = comp.superpose(mainComponent, true);
+                                console.log(`[Superpose] '${overlay.id}' Global result:`, s);
                             }
 
-                            console.log("Superposition result:", s);
-
-                            // Extract RMSD (NGL sometimes calls it 'mean2' for mean square error? No, it's rmsd usually)
-                            // But checking 'rmsd' property
                             if (s && onOverlayRMSDCalculated) {
-                                const val = s.rmsd;
+                                // NGL uses 'rmsd' or sometimes 'mean2' (mean square deviation)
+                                const val = s.rmsd ?? s.mean2;
+                                console.log(`[Superpose] Calculated RMSD: ${val}`);
+
                                 if (typeof val === 'number') {
                                     onOverlayRMSDCalculated(overlay.id, val);
+                                } else {
+                                    console.warn(`[Superpose] Invalid RMSD value type: ${typeof val}`, s);
                                 }
+                            } else {
+                                console.warn("[Superpose] No result object or callback missing", { s, hasCallback: !!onOverlayRMSDCalculated });
                             }
                         } catch (e) {
                             console.warn("Superposition failed:", e);
