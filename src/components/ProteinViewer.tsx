@@ -1283,13 +1283,17 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     useEffect(() => {
         if (stageRef.current) {
             if (isSpinning) {
-                // If speed is provided, use array format: [axisX, axisY, axisZ, speed]
-                // NGL default axis is Y [0, 1, 0].
-                if (typeof spinSpeed === 'number') {
-                    stageRef.current.setSpin([0, 1, 0], spinSpeed);
-                } else {
-                    stageRef.current.setSpin(true);
+                // Determine speed (default is approx 0.01)
+                const speed = (typeof spinSpeed === 'number') ? spinSpeed : 0.01;
+
+                // Update internal parameters if available
+                if (stageRef.current.spinAnimation) {
+                    stageRef.current.spinAnimation.axis.set(0, 1, 0);
+                    stageRef.current.spinAnimation.angle = speed;
                 }
+
+                // Ensure spinning is enabled
+                stageRef.current.setSpin(true);
             } else {
                 stageRef.current.setSpin(false);
             }
