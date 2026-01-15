@@ -2155,9 +2155,9 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 // Oscillate velocity: dAlpha = Amplitude * cos(frequency * t)
                 // Resulting position is sin wave.
                 // Frequency: slower (0.001)
-                // Amplitude scale: 0.1 deg per frame max
+                // Amplitude scale: 1.5 deg per frame max = ~180deg total swing
                 const time = Date.now() - startTime;
-                const delta = 0.5 * Math.cos(time * 0.001);
+                const delta = 1.5 * Math.cos(time * 0.001);
                 // Rotate camera slightly
                 stageRef.current.viewerControls.rotate(delta, 0);
                 animationId = requestAnimationFrame(animate);
