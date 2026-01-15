@@ -1585,7 +1585,10 @@ function App() {
       {/* HUD - Positioned at bottom to avoid viewport interference */}
       <HUD
         hoveredResidue={hoveredResidue}
+        pdbMetadata={pdbMetadata}
+        pdbId={pdbId}
         isLightMode={isLightMode}
+        isEmbedMode={isEmbedMode}
       />
 
       {isMeasurementPanelOpen && (
