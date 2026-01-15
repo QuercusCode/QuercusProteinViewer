@@ -2141,13 +2141,32 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     }, [isSpinning]);
 
     useEffect(() => {
-        if (stageRef.current) {
-            if (isRocking) {
-                // Slower rocking: angle=1.05 (radians ~60deg), step=0.0005 (very subtle)
-                stageRef.current.setRock(true, 1.05, 0.0005);
-            } else {
-                stageRef.current.setRock(false);
-            }
+        if (!stageRef.current) return;
+
+        if (isRocking) {
+            stageRef.current.setRock(false); // Disable native
+            stageRef.current.setSpin(false);
+
+            let animationId: number;
+            const startTime = Date.now();
+
+            const animate = () => {
+                // Custom Gentle Rock Animation
+                // Oscillate velocity: dAlpha = Amplitude * cos(frequency * t)
+                // Resulting position is sin wave.
+                // Frequency: slower (0.001)
+                // Amplitude scale: 0.1 deg per frame max
+                const time = Date.now() - startTime;
+                const delta = 0.5 * Math.cos(time * 0.001);
+                // Rotate camera slightly
+                stageRef.current.viewerControls.rotate(delta, 0);
+                animationId = requestAnimationFrame(animate);
+            };
+
+            animate();
+            return () => cancelAnimationFrame(animationId);
+        } else {
+            stageRef.current.setRock(false);
         }
     }, [isRocking]);
 
