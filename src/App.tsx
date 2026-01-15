@@ -802,6 +802,8 @@ function App() {
           customBackgroundColor: ctrl.customBackgroundColor,
           isMeasurementMode: isMeasurementMode, // This is global for now, or per-viewport?
           measurements: ctrl.measurements,
+          customColors: ctrl.customColors,
+          overlays: ctrl.overlays,
           orientation: ref.current?.getOrientation()
         };
       });
@@ -814,6 +816,7 @@ function App() {
         // Global boolean flags or specific viewport data
         isLightMode,
         isCleanMode,
+        palette: colorPalette,
         snapshots, // Global snapshots
         // The core data
         viewports: viewportsData
@@ -856,6 +859,7 @@ function App() {
         if (session.viewMode) setViewMode(session.viewMode as ViewMode);
         if (session.isLightMode !== undefined) setIsLightMode(session.isLightMode);
         if (session.isCleanMode !== undefined) setIsCleanMode(session.isCleanMode);
+        if (session.palette) setColorPalette(session.palette);
         if (session.snapshots) setSnapshots(session.snapshots);
 
         if (Array.isArray(session.viewports)) {
@@ -871,6 +875,8 @@ function App() {
               if (vp.isSpinning !== undefined) ctrl.setIsSpinning(vp.isSpinning);
               if (vp.customBackgroundColor) ctrl.setCustomBackgroundColor(vp.customBackgroundColor);
               if (vp.measurements) ctrl.setMeasurements(vp.measurements);
+              if (vp.customColors) ctrl.setCustomColors(vp.customColors);
+              if (vp.overlays) ctrl.setOverlays(vp.overlays);
 
               // Orientation
               if (vp.orientation) {
@@ -901,6 +907,10 @@ function App() {
 
         if (session.snapshots) setSnapshots(session.snapshots);
 
+        // Restore custom/overlay if present in legacy object
+        if (session.customColors) ctrl.setCustomColors(session.customColors);
+        if (session.overlays) ctrl.setOverlays(session.overlays);
+
         // Restore orientation
         if (session.orientation) {
           setTimeout(() => {
@@ -909,7 +919,6 @@ function App() {
         }
         success("Session loaded ✓");
       }
-
     } catch (error) {
       console.error("Failed to load session:", error);
       alert("Failed to load session file");
