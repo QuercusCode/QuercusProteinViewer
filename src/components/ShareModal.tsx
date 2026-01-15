@@ -44,6 +44,17 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
         { name: 'Pink', value: '#ec4899' }, // pink-500
     ];
 
+    // Post spin speed updates to iframe
+    useEffect(() => {
+        const iframe = document.querySelector('iframe[title="Embed Preview"]') as HTMLIFrameElement;
+        if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.postMessage({
+                type: 'UPDATE_SPIN_SPEED',
+                speed: embedSpinSpeed
+            }, '*');
+        }
+    }, [embedSpinSpeed]);
+
     // Orientation Message Handler
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
@@ -55,6 +66,17 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
         window.addEventListener('message', handleMessage);
         return () => window.removeEventListener('message', handleMessage);
     }, []);
+
+    // Post spin speed updates to iframe
+    useEffect(() => {
+        const iframe = document.querySelector('iframe[title="Quercus Viewer"]') as HTMLIFrameElement;
+        if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.postMessage({
+                type: 'UPDATE_SPIN_SPEED',
+                speed: embedSpinSpeed
+            }, '*');
+        }
+    }, [embedSpinSpeed]);
 
     const handleSetStartView = () => {
         console.log("ShareModal: handleSetStartView clicked. Sending REQUEST_ORIENTATION");

@@ -371,6 +371,11 @@ function App() {
         } else {
           console.warn("App: Orientation is null or ref missing");
         }
+      } else if (event.data?.type === 'UPDATE_SPIN_SPEED') {
+        // Update spin speed dynamically from parent
+        if (typeof event.data.speed === 'number') {
+          setEmbedSpinSpeed(event.data.speed);
+        }
       }
     };
 
