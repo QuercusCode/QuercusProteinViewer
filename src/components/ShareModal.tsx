@@ -30,6 +30,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
     const [embedTransparent, setEmbedTransparent] = useState(false);
     const [embedBorderRadius, setEmbedBorderRadius] = useState<0 | 12 | 24>(12);
     const [embedShadow, setEmbedShadow] = useState(true);
+    const [embedLazy, setEmbedLazy] = useState(false);
     const [embedColor, setEmbedColor] = useState<string | null>(null);
     const [embedInteractionWrapper, setEmbedInteractionWrapper] = useState(false);
 
@@ -115,6 +116,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
         if (embedTheme === 'dark') url += '&theme=dark';
         if (embedStatic) url += '&interaction=false';
         if (embedScrollProtection) url += '&scroll=false';
+        if (embedLazy) url += '&lazy=true';
         if (embedInteractionWrapper) url += '&interactionWrapper=true';
         if (embedColor) url += `&color=${embedColor.replace('#', '')}`;
         if (embedTransparent) url += '&bg=transparent';
@@ -144,6 +146,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
   allowFullScreen
   ${embedTransparent ? 'allowTransparency="true"' : ''}
+  ${embedLazy ? 'loading="lazy"' : ''}
 ></iframe>`;
 
     const handleCopyEmbed = async () => {
@@ -347,6 +350,20 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                                     Set Start View
                                                 </span>
                                                 {embedOrientation ? <Check className="w-4 h-4" /> : <Camera className="w-4 h-4" />}
+                                            </button>
+
+                                            <button
+                                                onClick={() => setEmbedLazy(!embedLazy)}
+                                                className={`flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium border transition-colors ${embedLazy
+                                                    ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                                                    : (isLightMode ? 'bg-neutral-100/50 text-neutral-600 border-neutral-200 hover:bg-neutral-100' : 'bg-neutral-800/50 text-neutral-400 border-neutral-700 hover:bg-neutral-800')
+                                                    }`}
+                                            >
+                                                <span className="flex items-center gap-2">
+                                                    <div className={`w-2 h-2 rounded-full ${embedLazy ? 'bg-blue-500' : 'bg-neutral-400'}`} />
+                                                    Lazy Load (Poster)
+                                                </span>
+                                                {embedLazy && <Check className="w-4 h-4" />}
                                             </button>
 
                                             <button
