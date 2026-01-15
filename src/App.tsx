@@ -2085,10 +2085,10 @@ function App() {
         <a
           href="https://quercuscode.github.io/QuercusViewer/"
           target="_blank"
-          rel="noopener noreferrer"
-          className="fixed bottom-2 right-2 md:bottom-3 md:right-3 z-50 px-2 py-1 md:px-3 md:py-1.5 bg-black/80 backdrop-blur-md text-white text-[10px] md:text-xs font-bold rounded-full shadow-lg border border-white/20 hover:scale-105 transition-transform flex items-center gap-1 md:gap-1.5"
+          rel="noopener noreferrer" // Moved to bottom-left, smaller size, logo icon
+          className="fixed bottom-2 left-2 md:bottom-3 md:left-3 z-50 px-1.5 py-0.5 md:px-2 md:py-1 bg-black/80 backdrop-blur-md text-white text-[9px] md:text-[10px] font-bold rounded-full shadow-lg border border-white/20 hover:scale-105 transition-transform flex items-center gap-1 md:gap-1.5"
         >
-          <span className="text-sm md:text-lg leading-none">🧬</span>
+          <img src="logo/logo-white.png" alt="Q" className="w-3 h-3 md:w-3.5 md:h-3.5" />
           Powered by Quercus
         </a>
       )}
