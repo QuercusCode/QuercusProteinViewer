@@ -1715,19 +1715,30 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             console.log(`[Superpose] Aligning '${overlay.id}' (${overlayAtoms} atoms) to Main (${mainAtoms} atoms)`);
 
                             // align=true moves the component
-                            let s = comp.superpose(mainComponent, true, "CA");
-                            console.log(`[Superpose] '${overlay.id}' CA result keys:`, s ? Object.keys(s) : 'null');
+                            let s: any = undefined;
 
-                            // Fallback if CA superposition fails
+                            // Strategy 1: CA (Alpha Carbon - Best for Proteins)
+                            try {
+                                s = comp.superpose(mainComponent, true, "CA");
+                                console.log(`[Superpose] Strategy 'CA' result:`, s ? s.rmsd : 'null');
+                            } catch (e) { console.warn("[Superpose] 'CA' strategy threw error", e); }
+
+                            // Strategy 2: Backbone (If CA missing or sparse)
                             if (!s || (typeof s.rmsd !== 'number' && typeof s.mean2 !== 'number')) {
-                                console.log(`[Superpose] CA failed. Retrying with 'backbone'...`);
-                                s = comp.superpose(mainComponent, true, "backbone");
+                                try {
+                                    console.log(`[Superpose] Retrying strategy 'backbone'...`);
+                                    s = comp.superpose(mainComponent, true, "backbone");
+                                    console.log(`[Superpose] Strategy 'backbone' result:`, s ? s.rmsd : 'null');
+                                } catch (e) { console.warn("[Superpose] 'backbone' strategy threw error", e); }
+                            }
 
-                                if (!s || (typeof s.rmsd !== 'number' && typeof s.mean2 !== 'number')) {
-                                    console.log(`[Superpose] Backbone failed. Retrying Global (all atoms)...`);
-                                    s = comp.superpose(mainComponent, true);
-                                    console.log(`[Superpose] Global result keys:`, s ? Object.keys(s) : 'null');
-                                }
+                            // Strategy 3: All Atoms (Explicit empty string) - Fallback for small molecules or identical files
+                            if (!s || (typeof s.rmsd !== 'number' && typeof s.mean2 !== 'number')) {
+                                try {
+                                    console.log(`[Superpose] Retrying strategy 'all' ("")...`);
+                                    s = comp.superpose(mainComponent, true, "");
+                                    console.log(`[Superpose] Strategy 'all' result:`, s ? s.rmsd : 'null');
+                                } catch (e) { console.warn("[Superpose] 'all' strategy threw error", e); }
                             }
 
                             if (onOverlayRMSDCalculated) {
@@ -1737,9 +1748,9 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                                 if (s && (typeof s.rmsd === 'number' || typeof s.mean2 === 'number')) {
                                     val = s.rmsd ?? s.mean2;
-                                    console.log(`[Superpose] Calculated RMSD: ${val}`);
+                                    console.log(`[Superpose] Final RMSD: ${val}`);
                                 } else {
-                                    console.warn(`[Superpose] Failed to calculate RMSD (Result invalid). Returning -1.`);
+                                    console.warn(`[Superpose] All strategies failed to return valid RMSD.`);
                                 }
                                 onOverlayRMSDCalculated(overlay.id, val);
                             }
