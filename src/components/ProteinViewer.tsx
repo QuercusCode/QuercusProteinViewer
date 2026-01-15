@@ -1706,10 +1706,23 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         try {
                             // align=true moves the component
                             // align=true moves the component
-                            const s = comp.superpose(mainComponent, true, "CA");
+                            let s = comp.superpose(mainComponent, true, "CA");
+
+                            // Fallback if CA superposition fails (or returns bad RMSD)
+                            if (!s || (typeof s.rmsd !== 'number' && typeof s.mean2 !== 'number')) {
+                                console.log("CA superposition failed or invalid, retrying with all atoms...");
+                                s = comp.superpose(mainComponent, true);
+                            }
+
                             console.log("Superposition result:", s);
-                            if (s && typeof s.rmsd === 'number' && onOverlayRMSDCalculated) {
-                                onOverlayRMSDCalculated(overlay.id, s.rmsd);
+
+                            // Extract RMSD (NGL sometimes calls it 'mean2' for mean square error? No, it's rmsd usually)
+                            // But checking 'rmsd' property
+                            if (s && onOverlayRMSDCalculated) {
+                                const val = s.rmsd;
+                                if (typeof val === 'number') {
+                                    onOverlayRMSDCalculated(overlay.id, val);
+                                }
                             }
                         } catch (e) {
                             console.warn("Superposition failed:", e);
