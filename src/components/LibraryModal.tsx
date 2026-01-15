@@ -234,7 +234,7 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }
                     )}
 
                     {/* VIEW: LIST */}
-                    {activeTab !== 'playlists' && viewMode === 'list' && (
+                    {viewMode === 'list' && (
                         <div className="flex flex-col animate-in slide-in-from-right-4 duration-300">
                             {/* Sub-Header / Back */}
                             <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6 sticky top-0 z-20 bg-gray-900/95 backdrop-blur py-2 -mx-2 px-2 border-b border-white/5 sm:border-none sm:bg-transparent sm:py-0 sm:static">
