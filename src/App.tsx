@@ -870,6 +870,10 @@ function App() {
       const text = await file.text();
       const session = JSON.parse(text);
 
+      // Set Title to Filename (minus extension)
+      const sessionTitle = file.name.replace(/\.json$/i, '');
+      setProteinTitle(sessionTitle);
+
       if (!session.timestamp) console.warn("Session file missing timestamp");
 
       if (session.version === 2) {
