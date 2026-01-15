@@ -44,8 +44,7 @@ import { useHistory } from './hooks/useHistory';
 import { useVisualStack, type VisualState } from './hooks/useVisualStack';
 import { useStructureController, type StructureController } from './hooks/useStructureController';
 import { useStructureMetadata } from './hooks/useStructureMetadata';
-import { usePlaylist } from './hooks/usePlaylist';
-import { PlaylistBar } from './components/PlaylistBar';
+
 
 import { initGA, logPageView, logEvent } from './utils/analytics';
 
@@ -1374,31 +1373,6 @@ function App() {
     },
   ], [isPublicationMode, isSpinning, isLightMode, isMeasurementMode, showContactMap, handleSaveSession, handleSnapshot, handleResetView]);
 
-  // --- PLAYLIST HOOK ---
-  const {
-    currentPlaylist,
-    currentTrack,
-    isPlaying: isPlaylistPlaying,
-    startPlaylist,
-    stopPlaylist,
-    togglePlay: togglePlaylistPlay,
-    nextTrack,
-    prevTrack
-  } = usePlaylist({
-    onLoadStructure: (id, source) => {
-      // Reset view to avoid carry-over artifacts
-      activeController.handleResetView();
-      setFile(null);
-
-      // Force update
-      activeController.setDataSource(source);
-      activeController.setPdbId(id);
-      setIsSpinning(true); // Always spin during playlists
-      setRepresentation('cartoon'); // Default
-    }
-  });
-
-
   return (
     <main
       className={`w-full h-full relative overflow-hidden transition-colors duration-300 ${customBackgroundColor === 'transparent'
@@ -1532,11 +1506,7 @@ function App() {
               }
             });
         }}
-        onStartPlaylist={(id) => {
-          startPlaylist(id);
-          setIsLibraryOpen(false);
-          setShowLanding(false);
-        }}
+
       />
 
       <FavoritesPanel
@@ -1618,15 +1588,7 @@ function App() {
       )}
 
       {/* --- PLAYLIST BAR (Overlay) --- */}
-      <PlaylistBar
-        currentPlaylist={currentPlaylist}
-        currentTrack={currentTrack}
-        isPlaying={isPlaylistPlaying}
-        onTogglePlay={togglePlaylistPlay}
-        onNext={nextTrack}
-        onPrev={prevTrack}
-        onStop={stopPlaylist}
-      />
+
       {/* Main Content: Flex Container for Sidebars and Viewports */}
       <div className="flex flex-1 w-full h-full overflow-hidden">
 

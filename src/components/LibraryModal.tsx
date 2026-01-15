@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { Search, X, BookOpen, Database, FlaskConical, Dna, Activity, Zap, Shield, Grid, Archive, Anchor, Layers, ArrowLeft, Syringe, Hexagon, Magnet, Pill, Leaf, Sun, Brain, HeartPulse, Puzzle, ListMusic, Play } from 'lucide-react';
+import { Search, X, BookOpen, Database, FlaskConical, Dna, Activity, Zap, Shield, Grid, Archive, Anchor, Layers, ArrowLeft, Syringe, Hexagon, Magnet, Pill, Leaf, Sun, Brain, HeartPulse, Puzzle } from 'lucide-react';
 import clsx from 'clsx';
 import { OFFLINE_LIBRARY } from '../data/library';
 import { CHEMICAL_LIBRARY } from '../data/chemicalLibrary';
-import { PLAYLISTS } from '../data/playlists';
+
 
 
 // --- TYPES ---
@@ -12,7 +12,6 @@ interface LibraryModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSelect: (url: string) => void;
-    onStartPlaylist: (id: string) => void;
 }
 
 // --- PROTEIN CATEGORY CONFIG ---
@@ -47,8 +46,8 @@ const CHEMICAL_CATEGORY_CONFIG: Record<string, { icon: React.ReactNode, style: s
     'Amino Acids': { icon: <Puzzle size={20} />, style: 'text-indigo-400 border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 active-color:bg-indigo-500', description: 'Building blocks of proteins.' },
 };
 
-const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect, onStartPlaylist }) => {
-    const [activeTab, setActiveTab] = useState<'proteins' | 'chemicals' | 'playlists'>('proteins');
+const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect }) => {
+    const [activeTab, setActiveTab] = useState<'proteins' | 'chemicals'>('proteins');
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string | 'All'>('All');
     const [viewMode, setViewMode] = useState<'categories' | 'list'>('categories');
@@ -58,7 +57,7 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect, 
     const currentConfig = activeTab === 'proteins' ? PROTEIN_CATEGORY_CONFIG : CHEMICAL_CATEGORY_CONFIG;
 
     // Reset view on tab change
-    const handleTabChange = (tab: 'proteins' | 'chemicals' | 'playlists') => {
+    const handleTabChange = (tab: 'proteins' | 'chemicals') => {
         setActiveTab(tab);
         setViewMode('categories');
         setSelectedCategory('All');
@@ -123,11 +122,7 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect, 
         }
     };
 
-    // Handle Playlist Start
-    const handlePlaylistSelect = (playlistId: string) => {
-        onStartPlaylist(playlistId);
-        onClose();
-    }
+
 
     if (!isOpen) return null;
 
@@ -174,16 +169,7 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect, 
                             <FlaskConical size={16} />
                             Chemicals
                         </button>
-                        <button
-                            onClick={() => handleTabChange('playlists')}
-                            className={clsx(
-                                "flex-1 sm:flex-none px-3 py-2 rounded-lg text-sm font-bold transition-all flex items-center justify-center gap-2 whitespace-nowrap",
-                                activeTab === 'playlists' ? "bg-purple-500/20 text-purple-400 shadow-sm" : "text-gray-500 hover:text-gray-300"
-                            )}
-                        >
-                            <ListMusic size={16} />
-                            Playlists
-                        </button>
+
 
                     </div>
 
@@ -192,9 +178,9 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect, 
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
                         <input
                             type="text"
-                            placeholder={activeTab === 'proteins' ? "Search Library..." : activeTab === 'chemicals' ? "Search Chemicals..." : "Search Playlists..."}
+                            placeholder={activeTab === 'proteins' ? "Search Library..." : "Search Chemicals..."}
                             value={searchTerm}
-                            disabled={activeTab === 'playlists'}
+
                             onChange={(e) => handleSearch(e.target.value)}
                             className="w-full bg-black/40 border border-white/10 rounded-xl pl-10 pr-4 py-2 text-white placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                         />
@@ -209,7 +195,7 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect, 
                 <div className="flex-1 overflow-y-auto min-h-0 p-4 sm:p-6 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent bg-gradient-to-br from-gray-900 via-gray-900 to-black">
 
                     {/* VIEW: CATEGORY DASHBOARD */}
-                    {activeTab !== 'playlists' && viewMode === 'categories' && (
+                    {viewMode === 'categories' && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 animate-in fade-in zoom-in-95 duration-300">
                             {categories.map(cat => {
                                 const config = currentConfig[cat];
@@ -324,44 +310,7 @@ const LibraryModal: React.FC<LibraryModalProps> = ({ isOpen, onClose, onSelect, 
                     )}
 
 
-                    {/* VIEW: PLAYLISTS */}
-                    {activeTab === 'playlists' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in zoom-in-95 duration-300">
-                            {PLAYLISTS.map(playlist => (
-                                <div key={playlist.id} className="relative group overflow-hidden rounded-2xl border border-white/10 bg-gray-800 text-left hover:border-white/20 transition-all flex flex-col md:flex-row h-auto md:h-48">
-                                    {/* Cover Art Side */}
-                                    <div className={clsx("w-full md:w-32 h-32 md:h-full shrink-0 flex items-center justify-center text-white", playlist.coverColor)}>
-                                        <ListMusic size={32} />
-                                    </div>
 
-                                    {/* Content Side */}
-                                    <div className="flex-1 p-5 flex flex-col">
-                                        <h3 className="text-xl font-bold text-white mb-2">{playlist.title}</h3>
-                                        <p className="text-sm text-gray-400 mb-4 line-clamp-3 md:line-clamp-none flex-1">
-                                            {playlist.description}
-                                        </p>
-
-                                        <div className="flex items-center justify-between mt-auto">
-                                            <span className="text-xs font-mono text-gray-500 bg-black/20 px-2 py-1 rounded-lg">
-                                                {playlist.tracks.length} Tracks
-                                            </span>
-
-                                            <button
-                                                onClick={() => handlePlaylistSelect(playlist.id)}
-                                                className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-xl font-bold hover:scale-105 active:scale-95 transition-all shadow-lg shadow-white/10"
-                                            >
-                                                <Play size={16} fill="currentColor" />
-                                                Start
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    {/* Background decoration */}
-                                    <div className={clsx("absolute top-0 right-0 w-64 h-64 rounded-full blur-3xl opacity-10 -translate-y-1/2 translate-x-1/2 pointer-events-none", playlist.coverColor)}></div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
 
                 </div>
 

@@ -39,7 +39,6 @@
 * **Advanced Coloring**: Color by Chain, Residue, Element, Hydrophobicity, B-Factor, or define custom selection rules (e.g., "Chain A, 10-50").
 * **Publication-Ready Export**: Save transparent, high-resolution (3x) PNG images.
 * **Turntable Recording**: Generate smooth 360° video loops for presentations.
-* **Playlists**: Organize and save collections of structures for quick access.
 
 ---
 
