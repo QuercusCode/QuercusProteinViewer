@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, Copy, Download, Check, Linkedin } from 'lucide-react';
+import { X, Copy, Download, Check, Linkedin, Settings2 } from 'lucide-react';
 import QRCode from 'qrcode';
 import { logEvent } from '../utils/analytics';
 
@@ -349,19 +349,37 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                         <label className={`text-xs font-bold uppercase tracking-wider ${isLightMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
                                             Frame Width
                                         </label>
-                                        <div className={`grid grid-cols-5 gap-1 p-1 rounded-lg ${isLightMode ? 'bg-neutral-100' : 'bg-neutral-800'}`}>
-                                            {(['small', 'medium', 'large', 'full', 'custom'] as const).map((size) => (
-                                                <button
-                                                    key={size}
-                                                    onClick={() => setEmbedSize(size)}
-                                                    className={`py-1.5 text-xs font-medium rounded-md capitalize transition-all ${embedSize === size
-                                                        ? (isLightMode ? 'bg-white shadow text-neutral-900' : 'bg-neutral-700 shadow text-white')
-                                                        : 'text-neutral-500 hover:text-neutral-900'
-                                                        }`}
-                                                >
-                                                    {size}
-                                                </button>
-                                            ))}
+                                        <div className="flex gap-2">
+                                            {/* Presets Group */}
+                                            <div className={`flex-1 grid grid-cols-4 gap-1 p-1 rounded-lg ${isLightMode ? 'bg-neutral-100' : 'bg-neutral-800'}`}>
+                                                {(['small', 'medium', 'large', 'full'] as const).map((size) => (
+                                                    <button
+                                                        key={size}
+                                                        onClick={() => setEmbedSize(size)}
+                                                        className={`py-1.5 text-xs font-medium rounded-md capitalize transition-all ${embedSize === size
+                                                            ? (isLightMode ? 'bg-white shadow text-neutral-900' : 'bg-neutral-700 shadow text-white')
+                                                            : 'text-neutral-500 hover:text-neutral-900'
+                                                            }`}
+                                                    >
+                                                        {size}
+                                                    </button>
+                                                ))}
+                                            </div>
+
+                                            {/* Distinct Custom Button */}
+                                            <button
+                                                onClick={() => setEmbedSize('custom')}
+                                                className={`px-3 flex items-center gap-2 rounded-lg border text-xs font-bold uppercase tracking-wider transition-all ${embedSize === 'custom'
+                                                    ? 'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/20'
+                                                    : (isLightMode
+                                                        ? 'bg-white border-neutral-200 text-neutral-500 hover:border-neutral-300 hover:text-neutral-700'
+                                                        : 'bg-neutral-800 border-neutral-700 text-neutral-400 hover:border-neutral-600 hover:text-neutral-200')
+                                                    }`}
+                                                title="Custom Dimensions"
+                                            >
+                                                <Settings2 className="w-3.5 h-3.5" />
+                                                <span className="hidden sm:inline">Custom</span>
+                                            </button>
                                         </div>
 
                                         {/* Custom Dimensions Inputs */}
