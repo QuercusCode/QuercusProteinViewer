@@ -66,13 +66,12 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
     // Generate Embed Code
     const embedCode = `<iframe
   src="${shareUrl.replace('?', '?embed=true&')}"
-  src="${shareUrl.replace('?', '?embed=true&')}"
   width="100%"
   height="600"
   style="border:none; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); max-width: 100%;"
   title="Quercus Viewer"
   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-  allowfullscreen
+  allowFullScreen
 ></iframe>`;
 
     const handleCopyEmbed = async () => {
@@ -214,19 +213,53 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                             </>
                         ) : (
                             /* Embed Tab */
+                            /* Embed Tab */
                             <div className="space-y-4 mb-6">
-                                <div className={`p-4 rounded-lg border leading-relaxed font-mono text-xs overflow-x-auto ${isLightMode ? 'bg-neutral-50 border-neutral-200 text-neutral-600' : 'bg-neutral-950 border-neutral-800 text-neutral-400'}`}>
-                                    {embedCode}
+                                {/* Preview */}
+                                <div className="space-y-2">
+                                    <label className={`text-sm font-medium ${isLightMode ? 'text-neutral-700' : 'text-neutral-300'}`}>
+                                        Live Preview
+                                    </label>
+                                    <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/50">
+                                        <iframe
+                                            src={shareUrl.replace('?', '?embed=true&')}
+                                            className="w-full h-full border-none pointer-events-none" // Disable interaction in preview to avoid scrolling trap
+                                            title="Embed Preview"
+                                        />
+                                        <div className="absolute inset-0 bg-transparent flex items-center justify-center pointer-events-none">
+                                            {/* Optional overlay hint if needed */}
+                                        </div>
+                                    </div>
                                 </div>
+
+                                {/* Code Block */}
+                                <div className="space-y-2">
+                                    <label className={`text-sm font-medium ${isLightMode ? 'text-neutral-700' : 'text-neutral-300'}`}>
+                                        Copy Code
+                                    </label>
+                                    <div className={`relative p-3 rounded-lg border leading-relaxed font-mono text-[10px] sm:text-xs overflow-x-auto whitespace-pre group ${isLightMode ? 'bg-neutral-800 text-green-400 border-neutral-700 shadow-inner' : 'bg-black text-green-400 border-neutral-800 shadow-inner'}`}>
+                                        {embedCode}
+                                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button
+                                                onClick={handleCopyEmbed}
+                                                className="bg-white/10 hover:bg-white/20 text-white p-1 rounded"
+                                                title="Copy Code"
+                                            >
+                                                <Copy size={12} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <button
                                     onClick={handleCopyEmbed}
-                                    className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-bold transition-colors ${copied ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white'}`}
+                                    className={`w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-bold transition-colors shadow-lg ${copied ? 'bg-green-500 text-white' : 'bg-blue-600 hover:bg-blue-500 text-white hover:scale-[1.02] active:scale-[0.98]'}`}
                                 >
                                     {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                                    {copied ? 'Copied!' : 'Copy Embed Code'}
+                                    {copied ? 'Copied to Clipboard!' : 'Copy Embed Code'}
                                 </button>
                                 <p className={`text-xs text-center ${isLightMode ? 'text-neutral-500' : 'text-neutral-500'}`}>
-                                    Paste this code into your website or blog to display an interactive 3D viewer.
+                                    Paste this HTML code into your website, blog, or Notion page.
                                 </p>
                             </div>
                         )}
