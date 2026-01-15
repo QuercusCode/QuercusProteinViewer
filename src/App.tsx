@@ -289,6 +289,7 @@ function App() {
   const [showContactMap, setShowContactMap] = useState(false);
   const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
+  const [embedOrientation, setEmbedOrientation] = useState<any>(null);
 
   // Landing Overlay State
   // Handle Embed Options (Custom Controls)
@@ -311,9 +312,37 @@ function App() {
       }
       // Force Theme
       const themeParam = params.get('theme');
-      if (themeParam === 'light') setIsLightMode(true);
       if (themeParam === 'dark') setIsLightMode(false);
+
+      // Orientation
+      const orientationParam = params.get('orientation');
+      if (orientationParam) {
+        try {
+          const orientation = JSON.parse(orientationParam);
+          // We'll add a new state for it.
+          setEmbedOrientation(orientation);
+        } catch (e) {
+          console.warn("Invalid orientation param", e);
+        }
+      }
     }
+
+    // Listen for cross-origin messages (from ShareModal parent)
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.type === 'REQUEST_ORIENTATION') {
+        // Get orientation from view 0 (embed view)
+        const orientation = viewerRefs[0]?.current?.getOrientation();
+        if (orientation) {
+          (event.source as Window)?.postMessage({
+            type: 'ORIENTATION_RESPONSE',
+            orientation: orientation
+          }, event.origin === "null" ? "*" : event.origin);
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
   }, []);
 
   // Interaction State (for Static Embeds)
@@ -1888,7 +1917,8 @@ function App() {
                         backgroundColor={ctrl.customBackgroundColor || (isLightMode ? 'white' : 'black')}
                         measurementTextColor={measurementTextColorMode}
                         enableAmbientOcclusion={true}
-                        overlays={ctrl.overlays} // Added prop
+                        overlays={ctrl.overlays}
+                        initialOrientation={index === 0 ? embedOrientation : undefined}
 
 
                         onStructureLoaded={(info) => handleLoad(info, ctrl)}

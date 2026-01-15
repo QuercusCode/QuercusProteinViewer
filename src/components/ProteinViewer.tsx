@@ -54,6 +54,8 @@ export interface ProteinViewerProps {
     // Quality
     quality?: 'low' | 'medium' | 'high';
     enableAmbientOcclusion?: boolean;
+    initialOrientation?: any; // New prop for setting start view
+
 
 
     // Callbacks
@@ -102,6 +104,8 @@ export interface ProteinViewerRef {
     getLigandInteractions: () => Promise<import('../types').LigandInteraction[]>;
     focusResidue: (chain: string, resNo: number) => void;
     highlightAtom: (serial: number) => void;
+    getOrientation: () => any;
+    setOrientation: (orientation: any) => void;
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
@@ -137,6 +141,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     quality = 'medium',
     enableAmbientOcclusion = false,
     measurementTextColor = 'auto',
+    initialOrientation, // Destructure new prop
     disableScroll = false,
 }: ProteinViewerProps, ref: React.Ref<ProteinViewerRef>) => {
 
@@ -403,6 +408,21 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 componentRef.current.autoView(selection, 1000);
             } catch (e) {
                 console.warn("AutoView failed:", e);
+            }
+        },
+        getOrientation: () => {
+            if (stageRef.current) {
+                return stageRef.current.viewerControls.getOrientation();
+            }
+            return null;
+        },
+        setOrientation: (orientation: any) => {
+            if (stageRef.current && orientation) {
+                try {
+                    stageRef.current.viewerControls.orient(orientation);
+                } catch (e) {
+                    console.warn("Failed to set orientation", e);
+                }
             }
         },
         getSnapshotBlob: async (resolutionFactor: number = 3, transparent: boolean = true) => {
@@ -1637,7 +1657,17 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         try {
                             console.log("AutoView & Resize...");
                             stage.handleResize();
-                            component.autoView();
+                            // Apply Orientation or AutoView
+                            if (initialOrientation && stage.viewerControls) {
+                                try {
+                                    stage.viewerControls.orient(initialOrientation);
+                                } catch (e) {
+                                    console.warn("Failed to apply initial orientation, falling back to autoView", e);
+                                    component.autoView();
+                                }
+                            } else {
+                                component.autoView();
+                            }
                             if (stage.viewer) stage.viewer.requestRender();
                         } catch (e) { console.warn("AutoView failed", e); }
                     }, 1000);
