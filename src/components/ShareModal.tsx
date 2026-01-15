@@ -23,7 +23,9 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
     const [embedTheme, setEmbedTheme] = useState<'dark' | 'light'>('dark');
     const [embedStatic, setEmbedStatic] = useState(false);
     const [embedScrollProtection, setEmbedScrollProtection] = useState(false);
-    const [embedSize, setEmbedSize] = useState<'small' | 'medium' | 'large' | 'full'>('medium');
+    const [embedSize, setEmbedSize] = useState<'small' | 'medium' | 'large' | 'full' | 'custom'>('medium');
+    const [customWidth, setCustomWidth] = useState('800');
+    const [customHeight, setCustomHeight] = useState('600');
 
     // Generate QR Code
     useEffect(() => {
@@ -91,6 +93,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
             case 'medium': return { width: '600', height: '450' };
             case 'large': return { width: '800', height: '600' };
             case 'full': return { width: '100%', height: '600' };
+            case 'custom': return { width: customWidth, height: customHeight };
         }
     };
     const { width, height } = getDimensions();
@@ -346,8 +349,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                         <label className={`text-xs font-bold uppercase tracking-wider ${isLightMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
                                             Frame Width
                                         </label>
-                                        <div className={`grid grid-cols-4 gap-1 p-1 rounded-lg ${isLightMode ? 'bg-neutral-100' : 'bg-neutral-800'}`}>
-                                            {(['small', 'medium', 'large', 'full'] as const).map((size) => (
+                                        <div className={`grid grid-cols-5 gap-1 p-1 rounded-lg ${isLightMode ? 'bg-neutral-100' : 'bg-neutral-800'}`}>
+                                            {(['small', 'medium', 'large', 'full', 'custom'] as const).map((size) => (
                                                 <button
                                                     key={size}
                                                     onClick={() => setEmbedSize(size)}
@@ -360,6 +363,40 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                                 </button>
                                             ))}
                                         </div>
+
+                                        {/* Custom Dimensions Inputs */}
+                                        {embedSize === 'custom' && (
+                                            <div className="grid grid-cols-2 gap-3 mt-2 animate-in slide-in-from-top-2">
+                                                <div className="space-y-1">
+                                                    <label className={`text-[10px] font-medium ml-1 ${isLightMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
+                                                        Width (px/%)
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        value={customWidth}
+                                                        onChange={(e) => setCustomWidth(e.target.value)}
+                                                        className={`w-full px-3 py-2 rounded-lg text-sm font-medium outline-none border transition-all ${isLightMode
+                                                            ? 'bg-neutral-100 border-neutral-200 focus:border-blue-500 text-neutral-900 placeholder:text-neutral-400'
+                                                            : 'bg-neutral-800 border-neutral-700 focus:border-blue-500 text-white placeholder:text-neutral-500'}`}
+                                                        placeholder="800"
+                                                    />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <label className={`text-[10px] font-medium ml-1 ${isLightMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
+                                                        Height (px)
+                                                    </label>
+                                                    <input
+                                                        type="text"
+                                                        value={customHeight}
+                                                        onChange={(e) => setCustomHeight(e.target.value)}
+                                                        className={`w-full px-3 py-2 rounded-lg text-sm font-medium outline-none border transition-all ${isLightMode
+                                                            ? 'bg-neutral-100 border-neutral-200 focus:border-blue-500 text-neutral-900 placeholder:text-neutral-400'
+                                                            : 'bg-neutral-800 border-neutral-700 focus:border-blue-500 text-white placeholder:text-neutral-500'}`}
+                                                        placeholder="600"
+                                                    />
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
