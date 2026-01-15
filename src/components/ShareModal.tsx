@@ -41,53 +41,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
     }, []);
 
     const handleSetStartView = () => {
-
-
-        // Wait, the previous plan was "postMessage Communication". 
-        // "Set up postMessage communication between the ShareModal (parent window) and the embedded iframe (child window running App.tsx)".
-        // Ah, the user wants the "Set Start View" to capture the view *of the preview iframe*? 
-        // OR the view of the *main application* before the user clicked share?
-
-        // Usually, "Set Start View" implies "Use the current view I am looking at".
-        // If the modal is covering the screen, the user can't see the main view.
-        // BUT the preview iframe shows the structure.
-        // If the user interacts with the PREVIEW iframe to set the view, then we need postMessage.
-        // `pointer-events-none` is on the preview iframe currently (line 431).
-        // So user cannot interact with preview.
-
-        // REVISED PLAN: 
-        // 1. We assume the user sets the view in the MAIN APP before clicking "Share".
-        // 2. So we need to capture the orientation *at the moment Share is clicked* or allow ShareModal to ask App for it.
-        // Since ShareModal is imported in App, we can pass a callback `getOrientation`?
-        // Or pass the orientation *into* ShareModal?
-
-        // However, the prompt said: "Implement a button ... that captures the current camera orientation from the ProteinViewer."
-        // And "Implement postMessage ... between ShareModal and embedded iframe".
-        // This implies the user *interacts with the embedded iframe*?
-        // But the embedded iframe in the modal is small and currently `pointer-events-none`.
-
-        // If the intention was to capture the MAIN viewer's orientation (which makes sense), 
-        // then `postMessage` within the same window is weird (but valid if we treat components loosely).
-        // But wait. "Update Embed Code with Orientation". 
-        // If I use `postMessage` to talk to the *preview* iframe, I need to enable pointer events on it first?
-
-        // Let's assume the goal is to capture the CURRENT MAIN VIEW.
-        // But the previous instructions specifically implemented `REQUEST_ORIENTATION` listener in `App.tsx`.
-        // If `ShareModal` is inside `App.tsx`, it's running in the SAME window.
-        // So `window.postMessage` sends a message to... window.
-        // `App.tsx` listens on `window`.
-        // So yes, we can use `window.postMessage` to talk to `App` (self).
-        // AND `App` will look at `viewerRefs[0]`.
-        // If `ShareModal` is open, `App` is still mounted.
-        // `viewerRefs[0]` should be the main viewer (in single view mode).
-
-        // So the flow:
-        // 1. ShareModal: Click "Set Start View".
-        // 2. ShareModal: `window.postMessage({ type: 'REQUEST_ORIENTATION' }, '*')`
-        // 3. App (same window): Receives message, gets `viewerRefs[0].getOrientation()`, sends `ORIENTATION_RESPONSE`.
-        // 4. ShareModal: Receives `ORIENTATION_RESPONSE`, sets state.
-
-        // This works!
+        console.log("ShareModal: handleSetStartView clicked. Sending REQUEST_ORIENTATION");
+        // Request orientation from main window (App)
         window.postMessage({ type: 'REQUEST_ORIENTATION' }, '*');
     };
 

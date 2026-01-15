@@ -86,8 +86,7 @@ export interface ProteinViewerRef {
     highlightResidue: (chain: string, resNo: number) => void;
     focusLigands: () => void;
     clearHighlight: () => void;
-    getCameraOrientation: () => any;
-    setCameraOrientation: (orientation: any) => void;
+
     getAtomCoordinates: () => Promise<{ x: number[], y: number[], z: number[], labels: string[], ss: string[] }[]>;
     getTorsionData: () => Promise<{ phi: number | null, psi: number | null, chain: string, resNo: number, resName: string }[]>;
     getAtomPosition: (chain: string, resNo: number, atomName?: string) => { x: number, y: number, z: number } | null;
@@ -410,21 +409,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 console.warn("AutoView failed:", e);
             }
         },
-        getOrientation: () => {
-            if (stageRef.current) {
-                return stageRef.current.viewerControls.getOrientation();
-            }
-            return null;
-        },
-        setOrientation: (orientation: any) => {
-            if (stageRef.current && orientation) {
-                try {
-                    stageRef.current.viewerControls.orient(orientation);
-                } catch (e) {
-                    console.warn("Failed to set orientation", e);
-                }
-            }
-        },
+
         getSnapshotBlob: async (resolutionFactor: number = 3, transparent: boolean = true) => {
             if (!stageRef.current) return null;
 
@@ -708,13 +693,21 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 console.warn("Clear highlight failed:", e);
             }
         },
-        getCameraOrientation: () => {
+        getOrientation: () => {
             if (!stageRef.current || !stageRef.current.viewerControls) return null;
-            return stageRef.current.viewerControls.getOrientation();
+            const orientation = stageRef.current.viewerControls.getOrientation();
+            // Ensure we return a plain array for JSON serialization
+            if (orientation && orientation.elements) {
+                return Array.from(orientation.elements);
+            } else if (orientation && typeof orientation.length === 'number') {
+                return Array.from(orientation);
+            }
+            return orientation;
         },
-        setCameraOrientation: (orientation: any) => {
+        setOrientation: (orientation: any) => {
             if (!stageRef.current || !stageRef.current.viewerControls || !orientation) return;
             try {
+                // If it's a plain array, NGL should handle it, but we can verify
                 stageRef.current.viewerControls.orient(orientation);
             } catch (e) {
                 console.warn("Failed to set orientation:", e);

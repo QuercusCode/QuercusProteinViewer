@@ -329,16 +329,24 @@ function App() {
     }
 
     // Listen for cross-origin messages (from ShareModal parent)
+    // Listen for cross-origin messages (from ShareModal parent)
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === 'REQUEST_ORIENTATION') {
+        console.log("App: Received REQUEST_ORIENTATION");
         // Get orientation from view 0 (main viewer)
-        const orientation = viewerRefs[0]?.current?.getOrientation();
+        const viewerRef = viewerRefs[0]?.current;
+        const orientation = viewerRef?.getOrientation();
+        console.log("App: Orientation retrieved:", orientation, "Ref present:", !!viewerRef);
+
         if (orientation) {
           // For same-window communication, post back to window
+          console.log("App: Posting ORIENTATION_RESPONSE");
           window.postMessage({
             type: 'ORIENTATION_RESPONSE',
             orientation: orientation
           }, '*');
+        } else {
+          console.warn("App: Orientation is null or ref missing");
         }
       }
     };
@@ -674,9 +682,9 @@ function App() {
     // Find index of this controller
     const index = controllers.indexOf(ctrl);
     if (index !== -1 && initialUrlState.viewports?.[index]?.orientation) {
-      // Apply orientation after a short delay to ensure rendering matches
+      // Restore orientation for Viewport 0 if present (now handled by initialOrientation prop for V0, but explicit logic here for others/restore)
       setTimeout(() => {
-        viewerRefs[index].current?.setCameraOrientation(initialUrlState.viewports[index].orientation);
+        viewerRefs[index].current?.setOrientation(initialUrlState.viewports[index].orientation);
       }, 500);
     }
   }, [addToHistory, controllers, initialUrlState]);
@@ -794,7 +802,7 @@ function App() {
           customBackgroundColor: ctrl.customBackgroundColor,
           isMeasurementMode: isMeasurementMode, // This is global for now, or per-viewport?
           measurements: ctrl.measurements,
-          orientation: ref.current?.getCameraOrientation() || null
+          orientation: ref.current?.getOrientation()
         };
       });
 
@@ -867,7 +875,7 @@ function App() {
               // Orientation
               if (vp.orientation) {
                 setTimeout(() => {
-                  viewerRefs[index].current?.setCameraOrientation(vp.orientation);
+                  viewerRefs[index].current?.setOrientation(vp.orientation);
                 }, 1500); // Delay to allow loading
               }
             }
@@ -893,9 +901,10 @@ function App() {
 
         if (session.snapshots) setSnapshots(session.snapshots);
 
+        // Restore orientation
         if (session.orientation) {
           setTimeout(() => {
-            viewerRefs[0].current?.setCameraOrientation(session.orientation);
+            viewerRefs[0].current?.setOrientation(session.orientation);
           }, 1500);
         }
         success("Session loaded ✓");
@@ -2062,7 +2071,7 @@ function App() {
             customColors: ctrl.customColors,
             customBackgroundColor: ctrl.customBackgroundColor,
             dataSource: ctrl.dataSource,
-            orientation: viewerRefs[index].current?.getCameraOrientation()
+            orientation: viewerRefs[index].current?.getOrientation()
           })));
         }}
         pdbMetadata={pdbMetadata}
@@ -2100,7 +2109,7 @@ function App() {
           customColors: ctrl.customColors,
           customBackgroundColor: ctrl.customBackgroundColor,
           dataSource: ctrl.dataSource,
-          orientation: viewerRefs[index].current?.getCameraOrientation()
+          orientation: viewerRefs[index].current?.getOrientation()
         })))}
         isLightMode={isLightMode}
       />
