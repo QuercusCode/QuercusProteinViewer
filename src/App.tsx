@@ -309,6 +309,7 @@ function App() {
       // Transparent Background
       if (params.get('bg') === 'transparent') {
         setCustomBackgroundColor('transparent');
+        document.documentElement.style.setProperty('--body-bg', 'transparent');
       }
       // Force Theme
       const themeParam = params.get('theme');
@@ -324,6 +325,12 @@ function App() {
           setEmbedOrientation(orientation);
         } catch (e) {
           console.warn("Invalid orientation param", e);
+        }
+        // Accent Color
+        const colorParam = params.get('color');
+        if (colorParam) {
+          document.documentElement.style.setProperty('--brand-color', '#' + colorParam.replace('#', ''));
+          document.body.classList.add('embed-custom-color');
         }
       }
     }
@@ -394,6 +401,10 @@ function App() {
       document.body.style.lineHeight = '';
     }
   }, [isDyslexicFont]);
+
+  // Interaction Wrapper State
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const params = new URLSearchParams(window.location.search);
 
   // Sidebar Sections State (Lifted from Controls)
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -1669,422 +1680,443 @@ function App() {
         />
       )}
       {/* HUD - Positioned at bottom to avoid viewport interference */}
-      <HUD
-        hoveredResidue={hoveredResidue}
-        pdbMetadata={pdbMetadata}
-        pdbId={pdbId}
-        isLightMode={isLightMode}
-        isEmbedMode={isEmbedMode}
-      />
-
-      {isMeasurementPanelOpen && (
-        <MeasurementPanel
-          isOpen={isMeasurementPanelOpen}
-          measurements={measurements}
-          onUpdate={handleUpdateMeasurement}
-          onDelete={handleDeleteMeasurement}
-          onClearAll={() => {
-            setMeasurements([]);
-            viewerRef.current?.clearMeasurements();
-          }}
-          textColorMode={measurementTextColorMode}
-          onSetTextColor={(color) => {
-            setMeasurementTextColorMode(color);
-          }}
-          onClose={() => {
-            setIsMeasurementMode(false);
-            setIsMeasurementPanelOpen(false);
-          }}
-          isLightMode={isLightMode}
-        />
+      {/* Proteinvier and UI */}
+      {/* Click-to-Interact Overlay */}
+      {(!hasInteracted && params.get('interactionWrapper') === 'true') && (
+        <div
+          className="absolute inset-0 z-50 flex items-center justify-center bg-black/10 hover:bg-black/20 transition-colors cursor-pointer group backdrop-blur-[1px]"
+          onClick={() => setHasInteracted(true)}
+        >
+          <button className="bg-white/90 text-black px-6 py-3 rounded-full font-bold shadow-lg transform group-hover:scale-105 transition-all flex items-center gap-2">
+            {/* Mouse Pointer Icon */}
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 3 7.07 16.97 2.51-7.39 7.39-2.51L3 3z" /><path d="m13 13 6 6" /></svg>
+            Click to Interact
+          </button>
+        </div>
       )}
 
-      {/* Superposition Modal - Linked to Active Controller */}
-      <SuperpositionModal
-        isOpen={isSuperpositionModalOpen}
-        onClose={() => setIsSuperpositionModalOpen(false)}
-        overlays={controllers[activeViewIndex].overlays}
-        onAddOverlay={controllers[activeViewIndex].addOverlay}
-        onRemoveOverlay={controllers[activeViewIndex].removeOverlay}
-        onToggleOverlay={controllers[activeViewIndex].toggleOverlay}
-      />
+      {!showLanding && (
+        <>
+          <HUD
+            hoveredResidue={hoveredResidue}
+            pdbMetadata={pdbMetadata}
+            pdbId={pdbId}
+            isLightMode={isLightMode}
+            isEmbedMode={isEmbedMode}
+          />
 
-      {/* BACKGROUND (Dark Mode) */}
-      {!isLightMode && !customBackgroundColor && activeViewIndex === 0 && viewMode === 'single' && (
-        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-950 -z-10" />
-      )}
-
-      {/* --- PLAYLIST BAR (Overlay) --- */}
-
-      {/* Main Content: Flex Container for Sidebars and Viewports */}
-      <div className="flex flex-1 w-full h-full overflow-hidden">
-
-        {/* Logic to determine if we are looking at a Chemical */}
-        {(() => {
-          if (isEmbedMode) return null; // Hide Sidebar in Embed Mode
-
-          const isChemical = dataSource === 'pubchem' ||
-            (file && /\.(sdf|mol|cif)$/i.test(file.name));
-
-          return (
-            <Controls
-              pdbId={pdbId}
-              setPdbId={handlePdbIdChange}
-              dataSource={dataSource}
-              setDataSource={setDataSource}
-              isChemical={!!isChemical}
-              onUpload={handleUpload}
-              representation={representation}
-              setRepresentation={setRepresentation}
-              coloring={coloring}
-              setColoring={setColoring}
-              onResetView={() => handleToolAction('reset')}
-              chains={chains}
-              ligands={ligands}
-              isMeasurementMode={isMeasurementMode}
-              setIsMeasurementMode={setIsMeasurementMode}
-              isPublicationMode={isPublicationMode}
-              onTogglePublicationMode={togglePublicationMode}
-              onClearMeasurements={() => {
+          {isMeasurementPanelOpen && (
+            <MeasurementPanel
+              isOpen={isMeasurementPanelOpen}
+              measurements={measurements}
+              onUpdate={handleUpdateMeasurement}
+              onDelete={handleDeleteMeasurement}
+              onClearAll={() => {
                 setMeasurements([]);
                 viewerRef.current?.clearMeasurements();
               }}
+              textColorMode={measurementTextColorMode}
+              onSetTextColor={(color) => {
+                setMeasurementTextColorMode(color);
+              }}
+              onClose={() => {
+                setIsMeasurementMode(false);
+                setIsMeasurementPanelOpen(false);
+              }}
               isLightMode={isLightMode}
-              setIsLightMode={setIsLightMode}
-              highlightedResidue={highlightedResidue}
-              onResidueClick={handleSequenceResidueClick}
-              showSurface={showSurface}
-              setShowSurface={setShowSurface}
-              showLigands={showLigands}
-              setShowLigands={setShowLigands}
-              showIons={showIons}
-              setShowIons={setShowIons}
-              onFocusLigands={handleFocusLigands}
-              onRecordMovie={handleRecordMovie}
-              isRecording={isRecording}
-              proteinTitle={proteinTitle}
-              snapshots={snapshots}
-              onSnapshot={handleSnapshot}
-              onDownloadSnapshot={handleDownloadSnapshot}
-              onDeleteSnapshot={handleDeleteSnapshot}
-              isSpinning={isSpinning}
-              setIsSpinning={setIsSpinning}
-              onSaveSession={() => handleToolAction('save')}
-              onLoadSession={handleLoadSession}
-              onDownloadPDB={handleDownloadPDB}
-              onDownloadSequence={handleDownloadSequence}
-              onToggleContactMap={() => setShowContactMap(!showContactMap)}
-              onTakeSnapshot={handleSnapshot}
-              movies={movies}
-              onDownloadMovie={handleDownloadMovie}
-              onDeleteMovie={handleDeleteMovie}
-              isCleanMode={isCleanMode}
-              setIsCleanMode={setIsCleanMode}
-              onShare={() => handleToolAction('share')}
-              onToggleShare={() => handleToolAction('share')}
-              onToggleLibrary={() => setIsLibraryOpen(!isLibraryOpen)}
-              onToggleMeasurement={() => setIsMeasurementMode(!isMeasurementMode)}
-              onOpenSuperposition={() => setIsSuperpositionModalOpen(true)} // Added prop
-              colorPalette={colorPalette}
-              setColorPalette={setColorPalette}
-              isDyslexicFont={isDyslexicFont}
-              setIsDyslexicFont={setIsDyslexicFont}
-              customBackgroundColor={customBackgroundColor}
-              setCustomBackgroundColor={setCustomBackgroundColor}
-              pdbMetadata={pdbMetadata}
-              onHighlightRegion={(selection, label) => {
-                viewerRef.current?.highlightRegion(selection, label);
-              }}
-              onStartTour={handleStartTour}
-              openSections={openSections}
-              onToggleSection={handleToggleSection}
-              isMobileSidebarOpen={isMobileSidebarOpen}
-              onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-              onToggleFavorite={() => toggleFavorite(pdbId, dataSource, proteinTitle || undefined)}
-              isFavorite={isFavorite(pdbId, dataSource)}
-              onOpenFavorites={() => {
-                setFavoritesTab('favorites');
-                setIsFavoritesOpen(true);
-              }}
-              onOpenHistory={() => {
-                setFavoritesTab('history');
-                setIsFavoritesOpen(true);
-              }}
-              history={history}
-
-
-
-              // Undo/Redo
-              onUndo={undo}
-              onRedo={redo}
-              canUndo={canUndo}
-              canRedo={canRedo}
-
-              // Custom Colors
-              customColors={customColors}
-              setCustomColors={setCustomColors}
-
-              // Multi-View Mode
-              viewMode={viewMode}
-              onSetViewMode={setViewMode}
-
-
             />
-          );
-        })()}
+          )}
 
-        {/* Multi-View Layout */}
-        <div className="relative flex-1 flex w-full h-full overflow-hidden bg-black">
-          {(() => {
-            // Helper: Render single viewport
-            const renderViewport = (index: number, extraClasses = '') => {
-              const ctrl = controllers[index];
-              const ref = viewerRefs[index];
-              const isActive = activeViewIndex === index;
-              const showHeader = viewMode !== 'single';
-              const viewportLabels = ['Viewport 1', 'Viewport 2', 'Viewport 3', 'Viewport 4'];
+          {/* Superposition Modal - Linked to Active Controller */}
+          <SuperpositionModal
+            isOpen={isSuperpositionModalOpen}
+            onClose={() => setIsSuperpositionModalOpen(false)}
+            overlays={controllers[activeViewIndex].overlays}
+            onAddOverlay={controllers[activeViewIndex].addOverlay}
+            onRemoveOverlay={controllers[activeViewIndex].removeOverlay}
+            onToggleOverlay={controllers[activeViewIndex].toggleOverlay}
+          />
+
+          {/* BACKGROUND (Dark Mode) */}
+          {!isLightMode && !customBackgroundColor && activeViewIndex === 0 && viewMode === 'single' && (
+            <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-950 -z-10" />
+          )}
+
+          {/* --- PLAYLIST BAR (Overlay) --- */}
+
+          {/* Main Content: Flex Container for Sidebars and Viewports */}
+          <div className="flex flex-1 w-full h-full overflow-hidden">
+
+            {/* Logic to determine if we are looking at a Chemical */}
+            {(() => {
+              if (isEmbedMode) return null; // Hide Sidebar in Embed Mode
+
+              const isChemical = dataSource === 'pubchem' ||
+                (file && /\.(sdf|mol|cif)$/i.test(file.name));
 
               return (
-                <div key={index} className={`flex flex-col h-full ${extraClasses}`}>
-                  {/* Viewport Header */}
-                  {showHeader && (
-                    <div
-                      onClick={() => setActiveViewIndex(index)}
-                      className={`shrink-0 h-9 flex items-center justify-between px-3 border-b transition-colors cursor-pointer select-none relative
+                <Controls
+                  pdbId={pdbId}
+                  setPdbId={handlePdbIdChange}
+                  dataSource={dataSource}
+                  setDataSource={setDataSource}
+                  isChemical={!!isChemical}
+                  onUpload={handleUpload}
+                  representation={representation}
+                  setRepresentation={setRepresentation}
+                  coloring={coloring}
+                  setColoring={setColoring}
+                  onResetView={() => handleToolAction('reset')}
+                  chains={chains}
+                  ligands={ligands}
+                  isMeasurementMode={isMeasurementMode}
+                  setIsMeasurementMode={setIsMeasurementMode}
+                  isPublicationMode={isPublicationMode}
+                  onTogglePublicationMode={togglePublicationMode}
+                  onClearMeasurements={() => {
+                    setMeasurements([]);
+                    viewerRef.current?.clearMeasurements();
+                  }}
+                  isLightMode={isLightMode}
+                  setIsLightMode={setIsLightMode}
+                  highlightedResidue={highlightedResidue}
+                  onResidueClick={handleSequenceResidueClick}
+                  showSurface={showSurface}
+                  setShowSurface={setShowSurface}
+                  showLigands={showLigands}
+                  setShowLigands={setShowLigands}
+                  showIons={showIons}
+                  setShowIons={setShowIons}
+                  onFocusLigands={handleFocusLigands}
+                  onRecordMovie={handleRecordMovie}
+                  isRecording={isRecording}
+                  proteinTitle={proteinTitle}
+                  snapshots={snapshots}
+                  onSnapshot={handleSnapshot}
+                  onDownloadSnapshot={handleDownloadSnapshot}
+                  onDeleteSnapshot={handleDeleteSnapshot}
+                  isSpinning={isSpinning}
+                  setIsSpinning={setIsSpinning}
+                  onSaveSession={() => handleToolAction('save')}
+                  onLoadSession={handleLoadSession}
+                  onDownloadPDB={handleDownloadPDB}
+                  onDownloadSequence={handleDownloadSequence}
+                  onToggleContactMap={() => setShowContactMap(!showContactMap)}
+                  onTakeSnapshot={handleSnapshot}
+                  movies={movies}
+                  onDownloadMovie={handleDownloadMovie}
+                  onDeleteMovie={handleDeleteMovie}
+                  isCleanMode={isCleanMode}
+                  setIsCleanMode={setIsCleanMode}
+                  onShare={() => handleToolAction('share')}
+                  onToggleShare={() => handleToolAction('share')}
+                  onToggleLibrary={() => setIsLibraryOpen(!isLibraryOpen)}
+                  onToggleMeasurement={() => setIsMeasurementMode(!isMeasurementMode)}
+                  onOpenSuperposition={() => setIsSuperpositionModalOpen(true)} // Added prop
+                  colorPalette={colorPalette}
+                  setColorPalette={setColorPalette}
+                  isDyslexicFont={isDyslexicFont}
+                  setIsDyslexicFont={setIsDyslexicFont}
+                  customBackgroundColor={customBackgroundColor}
+                  setCustomBackgroundColor={setCustomBackgroundColor}
+                  pdbMetadata={pdbMetadata}
+                  onHighlightRegion={(selection, label) => {
+                    viewerRef.current?.highlightRegion(selection, label);
+                  }}
+                  onStartTour={handleStartTour}
+                  openSections={openSections}
+                  onToggleSection={handleToggleSection}
+                  isMobileSidebarOpen={isMobileSidebarOpen}
+                  onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+                  onToggleFavorite={() => toggleFavorite(pdbId, dataSource, proteinTitle || undefined)}
+                  isFavorite={isFavorite(pdbId, dataSource)}
+                  onOpenFavorites={() => {
+                    setFavoritesTab('favorites');
+                    setIsFavoritesOpen(true);
+                  }}
+                  onOpenHistory={() => {
+                    setFavoritesTab('history');
+                    setIsFavoritesOpen(true);
+                  }}
+                  history={history}
+
+
+
+                  // Undo/Redo
+                  onUndo={undo}
+                  onRedo={redo}
+                  canUndo={canUndo}
+                  canRedo={canRedo}
+
+                  // Custom Colors
+                  customColors={customColors}
+                  setCustomColors={setCustomColors}
+
+                  // Multi-View Mode
+                  viewMode={viewMode}
+                  onSetViewMode={setViewMode}
+
+
+                />
+              );
+            })()}
+
+            {/* Multi-View Layout */}
+            <div className="relative flex-1 flex w-full h-full overflow-hidden bg-black">
+              {(() => {
+                // Helper: Render single viewport
+                const renderViewport = (index: number, extraClasses = '') => {
+                  const ctrl = controllers[index];
+                  const ref = viewerRefs[index];
+                  const isActive = activeViewIndex === index;
+                  const showHeader = viewMode !== 'single';
+                  const viewportLabels = ['Viewport 1', 'Viewport 2', 'Viewport 3', 'Viewport 4'];
+
+                  return (
+                    <div key={index} className={`flex flex-col h-full ${extraClasses}`}>
+                      {/* Viewport Header */}
+                      {showHeader && (
+                        <div
+                          onClick={() => setActiveViewIndex(index)}
+                          className={`shrink-0 h-9 flex items-center justify-between px-3 border-b transition-colors cursor-pointer select-none relative
                         ${isActive ? 'bg-[#1a1a1a] border-indigo-500/50' : 'bg-black border-[#222] opacity-60 hover:opacity-100'}
                       `}
-                    >
-                      <div className="flex items-center gap-2 relative z-10 pointer-events-none">
-                        <div className={`w-2 h-2 rounded-full shadow-sm transition-all ${isActive ? 'bg-indigo-500 shadow-indigo-500/50 scale-110' : 'bg-neutral-700'}`} />
-                        <span className={`text-[10px] font-bold uppercase tracking-widest ${isActive ? 'text-indigo-400' : 'text-neutral-500'}`}>
-                          {viewportLabels[index]}
-                        </span>
-                      </div>
-
-                      <div className="absolute inset-0 flex items-center justify-center px-20 pointer-events-none">
-                        <div className="relative group flex justify-center pointer-events-auto max-w-full">
-                          <span
-                            className="text-[10px] text-neutral-400 font-mono truncate block text-center"
-                          >
-                            {ctrl.proteinTitle || ctrl.pdbId || (ctrl.file ? ctrl.file.name : "No Structure")}
-                          </span>
-                          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 bg-neutral-900 text-white text-[10px] rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border border-neutral-700 w-max max-w-[90%] text-center whitespace-normal break-words shadow-xl">
-                            {ctrl.proteinTitle || ctrl.pdbId || (ctrl.file ? ctrl.file.name : "No Structure")}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="relative z-10 ml-auto">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); ctrl.handleResetView(); }}
-                          className="p-1 hover:bg-white/10 rounded text-neutral-500 hover:text-white transition-colors shrink-0"
-                          title="Reset Camera"
                         >
-                          <RefreshCw className="w-3 h-3" />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Viewer */}
-                  <div className="relative flex-1 w-full h-full">
-                    {!ctrl.pdbId && !ctrl.file ? (
-                      <div className={`absolute inset-0 flex items-center justify-center text-center select-none z-0 ${viewMode === 'single' ? 'p-6' : 'p-2'}`}>
-                        <div className={`max-w-md space-y-4 opacity-100 transform translate-y-0 transition-all duration-500 animate-in fade-in zoom-in-95 ${viewMode !== 'single' ? 'scale-90 origin-center' : ''}`}>
-
-                          {/* Large Header - Hide in multi-view to save space */}
-                          {viewMode === 'single' && (
-                            <>
-                              <div className="flex justify-center mb-4">
-                                <div className="p-4 bg-neutral-800/50 rounded-2xl border border-white/5 shadow-2xl backdrop-blur-sm">
-                                  <Grid3X3 className="w-12 h-12 text-blue-500/50" />
-                                </div>
-                              </div>
-                              <h2 className="text-2xl font-bold text-white tracking-tight">Ready to Visualize?</h2>
-                              <p className="text-neutral-400">
-                                Select a structure to begin exploring in 3D.
-                              </p>
-                            </>
-                          )}
-
-                          {/* Compact Header for Multi-View */}
-                          {viewMode !== 'single' && (
-                            <div className="mb-2">
-                              <Grid3X3 className="w-8 h-8 text-neutral-600 mx-auto mb-2 opacity-50" />
-                              <p className="text-[10px] text-neutral-500 font-medium uppercase tracking-wider">Empty Viewport</p>
-                            </div>
-                          )}
-
-                          <div className={`flex items-center justify-center gap-2 ${viewMode === 'single' ? 'pt-4' : 'pt-1 flex-col sm:flex-row'}`}>
-                            <button
-                              onClick={() => {
-                                setActiveViewIndex(index);
-                                setIsLibraryOpen(true);
-                              }}
-                              className={`flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-900/20 ${viewMode === 'single' ? 'px-5 py-2.5' : 'px-3 py-1.5 text-xs w-full sm:w-auto min-w-[100px]'}`}
-                            >
-                              <BookOpen className={viewMode === 'single' ? "w-4 h-4" : "w-3 h-3"} />
-                              {viewMode === 'single' ? "Browse Library" : "Library"}
-                            </button>
-                            <label
-                              onClick={() => setActiveViewIndex(index)}
-                              className={`flex items-center justify-center gap-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl font-medium transition-all hover:scale-105 active:scale-95 cursor-pointer border border-white/10 hover:border-white/20 ${viewMode === 'single' ? 'px-5 py-2.5' : 'px-3 py-1.5 text-xs w-full sm:w-auto min-w-[100px]'}`}
-                            >
-                              <Upload className={viewMode === 'single' ? "w-4 h-4" : "w-3 h-3"} />
-                              {viewMode === 'single' ? "Upload File" : "Upload"}
-                              <input
-                                type="file"
-                                className="hidden"
-                                accept=".pdb,.cif,.ent,.mol,.sdf,.mol2,.xyz"
-                                onChange={(e) => {
-                                  if (e.target.files?.[0]) {
-                                    // Set this viewport as active
-                                    setActiveViewIndex(index);
-                                    // Use the specific controller for this viewport
-                                    ctrl.handleUpload(e.target.files[0]);
-                                  }
-                                }}
-                              />
-                            </label>
+                          <div className="flex items-center gap-2 relative z-10 pointer-events-none">
+                            <div className={`w-2 h-2 rounded-full shadow-sm transition-all ${isActive ? 'bg-indigo-500 shadow-indigo-500/50 scale-110' : 'bg-neutral-700'}`} />
+                            <span className={`text-[10px] font-bold uppercase tracking-widest ${isActive ? 'text-indigo-400' : 'text-neutral-500'}`}>
+                              {viewportLabels[index]}
+                            </span>
                           </div>
 
-                          {viewMode === 'single' && (
-                            <div className="pt-8 text-xs text-neutral-600 font-mono">
-                              <p>Or enter a PDB ID or PubChem Code (e.g., <span className="text-neutral-400">2244</span>) in the sidebar.</p>
+                          <div className="absolute inset-0 flex items-center justify-center px-20 pointer-events-none">
+                            <div className="relative group flex justify-center pointer-events-auto max-w-full">
+                              <span
+                                className="text-[10px] text-neutral-400 font-mono truncate block text-center"
+                              >
+                                {ctrl.proteinTitle || ctrl.pdbId || (ctrl.file ? ctrl.file.name : "No Structure")}
+                              </span>
+                              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-2 py-1 bg-neutral-900 text-white text-[10px] rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50 border border-neutral-700 w-max max-w-[90%] text-center whitespace-normal break-words shadow-xl">
+                                {ctrl.proteinTitle || ctrl.pdbId || (ctrl.file ? ctrl.file.name : "No Structure")}
+                              </div>
                             </div>
-                          )}
+                          </div>
+
+                          <div className="relative z-10 ml-auto">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); ctrl.handleResetView(); }}
+                              className="p-1 hover:bg-white/10 rounded text-neutral-500 hover:text-white transition-colors shrink-0"
+                              title="Reset Camera"
+                            >
+                              <RefreshCw className="w-3 h-3" />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Viewer */}
+                      <div className="relative flex-1 w-full h-full">
+                        {!ctrl.pdbId && !ctrl.file ? (
+                          <div className={`absolute inset-0 flex items-center justify-center text-center select-none z-0 ${viewMode === 'single' ? 'p-6' : 'p-2'}`}>
+                            <div className={`max-w-md space-y-4 opacity-100 transform translate-y-0 transition-all duration-500 animate-in fade-in zoom-in-95 ${viewMode !== 'single' ? 'scale-90 origin-center' : ''}`}>
+
+                              {/* Large Header - Hide in multi-view to save space */}
+                              {viewMode === 'single' && (
+                                <>
+                                  <div className="flex justify-center mb-4">
+                                    <div className="p-4 bg-neutral-800/50 rounded-2xl border border-white/5 shadow-2xl backdrop-blur-sm">
+                                      <Grid3X3 className="w-12 h-12 text-blue-500/50" />
+                                    </div>
+                                  </div>
+                                  <h2 className="text-2xl font-bold text-white tracking-tight">Ready to Visualize?</h2>
+                                  <p className="text-neutral-400">
+                                    Select a structure to begin exploring in 3D.
+                                  </p>
+                                </>
+                              )}
+
+                              {/* Compact Header for Multi-View */}
+                              {viewMode !== 'single' && (
+                                <div className="mb-2">
+                                  <Grid3X3 className="w-8 h-8 text-neutral-600 mx-auto mb-2 opacity-50" />
+                                  <p className="text-[10px] text-neutral-500 font-medium uppercase tracking-wider">Empty Viewport</p>
+                                </div>
+                              )}
+
+                              <div className={`flex items-center justify-center gap-2 ${viewMode === 'single' ? 'pt-4' : 'pt-1 flex-col sm:flex-row'}`}>
+                                <button
+                                  onClick={() => {
+                                    setActiveViewIndex(index);
+                                    setIsLibraryOpen(true);
+                                  }}
+                                  className={`flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-900/20 ${viewMode === 'single' ? 'px-5 py-2.5' : 'px-3 py-1.5 text-xs w-full sm:w-auto min-w-[100px]'}`}
+                                >
+                                  <BookOpen className={viewMode === 'single' ? "w-4 h-4" : "w-3 h-3"} />
+                                  {viewMode === 'single' ? "Browse Library" : "Library"}
+                                </button>
+                                <label
+                                  onClick={() => setActiveViewIndex(index)}
+                                  className={`flex items-center justify-center gap-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl font-medium transition-all hover:scale-105 active:scale-95 cursor-pointer border border-white/10 hover:border-white/20 ${viewMode === 'single' ? 'px-5 py-2.5' : 'px-3 py-1.5 text-xs w-full sm:w-auto min-w-[100px]'}`}
+                                >
+                                  <Upload className={viewMode === 'single' ? "w-4 h-4" : "w-3 h-3"} />
+                                  {viewMode === 'single' ? "Upload File" : "Upload"}
+                                  <input
+                                    type="file"
+                                    className="hidden"
+                                    accept=".pdb,.cif,.ent,.mol,.sdf,.mol2,.xyz"
+                                    onChange={(e) => {
+                                      if (e.target.files?.[0]) {
+                                        // Set this viewport as active
+                                        setActiveViewIndex(index);
+                                        // Use the specific controller for this viewport
+                                        ctrl.handleUpload(e.target.files[0]);
+                                      }
+                                    }}
+                                  />
+                                </label>
+                              </div>
+
+                              {viewMode === 'single' && (
+                                <div className="pt-8 text-xs text-neutral-600 font-mono">
+                                  <p>Or enter a PDB ID or PubChem Code (e.g., <span className="text-neutral-400">2244</span>) in the sidebar.</p>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ) : (
+                          <ProteinViewer
+                            ref={ref}
+                            pdbId={ctrl.pdbId}
+                            dataSource={ctrl.dataSource}
+                            file={ctrl.file || undefined}
+                            fileType={ctrl.fileType}
+                            isLightMode={isLightMode}
+                            isSpinning={ctrl.isSpinning}
+                            representation={ctrl.representation}
+                            showSurface={ctrl.showSurface}
+                            showLigands={ctrl.showLigands}
+                            showIons={ctrl.showIons}
+                            coloring={ctrl.coloring}
+                            customColors={ctrl.customColors}
+                            palette={colorPalette}
+                            backgroundColor={ctrl.customBackgroundColor || (isLightMode ? 'white' : 'black')}
+                            measurementTextColor={measurementTextColorMode}
+                            enableAmbientOcclusion={true}
+                            overlays={ctrl.overlays}
+                            initialOrientation={index === 0 ? embedOrientation : undefined}
+
+
+                            onStructureLoaded={(info) => handleLoad(info, ctrl)}
+                            onAtomClick={(info) => handleAtomClick(info, index)}
+                            isMeasurementMode={isMeasurementMode}
+                            measurements={ctrl.measurements}
+                            onAddMeasurement={(m) => {
+                              ctrl.setMeasurements([...ctrl.measurements, m]);
+                              ctrl.setIsMeasurementPanelOpen(true);
+                              setActiveViewIndex(index);
+                            }}
+                            onHover={setHoveredResidue}
+
+
+
+                            // Action bindings for this viewport
+                            quality={isPublicationMode ? 'high' : 'medium'}
+                            resetCamera={ctrl.resetKey}
+                            disableScroll={!isScrollEnabled} // Scroll Protection
+
+                            className="w-full h-full"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  );
+                };
+
+                // Render layout based on viewMode
+                switch (viewMode) {
+                  case 'single':
+                    return renderViewport(0, 'w-full');
+
+                  case 'dual':
+                    return (
+                      <>
+                        {renderViewport(0, 'w-1/2 border-r border-[#333]')}
+                        {renderViewport(1, 'w-1/2')}
+                      </>
+                    );
+
+                  case 'triple':
+                    return (
+                      <div className="flex flex-col w-full h-full">
+                        {renderViewport(0, 'w-full h-1/2 border-b border-[#333]')}
+                        <div className="flex h-1/2 w-full">
+                          {renderViewport(1, 'w-1/2 border-r border-[#333]')}
+                          {renderViewport(2, 'w-1/2')}
                         </div>
                       </div>
-                    ) : (
-                      <ProteinViewer
-                        ref={ref}
-                        pdbId={ctrl.pdbId}
-                        dataSource={ctrl.dataSource}
-                        file={ctrl.file || undefined}
-                        fileType={ctrl.fileType}
-                        isLightMode={isLightMode}
-                        isSpinning={ctrl.isSpinning}
-                        representation={ctrl.representation}
-                        showSurface={ctrl.showSurface}
-                        showLigands={ctrl.showLigands}
-                        showIons={ctrl.showIons}
-                        coloring={ctrl.coloring}
-                        customColors={ctrl.customColors}
-                        palette={colorPalette}
-                        backgroundColor={ctrl.customBackgroundColor || (isLightMode ? 'white' : 'black')}
-                        measurementTextColor={measurementTextColorMode}
-                        enableAmbientOcclusion={true}
-                        overlays={ctrl.overlays}
-                        initialOrientation={index === 0 ? embedOrientation : undefined}
+                    );
 
+                  case 'quad':
+                    return (
+                      <div className="flex flex-col w-full h-full">
+                        <div className="flex h-1/2 w-full border-b border-[#333]">
+                          {renderViewport(0, 'w-1/2 border-r border-[#333]')}
+                          {renderViewport(1, 'w-1/2')}
+                        </div>
+                        <div className="flex h-1/2 w-full">
+                          {renderViewport(2, 'w-1/2 border-r border-[#333]')}
+                          {renderViewport(3, 'w-1/2')}
+                        </div>
+                      </div>
+                    );
 
-                        onStructureLoaded={(info) => handleLoad(info, ctrl)}
-                        onAtomClick={(info) => handleAtomClick(info, index)}
-                        isMeasurementMode={isMeasurementMode}
-                        measurements={ctrl.measurements}
-                        onAddMeasurement={(m) => {
-                          ctrl.setMeasurements([...ctrl.measurements, m]);
-                          ctrl.setIsMeasurementPanelOpen(true);
-                          setActiveViewIndex(index);
-                        }}
-                        onHover={setHoveredResidue}
+                  default:
+                    // Fallback to single view
+                    return renderViewport(0, 'w-full');
+                }
+              })()}
+            </div>
+            {/* Right Sidebar: Sequence Track */}
+            {!isCleanMode && (
+              <SequenceTrack
+                id="sequence-track"
+                chains={chains}
+                highlightedResidue={highlightedResidue}
+                onHoverResidue={() => { }}
+                onClickResidue={(chain, resNo) => viewerRef.current?.focusResidue(chain, resNo)}
+                onClickAtom={(serial) => viewerRef.current?.highlightAtom(serial)}
+                isLightMode={isLightMode}
+                coloring={coloring}
+                colorPalette={colorPalette}
+              />
+            )}
+          </div>
 
-
-
-                        // Action bindings for this viewport
-                        quality={isPublicationMode ? 'high' : 'medium'}
-                        resetCamera={ctrl.resetKey}
-                        disableScroll={!isScrollEnabled} // Scroll Protection
-
-                        className="w-full h-full"
-                      />
-                    )}
-                  </div>
-                </div>
-              );
-            };
-
-            // Render layout based on viewMode
-            switch (viewMode) {
-              case 'single':
-                return renderViewport(0, 'w-full');
-
-              case 'dual':
-                return (
-                  <>
-                    {renderViewport(0, 'w-1/2 border-r border-[#333]')}
-                    {renderViewport(1, 'w-1/2')}
-                  </>
-                );
-
-              case 'triple':
-                return (
-                  <div className="flex flex-col w-full h-full">
-                    {renderViewport(0, 'w-full h-1/2 border-b border-[#333]')}
-                    <div className="flex h-1/2 w-full">
-                      {renderViewport(1, 'w-1/2 border-r border-[#333]')}
-                      {renderViewport(2, 'w-1/2')}
-                    </div>
-                  </div>
-                );
-
-              case 'quad':
-                return (
-                  <div className="flex flex-col w-full h-full">
-                    <div className="flex h-1/2 w-full border-b border-[#333]">
-                      {renderViewport(0, 'w-1/2 border-r border-[#333]')}
-                      {renderViewport(1, 'w-1/2')}
-                    </div>
-                    <div className="flex h-1/2 w-full">
-                      {renderViewport(2, 'w-1/2 border-r border-[#333]')}
-                      {renderViewport(3, 'w-1/2')}
-                    </div>
-                  </div>
-                );
-
-              default:
-                // Fallback to single view
-                return renderViewport(0, 'w-full');
-            }
-          })()}
-        </div>
-        {/* Right Sidebar: Sequence Track */}
-        {!isCleanMode && (
-          <SequenceTrack
-            id="sequence-track"
-            chains={chains}
-            highlightedResidue={highlightedResidue}
-            onHoverResidue={() => { }}
-            onClickResidue={(chain, resNo) => viewerRef.current?.focusResidue(chain, resNo)}
-            onClickAtom={(serial) => viewerRef.current?.highlightAtom(serial)}
-            isLightMode={isLightMode}
-            coloring={coloring}
-            colorPalette={colorPalette}
+          <ViewportSelector
+            isOpen={isSelectorOpen}
+            viewMode={viewMode}
+            actionName={pendingToolAction?.type === 'record' ? 'Record Video' :
+              pendingToolAction?.type === 'snapshot' ? 'Take Snapshot' :
+                pendingToolAction?.type === 'reset' ? 'Reset View' :
+                  pendingToolAction?.type === 'save' ? 'Save Session' : 'Unknown Action'}
+            onConfirm={handleSelectorConfirm}
+            onCancel={() => { setIsSelectorOpen(false); setPendingToolAction(null); }}
           />
-        )}
-      </div>
 
-      <ViewportSelector
-        isOpen={isSelectorOpen}
-        viewMode={viewMode}
-        actionName={pendingToolAction?.type === 'record' ? 'Record Video' :
-          pendingToolAction?.type === 'snapshot' ? 'Take Snapshot' :
-            pendingToolAction?.type === 'reset' ? 'Reset View' :
-              pendingToolAction?.type === 'save' ? 'Save Session' : 'Unknown Action'}
-        onConfirm={handleSelectorConfirm}
-        onCancel={() => { setIsSelectorOpen(false); setPendingToolAction(null); }}
-      />
+          <SnapshotModal
+            isOpen={isSnapshotModalOpen}
+            viewMode={viewMode}
+            onConfirm={handleSnapshotConfirm}
+            onCancel={() => setIsSnapshotModalOpen(false)}
+          />
+          {/* End Main Content Flex Container */}
 
-      <SnapshotModal
-        isOpen={isSnapshotModalOpen}
-        viewMode={viewMode}
-        onConfirm={handleSnapshotConfirm}
-        onCancel={() => setIsSnapshotModalOpen(false)}
-      />
-      {/* End Main Content Flex Container */}
 
+        </>
+      )}
 
       <ContactMap
+
         isOpen={showContactMap}
         onClose={() => setShowContactMap(false)}
         chains={chains}

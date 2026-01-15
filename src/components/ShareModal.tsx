@@ -27,6 +27,20 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
     const [customWidth, setCustomWidth] = useState('800');
     const [customHeight, setCustomHeight] = useState('600');
     const [embedOrientation, setEmbedOrientation] = useState<any>(null);
+    const [embedTransparent, setEmbedTransparent] = useState(false);
+    const [embedBorderRadius, setEmbedBorderRadius] = useState<0 | 12 | 24>(12);
+    const [embedShadow, setEmbedShadow] = useState(true);
+    const [embedColor, setEmbedColor] = useState<string | null>(null);
+    const [embedInteractionWrapper, setEmbedInteractionWrapper] = useState(false);
+
+    const BRAND_COLORS = [
+        { name: 'Blue', value: '#3b82f6' }, // blue-500
+        { name: 'Purple', value: '#a855f7' }, // purple-500
+        { name: 'Green', value: '#22c55e' }, // green-500
+        { name: 'Red', value: '#ef4444' }, // red-500
+        { name: 'Orange', value: '#f97316' }, // orange-500
+        { name: 'Pink', value: '#ec4899' }, // pink-500
+    ];
 
     // Orientation Message Handler
     useEffect(() => {
@@ -101,6 +115,9 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
         if (embedTheme === 'dark') url += '&theme=dark';
         if (embedStatic) url += '&interaction=false';
         if (embedScrollProtection) url += '&scroll=false';
+        if (embedInteractionWrapper) url += '&interactionWrapper=true';
+        if (embedColor) url += `&color=${embedColor.replace('#', '')}`;
+        if (embedTransparent) url += '&bg=transparent';
         if (embedOrientation) url += `&orientation=${encodeURIComponent(JSON.stringify(embedOrientation))}`;
         return url;
     };
@@ -122,10 +139,11 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
   src="${finalEmbedUrl}"
   width="${width}"
   height="${height}"
-  style="border:none; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); max-width: 100%;"
+  style="border:none; border-radius: ${embedBorderRadius}px; box-shadow: ${embedShadow ? '0 4px 6px -1px rgb(0 0 0 / 0.1)' : 'none'}; max-width: 100%;${embedTransparent ? ' background: transparent;' : ''}"
   title="Quercus Viewer"
   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
   allowFullScreen
+  ${embedTransparent ? 'allowTransparency="true"' : ''}
 ></iframe>`;
 
     const handleCopyEmbed = async () => {
@@ -330,6 +348,20 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                                 </span>
                                                 {embedOrientation ? <Check className="w-4 h-4" /> : <Camera className="w-4 h-4" />}
                                             </button>
+
+                                            <button
+                                                onClick={() => setEmbedInteractionWrapper(!embedInteractionWrapper)}
+                                                className={`flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium border transition-colors ${embedInteractionWrapper
+                                                    ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                                                    : (isLightMode ? 'bg-neutral-100/50 text-neutral-600 border-neutral-200 hover:bg-neutral-100' : 'bg-neutral-800/50 text-neutral-400 border-neutral-700 hover:bg-neutral-800')
+                                                    }`}
+                                            >
+                                                <span className="flex items-center gap-2">
+                                                    <div className={`w-2 h-2 rounded-full ${embedInteractionWrapper ? 'bg-blue-500' : 'bg-neutral-400'}`} />
+                                                    Click-to-Interact
+                                                </span>
+                                                {embedInteractionWrapper && <Check className="w-4 h-4" />}
+                                            </button>
                                         </div>
                                     </div>
 
@@ -374,6 +406,88 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                                     Light Theme
                                                 </button>
                                             </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Visual Style Group */}
+                                    <div className="space-y-3">
+                                        <label className={`text-xs font-bold uppercase tracking-wider ${isLightMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
+                                            Visual Style
+                                        </label>
+                                        <div className="flex flex-col gap-2">
+                                            {/* Color Picker */}
+                                            <div className={`p-3 rounded-lg border space-y-2 ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-800/50 border-neutral-700'}`}>
+                                                <div className="flex justify-between text-xs font-medium opacity-70">
+                                                    <span>Accent Color</span>
+                                                </div>
+                                                <div className="flex gap-2 justify-between">
+                                                    <button
+                                                        onClick={() => setEmbedColor(null)}
+                                                        className={`w-6 h-6 rounded-full border-2 transition-all ${!embedColor ? 'border-white ring-2 ring-blue-500/50' : 'border-transparent hover:border-white/50'}`}
+                                                        style={{ background: 'linear-gradient(135deg, #3b82f6 50%, #22c55e 50%)' }} // Placeholder "Default" rainbow-ish or blue
+                                                        title="Default"
+                                                    />
+                                                    {BRAND_COLORS.map((color) => (
+                                                        <button
+                                                            key={color.name}
+                                                            onClick={() => setEmbedColor(color.value)}
+                                                            className={`w-6 h-6 rounded-full border-2 transition-all ${embedColor === color.value ? 'border-white ring-2 ring-white/20 scale-110' : 'border-transparent hover:scale-110'}`}
+                                                            style={{ backgroundColor: color.value }}
+                                                            title={color.name}
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            <button
+                                                onClick={() => setEmbedTransparent(!embedTransparent)}
+                                                className={`flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium border transition-colors ${embedTransparent
+                                                    ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                                                    : (isLightMode ? 'bg-neutral-100/50 text-neutral-600 border-neutral-200 hover:bg-neutral-100' : 'bg-neutral-800/50 text-neutral-400 border-neutral-700 hover:bg-neutral-800')
+                                                    }`}
+                                            >
+                                                <span className="flex items-center gap-2">
+                                                    <div className={`w-2 h-2 rounded-full ${embedTransparent ? 'bg-blue-500' : 'bg-neutral-400'}`} />
+                                                    Transparent Background
+                                                </span>
+                                                {embedTransparent && <Check className="w-4 h-4" />}
+                                            </button>
+
+                                            <button
+                                                onClick={() => setEmbedShadow(!embedShadow)}
+                                                className={`flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium border transition-colors ${embedShadow
+                                                    ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                                                    : (isLightMode ? 'bg-neutral-100/50 text-neutral-600 border-neutral-200 hover:bg-neutral-100' : 'bg-neutral-800/50 text-neutral-400 border-neutral-700 hover:bg-neutral-800')
+                                                    }`}
+                                            >
+                                                <span className="flex items-center gap-2">
+                                                    <div className={`w-2 h-2 rounded-full ${embedShadow ? 'bg-blue-500' : 'bg-neutral-400'}`} />
+                                                    Drop Shadow
+                                                </span>
+                                                {embedShadow && <Check className="w-4 h-4" />}
+                                            </button>
+
+                                            {/* Border Radius Control */}
+                                            <div className={`p-3 rounded-lg border space-y-2 ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-800/50 border-neutral-700'}`}>
+                                                <div className="flex justify-between text-xs font-medium opacity-70">
+                                                    <span>Corner Radius</span>
+                                                    <span>{embedBorderRadius}px</span>
+                                                </div>
+                                                <div className="flex gap-1">
+                                                    {[0, 12, 24].map((radius) => (
+                                                        <button
+                                                            key={radius}
+                                                            onClick={() => setEmbedBorderRadius(radius as any)}
+                                                            className={`flex-1 py-1.5 text-xs rounded transition-all ${embedBorderRadius === radius
+                                                                ? 'bg-blue-600 text-white shadow'
+                                                                : (isLightMode ? 'bg-white text-neutral-600 hover:bg-neutral-200' : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700')}`}
+                                                        >
+                                                            {radius === 0 ? 'Sharp' : radius === 12 ? 'Round' : 'Soft'}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+
                                         </div>
                                     </div>
 

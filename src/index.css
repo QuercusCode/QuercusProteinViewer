@@ -6,11 +6,39 @@
   }
 
   body {
-    @apply bg-neutral-900 text-neutral-100 m-0 overflow-hidden w-screen h-screen fixed inset-0;
+    @apply text-neutral-100 m-0 overflow-hidden w-screen h-screen fixed inset-0;
+    background-color: var(--body-bg, theme('colors.neutral.900'));
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   }
 
   #root {
     @apply w-full h-full;
+  }
+}
+
+/* Custom Brand Color Overrides for Embeds */
+@layer utilities {
+  .embed-custom-color .text-blue-400 {
+    color: var(--brand-color) !important;
+  }
+
+  .embed-custom-color .text-blue-500 {
+    color: var(--brand-color) !important;
+  }
+
+  .embed-custom-color .bg-blue-500 {
+    background-color: var(--brand-color) !important;
+  }
+
+  .embed-custom-color .bg-blue-600 {
+    background-color: var(--brand-color) !important;
+  }
+
+  .embed-custom-color .border-blue-500 {
+    border-color: var(--brand-color) !important;
+  }
+
+  .embed-custom-color .border-blue-600 {
+    border-color: var(--brand-color) !important;
   }
 }
