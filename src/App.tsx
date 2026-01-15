@@ -1886,6 +1886,9 @@ function App() {
                         measurementTextColor={measurementTextColorMode}
                         enableAmbientOcclusion={true}
                         overlays={ctrl.overlays} // Added prop
+                        onOverlayRMSDCalculated={(id, rmsd) => {
+                          ctrl.setOverlays(prev => prev.map(o => o.id === id ? { ...o, rmsd } : o));
+                        }}
 
                         onStructureLoaded={(info) => handleLoad(info, ctrl)}
                         onAtomClick={(info) => handleAtomClick(info, index)}

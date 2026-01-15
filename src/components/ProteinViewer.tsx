@@ -71,6 +71,7 @@ export interface ProteinViewerProps {
     isMeasurementMode?: boolean;
     measurements?: Measurement[];
     onAddMeasurement?: (m: Measurement) => void;
+    onOverlayRMSDCalculated?: (id: string, rmsd: number) => void;
 
     // Actions
     resetCamera?: number; // Increment to trigger reset
@@ -129,6 +130,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     isMeasurementMode = false,
     measurements,
     onAddMeasurement,
+    onOverlayRMSDCalculated,
     onHover,
     isLightMode,
     quality = 'medium',
@@ -1703,7 +1705,12 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         console.log(`Superposing ${overlay.id} onto main structure...`);
                         try {
                             // align=true moves the component
-                            comp.superpose(mainComponent, true, "CA");
+                            // align=true moves the component
+                            const s = comp.superpose(mainComponent, true, "CA");
+                            console.log("Superposition result:", s);
+                            if (s && typeof s.rmsd === 'number' && onOverlayRMSDCalculated) {
+                                onOverlayRMSDCalculated(overlay.id, s.rmsd);
+                            }
                         } catch (e) {
                             console.warn("Superposition failed:", e);
                         }

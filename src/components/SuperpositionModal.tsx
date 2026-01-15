@@ -123,7 +123,14 @@ export const SuperpositionModal: React.FC<SuperpositionModalProps> = ({
                                             />
                                             <div className="flex flex-col min-w-0 overflow-hidden">
                                                 <span className="text-sm font-medium text-neutral-200 truncate" title={item.description}>{item.description || 'Unknown Structure'}</span>
-                                                <span className="text-[10px] text-neutral-500 font-mono truncate" title={item.id}>{item.id}</span>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-[10px] text-neutral-500 font-mono truncate" title={item.id}>{item.id}</span>
+                                                    {item.rmsd !== undefined && (
+                                                        <span className="text-[9px] font-bold bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded border border-green-500/30">
+                                                            RMSD: {item.rmsd.toFixed(3)} Å
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
 
