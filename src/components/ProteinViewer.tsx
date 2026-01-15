@@ -2149,17 +2149,29 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
             let animationId: number;
             const startTime = Date.now();
+            let lastTime = startTime;
 
             const animate = () => {
-                // Custom Gentle Rock Animation
-                // Oscillate velocity: dAlpha = Amplitude * cos(frequency * t)
-                // Resulting position is sin wave.
-                // Frequency: slower (0.001)
-                // Amplitude scale: 1.5 deg per frame max = ~180deg total swing
-                const time = Date.now() - startTime;
-                const delta = 1.5 * Math.cos(time * 0.001);
-                // Rotate camera slightly
-                stageRef.current.viewerControls.rotate(delta, 0);
+                const now = Date.now();
+                const totalTime = (now - startTime) * 0.001; // seconds
+                const dt = (now - lastTime) * 0.001; // seconds
+                lastTime = now;
+
+                // Parameters
+                // Amplitude: 180 degrees total range -> +/- 90 degrees = +/- 1.57 radians
+                const amplitude = 1.57;
+                // Frequency: 0.2 rad/s (approx 30s period for full cycle) - very slow
+                const frequency = 0.2;
+
+                // dTheta/dt = Amplitude * w * cos(w*t)
+                // Delta for this frame:
+                const delta = amplitude * frequency * Math.cos(frequency * totalTime) * dt;
+
+                // Rotate around Y axis
+                if (stageRef.current && stageRef.current.viewerControls) {
+                    stageRef.current.viewerControls.rotate(delta, 0);
+                }
+
                 animationId = requestAnimationFrame(animate);
             };
 
