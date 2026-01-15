@@ -20,8 +20,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
     // Embed Options State
     const [embedSpin, setEmbedSpin] = useState(false);
     const [embedControls, setEmbedControls] = useState(true);
-    const [embedTransparent, setEmbedTransparent] = useState(false);
-    const [embedLight, setEmbedLight] = useState(false);
+    const [embedTheme, setEmbedTheme] = useState<'dark' | 'light'>('dark');
     const [embedStatic, setEmbedStatic] = useState(false);
 
     // Generate QR Code
@@ -75,8 +74,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
         let url = shareUrl.replace('?', '?embed=true&');
         if (embedSpin) url += '&spin=true';
         if (!embedControls) url += '&ui=false';
-        if (embedTransparent) url += '&bg=transparent';
-        if (embedLight) url += '&theme=light';
+        if (embedTheme === 'light') url += '&theme=light';
+        if (embedTheme === 'dark') url += '&theme=dark';
         if (embedStatic) url += '&interaction=false';
         return url;
     };
@@ -87,7 +86,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
   src="${finalEmbedUrl}"
   width="100%"
   height="600"
-  style="border:none; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); max-width: 100%;${embedTransparent ? ' background: transparent;' : ''}"
+  style="border:none; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); max-width: 100%;"
   title="Quercus Viewer"
   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
   allowFullScreen
@@ -255,29 +254,31 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                         <div className={`w-3 h-3 rounded-full border-2 ${!embedControls ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
                                         Hide Controls
                                     </button>
-                                    <button
-                                        onClick={() => setEmbedTransparent(!embedTransparent)}
-                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedTransparent
-                                            ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
-                                            : (isLightMode ? 'bg-neutral-100 text-neutral-600 border-neutral-200' : 'bg-neutral-800 text-neutral-400 border-neutral-700')
-                                            }`}
-                                    >
-                                        <div className={`w-3 h-3 rounded-full border-2 ${embedTransparent ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
-                                        Transparent BG
-                                    </button>
-                                    <button
-                                        onClick={() => setEmbedLight(!embedLight)}
-                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedLight
-                                            ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
-                                            : (isLightMode ? 'bg-neutral-100 text-neutral-600 border-neutral-200' : 'bg-neutral-800 text-neutral-400 border-neutral-700')
-                                            }`}
-                                    >
-                                        <div className={`w-3 h-3 rounded-full border-2 ${embedLight ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
-                                        Light Theme
-                                    </button>
+                                    {/* Theme Switch */}
+                                    <div className={`flex items-center p-0.5 rounded-full border ${isLightMode ? 'bg-neutral-100 border-neutral-200' : 'bg-neutral-800 border-neutral-700'}`}>
+                                        <button
+                                            onClick={() => setEmbedTheme('dark')}
+                                            className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${embedTheme === 'dark'
+                                                ? (isLightMode ? 'bg-white shadow text-neutral-900' : 'bg-neutral-700 shadow text-white')
+                                                : 'text-neutral-500 hover:text-neutral-400'
+                                                }`}
+                                        >
+                                            Dark
+                                        </button>
+                                        <button
+                                            onClick={() => setEmbedTheme('light')}
+                                            className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${embedTheme === 'light'
+                                                ? (isLightMode ? 'bg-white shadow text-neutral-900' : 'bg-neutral-600 shadow text-white')
+                                                : 'text-neutral-500 hover:text-neutral-400'
+                                                }`}
+                                        >
+                                            Light
+                                        </button>
+                                    </div>
+
                                     <button
                                         onClick={() => setEmbedStatic(!embedStatic)}
-                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedStatic
+                                        className={`flexItems-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedStatic
                                             ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
                                             : (isLightMode ? 'bg-neutral-100 text-neutral-600 border-neutral-200' : 'bg-neutral-800 text-neutral-400 border-neutral-700')
                                             }`}
@@ -292,7 +293,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                     <label className={`text-sm font-medium ${isLightMode ? 'text-neutral-700' : 'text-neutral-300'}`}>
                                         Live Preview
                                     </label>
-                                    <div className={`relative w-full aspect-video rounded-xl overflow-hidden border border-white/10 shadow-lg ${embedTransparent ? 'bg-[url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0ibm9uZSI+PHBhdGggZmlsbD0iIzIyMiIgZD0iTTAgMGgxMHYxMEgwem0xMCAxMGgxMHYxMEgxMHoiLz48cGF0aCBmaWxsPSIjMzMzIiBkPSJNMTAgMGgxMHYxMEgxMHptLTEwIDEwaDEwdjEwSDB6Ii8+PC9zdmc+")]' : 'bg-black/50'}`}>
+                                    <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-white/10 shadow-lg bg-black/50">
                                         <iframe
                                             src={finalEmbedUrl}
                                             className="w-full h-full border-none pointer-events-none" // Disable interaction in preview to avoid scrolling trap
