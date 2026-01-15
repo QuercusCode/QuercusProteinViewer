@@ -122,10 +122,10 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm animate-in fade-in overflow-y-auto">
-            <div className={`relative w-full max-w-6xl rounded-xl shadow-2xl p-6 my-auto ${isLightMode ? 'bg-white text-neutral-900' : 'bg-neutral-900 text-white'}`}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 bg-black/70 backdrop-blur-sm animate-in fade-in overflow-y-auto">
+            <div className={`relative w-full max-w-5xl rounded-xl shadow-2xl p-5 my-auto ${isLightMode ? 'bg-white text-neutral-900' : 'bg-neutral-900 text-white'}`}>
                 {/* Header */}
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-4">
                     <h2 className="text-xl font-bold">Share Visualization</h2>
                     <button
                         onClick={onClose}
@@ -150,7 +150,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                 ) : (
                     <>
                         {/* Tabs */}
-                        <div className={`flex p-1 mb-6 rounded-lg ${isLightMode ? 'bg-neutral-100' : 'bg-neutral-800'}`}>
+                        <div className={`flex p-1 mb-4 rounded-lg ${isLightMode ? 'bg-neutral-100' : 'bg-neutral-800'}`}>
                             <button
                                 onClick={() => setActiveTab('link')}
                                 className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'link'
@@ -247,9 +247,9 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                             </>
                         ) : (
                             /* Embed Tab */
-                            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-2">
+                            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-1">
                                 {/* Left Column: Controls */}
-                                <div className="md:col-span-5 space-y-6">
+                                <div className="md:col-span-5 space-y-4">
                                     {/* Behavior Group */}
                                     <div className="space-y-3">
                                         <label className={`text-xs font-bold uppercase tracking-wider ${isLightMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
