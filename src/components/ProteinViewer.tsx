@@ -105,6 +105,7 @@ export interface ProteinViewerRef {
     highlightAtom: (serial: number) => void;
     getOrientation: () => any;
     setOrientation: (orientation: any) => void;
+    getPdbBlob: () => Blob | null; // Method to extract current structure as blob
 }
 
 export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
@@ -691,6 +692,17 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 }
             } catch (e) {
                 console.warn("Clear highlight failed:", e);
+            }
+        },
+        getPdbBlob: () => {
+            if (!componentRef.current || !componentRef.current.structure) return null;
+            try {
+                const writer = new window.NGL.PdbWriter(componentRef.current.structure);
+                const pdbString = writer.getData();
+                return new Blob([pdbString], { type: 'text/plain' });
+            } catch (e) {
+                console.error("Failed to write PDB blob:", e);
+                return null;
             }
         },
         getOrientation: () => {

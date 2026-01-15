@@ -783,30 +783,48 @@ function App() {
   // Session Management
   // Session Management
   // Session Management
-  // Session Management
-  const handleSaveSession = () => {
+  const handleSaveSession = async () => {
     try {
-      console.log("Starting save session (Version 2 Mockup)");
+      console.log("Saving session (V2)...");
 
-      // Collect state from all controllers
-      const viewportsData = controllers.map((ctrl, index) => {
+      // 1. Gather Data (Async)
+      const viewportsPromises = controllers.map(async (ctrl, index) => {
         const ref = viewerRefs[index];
+        let fileContent: string | undefined = undefined;
+
+        // Capture Content if possible (especially for local files)
+        // We check if PDB ID looks like a local filename or "Unknown", or explicit logic
+        // DataSource 'file' doesn't exist in type, usually it's 'url' or 'pdb' with non-standard ID
+        const isLocal = !ctrl.pdbId || ctrl.pdbId === 'Unknown' || ctrl.pdbId.includes('.') || (ctrl.dataSource as any) === 'file' || (ctrl.dataSource as any) === 'url' || ctrl.pdbId.length > 5;
+
+        if (isLocal && ref.current && ref.current.getPdbBlob) {
+          const blob = ref.current.getPdbBlob();
+          if (blob) {
+            fileContent = await blob.text();
+          }
+        }
+
         return {
-          pdbId: String(ctrl.pdbId || ""),
-          representation: String(ctrl.representation),
-          coloring: String(ctrl.coloring),
+          id: ctrl.pdbId,
+          pdbId: ctrl.pdbId,
+          dataSource: ctrl.dataSource,
+          fileContent: fileContent, // New Field
+          representation: ctrl.representation,
+          coloring: ctrl.coloring,
           showSurface: ctrl.showSurface,
           showLigands: ctrl.showLigands,
           showIons: ctrl.showIons,
           isSpinning: ctrl.isSpinning,
           customBackgroundColor: ctrl.customBackgroundColor,
-          isMeasurementMode: isMeasurementMode, // This is global for now, or per-viewport?
+          isMeasurementMode: isMeasurementMode,
           measurements: ctrl.measurements,
           customColors: ctrl.customColors,
           overlays: ctrl.overlays,
           orientation: ref.current?.getOrientation()
         };
       });
+
+      const viewportsData = await Promise.all(viewportsPromises);
 
       // Construct Data safely (V2 Format)
       const sessionData = {
@@ -866,7 +884,21 @@ function App() {
           session.viewports.forEach((vp: any, index: number) => {
             if (index < controllers.length) {
               const ctrl = controllers[index];
-              if (vp.pdbId) ctrl.setPdbId(vp.pdbId);
+              // Restore Content if present
+              if (vp.fileContent) {
+                const file = new File([vp.fileContent], `${vp.pdbId || 'structure'}.pdb`, { type: 'text/plain' });
+                ctrl.setFile(file);
+                // We also need to set PDB ID to trigger load, or handleUpload?
+                // Best to use handleUpload to trigger the flow
+                // But handleUpload expects user interaction usually.
+                // Let's manually set file and ID.
+                // If we set ID, ProteinViewer might try to fetch. 
+                // If we set file, we need to ensure ProteinViewer uses it.
+                // ProteinViewer uses `file` prop if provided.
+              } else if (vp.pdbId) {
+                ctrl.setPdbId(vp.pdbId);
+              }
+
               if (vp.representation) ctrl.setRepresentation(vp.representation);
               if (vp.coloring) ctrl.setColoring(vp.coloring);
               if (vp.showSurface !== undefined) ctrl.setShowSurface(vp.showSurface);
