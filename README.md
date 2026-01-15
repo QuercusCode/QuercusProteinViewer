@@ -12,91 +12,63 @@
   <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
 </div>
 
-A professional, high-performance 3D Protein & Chemical structure viewer built for modern research. Visualize PDB structures with publication-quality rendering, advanced comparison tools, and intuitive customizations directly in your browser.
+<br />
 
-## ✨ New in v1.0
-
-### advanced Structural Comparison
-
-- **Structure Superposition**: Align multiple structures (PDB IDs or local files) on top of each other to compare active sites, mutant variations, or conformational changes.
-- **Multi-View System**: Split the screen into up to 4 viewports (Single, Side-by-Side, Grid) to compare distinct structures simultaneously.
-
-### 🎨 Customization & Branding
-
-- **Custom Residue Coloring**: Define precise coloring rules (e.g., "Chain A, residues 20-40") to highlight specific domains or interaction sites.
-- **Persistent State**: Custom colors and view settings are now saved in the shared URL.
-- **Adaptive Theming**: Full support for Light and Dark modes, with adaptive logos and high-contrast UI updates.
-- **Brand Identity**: Featuring the new **Quercus** visual identity.
-
-### 🤝 Support & Community
-
-- **GitHub Issues**: Direct reporting for bugs and features.
-- **Community Support**: "Buy Me a Coffee" integration for supporting development.
+**Quercus Viewer** is a professional-grade 3D viewer for protein and chemical structures. Designed for researchers and students, it combines publication-quality rendering with intuitive analysis tools right in your browser.
 
 ---
 
-## 🔬 Core Features
+## ⚡️ Key Capabilities
 
-### Visualization
+### 🔬 Visualization
 
-- **Dual Loading**: Fetch typically from **RCSB PDB**, **PubChem** (CIDs), or drag & drop local files (`.pdb`, `.cif`, `.sdf`, `.mol`).
-- **representations**: Cartoon, Ball & Stick (with bond order), Spacefill, Licorice, Surface, Backbone, and more.
-- **Smart Detection**: Automatically handles DNA/RNA bases and small molecule bonds.
+* **Universal Loading**: Instantly load structures from **RCSB PDB**, **PubChem** (CIDs), or drag-and-drop local files (`.pdb`, `.cif`, `.sdf`, `.mol`).
+* **Rich Representations**: Switch seamlessly between Cartoon, Ball & Stick, Spacefill, Surface, Licorice, Backbone, and more.
+* **Smart Defaults**: Automatic recognition of DNA/RNA, ligands, and ions.
+* **Multi-View**: Split the screen (Side-by-Side or Grid) to compare up to 4 structures simultaneously.
 
-### Analysis
+### 🧬 Analysis
 
-- **Contact Map**: 2D heatmap of residue interactions with 3D sync.
-- **Measurements**: Precise Angstrom distance tools.
-- **Motif Search**: Find specific sequences or substructures instantly.
+* **Structure Superposition**: Visually align multiple structures to compare conformations and binding sites.
+* **Contact Maps**: Interactive 2D heatmaps synced with the 3D view to explore residue interactions.
+* **Measurements**: Precise distance tools (Angstroms) to measure bond lengths and proximity.
+* **Sequence Viewer**: Interactive sequence track to highlight and select specific residues.
 
-### Export
+### 🎨 Customization & Export
 
-- **Publication-Ready**: Export transparent, high-res PNGs (3x scaling).
-- **Movies**: Record 360° turntable animations.
-- **Sessions**: Save your workspace state to JSON for later use.
+* **Advanced Coloring**: Color by Chain, Residue, Element, Hydrophobicity, B-Factor, or define custom selection rules (e.g., "Chain A, 10-50").
+* **Publication-Ready Export**: Save transparent, high-resolution (3x) PNG images.
+* **Turntable Recording**: Generate smooth 360° video loops for presentations.
+* **Playlists**: Organize and save collections of structures for quick access.
 
-## 🚀 Getting Started
+---
 
-### Prerequisites
+## 🚀 Quick Start
 
-- Node.js (v16+)
-- npm
+Get running in seconds:
 
-### Installation
+```bash
+# 1. Clone
+git clone https://github.com/QuercusCode/QuercusProteinViewer.git
+cd QuercusProteinViewer
 
-1. **Clone the repository**
+# 2. Install
+npm install
 
-   ```bash
-   git clone https://github.com/QuercusCode/QuercusProteinViewer.git
-   cd QuercusProteinViewer
-   ```
+# 3. Launch
+npm run dev
+```
 
-2. **Install dependencies**
+Open `http://localhost:5173` to start viewing.
 
-   ```bash
-   npm install
-   ```
+---
 
-3. **Run locally**
+## 🤝 Support
 
-   ```bash
-   npm run dev
-   ```
+If you find this tool useful, consider supporting its development!
 
-   Open `http://localhost:5173`.
-
-## 🤝 Contributing & Support
-
-We welcome contributions! Please open an issue for bugs or feature requests.
-
-If you find this tool useful for your work, consider supporting its development:
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support-orange?style=for-the-badge&logo=buy-me-a-coffee)](https://buymeacoffee.com/amirmcheraghali)
 
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
-
-## 📢 Acknowledgments
-
-- Data: [RCSB PDB](https://www.rcsb.org/), [PubChem](https://pubchem.ncbi.nlm.nih.gov/).
-- Engine: [NGL Viewer](http://nglviewer.org/).
+MIT License. Data providers: [RCSB PDB](https://www.rcsb.org/), [PubChem](https://pubchem.ncbi.nlm.nih.gov/). Engine: [NGL Viewer](http://nglviewer.org/).
