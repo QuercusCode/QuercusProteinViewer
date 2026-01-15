@@ -312,6 +312,7 @@ function App() {
       }
       // Force Theme
       const themeParam = params.get('theme');
+      if (themeParam === 'light') setIsLightMode(true);
       if (themeParam === 'dark') setIsLightMode(false);
 
       // Orientation
@@ -330,13 +331,14 @@ function App() {
     // Listen for cross-origin messages (from ShareModal parent)
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === 'REQUEST_ORIENTATION') {
-        // Get orientation from view 0 (embed view)
+        // Get orientation from view 0 (main viewer)
         const orientation = viewerRefs[0]?.current?.getOrientation();
         if (orientation) {
-          (event.source as Window)?.postMessage({
+          // For same-window communication, post back to window
+          window.postMessage({
             type: 'ORIENTATION_RESPONSE',
             orientation: orientation
-          }, event.origin === "null" ? "*" : event.origin);
+          }, '*');
         }
       }
     };
