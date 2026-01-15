@@ -1717,9 +1717,13 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             // align=true moves the component
                             let s: any = undefined;
 
+                            // Low-Level API Access
+                            const mainStruct = mainComponent.structure;
+                            const overlayStruct = comp.structure;
+
                             // Strategy 1: CA (Alpha Carbon - Best for Proteins)
                             try {
-                                s = comp.superpose(mainComponent, true, "CA");
+                                s = overlayStruct.superpose(mainStruct, true, "CA");
                                 console.log(`[Superpose] Strategy 'CA' result:`, s ? s.rmsd : 'null');
                             } catch (e) { console.warn("[Superpose] 'CA' strategy threw error", e); }
 
@@ -1727,7 +1731,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             if (!s || (typeof s.rmsd !== 'number' && typeof s.mean2 !== 'number')) {
                                 try {
                                     console.log(`[Superpose] Retrying strategy 'backbone'...`);
-                                    s = comp.superpose(mainComponent, true, "backbone");
+                                    s = overlayStruct.superpose(mainStruct, true, "backbone");
                                     console.log(`[Superpose] Strategy 'backbone' result:`, s ? s.rmsd : 'null');
                                 } catch (e) { console.warn("[Superpose] 'backbone' strategy threw error", e); }
                             }
@@ -1736,10 +1740,13 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             if (!s || (typeof s.rmsd !== 'number' && typeof s.mean2 !== 'number')) {
                                 try {
                                     console.log(`[Superpose] Retrying strategy 'all' ("")...`);
-                                    s = comp.superpose(mainComponent, true, "");
+                                    s = overlayStruct.superpose(mainStruct, true, "");
                                     console.log(`[Superpose] Strategy 'all' result:`, s ? s.rmsd : 'null');
                                 } catch (e) { console.warn("[Superpose] 'all' strategy threw error", e); }
                             }
+
+                            // Update visual representation to match new coordinates
+                            comp.updateRepresentations({ position: true });
 
                             if (onOverlayRMSDCalculated) {
                                 // NGL uses 'rmsd' or sometimes 'mean2' (mean square deviation)
