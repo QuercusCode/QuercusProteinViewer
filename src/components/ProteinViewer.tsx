@@ -40,6 +40,7 @@ export interface ProteinViewerProps {
     // Appearance
     isLightMode: boolean;
     isSpinning: boolean;
+    spinSpeed?: number; // New prop
     representation: RepresentationType;
     showSurface: boolean;
     showLigands?: boolean;  // Optional, defaults to true
@@ -132,6 +133,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     showLigands = false,
     showIons = false,
     isSpinning = false,
+    spinSpeed,
     isMeasurementMode = false,
     measurements,
     onAddMeasurement,
@@ -1280,9 +1282,19 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     useEffect(() => {
         if (stageRef.current) {
-            stageRef.current.setSpin(isSpinning);
+            if (isSpinning) {
+                // If speed is provided, use array format: [axisX, axisY, axisZ, speed]
+                // NGL default axis is Y [0, 1, 0].
+                if (typeof spinSpeed === 'number') {
+                    stageRef.current.setSpin([0, 1, 0], spinSpeed);
+                } else {
+                    stageRef.current.setSpin(true);
+                }
+            } else {
+                stageRef.current.setSpin(false);
+            }
         }
-    }, [isSpinning]);
+    }, [isSpinning, spinSpeed]);
 
     // Handle Window Resize
     useEffect(() => {

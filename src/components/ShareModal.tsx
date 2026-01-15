@@ -19,6 +19,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
 
     // Embed Options State
     const [embedSpin, setEmbedSpin] = useState(false);
+    const [embedSpinSpeed, setEmbedSpinSpeed] = useState(0.005); // Default spin speed
     const [embedControls, setEmbedControls] = useState(true);
     const [embedTheme, setEmbedTheme] = useState<'dark' | 'light'>('dark');
     const [embedStatic, setEmbedStatic] = useState(false);
@@ -30,7 +31,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
     const [embedTransparent, setEmbedTransparent] = useState(false);
     const [embedBorderRadius, setEmbedBorderRadius] = useState<0 | 12 | 24>(12);
     const [embedShadow, setEmbedShadow] = useState(true);
-    const [embedLazy, setEmbedLazy] = useState(false);
+    // const [embedLazy, setEmbedLazy] = useState(false); // REMOVED
     const [embedColor, setEmbedColor] = useState<string | null>(null);
     const [embedInteractionWrapper, setEmbedInteractionWrapper] = useState(false);
 
@@ -110,13 +111,16 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
     // Generate Embed Code
     const getEmbedUrl = () => {
         let url = shareUrl.replace('?', '?embed=true&');
-        if (embedSpin) url += '&spin=true';
+        if (embedSpin) {
+            url += '&spin=true';
+            url += `&speed=${embedSpinSpeed}`;
+        }
         if (!embedControls) url += '&ui=false';
         if (embedTheme === 'light') url += '&theme=light';
         if (embedTheme === 'dark') url += '&theme=dark';
         if (embedStatic) url += '&interaction=false';
         if (embedScrollProtection) url += '&scroll=false';
-        if (embedLazy) url += '&lazy=true';
+        // if (embedLazy) url += '&lazy=true'; // REMOVED
         if (embedInteractionWrapper) url += '&interactionWrapper=true';
         if (embedColor) url += `&color=${embedColor.replace('#', '')}`;
         if (embedTransparent) url += '&bg=transparent';
@@ -145,8 +149,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
   title="Quercus Viewer"
   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
   allowFullScreen
+  allowFullScreen
   ${embedTransparent ? 'allowTransparency="true"' : ''}
-  ${embedLazy ? 'loading="lazy"' : ''}
 ></iframe>`;
 
     const handleCopyEmbed = async () => {
@@ -311,6 +315,29 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                                 {embedSpin && <Check className="w-4 h-4" />}
                                             </button>
 
+                                            {/* Spin Speed Slider - Only show when Spin is enabled */}
+                                            {embedSpin && (
+                                                <div className="px-4 py-3 rounded-lg border space-y-2 animate-in slide-in-from-top-2 fade-in duration-200 bg-neutral-500/5 border-neutral-500/10">
+                                                    <div className="flex justify-between items-center">
+                                                        <span className={`text-xs font-medium ${isLightMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
+                                                            Spin Speed
+                                                        </span>
+                                                        <span className={`text-xs font-medium ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>
+                                                            {Math.round(embedSpinSpeed * 1000)}
+                                                        </span>
+                                                    </div>
+                                                    <input
+                                                        type="range"
+                                                        min="0.001"
+                                                        max="0.05"
+                                                        step="0.001"
+                                                        value={embedSpinSpeed}
+                                                        onChange={(e) => setEmbedSpinSpeed(parseFloat(e.target.value))}
+                                                        className="w-full h-1.5 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-blue-500 hover:accent-blue-400"
+                                                    />
+                                                </div>
+                                            )}
+
                                             <button
                                                 onClick={() => setEmbedScrollProtection(!embedScrollProtection)}
                                                 className={`flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium border transition-colors ${embedScrollProtection
@@ -352,19 +379,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                                 {embedOrientation ? <Check className="w-4 h-4" /> : <Camera className="w-4 h-4" />}
                                             </button>
 
-                                            <button
-                                                onClick={() => setEmbedLazy(!embedLazy)}
-                                                className={`flex items-center justify-between px-4 py-3 rounded-lg text-sm font-medium border transition-colors ${embedLazy
-                                                    ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
-                                                    : (isLightMode ? 'bg-neutral-100/50 text-neutral-600 border-neutral-200 hover:bg-neutral-100' : 'bg-neutral-800/50 text-neutral-400 border-neutral-700 hover:bg-neutral-800')
-                                                    }`}
-                                            >
-                                                <span className="flex items-center gap-2">
-                                                    <div className={`w-2 h-2 rounded-full ${embedLazy ? 'bg-blue-500' : 'bg-neutral-400'}`} />
-                                                    Lazy Load (Poster)
-                                                </span>
-                                                {embedLazy && <Check className="w-4 h-4" />}
-                                            </button>
+                                            {/* Lazy Load Button REMOVED */}
 
                                             <button
                                                 onClick={() => setEmbedInteractionWrapper(!embedInteractionWrapper)}

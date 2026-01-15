@@ -31,8 +31,7 @@ import type {
 import {
   Camera, RefreshCw, Upload,
   Settings, Zap, Activity, Grid3X3, Palette,
-  Share2, Save, FolderOpen, Video, Ruler, Maximize2, Star, Undo2, Redo2, BookOpen,
-  Play
+  Share2, Save, FolderOpen, Video, Ruler, Maximize2, Star, Undo2, Redo2, BookOpen
 } from 'lucide-react';
 import { startOnboardingTour } from './components/TourGuide';
 import { ViewportSelector } from './components/ViewportSelector';
@@ -302,6 +301,13 @@ function App() {
       // Auto-Spin
       if (params.get('spin') === 'true') {
         setIsSpinning(true);
+        // Spin Speed
+        const speedParam = params.get('speed');
+        if (speedParam) {
+          // You might need a way to pass this down.
+          // For now, let's assume ProteinViewer can handle it eventually.
+          // We need a way to store this.
+        }
       }
       // Hide UI (Clean Mode)
       if (params.get('ui') === 'false') {
@@ -332,6 +338,15 @@ function App() {
         if (colorParam) {
           document.documentElement.style.setProperty('--brand-color', '#' + colorParam.replace('#', ''));
           document.body.classList.add('embed-custom-color');
+        }
+
+        // Spin Speed
+        const speedParam = params.get('speed');
+        if (speedParam) {
+          const speed = parseFloat(speedParam);
+          if (!isNaN(speed)) {
+            setEmbedSpinSpeed(speed);
+          }
         }
       }
     }
@@ -383,11 +398,11 @@ function App() {
     return !hasPdb && !isEmbed;
   });
 
-  // Lazy Load State
-  const [isLazyLoaded, setIsLazyLoaded] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get('lazy') === 'true';
-  });
+  // Lazy Load State REMOVED
+  // const [isLazyLoaded, setIsLazyLoaded] = useState(() => {
+  //   const params = new URLSearchParams(window.location.search);
+  //   return params.get('lazy') === 'true';
+  // });
 
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [favoritesTab, setFavoritesTab] = useState<'favorites' | 'history'>('favorites');
@@ -396,6 +411,7 @@ function App() {
 
   // Accessibility: Dyslexic Font
   const [isDyslexicFont, setIsDyslexicFont] = useState(false);
+  const [embedSpinSpeed, setEmbedSpinSpeed] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     if (isDyslexicFont) {
@@ -1923,158 +1939,116 @@ function App() {
 
                       {/* Viewer */}
                       <div className="relative flex-1 w-full h-full">
-                        {/* Lazy Load Overlay (Embed Only) */}
-                        {isEmbedMode && isLazyLoaded && index === 0 ? (
-                          <div className="absolute inset-0 z-50 bg-black flex items-center justify-center overflow-hidden">
-                            {/* Poster Image */}
-                            {ctrl.pdbId ? (
-                              <img
-                                src={`https://cdn.rcsb.org/images/entries/${ctrl.pdbId.toLowerCase()}_assembly-1.jpeg`}
-                                alt="Structure Preview"
-                                className="absolute inset-0 w-full h-full object-cover opacity-60 hover:scale-105 transition-transform duration-[2000ms]"
-                              />
-                            ) : ctrl.dataSource === 'pubchem' ? (
-                              <img
-                                src={`https://pubchem.ncbi.nlm.nih.gov/image/imgsrv.fcgi?cid=${(ctrl.file?.name?.match(/\d+/)?.[0] || '1')}&t=l`} // Fallback logic needed for CID
-                                alt="Structure Preview"
-                                className="absolute inset-0 w-full h-full object-cover opacity-60"
-                              />
-                            ) : (
-                              // Generic Gradient Fallback
-                              <div className="absolute inset-0 bg-gradient-to-br from-neutral-800 via-neutral-900 to-black opacity-80" />
-                            )}
+                        {/* Lazy Load Overlay REMOVED */}
+                        {(!ctrl.pdbId && !ctrl.file) ? (
+                          <div className={`absolute inset-0 flex items-center justify-center text-center select-none z-0 ${viewMode === 'single' ? 'p-6' : 'p-2'}`}>
+                            <div className={`max-w-md space-y-4 opacity-100 transform translate-y-0 transition-all duration-500 animate-in fade-in zoom-in-95 ${viewMode !== 'single' ? 'scale-90 origin-center' : ''}`}>
 
-                            {/* Play Button Overlay */}
-                            <button
-                              onClick={() => setIsLazyLoaded(false)}
-                              className="relative z-[60] group flex flex-col items-center gap-4 transition-all hover:scale-105 cursor-pointer"
-                              title="Load 3D Viewer"
-                            >
-                              <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-2xl group-hover:bg-white/20 transition-all">
-                                <Play className="w-10 h-10 text-white fill-white ml-1 shadow-lg" />
+                              {/* Large Header - Hide in multi-view to save space */}
+                              {viewMode === 'single' && (
+                                <>
+                                  <div className="flex justify-center mb-4">
+                                    <div className="p-4 bg-neutral-800/50 rounded-2xl border border-white/5 shadow-2xl backdrop-blur-sm">
+                                      <Grid3X3 className="w-12 h-12 text-blue-500/50" />
+                                    </div>
+                                  </div>
+                                  <h2 className="text-2xl font-bold text-white tracking-tight">Ready to Visualize?</h2>
+                                  <p className="text-neutral-400">
+                                    Select a structure to begin exploring in 3D.
+                                  </p>
+                                </>
+                              )}
+
+                              {/* Compact Header for Multi-View */}
+                              {viewMode !== 'single' && (
+                                <div className="mb-2">
+                                  <Grid3X3 className="w-8 h-8 text-neutral-600 mx-auto mb-2 opacity-50" />
+                                  <p className="text-[10px] text-neutral-500 font-medium uppercase tracking-wider">Empty Viewport</p>
+                                </div>
+                              )}
+
+                              <div className={`flex items-center justify-center gap-2 ${viewMode === 'single' ? 'pt-4' : 'pt-1 flex-col sm:flex-row'}`}>
+                                <button
+                                  onClick={() => {
+                                    setActiveViewIndex(index);
+                                    setIsLibraryOpen(true);
+                                  }}
+                                  className={`flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-900/20 ${viewMode === 'single' ? 'px-5 py-2.5' : 'px-3 py-1.5 text-xs w-full sm:w-auto min-w-[100px]'}`}
+                                >
+                                  <BookOpen className={viewMode === 'single' ? "w-4 h-4" : "w-3 h-3"} />
+                                  {viewMode === 'single' ? "Browse Library" : "Library"}
+                                </button>
+                                <label
+                                  onClick={() => setActiveViewIndex(index)}
+                                  className={`flex items-center justify-center gap-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl font-medium transition-all hover:scale-105 active:scale-95 cursor-pointer border border-white/10 hover:border-white/20 ${viewMode === 'single' ? 'px-5 py-2.5' : 'px-3 py-1.5 text-xs w-full sm:w-auto min-w-[100px]'}`}
+                                >
+                                  <Upload className={viewMode === 'single' ? "w-4 h-4" : "w-3 h-3"} />
+                                  {viewMode === 'single' ? "Upload File" : "Upload"}
+                                  <input
+                                    type="file"
+                                    className="hidden"
+                                    accept=".pdb,.cif,.ent,.mol,.sdf,.mol2,.xyz"
+                                    onChange={(e) => {
+                                      if (e.target.files?.[0]) {
+                                        // Set this viewport as active
+                                        setActiveViewIndex(index);
+                                        // Use the specific controller for this viewport
+                                        ctrl.handleUpload(e.target.files[0]);
+                                      }
+                                    }}
+                                  />
+                                </label>
                               </div>
-                              <span className="text-white font-medium text-lg tracking-wide drop-shadow-md bg-black/50 px-3 py-1 rounded-full border border-white/5">
-                                Click to Interact
-                              </span>
-                            </button>
 
-                            {/* Badge */}
-                            <div className="absolute bottom-4 right-4 px-3 py-1 rounded-full bg-black/60 backdrop-blur text-white text-xs font-medium border border-white/10 z-[60]">
-                              3D Viewer
+                              {viewMode === 'single' && (
+                                <div className="pt-8 text-xs text-neutral-600 font-mono">
+                                  <p>Or enter a PDB ID or PubChem Code (e.g., <span className="text-neutral-400">2244</span>) in the sidebar.</p>
+                                </div>
+                              )}
                             </div>
                           </div>
                         ) : (
-                          !ctrl.pdbId && !ctrl.file ? (
-                            <div className={`absolute inset-0 flex items-center justify-center text-center select-none z-0 ${viewMode === 'single' ? 'p-6' : 'p-2'}`}>
-                              <div className={`max-w-md space-y-4 opacity-100 transform translate-y-0 transition-all duration-500 animate-in fade-in zoom-in-95 ${viewMode !== 'single' ? 'scale-90 origin-center' : ''}`}>
-
-                                {/* Large Header - Hide in multi-view to save space */}
-                                {viewMode === 'single' && (
-                                  <>
-                                    <div className="flex justify-center mb-4">
-                                      <div className="p-4 bg-neutral-800/50 rounded-2xl border border-white/5 shadow-2xl backdrop-blur-sm">
-                                        <Grid3X3 className="w-12 h-12 text-blue-500/50" />
-                                      </div>
-                                    </div>
-                                    <h2 className="text-2xl font-bold text-white tracking-tight">Ready to Visualize?</h2>
-                                    <p className="text-neutral-400">
-                                      Select a structure to begin exploring in 3D.
-                                    </p>
-                                  </>
-                                )}
-
-                                {/* Compact Header for Multi-View */}
-                                {viewMode !== 'single' && (
-                                  <div className="mb-2">
-                                    <Grid3X3 className="w-8 h-8 text-neutral-600 mx-auto mb-2 opacity-50" />
-                                    <p className="text-[10px] text-neutral-500 font-medium uppercase tracking-wider">Empty Viewport</p>
-                                  </div>
-                                )}
-
-                                <div className={`flex items-center justify-center gap-2 ${viewMode === 'single' ? 'pt-4' : 'pt-1 flex-col sm:flex-row'}`}>
-                                  <button
-                                    onClick={() => {
-                                      setActiveViewIndex(index);
-                                      setIsLibraryOpen(true);
-                                    }}
-                                    className={`flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-medium transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-900/20 ${viewMode === 'single' ? 'px-5 py-2.5' : 'px-3 py-1.5 text-xs w-full sm:w-auto min-w-[100px]'}`}
-                                  >
-                                    <BookOpen className={viewMode === 'single' ? "w-4 h-4" : "w-3 h-3"} />
-                                    {viewMode === 'single' ? "Browse Library" : "Library"}
-                                  </button>
-                                  <label
-                                    onClick={() => setActiveViewIndex(index)}
-                                    className={`flex items-center justify-center gap-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl font-medium transition-all hover:scale-105 active:scale-95 cursor-pointer border border-white/10 hover:border-white/20 ${viewMode === 'single' ? 'px-5 py-2.5' : 'px-3 py-1.5 text-xs w-full sm:w-auto min-w-[100px]'}`}
-                                  >
-                                    <Upload className={viewMode === 'single' ? "w-4 h-4" : "w-3 h-3"} />
-                                    {viewMode === 'single' ? "Upload File" : "Upload"}
-                                    <input
-                                      type="file"
-                                      className="hidden"
-                                      accept=".pdb,.cif,.ent,.mol,.sdf,.mol2,.xyz"
-                                      onChange={(e) => {
-                                        if (e.target.files?.[0]) {
-                                          // Set this viewport as active
-                                          setActiveViewIndex(index);
-                                          // Use the specific controller for this viewport
-                                          ctrl.handleUpload(e.target.files[0]);
-                                        }
-                                      }}
-                                    />
-                                  </label>
-                                </div>
-
-                                {viewMode === 'single' && (
-                                  <div className="pt-8 text-xs text-neutral-600 font-mono">
-                                    <p>Or enter a PDB ID or PubChem Code (e.g., <span className="text-neutral-400">2244</span>) in the sidebar.</p>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          ) : (
-                            <ProteinViewer
-                              ref={ref}
-                              pdbId={ctrl.pdbId}
-                              dataSource={ctrl.dataSource}
-                              file={ctrl.file || undefined}
-                              fileType={ctrl.fileType}
-                              isLightMode={isLightMode}
-                              isSpinning={ctrl.isSpinning}
-                              representation={ctrl.representation}
-                              showSurface={ctrl.showSurface}
-                              showLigands={ctrl.showLigands}
-                              showIons={ctrl.showIons}
-                              coloring={ctrl.coloring}
-                              customColors={ctrl.customColors}
-                              palette={colorPalette}
-                              backgroundColor={ctrl.customBackgroundColor || (isLightMode ? 'white' : 'black')}
-                              measurementTextColor={measurementTextColorMode}
-                              enableAmbientOcclusion={true}
-                              overlays={ctrl.overlays}
-                              initialOrientation={index === 0 ? embedOrientation : undefined}
+                          <ProteinViewer
+                            ref={ref}
+                            pdbId={ctrl.pdbId}
+                            dataSource={ctrl.dataSource}
+                            file={ctrl.file || undefined}
+                            fileType={ctrl.fileType}
+                            isLightMode={isLightMode}
+                            isSpinning={ctrl.isSpinning}
+                            representation={ctrl.representation}
+                            showSurface={ctrl.showSurface}
+                            showLigands={ctrl.showLigands}
+                            showIons={ctrl.showIons}
+                            coloring={ctrl.coloring}
+                            customColors={ctrl.customColors}
+                            palette={colorPalette}
+                            backgroundColor={ctrl.customBackgroundColor || (isLightMode ? 'white' : 'black')}
+                            measurementTextColor={measurementTextColorMode}
+                            overlays={ctrl.overlays}
+                            initialOrientation={index === 0 ? embedOrientation : undefined}
+                            spinSpeed={index === 0 ? embedSpinSpeed : undefined}
 
 
-                              onStructureLoaded={(info) => handleLoad(info, ctrl)}
-                              onAtomClick={(info) => handleAtomClick(info, index)}
-                              isMeasurementMode={isMeasurementMode}
-                              measurements={ctrl.measurements}
-                              onAddMeasurement={(m) => {
-                                ctrl.setMeasurements([...ctrl.measurements, m]);
-                                ctrl.setIsMeasurementPanelOpen(true);
-                                setActiveViewIndex(index);
-                              }}
-                              onHover={setHoveredResidue}
+                            onStructureLoaded={(info) => handleLoad(info, ctrl)}
+                            onAtomClick={(info) => handleAtomClick(info, index)}
+                            isMeasurementMode={isMeasurementMode}
+                            measurements={ctrl.measurements}
+                            onAddMeasurement={(m) => {
+                              ctrl.setMeasurements([...ctrl.measurements, m]);
+                              ctrl.setIsMeasurementPanelOpen(true);
+                              setActiveViewIndex(index);
+                            }}
+                            onHover={setHoveredResidue}
 
 
 
-                              // Action bindings for this viewport
-                              quality={isPublicationMode ? 'high' : 'medium'}
-                              resetCamera={ctrl.resetKey}
-                              disableScroll={!isScrollEnabled} // Scroll Protection
+                            // Action bindings for this viewport
+                            quality={isPublicationMode ? 'high' : 'medium'}
+                            resetCamera={ctrl.resetKey}
+                            disableScroll={!isScrollEnabled} // Scroll Protection
 
-                              className="w-full h-full"
-                            />
-                          )
+                          />
                         )}
                       </div>
                     </div>
