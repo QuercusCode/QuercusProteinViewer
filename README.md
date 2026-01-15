@@ -1,6 +1,10 @@
 # Quercus Viewer 🧬
 
 <div align="center">
+  <img src="public/logo/full-black.png" alt="Quercus Viewer Logo" width="200" />
+</div>
+
+<div align="center">
   <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
   <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
@@ -37,7 +41,6 @@ A professional, high-performance 3D Protein & Chemical structure viewer built fo
 - **Dual Loading**: Fetch typically from **RCSB PDB**, **PubChem** (CIDs), or drag & drop local files (`.pdb`, `.cif`, `.sdf`, `.mol`).
 - **representations**: Cartoon, Ball & Stick (with bond order), Spacefill, Licorice, Surface, Backbone, and more.
 - **Smart Detection**: Automatically handles DNA/RNA bases and small molecule bonds.
-- **Dr. AI Analyst**: Integrated Gemini 1.5 assistance for structure explanation and automated viewer control.
 
 ### Analysis
 
