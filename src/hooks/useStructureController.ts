@@ -22,8 +22,6 @@ export interface StructureController {
     setCustomColors: (colors: CustomColorRule[] | ((prev: CustomColorRule[]) => CustomColorRule[])) => void;
     isSpinning: boolean;
     setIsSpinning: (spinning: boolean | ((prev: boolean) => boolean)) => void;
-    isRocking?: boolean; // New: Gentle Rocking
-    setIsRocking: (rocking: boolean | ((prev: boolean) => boolean)) => void;
     showSurface: boolean;
     setShowSurface: (show: boolean | ((prev: boolean) => boolean)) => void;
     showLigands: boolean;
@@ -77,7 +75,6 @@ export const useStructureController = (initialState: any = {}): StructureControl
     const [coloring, setColoring] = useState<ColoringType>(initialState.coloring || 'chainid');
     const [customColors, setCustomColors] = useState<CustomColorRule[]>(initialState.customColors || []);
     const [isSpinning, setIsSpinning] = useState(false);
-    const [isRocking, setIsRocking] = useState(false); // New
     const [showSurface, setShowSurface] = useState(false);
     const [showLigands, setShowLigands] = useState(false);
     const [showIons, setShowIons] = useState(initialState.showIons ?? false);
@@ -170,7 +167,6 @@ export const useStructureController = (initialState: any = {}): StructureControl
         coloring, setColoring,
         customColors, setCustomColors,
         isSpinning, setIsSpinning,
-        isRocking, setIsRocking, // New
         showSurface, setShowSurface,
         showLigands, setShowLigands,
         showIons,

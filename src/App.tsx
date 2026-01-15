@@ -223,7 +223,6 @@ function App() {
     coloring, setColoring,
     customColors, setCustomColors,
     isSpinning, setIsSpinning,
-    setIsRocking, // New: Gentle Rocking
     showSurface, setShowSurface,
     showLigands, setShowLigands,
     showIons, setShowIons,
@@ -301,12 +300,6 @@ function App() {
       // Auto-Spin
       if (params.get('spin') === 'true') {
         setIsSpinning(true);
-        setIsRocking(false);
-      }
-      // Gentle Rocking
-      if (params.get('rock') === 'true') {
-        setIsRocking(true);
-        setIsSpinning(false);
       }
       // Hide UI (Clean Mode)
       if (params.get('ui') === 'false') {
@@ -1884,7 +1877,6 @@ function App() {
                         fileType={ctrl.fileType}
                         isLightMode={isLightMode}
                         isSpinning={ctrl.isSpinning}
-                        isRocking={ctrl.isRocking} // New prop
                         representation={ctrl.representation}
                         showSurface={ctrl.showSurface}
                         showLigands={ctrl.showLigands}
@@ -2069,7 +2061,6 @@ function App() {
           representation: ctrl.representation,
           coloring: ctrl.coloring,
           isSpinning: ctrl.isSpinning,
-          isRocking: ctrl.isRocking, // Pass through
           showLigands: ctrl.showLigands,
           showSurface: ctrl.showSurface,
           showIons: ctrl.showIons,

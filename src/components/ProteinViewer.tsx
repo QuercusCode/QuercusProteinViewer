@@ -40,7 +40,6 @@ export interface ProteinViewerProps {
     // Appearance
     isLightMode: boolean;
     isSpinning: boolean;
-    isRocking?: boolean; // New: Gentle Rocking
     representation: RepresentationType;
     showSurface: boolean;
     showLigands?: boolean;  // Optional, defaults to true
@@ -129,7 +128,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     showLigands = false,
     showIons = false,
     isSpinning = false,
-    isRocking = false, // New
     isMeasurementMode = false,
     measurements,
     onAddMeasurement,
@@ -2140,47 +2138,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         }
     }, [isSpinning]);
 
-    useEffect(() => {
-        if (!stageRef.current) return;
-
-        if (isRocking) {
-            stageRef.current.setRock(false); // Disable native
-            stageRef.current.setSpin(false);
-
-            let animationId: number;
-            const startTime = Date.now();
-            let lastTime = startTime;
-
-            const animate = () => {
-                const now = Date.now();
-                const totalTime = (now - startTime) * 0.001; // seconds
-                const dt = (now - lastTime) * 0.001; // seconds
-                lastTime = now;
-
-                // Parameters
-                // Amplitude: 180 degrees total range -> +/- 90 degrees = +/- 1.57 radians
-                const amplitude = 1.57;
-                // Frequency: 0.2 rad/s (approx 30s period for full cycle) - very slow
-                const frequency = 0.2;
-
-                // dTheta/dt = Amplitude * w * cos(w*t)
-                // Delta for this frame:
-                const delta = amplitude * frequency * Math.cos(frequency * totalTime) * dt;
-
-                // Rotate around Y axis
-                if (stageRef.current && stageRef.current.viewerControls) {
-                    stageRef.current.viewerControls.rotate(delta, 0);
-                }
-
-                animationId = requestAnimationFrame(animate);
-            };
-
-            animate();
-            return () => cancelAnimationFrame(animationId);
-        } else {
-            stageRef.current.setRock(false);
-        }
-    }, [isRocking]);
 
     useEffect(() => {
         if (stageRef.current && resetCamera) {

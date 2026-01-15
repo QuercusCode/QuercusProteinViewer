@@ -19,11 +19,11 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
 
     // Embed Options State
     const [embedSpin, setEmbedSpin] = useState(false);
-    const [embedRock, setEmbedRock] = useState(false); // New: Gentle Rock
     const [embedControls, setEmbedControls] = useState(true);
     const [embedTheme, setEmbedTheme] = useState<'dark' | 'light'>('dark');
     const [embedStatic, setEmbedStatic] = useState(false);
     const [embedScrollProtection, setEmbedScrollProtection] = useState(false);
+    const [embedSize, setEmbedSize] = useState<'small' | 'medium' | 'large' | 'full'>('medium');
 
     // Generate QR Code
     useEffect(() => {
@@ -75,7 +75,6 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
     const getEmbedUrl = () => {
         let url = shareUrl.replace('?', '?embed=true&');
         if (embedSpin) url += '&spin=true';
-        if (embedRock) url += '&rock=true';
         if (!embedControls) url += '&ui=false';
         if (embedTheme === 'light') url += '&theme=light';
         if (embedTheme === 'dark') url += '&theme=dark';
@@ -86,10 +85,20 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
 
     const finalEmbedUrl = getEmbedUrl();
 
+    const getDimensions = () => {
+        switch (embedSize) {
+            case 'small': return { width: '400', height: '300' };
+            case 'medium': return { width: '600', height: '450' };
+            case 'large': return { width: '800', height: '600' };
+            case 'full': return { width: '100%', height: '600' };
+        }
+    };
+    const { width, height } = getDimensions();
+
     const embedCode = `<iframe
   src="${finalEmbedUrl}"
-  width="100%"
-  height="600"
+  width="${width}"
+  height="${height}"
   style="border:none; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); max-width: 100%;"
   title="Quercus Viewer"
   allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
@@ -239,11 +248,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                 {/* Options Row */}
                                 <div className="flex flex-wrap gap-3 mb-2">
                                     <button
-                                        onClick={() => {
-                                            const newVal = !embedSpin;
-                                            setEmbedSpin(newVal);
-                                            if (newVal) setEmbedRock(false); // Mux
-                                        }}
+                                        onClick={() => setEmbedSpin(!embedSpin)}
                                         className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedSpin
                                             ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
                                             : (isLightMode ? 'bg-neutral-100 text-neutral-600 border-neutral-200' : 'bg-neutral-800 text-neutral-400 border-neutral-700')
@@ -251,20 +256,6 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                     >
                                         <div className={`w-3 h-3 rounded-full border-2 ${embedSpin ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
                                         Auto-Spin
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            const newVal = !embedRock;
-                                            setEmbedRock(newVal);
-                                            if (newVal) setEmbedSpin(false); // Mux
-                                        }}
-                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedRock
-                                            ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
-                                            : (isLightMode ? 'bg-neutral-100 text-neutral-600 border-neutral-200' : 'bg-neutral-800 text-neutral-400 border-neutral-700')
-                                            }`}
-                                    >
-                                        <div className={`w-3 h-3 rounded-full border-2 ${embedRock ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
-                                        Gentle Rock
                                     </button>
                                     <button
                                         onClick={() => setEmbedControls(!embedControls)}
@@ -319,6 +310,27 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                         <div className={`w-3 h-3 rounded-full border-2 ${embedScrollProtection ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
                                         Scroll Protection
                                     </button>
+                                </div>
+
+                                {/* Frame Size Selector */}
+                                <div className="space-y-2 mb-4">
+                                    <label className={`text-xs font-medium ${isLightMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
+                                        Frame Size
+                                    </label>
+                                    <div className={`flex p-1 rounded-lg ${isLightMode ? 'bg-neutral-100' : 'bg-neutral-800'}`}>
+                                        {(['small', 'medium', 'large', 'full'] as const).map((size) => (
+                                            <button
+                                                key={size}
+                                                onClick={() => setEmbedSize(size)}
+                                                className={`flex-1 py-1 text-xs font-medium rounded-md capitalize transition-all ${embedSize === size
+                                                    ? (isLightMode ? 'bg-white shadow text-neutral-900' : 'bg-neutral-700 shadow text-white')
+                                                    : 'text-neutral-500 hover:text-neutral-900'
+                                                    }`}
+                                            >
+                                                {size}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 {/* Preview */}
