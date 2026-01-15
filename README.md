@@ -1,8 +1,8 @@
 # Quercus Viewer 🧬
 
 <div align="center">
-  <img src="public/logo/full-black.png#gh-light-mode-only" alt="Quercus Viewer Logo" width="200" />
-  <img src="public/logo/full-white.png#gh-dark-mode-only" alt="Quercus Viewer Logo" width="200" />
+  <img src="public/logo/full-black.png#gh-light-mode-only" alt="Quercus Viewer Logo" width="600" />
+  <img src="public/logo/full-white.png#gh-dark-mode-only" alt="Quercus Viewer Logo" width="600" />
 </div>
 
 <div align="center">
