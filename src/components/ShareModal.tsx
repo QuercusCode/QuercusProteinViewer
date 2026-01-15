@@ -120,7 +120,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm animate-in fade-in">
-            <div className={`relative w-full max-w-lg rounded-xl shadow-2xl p-6 ${isLightMode ? 'bg-white text-neutral-900' : 'bg-neutral-900 text-white'}`}>
+            <div className={`relative w-full max-w-2xl rounded-xl shadow-2xl p-6 ${isLightMode ? 'bg-white text-neutral-900' : 'bg-neutral-900 text-white'}`}>
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold">Share Visualization</h2>
@@ -245,71 +245,87 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                         ) : (
                             /* Embed Tab */
                             <div className="space-y-4 mb-6">
-                                {/* Options Row */}
-                                <div className="flex flex-wrap gap-3 mb-2">
-                                    <button
-                                        onClick={() => setEmbedSpin(!embedSpin)}
-                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedSpin
-                                            ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
-                                            : (isLightMode ? 'bg-neutral-100 text-neutral-600 border-neutral-200' : 'bg-neutral-800 text-neutral-400 border-neutral-700')
-                                            }`}
-                                    >
-                                        <div className={`w-3 h-3 rounded-full border-2 ${embedSpin ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
-                                        Auto-Spin
-                                    </button>
-                                    <button
-                                        onClick={() => setEmbedControls(!embedControls)}
-                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${!embedControls
-                                            ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
-                                            : (isLightMode ? 'bg-neutral-100 text-neutral-600 border-neutral-200' : 'bg-neutral-800 text-neutral-400 border-neutral-700')
-                                            }`}
-                                    >
-                                        <div className={`w-3 h-3 rounded-full border-2 ${!embedControls ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
-                                        Hide Controls
-                                    </button>
-                                    {/* Theme Switch */}
-                                    <div className={`flex items-center p-0.5 rounded-full border ${isLightMode ? 'bg-neutral-100 border-neutral-200' : 'bg-neutral-800 border-neutral-700'}`}>
-                                        <button
-                                            onClick={() => setEmbedTheme('dark')}
-                                            className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${embedTheme === 'dark'
-                                                ? (isLightMode ? 'bg-white shadow text-neutral-900' : 'bg-neutral-700 shadow text-white')
-                                                : 'text-neutral-500 hover:text-neutral-400'
-                                                }`}
-                                        >
-                                            Dark
-                                        </button>
-                                        <button
-                                            onClick={() => setEmbedTheme('light')}
-                                            className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${embedTheme === 'light'
-                                                ? (isLightMode ? 'bg-white shadow text-neutral-900' : 'bg-neutral-600 shadow text-white')
-                                                : 'text-neutral-500 hover:text-neutral-400'
-                                                }`}
-                                        >
-                                            Light
-                                        </button>
+                                {/* Options Grid */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-4">
+                                    {/* Behavior Group */}
+                                    <div className="space-y-2">
+                                        <label className={`text-xs font-medium ${isLightMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
+                                            Behavior
+                                        </label>
+                                        <div className="flex flex-wrap gap-2">
+                                            <button
+                                                onClick={() => setEmbedSpin(!embedSpin)}
+                                                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedSpin
+                                                    ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                                                    : (isLightMode ? 'bg-neutral-100 text-neutral-600 border-neutral-200' : 'bg-neutral-800 text-neutral-400 border-neutral-700')
+                                                    }`}
+                                            >
+                                                <div className={`w-3 h-3 rounded-full border-2 ${embedSpin ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
+                                                Auto-Spin
+                                            </button>
+                                            <button
+                                                onClick={() => setEmbedScrollProtection(!embedScrollProtection)}
+                                                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedScrollProtection
+                                                    ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                                                    : (isLightMode ? 'bg-neutral-100 text-neutral-600 border-neutral-200' : 'bg-neutral-800 text-neutral-400 border-neutral-700')
+                                                    }`}
+                                            >
+                                                <div className={`w-3 h-3 rounded-full border-2 ${embedScrollProtection ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
+                                                Scroll Protection
+                                            </button>
+                                            <button
+                                                onClick={() => setEmbedStatic(!embedStatic)}
+                                                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedStatic
+                                                    ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                                                    : (isLightMode ? 'bg-neutral-100 text-neutral-600 border-neutral-200' : 'bg-neutral-800 text-neutral-400 border-neutral-700')
+                                                    }`}
+                                            >
+                                                <div className={`w-3 h-3 rounded-full border-2 ${embedStatic ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
+                                                Static Mode
+                                            </button>
+                                        </div>
                                     </div>
 
-                                    <button
-                                        onClick={() => setEmbedStatic(!embedStatic)}
-                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedStatic
-                                            ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
-                                            : (isLightMode ? 'bg-neutral-100 text-neutral-600 border-neutral-200' : 'bg-neutral-800 text-neutral-400 border-neutral-700')
-                                            }`}
-                                    >
-                                        <div className={`w-3 h-3 rounded-full border-2 ${embedStatic ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
-                                        Static Mode
-                                    </button>
+                                    {/* Appearance Group */}
+                                    <div className="space-y-2">
+                                        <label className={`text-xs font-medium ${isLightMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
+                                            Appearance
+                                        </label>
+                                        <div className="flex flex-wrap gap-2">
+                                            <button
+                                                onClick={() => setEmbedControls(!embedControls)}
+                                                className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${!embedControls
+                                                    ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                                                    : (isLightMode ? 'bg-neutral-100 text-neutral-600 border-neutral-200' : 'bg-neutral-800 text-neutral-400 border-neutral-700')
+                                                    }`}
+                                            >
+                                                <div className={`w-3 h-3 rounded-full border-2 ${!embedControls ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
+                                                Hide Controls
+                                            </button>
 
-                                    <button
-                                        onClick={() => setEmbedScrollProtection(!embedScrollProtection)}
-                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedScrollProtection
-                                            ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
-                                            : (isLightMode ? 'bg-neutral-100 text-neutral-600 border-neutral-200' : 'bg-neutral-800 text-neutral-400 border-neutral-700')
-                                            }`}
-                                    >
-                                        <div className={`w-3 h-3 rounded-full border-2 ${embedScrollProtection ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
-                                        Scroll Protection
-                                    </button>
+                                            {/* Theme Toggle */}
+                                            <div className={`flex items-center p-0.5 rounded-full border ${isLightMode ? 'bg-neutral-100 border-neutral-200' : 'bg-neutral-800 border-neutral-700'}`}>
+                                                <button
+                                                    onClick={() => setEmbedTheme('dark')}
+                                                    className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${embedTheme === 'dark'
+                                                        ? (isLightMode ? 'bg-white shadow text-neutral-900' : 'bg-neutral-700 shadow text-white')
+                                                        : 'text-neutral-500 hover:text-neutral-400'
+                                                        }`}
+                                                >
+                                                    Dark
+                                                </button>
+                                                <button
+                                                    onClick={() => setEmbedTheme('light')}
+                                                    className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${embedTheme === 'light'
+                                                        ? (isLightMode ? 'bg-white shadow text-neutral-900' : 'bg-neutral-600 shadow text-white')
+                                                        : 'text-neutral-500 hover:text-neutral-400'
+                                                        }`}
+                                                >
+                                                    Light
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 {/* Frame Size Selector */}
