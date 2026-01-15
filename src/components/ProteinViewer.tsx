@@ -1980,6 +1980,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             component.removeAllRepresentations();
             highlightComponentRef.current = null;
 
+            console.log("[ProteinViewer] updateRepresentation: customColors =", customColors);
+
 
 
 
@@ -2041,7 +2043,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
                 // 3. Register Selection Scheme
                 try {
-                    const compositeId = NGL.ColormakerRegistry.addSelectionScheme(dataList, "custom_composite");
+                    const params = {
+                        schemeId: `custom_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+                    };
+                    const compositeId = NGL.ColormakerRegistry.addSelectionScheme(dataList, params.schemeId);
                     if (compositeId) finalColor = compositeId;
                 } catch (e) {
                     console.error("Failed to register selection scheme", e);

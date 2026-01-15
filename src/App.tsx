@@ -875,10 +875,11 @@ function App() {
               if (vp.isSpinning !== undefined) ctrl.setIsSpinning(vp.isSpinning);
               if (vp.customBackgroundColor) ctrl.setCustomBackgroundColor(vp.customBackgroundColor);
               if (vp.measurements) ctrl.setMeasurements(vp.measurements);
-              if (vp.customColors) ctrl.setCustomColors(vp.customColors);
-              if (vp.overlays) ctrl.setOverlays(vp.overlays);
 
               // Orientation
+              console.log(`[SessionLoad] Viewport ${index} Custom Colors:`, vp.customColors);
+              if (vp.customColors) ctrl.setCustomColors(vp.customColors);
+
               if (vp.orientation) {
                 setTimeout(() => {
                   viewerRefs[index].current?.setOrientation(vp.orientation);
