@@ -1704,16 +1704,30 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         // SUPERPOSE
                         console.log(`Superposing ${overlay.id} onto main structure...`);
                         try {
-                            // align=true moves the component
+                            // Verify main component structure availability
+                            if (!mainComponent || !mainComponent.structure) {
+                                console.warn("[Superpose] Main component or structure missing!", mainComponent);
+                                return;
+                            }
+
+                            const mainAtoms = mainComponent.structure.atomCount;
+                            const overlayAtoms = comp.structure.atomCount;
+                            console.log(`[Superpose] Aligning '${overlay.id}' (${overlayAtoms} atoms) to Main (${mainAtoms} atoms)`);
+
                             // align=true moves the component
                             let s = comp.superpose(mainComponent, true, "CA");
                             console.log(`[Superpose] '${overlay.id}' CA result keys:`, s ? Object.keys(s) : 'null');
 
-                            // Fallback if CA superposition fails (or returns bad RMSD)
+                            // Fallback if CA superposition fails
                             if (!s || (typeof s.rmsd !== 'number' && typeof s.mean2 !== 'number')) {
-                                console.log(`[Superpose] '${overlay.id}' CA failed (atoms: ${comp.structure.atomCount}). Retrying global...`);
-                                s = comp.superpose(mainComponent, true);
-                                console.log(`[Superpose] '${overlay.id}' Global result keys:`, s ? Object.keys(s) : 'null');
+                                console.log(`[Superpose] CA failed. Retrying with 'backbone'...`);
+                                s = comp.superpose(mainComponent, true, "backbone");
+
+                                if (!s || (typeof s.rmsd !== 'number' && typeof s.mean2 !== 'number')) {
+                                    console.log(`[Superpose] Backbone failed. Retrying Global (all atoms)...`);
+                                    s = comp.superpose(mainComponent, true);
+                                    console.log(`[Superpose] Global result keys:`, s ? Object.keys(s) : 'null');
+                                }
                             }
 
                             if (onOverlayRMSDCalculated) {
