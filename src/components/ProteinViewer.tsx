@@ -40,6 +40,7 @@ export interface ProteinViewerProps {
     // Appearance
     isLightMode: boolean;
     isSpinning: boolean;
+    isRocking?: boolean; // New: Gentle Rocking
     representation: RepresentationType;
     showSurface: boolean;
     showLigands?: boolean;  // Optional, defaults to true
@@ -128,6 +129,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     showLigands = false,
     showIons = false,
     isSpinning = false,
+    isRocking = false, // New
     isMeasurementMode = false,
     measurements,
     onAddMeasurement,
@@ -2137,6 +2139,12 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             stageRef.current.setSpin(isSpinning);
         }
     }, [isSpinning]);
+
+    useEffect(() => {
+        if (stageRef.current) {
+            stageRef.current.setRock(isRocking);
+        }
+    }, [isRocking]);
 
     useEffect(() => {
         if (stageRef.current && resetCamera) {

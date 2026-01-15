@@ -19,6 +19,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
 
     // Embed Options State
     const [embedSpin, setEmbedSpin] = useState(false);
+    const [embedRock, setEmbedRock] = useState(false); // New: Gentle Rock
     const [embedControls, setEmbedControls] = useState(true);
     const [embedTheme, setEmbedTheme] = useState<'dark' | 'light'>('dark');
     const [embedStatic, setEmbedStatic] = useState(false);
@@ -74,6 +75,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
     const getEmbedUrl = () => {
         let url = shareUrl.replace('?', '?embed=true&');
         if (embedSpin) url += '&spin=true';
+        if (embedRock) url += '&rock=true';
         if (!embedControls) url += '&ui=false';
         if (embedTheme === 'light') url += '&theme=light';
         if (embedTheme === 'dark') url += '&theme=dark';
@@ -237,14 +239,32 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                 {/* Options Row */}
                                 <div className="flex flex-wrap gap-3 mb-2">
                                     <button
-                                        onClick={() => setEmbedSpin(!embedSpin)}
-                                        className={`flexItems-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedSpin
+                                        onClick={() => {
+                                            const newVal = !embedSpin;
+                                            setEmbedSpin(newVal);
+                                            if (newVal) setEmbedRock(false); // Mux
+                                        }}
+                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedSpin
                                             ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
                                             : (isLightMode ? 'bg-neutral-100 text-neutral-600 border-neutral-200' : 'bg-neutral-800 text-neutral-400 border-neutral-700')
                                             }`}
                                     >
                                         <div className={`w-3 h-3 rounded-full border-2 ${embedSpin ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
                                         Auto-Spin
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            const newVal = !embedRock;
+                                            setEmbedRock(newVal);
+                                            if (newVal) setEmbedSpin(false); // Mux
+                                        }}
+                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedRock
+                                            ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                                            : (isLightMode ? 'bg-neutral-100 text-neutral-600 border-neutral-200' : 'bg-neutral-800 text-neutral-400 border-neutral-700')
+                                            }`}
+                                    >
+                                        <div className={`w-3 h-3 rounded-full border-2 ${embedRock ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
+                                        Gentle Rock
                                     </button>
                                     <button
                                         onClick={() => setEmbedControls(!embedControls)}
