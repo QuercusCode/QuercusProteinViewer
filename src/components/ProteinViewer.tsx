@@ -2143,8 +2143,8 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     useEffect(() => {
         if (stageRef.current) {
             if (isRocking) {
-                // Slower rocking: angle=0.5 (radians), step=0.002 (slow speed)
-                stageRef.current.setRock(true, 0.5, 0.002);
+                // Slower rocking: angle=0.2 (radians), step=0.0005 (very subtle)
+                stageRef.current.setRock(true, 0.2, 0.0005);
             } else {
                 stageRef.current.setRock(false);
             }
