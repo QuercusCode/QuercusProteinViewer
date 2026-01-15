@@ -291,6 +291,27 @@ function App() {
   const [isLibraryOpen, setIsLibraryOpen] = useState(false);
 
   // Landing Overlay State
+  // Handle Embed Options (Custom Controls)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const isEmbed = params.get('embed') === 'true';
+
+    if (isEmbed) {
+      // Auto-Spin
+      if (params.get('spin') === 'true') {
+        setIsSpinning(true);
+      }
+      // Hide UI (Clean Mode)
+      if (params.get('ui') === 'false') {
+        setIsCleanMode(true);
+      }
+      // Transparent Background
+      if (params.get('bg') === 'transparent') {
+        setCustomBackgroundColor('transparent');
+      }
+    }
+  }, []);
+
   const [showLanding, setShowLanding] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     const hasPdb = params.has('pdb') || params.has('url') || params.has('file');
