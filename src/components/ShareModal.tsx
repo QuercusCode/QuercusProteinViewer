@@ -21,6 +21,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
     const [embedSpin, setEmbedSpin] = useState(false);
     const [embedControls, setEmbedControls] = useState(true);
     const [embedTransparent, setEmbedTransparent] = useState(false);
+    const [embedLight, setEmbedLight] = useState(false);
+    const [embedStatic, setEmbedStatic] = useState(false);
 
     // Generate QR Code
     useEffect(() => {
@@ -74,6 +76,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
         if (embedSpin) url += '&spin=true';
         if (!embedControls) url += '&ui=false';
         if (embedTransparent) url += '&bg=transparent';
+        if (embedLight) url += '&theme=light';
+        if (embedStatic) url += '&interaction=false';
         return url;
     };
 
@@ -260,6 +264,26 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                     >
                                         <div className={`w-3 h-3 rounded-full border-2 ${embedTransparent ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
                                         Transparent BG
+                                    </button>
+                                    <button
+                                        onClick={() => setEmbedLight(!embedLight)}
+                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedLight
+                                            ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                                            : (isLightMode ? 'bg-neutral-100 text-neutral-600 border-neutral-200' : 'bg-neutral-800 text-neutral-400 border-neutral-700')
+                                            }`}
+                                    >
+                                        <div className={`w-3 h-3 rounded-full border-2 ${embedLight ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
+                                        Light Theme
+                                    </button>
+                                    <button
+                                        onClick={() => setEmbedStatic(!embedStatic)}
+                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedStatic
+                                            ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                                            : (isLightMode ? 'bg-neutral-100 text-neutral-600 border-neutral-200' : 'bg-neutral-800 text-neutral-400 border-neutral-700')
+                                            }`}
+                                    >
+                                        <div className={`w-3 h-3 rounded-full border-2 ${embedStatic ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
+                                        Static Mode
                                     </button>
                                 </div>
 

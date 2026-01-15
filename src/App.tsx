@@ -309,7 +309,17 @@ function App() {
       if (params.get('bg') === 'transparent') {
         setCustomBackgroundColor('transparent');
       }
+      // Force Theme
+      const themeParam = params.get('theme');
+      if (themeParam === 'light') setIsLightMode(true);
+      if (themeParam === 'dark') setIsLightMode(false);
     }
+  }, []);
+
+  // Interaction State (for Static Embeds)
+  const isInteractionEnabled = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('interaction') !== 'false';
   }, []);
 
   const [showLanding, setShowLanding] = useState(() => {
@@ -1412,6 +1422,9 @@ function App() {
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
     >
+      {/* Interaction Blocker for Static Embeds */}
+      {!isInteractionEnabled && <div className="absolute inset-0 z-50 bg-transparent cursor-default" />}
+
       <DragDropOverlay isDragging={isDragging} />
 
       <CommandPalette
@@ -1939,18 +1952,21 @@ function App() {
                 return renderViewport(0, 'w-full');
             }
           })()}
-        </div>   {/* Right Sidebar: Sequence Track */}
-        <SequenceTrack
-          id="sequence-track"
-          chains={chains}
-          highlightedResidue={highlightedResidue}
-          onHoverResidue={() => { }}
-          onClickResidue={(chain, resNo) => viewerRef.current?.focusResidue(chain, resNo)}
-          onClickAtom={(serial) => viewerRef.current?.highlightAtom(serial)}
-          isLightMode={isLightMode}
-          coloring={coloring}
-          colorPalette={colorPalette}
-        />
+        </div>
+        {/* Right Sidebar: Sequence Track */}
+        {!isCleanMode && (
+          <SequenceTrack
+            id="sequence-track"
+            chains={chains}
+            highlightedResidue={highlightedResidue}
+            onHoverResidue={() => { }}
+            onClickResidue={(chain, resNo) => viewerRef.current?.focusResidue(chain, resNo)}
+            onClickAtom={(serial) => viewerRef.current?.highlightAtom(serial)}
+            isLightMode={isLightMode}
+            coloring={coloring}
+            colorPalette={colorPalette}
+          />
+        )}
       </div>
 
       <ViewportSelector
