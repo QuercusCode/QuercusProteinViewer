@@ -322,6 +322,12 @@ function App() {
     return params.get('interaction') !== 'false';
   }, []);
 
+  // Scroll Protection State (Default: Scroll Enabled)
+  const isScrollEnabled = useMemo(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('scroll') !== 'false';
+  }, []);
+
   const [showLanding, setShowLanding] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     const hasPdb = params.has('pdb') || params.has('url') || params.has('file');
@@ -1900,6 +1906,7 @@ function App() {
                         // Action bindings for this viewport
                         quality={isPublicationMode ? 'high' : 'medium'}
                         resetCamera={ctrl.resetKey}
+                        disableScroll={!isScrollEnabled} // Scroll Protection
 
                         className="w-full h-full"
                       />

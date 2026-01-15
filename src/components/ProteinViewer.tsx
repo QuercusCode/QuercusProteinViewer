@@ -76,6 +76,7 @@ export interface ProteinViewerProps {
     // Actions
     resetCamera?: number; // Increment to trigger reset
     className?: string;
+    disableScroll?: boolean; // New: Scroll Protection
 }
 
 export interface ProteinViewerRef {
@@ -136,6 +137,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     quality = 'medium',
     enableAmbientOcclusion = false,
     measurementTextColor = 'auto',
+    disableScroll = false,
 }: ProteinViewerProps, ref: React.Ref<ProteinViewerRef>) => {
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -2141,6 +2143,19 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             try { stageRef.current.autoView(); } catch (e) { }
         }
     }, [resetCamera]);
+
+    // Handle Scroll Protection
+    useEffect(() => {
+        if (!stageRef.current) return;
+
+        if (disableScroll) {
+            stageRef.current.mouseControls.remove('scroll-zoom');
+        } else {
+            // Restore scroll zoom (default NGL behavior)
+            // Note: NGL uses MouseActions.zoomScroll
+            stageRef.current.mouseControls.add('scroll-zoom', window.NGL.MouseActions.zoomScroll);
+        }
+    }, [disableScroll]);
 
     return (
         <div className={clsx("relative w-full h-full", className)} style={backgroundColor === 'transparent' ? { background: 'transparent' } : {}}>

@@ -22,6 +22,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
     const [embedControls, setEmbedControls] = useState(true);
     const [embedTheme, setEmbedTheme] = useState<'dark' | 'light'>('dark');
     const [embedStatic, setEmbedStatic] = useState(false);
+    const [embedScrollProtection, setEmbedScrollProtection] = useState(false);
 
     // Generate QR Code
     useEffect(() => {
@@ -77,6 +78,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
         if (embedTheme === 'light') url += '&theme=light';
         if (embedTheme === 'dark') url += '&theme=dark';
         if (embedStatic) url += '&interaction=false';
+        if (embedScrollProtection) url += '&scroll=false';
         return url;
     };
 
@@ -278,13 +280,24 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
 
                                     <button
                                         onClick={() => setEmbedStatic(!embedStatic)}
-                                        className={`flexItems-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedStatic
+                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedStatic
                                             ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
                                             : (isLightMode ? 'bg-neutral-100 text-neutral-600 border-neutral-200' : 'bg-neutral-800 text-neutral-400 border-neutral-700')
                                             }`}
                                     >
                                         <div className={`w-3 h-3 rounded-full border-2 ${embedStatic ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
                                         Static Mode
+                                    </button>
+
+                                    <button
+                                        onClick={() => setEmbedScrollProtection(!embedScrollProtection)}
+                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${embedScrollProtection
+                                            ? 'bg-blue-500/10 text-blue-500 border-blue-500/20'
+                                            : (isLightMode ? 'bg-neutral-100 text-neutral-600 border-neutral-200' : 'bg-neutral-800 text-neutral-400 border-neutral-700')
+                                            }`}
+                                    >
+                                        <div className={`w-3 h-3 rounded-full border-2 ${embedScrollProtection ? 'border-blue-500 bg-blue-500' : 'border-current'}`} />
+                                        Scroll Protection
                                     </button>
                                 </div>
 
