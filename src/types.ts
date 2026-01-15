@@ -69,7 +69,7 @@ export interface SuperposedStructure {
     description?: string;
     isVisible: boolean;
     opacity?: number;
-    rmsd?: number;
+
 }
 
 

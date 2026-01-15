@@ -71,7 +71,7 @@ export interface ProteinViewerProps {
     isMeasurementMode?: boolean;
     measurements?: Measurement[];
     onAddMeasurement?: (m: Measurement) => void;
-    onOverlayRMSDCalculated?: (id: string, rmsd: number) => void;
+
 
     // Actions
     resetCamera?: number; // Increment to trigger reset
@@ -130,7 +130,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     isMeasurementMode = false,
     measurements,
     onAddMeasurement,
-    onOverlayRMSDCalculated,
+
     onHover,
     isLightMode,
     quality = 'medium',
@@ -1715,51 +1715,12 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             console.log(`[Superpose] Aligning '${overlay.id}' (${overlayAtoms} atoms) to Main (${mainAtoms} atoms)`);
 
                             // align=true moves the component
-                            let s: any = undefined;
-
-                            // Low-Level API Access
-                            const mainStruct = mainComponent.structure;
-                            const overlayStruct = comp.structure;
-
-                            // Strategy 1: CA (Alpha Carbon - Best for Proteins)
                             try {
-                                s = overlayStruct.superpose(mainStruct, true, "CA");
-                                console.log(`[Superpose] Strategy 'CA' result:`, s ? s.rmsd : 'null');
-                            } catch (e) { console.warn("[Superpose] 'CA' strategy threw error", e); }
-
-                            // Strategy 2: Backbone (If CA missing or sparse)
-                            if (!s || (typeof s.rmsd !== 'number' && typeof s.mean2 !== 'number')) {
-                                try {
-                                    console.log(`[Superpose] Retrying strategy 'backbone'...`);
-                                    s = overlayStruct.superpose(mainStruct, true, "backbone");
-                                    console.log(`[Superpose] Strategy 'backbone' result:`, s ? s.rmsd : 'null');
-                                } catch (e) { console.warn("[Superpose] 'backbone' strategy threw error", e); }
-                            }
-
-                            // Strategy 3: All Atoms (Explicit empty string) - Fallback for small molecules or identical files
-                            if (!s || (typeof s.rmsd !== 'number' && typeof s.mean2 !== 'number')) {
-                                try {
-                                    console.log(`[Superpose] Retrying strategy 'all' ("")...`);
-                                    s = overlayStruct.superpose(mainStruct, true, "");
-                                    console.log(`[Superpose] Strategy 'all' result:`, s ? s.rmsd : 'null');
-                                } catch (e) { console.warn("[Superpose] 'all' strategy threw error", e); }
-                            }
-
-                            // Update visual representation to match new coordinates
-                            comp.updateRepresentations({ position: true });
-
-                            if (onOverlayRMSDCalculated) {
-                                // NGL uses 'rmsd' or sometimes 'mean2' (mean square deviation)
-                                // Use fallback -1 if invalid
-                                let val: number = -1;
-
-                                if (s && (typeof s.rmsd === 'number' || typeof s.mean2 === 'number')) {
-                                    val = s.rmsd ?? s.mean2;
-                                    console.log(`[Superpose] Final RMSD: ${val}`);
-                                } else {
-                                    console.warn(`[Superpose] All strategies failed to return valid RMSD.`);
-                                }
-                                onOverlayRMSDCalculated(overlay.id, val);
+                                comp.superpose(mainComponent, true, "CA");
+                                // Also try to update position just in case
+                                comp.updateRepresentations({ position: true });
+                            } catch (e) {
+                                console.warn("Superposition failed:", e);
                             }
                         } catch (e) {
                             console.warn("Superposition failed:", e);
