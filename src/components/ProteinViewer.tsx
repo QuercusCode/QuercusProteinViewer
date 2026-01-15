@@ -1707,27 +1707,27 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             // align=true moves the component
                             // align=true moves the component
                             let s = comp.superpose(mainComponent, true, "CA");
-                            console.log(`[Superpose] '${overlay.id}' CA result:`, s);
+                            console.log(`[Superpose] '${overlay.id}' CA result keys:`, s ? Object.keys(s) : 'null');
 
                             // Fallback if CA superposition fails (or returns bad RMSD)
                             if (!s || (typeof s.rmsd !== 'number' && typeof s.mean2 !== 'number')) {
                                 console.log(`[Superpose] '${overlay.id}' CA failed (atoms: ${comp.structure.atomCount}). Retrying global...`);
                                 s = comp.superpose(mainComponent, true);
-                                console.log(`[Superpose] '${overlay.id}' Global result:`, s);
+                                console.log(`[Superpose] '${overlay.id}' Global result keys:`, s ? Object.keys(s) : 'null');
                             }
 
-                            if (s && onOverlayRMSDCalculated) {
+                            if (onOverlayRMSDCalculated) {
                                 // NGL uses 'rmsd' or sometimes 'mean2' (mean square deviation)
-                                const val = s.rmsd ?? s.mean2;
-                                console.log(`[Superpose] Calculated RMSD: ${val}`);
+                                // Use fallback -1 if invalid
+                                let val: number = -1;
 
-                                if (typeof val === 'number') {
-                                    onOverlayRMSDCalculated(overlay.id, val);
+                                if (s && (typeof s.rmsd === 'number' || typeof s.mean2 === 'number')) {
+                                    val = s.rmsd ?? s.mean2;
+                                    console.log(`[Superpose] Calculated RMSD: ${val}`);
                                 } else {
-                                    console.warn(`[Superpose] Invalid RMSD value type: ${typeof val}`, s);
+                                    console.warn(`[Superpose] Failed to calculate RMSD (Result invalid). Returning -1.`);
                                 }
-                            } else {
-                                console.warn("[Superpose] No result object or callback missing", { s, hasCallback: !!onOverlayRMSDCalculated });
+                                onOverlayRMSDCalculated(overlay.id, val);
                             }
                         } catch (e) {
                             console.warn("Superposition failed:", e);

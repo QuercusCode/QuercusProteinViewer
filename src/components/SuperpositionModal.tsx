@@ -126,9 +126,15 @@ export const SuperpositionModal: React.FC<SuperpositionModalProps> = ({
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-[10px] text-neutral-500 font-mono truncate" title={item.id}>{item.id}</span>
                                                     {item.rmsd !== undefined && (
-                                                        <span className="text-[9px] font-bold bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded border border-green-500/30">
-                                                            RMSD: {item.rmsd.toFixed(3)} Å
-                                                        </span>
+                                                        item.rmsd >= 0 ? (
+                                                            <span className="text-[9px] font-bold bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded border border-green-500/30">
+                                                                RMSD: {item.rmsd.toFixed(3)} Å
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-[9px] font-bold bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded border border-red-500/30" title="No matching atoms found for superposition">
+                                                                Alignment Failed
+                                                            </span>
+                                                        )
                                                     )}
                                                 </div>
                                             </div>
