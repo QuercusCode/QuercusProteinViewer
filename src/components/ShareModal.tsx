@@ -642,81 +642,97 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                     </p>
 
                                     {peerSession ? (
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
-                                            {/* My Session ID */}
-                                            <div className={`p-4 rounded-xl border ${isLightMode ? 'bg-white border-neutral-200' : 'bg-neutral-950 border-neutral-800'}`}>
-                                                <label className="text-xs font-bold uppercase tracking-wider text-indigo-500 mb-2 block flex items-center gap-2">
-                                                    <Radio className="w-3 h-3" />
-                                                    Your Session ID
-                                                </label>
-                                                <div className="flex items-center gap-2">
-                                                    <div className={`flex-1 font-mono text-sm truncate p-2 rounded ${isLightMode ? 'bg-neutral-100' : 'bg-neutral-900'}`}>
-                                                        {peerSession.peerId || 'Generating...'}
-                                                    </div>
-                                                    <button
-                                                        onClick={handleCopySessionId}
-                                                        disabled={!peerSession.peerId}
-                                                        className="p-2 rounded hover:bg-indigo-500/10 text-indigo-400 transition-colors"
-                                                        title="Copy ID"
-                                                    >
-                                                        {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                                                    </button>
-                                                    <button
-                                                        onClick={handleCopyJoinLink}
-                                                        disabled={!peerSession.peerId}
-                                                        className="p-2 rounded hover:bg-indigo-500/10 text-indigo-400 transition-colors"
-                                                        title="Copy Join Link"
-                                                    >
-                                                        {copied ? <Check className="w-4 h-4" /> : <Link className="w-4 h-4" />}
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {/* Scan to Join (New) */}
-                                            {peerSession.peerId && (
-                                                <div className={`col-span-1 md:col-span-2 p-4 rounded-xl border flex flex-col items-center gap-4 ${isLightMode ? 'bg-white border-neutral-200' : 'bg-neutral-950 border-neutral-800'}`}>
-                                                    <label className="text-xs font-bold uppercase tracking-wider text-green-500 flex items-center gap-2">
-                                                        <Camera className="w-3 h-3" />
-                                                        Scan to Join
-                                                    </label>
-                                                    <div className="flex items-center gap-6">
-                                                        <div className="bg-white p-2 rounded-lg">
+                                        <div className="space-y-6 text-left">
+                                            {/* Host Section: My Session ID + QR */}
+                                            <div className={`p-5 rounded-2xl border ${isLightMode ? 'bg-white border-neutral-200' : 'bg-neutral-950 border-neutral-800'}`}>
+                                                <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
+                                                    {/* QR Code (Fixed Size) */}
+                                                    {peerSession.peerId && (
+                                                        <div className="bg-white p-2 rounded-xl border border-neutral-200 shrink-0">
                                                             <img
                                                                 src={qrCodeDataUrl || ''}
                                                                 alt="Join Session QR"
-                                                                className="w-32 h-32"
+                                                                className="w-32 h-32 object-contain block"
                                                             />
                                                         </div>
-                                                        <div className={`text-sm ${isLightMode ? 'text-neutral-600' : 'text-neutral-400'} max-w-[200px]`}>
-                                                            <p>Scan with your phone or tablet to instantly join this session.</p>
+                                                    )}
+
+                                                    {/* Session ID Stats */}
+                                                    <div className="flex-1 w-full space-y-4">
+                                                        <div>
+                                                            <label className="text-xs font-bold uppercase tracking-wider text-indigo-500 mb-2 flex items-center gap-2">
+                                                                <Radio className="w-3 h-3" />
+                                                                Invite Others
+                                                            </label>
+                                                            <p className={`text-sm mb-3 ${isLightMode ? 'text-neutral-600' : 'text-neutral-400'}`}>
+                                                                Share this ID or let others scan the QR code to join your session instantly.
+                                                            </p>
+                                                            <div className="flex items-center gap-2">
+                                                                <div className={`flex-1 font-mono text-sm truncate p-3 rounded-lg border ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-900 border-neutral-800'}`}>
+                                                                    {peerSession.peerId || 'Generating...'}
+                                                                </div>
+                                                                <button
+                                                                    onClick={handleCopySessionId}
+                                                                    className="p-3 rounded-lg bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500/20 transition-colors"
+                                                                    title="Copy ID"
+                                                                >
+                                                                    {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                                                </button>
+                                                                <button
+                                                                    onClick={handleCopyJoinLink}
+                                                                    className="p-3 rounded-lg bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500/20 transition-colors"
+                                                                    title="Copy Link"
+                                                                >
+                                                                    <Link className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            )}
+                                            </div>
 
-                                            {/* Join Session */}
-                                            <div className={`p-4 rounded-xl border ${isLightMode ? 'bg-white border-neutral-200' : 'bg-neutral-950 border-neutral-800'}`}>
-                                                <label className="text-xs font-bold uppercase tracking-wider text-purple-500 mb-2 block flex items-center gap-2">
+                                            {/* Join Section */}
+                                            <div className="relative">
+                                                <div className="absolute inset-0 flex items-center">
+                                                    <div className={`w-full border-t ${isLightMode ? 'border-neutral-200' : 'border-neutral-800'}`}></div>
+                                                </div>
+                                                <div className="relative flex justify-center text-xs uppercase">
+                                                    <span className={`px-2 ${isLightMode ? 'bg-white text-neutral-500' : 'bg-neutral-900 text-neutral-500'}`}>Or join existing</span>
+                                                </div>
+                                            </div>
+
+                                            <div className={`p-5 rounded-2xl border ${isLightMode ? 'bg-white border-neutral-200' : 'bg-neutral-950 border-neutral-800'}`}>
+                                                <label className="text-xs font-bold uppercase tracking-wider text-purple-500 mb-3 block flex items-center gap-2">
                                                     <Globe className="w-3 h-3" />
-                                                    Join Session
+                                                    Join a Session
                                                 </label>
-                                                <div className="flex gap-2">
+                                                <div className="flex gap-3">
                                                     <input
                                                         type="text"
-                                                        placeholder="Enter Peer ID..."
+                                                        placeholder="Enter Peer ID to join..."
                                                         value={remotePeerIdInput}
                                                         onChange={(e) => setRemotePeerIdInput(e.target.value)}
-                                                        className={`flex-1 min-w-0 p-2 text-sm rounded outline-none border focus:border-purple-500 transition-colors ${isLightMode ? 'bg-neutral-100 border-neutral-200 text-neutral-900' : 'bg-neutral-900 border-neutral-800 text-white'
+                                                        className={`flex-1 min-w-0 px-4 py-2.5 text-sm rounded-lg outline-none border focus:border-purple-500 transition-all ${isLightMode ? 'bg-neutral-50 border-neutral-200 text-neutral-900' : 'bg-neutral-900 border-neutral-800 text-white'
                                                             }`}
                                                     />
                                                     <button
                                                         onClick={() => peerSession.connectToPeer(remotePeerIdInput)}
                                                         disabled={!remotePeerIdInput}
-                                                        className="px-4 py-2 text-sm font-bold rounded bg-purple-600 hover:bg-purple-500 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                                        className="px-6 py-2.5 text-sm font-bold rounded-lg bg-purple-600 hover:bg-purple-500 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-purple-500/20"
                                                     >
                                                         Join
                                                     </button>
                                                 </div>
+                                            </div>
+
+                                            {/* Status Footer */}
+                                            <div className="flex items-center justify-center gap-2 pt-2">
+                                                <div className={`w-2.5 h-2.5 rounded-full ${peerSession.isConnected ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-neutral-500'}`} />
+                                                <span className={`text-xs font-medium ${isLightMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
+                                                    {peerSession.isConnected
+                                                        ? `Active Session • ${peerSession.connections.length} peer(s) connected`
+                                                        : 'Ready to connect'}
+                                                </span>
                                             </div>
                                         </div>
                                     ) : (
