@@ -100,11 +100,8 @@ function App() {
   const [isSnapshotModalOpen, setIsSnapshotModalOpen] = useState(false);
 
   // Sync Incoming State
-  const isRemoteUpdate = useRef(false);
-
   useEffect(() => {
     if (peerSession.lastReceivedState) {
-      isRemoteUpdate.current = true;
       const s = peerSession.lastReceivedState;
       // We diligently sync Viewport 0
       const ctrl = controllers[0];
@@ -128,20 +125,28 @@ function App() {
 
   // Broadcast Outgoing State
   useEffect(() => {
-    // Echo Cancellation:
-    // If I am NOT the host (Guest), I should NOT broadcast updates that came from the Host.
-    // This breaks the infinite echo loop (Host -> Guest -> Host).
-    // If I AM the host, I must relay (Host -> Guest1 -> Host -> Guest2), so I continue to broadcast.
-    if (!peerSession.isHost && isRemoteUpdate.current) {
-      isRemoteUpdate.current = false;
-      return;
-    }
-
-    // Reset flag for next turn
-    isRemoteUpdate.current = false;
-
     if (peerSession.isConnected) {
       const ctrl = controllers[0];
+
+      // Explicit Echo Cancellation (Equality Check)
+      // If I am NOT the host (Guest), and the state I am about to broadcast MATCHES
+      // the state I last received from the Host, then I should remain silent.
+      // This proves that my local change was just a mirror of the Host's update.
+      // I only broadcast if I have DEVIATED from the Host (User interaction).
+      if (!peerSession.isHost && peerSession.lastReceivedState) {
+        const received = peerSession.lastReceivedState;
+        const matchesReceived =
+          (received.pdbId === undefined || received.pdbId === ctrl.pdbId) &&
+          (received.representation === undefined || received.representation === ctrl.representation) &&
+          (received.coloring === undefined || received.coloring === ctrl.coloring) &&
+          (received.isSpinning === undefined || received.isSpinning === ctrl.isSpinning) &&
+          (received.highlightedResidue === undefined || received.highlightedResidue === ctrl.highlightedResidue);
+
+        if (matchesReceived) {
+          return;
+        }
+      }
+
       peerSession.broadcastState({
         pdbId: ctrl.pdbId,
         representation: ctrl.representation,
