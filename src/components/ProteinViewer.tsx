@@ -186,57 +186,75 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
 
 
+    const drawMeasurement = (m: Measurement | MeasurementData) => {
+        // Use Native NGL Distance Representation (Most Robust)
 
+        let idx1: number | undefined;
+        let idx2: number | undefined;
 
-    const drawMeasurement = (m: MeasurementData) => {
-        // Legacy internal measurement drawing - kept for compatibility if needed,
-        // but we are moving to props-driven measurements.
-        // Unused for now in new mode.
-        console.log(m);
-        const atom1 = findAtom(m.atom1.chain, m.atom1.resNo, m.atom1.atomName);
-        const atom2 = findAtom(m.atom2.chain, m.atom2.resNo, m.atom2.atomName);
+        if ('shapeId' in m) {
+            // Legacy MeasurementData
+            idx1 = m.atom1.index;
+            idx2 = m.atom2.index;
+        } else {
+            // New Measurement Type
+            idx1 = m.atom1.atomIndex;
+            idx2 = m.atom2.atomIndex;
+        }
 
-        if (atom1 && atom2 && stageRef.current) {
-            // Use Native NGL Distance Representation (Most Robust)
-            // This bypasses Shape primitive issues by using built-in measurement rendering
-            // We need atom indices for this
-            let idx1 = m.atom1.index;
-            let idx2 = m.atom2.index;
+        // Fallback lookup if index is missing
+        if (idx1 === undefined) {
+            // To accept both types safely without complex logic, let's just cast for lookup keys
+            const a1Info = m.atom1 as any;
+            const a1 = findAtom(a1Info.chain, a1Info.resNo, a1Info.atomName || 'CA');
+            if (a1) idx1 = a1.index;
+        }
 
-            // Fallback for legacy data or if index is missing: careful lookups
-            // Note: We avoid holding two proxies simultaneously to prevent reuse issues
-            if (idx1 === undefined) {
-                const a1 = findAtom(m.atom1.chain, m.atom1.resNo, m.atom1.atomName);
-                if (a1) idx1 = a1.index;
-            }
-            if (idx2 === undefined) {
-                const a2 = findAtom(m.atom2.chain, m.atom2.resNo, m.atom2.atomName);
-                if (a2) idx2 = a2.index;
-            }
+        if (idx2 === undefined) {
+            const a2Info = m.atom2 as any;
+            const a2 = findAtom(a2Info.chain, a2Info.resNo, a2Info.atomName || 'CA');
+            if (a2) idx2 = a2.index;
+        }
 
-            if (typeof idx1 === 'number' && typeof idx2 === 'number') {
-                const params = {
-                    labelUnit: 'angstrom',
-                    labelSize: 2.0,
-                    labelColor: 'white',
-                    color: 'yellow',
-                    atomPair: [[idx1, idx2]],
-                    opacity: 1.0
-                };
+        if (idx1 !== undefined && idx2 !== undefined && componentRef.current) {
+            const params = {
+                labelUnit: 'angstrom',
+                labelSize: 2.0,
+                labelColor: 'white',
+                color: 'yellow',
+                atomPair: [[idx1, idx2]],
+                opacity: 1.0,
+                name: 'measurement-distance'
+            };
 
-                try {
-                    const distanceRep = componentRef.current.addRepresentation("distance", params);
-                    if (distanceRep) {
-                        measurementRepsRef.current.push(distanceRep);
-                    }
-                } catch (e) {
-                    console.warn("Failed to add distance representation", e);
+            try {
+                const distanceRep = componentRef.current.addRepresentation("distance", params);
+                if (distanceRep) {
+                    measurementRepsRef.current.push(distanceRep);
                 }
-            } else {
-                console.warn("Could not find atom indices for distance rep", m);
+            } catch (e) {
+                console.warn("Failed to add distance representation", e);
             }
         }
     };
+
+    // React to measurements prop change (Sync or Local Update)
+    useEffect(() => {
+        // 1. Clear existing measurements
+        if (componentRef.current) {
+            measurementRepsRef.current.forEach(rep => {
+                try {
+                    componentRef.current.removeRepresentation(rep);
+                } catch (e) { }
+            });
+            measurementRepsRef.current = [];
+        }
+
+        // 2. Draw new measurements
+        if (measurements && measurements.length > 0 && componentRef.current) {
+            measurements.forEach(m => drawMeasurement(m));
+        }
+    }, [measurements]);
 
 
 
