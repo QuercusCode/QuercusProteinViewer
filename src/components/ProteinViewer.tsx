@@ -1848,9 +1848,103 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
 
 
+
+    // Annotations Logic
+    const [overlayPositions, setOverlayPositions] = React.useState<Record<string, { x: number, y: number, visible: boolean }>>({});
+    const annotationsRef = useRef(annotations || []); // Keep track of latest annotations for render loop
+    const onAddAnnotationRef = useRef(onAddAnnotation);
+
+    useEffect(() => {
+        annotationsRef.current = annotations || [];
+    }, [annotations]);
+
+    useEffect(() => {
+        onAddAnnotationRef.current = onAddAnnotation;
+    }, [onAddAnnotation]);
+
+    // Handle Annotation Projection Loop
+    useEffect(() => {
+        if (!stageRef.current) return;
+        const stage = stageRef.current;
+
+        const updatePositions = () => {
+            if (!stage.viewer || !annotationsRef.current.length) return;
+
+            const newPositions: Record<string, { x: number, y: number, visible: boolean }> = {};
+            let hasUpdates = false;
+
+            annotationsRef.current.forEach(ann => {
+                const vec = new window.NGL.Vector3(ann.position.x, ann.position.y, ann.position.z);
+
+                // Project to screen space
+                vec.project(stage.viewer.camera);
+
+                // Convert to Pixel Coordinates
+                const canvas = stage.viewer.renderer.domElement;
+                const width = canvas.clientWidth;
+                const height = canvas.clientHeight;
+
+                const x = (vec.x * 0.5 + 0.5) * width;
+                const y = (-(vec.y * 0.5) + 0.5) * height;
+
+                // Check if visible
+                const visible = (vec.z >= -1 && vec.z <= 1);
+
+                newPositions[ann.id] = { x, y, visible };
+                hasUpdates = true;
+            });
+
+            if (hasUpdates) {
+                setOverlayPositions(newPositions);
+            }
+        };
+
+        // Bind to Render Signal for smooth sync during rotation
+        stage.viewer.signals.rendered.add(updatePositions);
+        updatePositions(); // Initial
+
+        return () => {
+            if (stage.viewer) stage.viewer.signals.rendered.remove(updatePositions);
+        };
+    }, [stageRef.current]);
+
+    // Handle Double Click for Adding Annotation
+    useEffect(() => {
+        if (!stageRef.current || !onAddAnnotation) return;
+        const stage = stageRef.current;
+
+        const dblClickHandler = (_stage: any, pickingProxy: any) => {
+            if (pickingProxy && pickingProxy.atom && onAddAnnotationRef.current) {
+                const atom = pickingProxy.atom;
+                // Create Annotation
+                const ann: Annotation = {
+                    id: crypto.randomUUID(),
+                    residue: {
+                        chain: atom.chainname,
+                        resNo: atom.resno,
+                        resName: atom.resname,
+                        atomIndex: atom.index,
+                        atomName: atom.atomname,
+                        element: atom.element
+                    },
+                    text: "New Note", // Default text
+                    position: { x: atom.x, y: atom.y, z: atom.z },
+                    author: "Unknown"
+                };
+                onAddAnnotationRef.current(ann);
+            }
+        };
+
+        stage.mouseControls.add("dblclick", dblClickHandler);
+
+        return () => {
+            stage.mouseControls.remove("dblclick", dblClickHandler);
+        };
+    }, [stageRef.current]);
+
     // Laser Pointer Logic (Ghost Hover Visuals)
     const laserPointerCompRef = useRef<any>(null);
-    const trailHistoryRef = useRef<{ x: number, y: number, z: number }[]>([]);
+    const trailHistoryRef = useRef<Array<{ x: number, y: number, z: number }>>([]);
 
     useEffect(() => {
         if (!componentRef.current || !stageRef.current) return;
@@ -1876,20 +1970,22 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         component.structure.eachResidue((res: any) => {
             if (res.chain.name === chain && res.resno === resNo) {
                 const atom = res.getAtomByName('CA') || res.getAtomByIndex(0);
-                if (atom) pos = { x: atom.x, y: atom.y, z: atom.z };
+                if (atom) {
+                    pos = { x: atom.x, y: atom.y, z: atom.z };
+                }
             }
         });
 
         if (pos) {
             // Update Trail
-            trailHistoryRef.current.push(pos as { x: number, y: number, z: number });
+            trailHistoryRef.current.push(pos as any);
             if (trailHistoryRef.current.length > 8) trailHistoryRef.current.shift();
 
             // Render Shape
             const shape = new window.NGL.Shape("laser-pointer");
 
             // Main Dot (Red/Pink Glowing)
-            shape.addSphere([pos.x, pos.y, pos.z], [1, 0, 0.5], 1.5);
+            shape.addSphere([(pos as any).x, (pos as any).y, (pos as any).z], [1, 0, 0.5], 1.5);
 
             // Trail (Fading)
             trailHistoryRef.current.forEach((tPos: { x: number, y: number, z: number }, i: number) => {
@@ -2319,6 +2415,37 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     return (
         <div className={clsx("relative w-full h-full", className)} style={backgroundColor === 'transparent' ? { background: 'transparent' } : {}}>
             <div ref={containerRef} className="w-full h-full" style={backgroundColor === 'transparent' ? { background: 'transparent' } : {}} />
+
+            {/* HTML Overlays for Annotations */}
+            {annotations && annotations.map(ann => {
+                const pos = overlayPositions[ann.id];
+                if (!pos || !pos.visible) return null;
+                return (
+                    <div
+                        key={ann.id}
+                        className="absolute pointer-events-auto bg-yellow-100 text-black text-xs p-2 rounded shadow-lg border border-yellow-300 max-w-[150px] transform -translate-x-1/2 -translate-y-full mb-2"
+                        style={{
+                            left: pos.x,
+                            top: pos.y,
+                            zIndex: 10
+                        }}
+                    >
+                        <div className="font-bold border-b border-black/10 mb-1 pb-0.5 text-[10px] uppercase opacity-50">
+                            {ann.residue.resName} {ann.residue.resNo}
+                        </div>
+                        <div contentEditable suppressContentEditableWarning
+                            onBlur={() => {
+                                // TODO: Update text callback
+                            }}
+                        >
+                            {ann.text}
+                        </div>
+                        {/* Triangle/Pointer */}
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-yellow-100" />
+                    </div>
+                );
+            })}
+
             {loading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-10 transition-all duration-300">
                     <Skeleton className="w-32 h-32 rounded-full opacity-50" />
