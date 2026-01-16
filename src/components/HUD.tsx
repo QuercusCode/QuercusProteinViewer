@@ -43,7 +43,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
 
             {/* Live Session Indicator */}
             {peerSession?.isConnected && (
-                <div className="flex flex-col items-center gap-1.5 animate-in slide-in-from-bottom-2">
+                <div className="flex flex-col items-center gap-1.5 animate-in slide-in-from-bottom-2 pointer-events-auto">
                     {/* Ghost Hover (Host's Pointer) */}
                     {remoteHoveredResidue && !isHost && (
                         <div className={`backdrop-blur-md rounded-full border ${borderColor} bg-indigo-500/90 text-white shadow-lg px-3 py-1 flex items-center gap-2 mb-1`}>
