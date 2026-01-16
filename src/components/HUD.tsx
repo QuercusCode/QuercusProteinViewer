@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import type { ResidueInfo, PDBMetadata } from '../types';
 import type { PeerSession } from '../hooks/usePeerSession';
 import { Lock, Unlock } from 'lucide-react';
@@ -22,6 +22,20 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
     const bgColor = isLightMode ? 'bg-white/80' : 'bg-black/80';
     const borderColor = isLightMode ? 'border-gray-200' : 'border-neutral-800';
 
+    // Stabilize Hover Effect: Prevent rapid switching when moving between atoms
+    const [effectiveResidue, setEffectiveResidue] = useState<ResidueInfo | null>(hoveredResidue);
+
+    useEffect(() => {
+        if (hoveredResidue) {
+            setEffectiveResidue(hoveredResidue);
+        } else {
+            // Add a small grace period before reverting to Title
+            // This prevents the "shifting" flickering when moving mouse across small gaps
+            const timer = setTimeout(() => setEffectiveResidue(null), 250);
+            return () => clearTimeout(timer);
+        }
+    }, [hoveredResidue]);
+
     // Show ID or Title when idle
     const structTitle = useMemo(() => {
         if (pdbMetadata?.title) return pdbMetadata.title;
@@ -37,7 +51,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
 
     // Position at bottom center to avoid interfering with any viewports
 
-    if (!hoveredResidue && (!structTitle || isEmbedMode)) return null;
+    if (!effectiveResidue && (!structTitle || isEmbedMode)) return null;
 
     return (
         <div className={`absolute bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none select-none transition-all duration-300 font-sans flex flex-col items-center gap-2`}>
@@ -86,27 +100,27 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
             <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-4 md:px-6 py-2 flex items-center justify-center min-w-[240px] transition-all duration-300 ease-out overflow-hidden`}>
                 <div className="relative flex items-center justify-center">
                     {/* Residue Info View - Fades In/Out */}
-                    <div className={`flex items-center gap-3 transition-opacity duration-300 ${hoveredResidue ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden absolute'}`}>
-                        {hoveredResidue && (
+                    <div className={`flex items-center gap-3 transition-opacity duration-300 ${effectiveResidue ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden absolute'}`}>
+                        {effectiveResidue && (
                             <>
-                                {STANDARD_RESIDUES.has(hoveredResidue.resName.toUpperCase()) ? (
+                                {STANDARD_RESIDUES.has(effectiveResidue.resName.toUpperCase()) ? (
                                     <>
                                         <span className={`font-semibold ${textColor} whitespace-nowrap`}>
-                                            {hoveredResidue.resName} <span className="opacity-90">{hoveredResidue.resNo}</span>
+                                            {effectiveResidue.resName} <span className="opacity-90">{effectiveResidue.resNo}</span>
                                         </span>
                                         <div className={`h-3 w-px ${isLightMode ? 'bg-black/10' : 'bg-white/20'}`} />
                                         <span className={`text-xs uppercase tracking-wide opacity-80 ${textColor} whitespace-nowrap`}>
-                                            Chain {hoveredResidue.chain}
+                                            Chain {effectiveResidue.chain}
                                         </span>
                                     </>
                                 ) : (
-                                    (hoveredResidue.atomName) ? (
+                                    (effectiveResidue.atomName) ? (
                                         <span className={`font-mono font-semibold ${textColor} whitespace-nowrap`}>
-                                            {hoveredResidue.atomName} <span className="text-xs opacity-80">#{hoveredResidue.atomSerial}</span>
+                                            {effectiveResidue.atomName} <span className="text-xs opacity-80">#{effectiveResidue.atomSerial}</span>
                                         </span>
                                     ) : (
                                         <span className={`font-semibold ${textColor} whitespace-nowrap`}>
-                                            {hoveredResidue.resName}
+                                            {effectiveResidue.resName}
                                         </span>
                                     )
                                 )}
@@ -115,7 +129,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
                     </div>
 
                     {/* Idle Title View - Fades In/Out */}
-                    <div className={`text-xs font-medium tracking-wider ${textColor} uppercase text-center truncate max-w-[240px] transition-opacity duration-300 ${!hoveredResidue ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden absolute'}`}>
+                    <div className={`text-xs font-medium tracking-wider ${textColor} uppercase text-center truncate max-w-[240px] transition-opacity duration-300 ${!effectiveResidue ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden absolute'}`}>
                         {structTitle}
                     </div>
                 </div>
