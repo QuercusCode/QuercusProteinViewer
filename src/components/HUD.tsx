@@ -74,7 +74,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
         <>
             {/* Live Session Participants (Top Right) */}
             {peerSession?.isConnected && (
-                <div className="fixed top-20 right-4 z-40 flex flex-col gap-2 items-end pointer-events-auto">
+                <div className="fixed top-20 right-28 z-40 flex flex-col gap-2 items-end pointer-events-auto">
                     <div className={`backdrop-blur-md rounded-xl border ${borderColor} ${bgColor} shadow-lg p-3 min-w-[180px] animate-in slide-in-from-right-4 transition-all duration-300`}>
                         <div className="flex items-center justify-between mb-2 pb-2 border-b border-white/10">
                             <span className={`text-[10px] font-bold uppercase tracking-wider opacity-70 ${textColor}`}>Live Session</span>
