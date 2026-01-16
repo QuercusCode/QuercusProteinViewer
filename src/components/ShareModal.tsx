@@ -31,17 +31,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
     const [embedBorderRadius, setEmbedBorderRadius] = useState<0 | 12 | 24>(12);
     const [embedShadow, setEmbedShadow] = useState(true);
     // const [embedLazy, setEmbedLazy] = useState(false); // REMOVED
-    const [embedColor, setEmbedColor] = useState<string | null>(null);
     const [embedInteractionWrapper, setEmbedInteractionWrapper] = useState(false);
-
-    const BRAND_COLORS = [
-        { name: 'Blue', value: '#3b82f6' }, // blue-500
-        { name: 'Purple', value: '#a855f7' }, // purple-500
-        { name: 'Green', value: '#22c55e' }, // green-500
-        { name: 'Red', value: '#ef4444' }, // red-500
-        { name: 'Orange', value: '#f97316' }, // orange-500
-        { name: 'Pink', value: '#ec4899' }, // pink-500
-    ];
 
 
 
@@ -124,7 +114,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
         if (embedScrollProtection) url += '&scroll=false';
         // if (embedLazy) url += '&lazy=true'; // REMOVED
         if (embedInteractionWrapper) url += '&interactionWrapper=true';
-        if (embedColor) url += `&color=${embedColor.replace('#', '')}`;
+
         if (embedTransparent) url += '&bg=transparent';
         if (embedOrientation) url += `&orientation=${encodeURIComponent(JSON.stringify(embedOrientation))}`;
         return url;
@@ -428,29 +418,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                             Visual Style
                                         </label>
                                         <div className="flex flex-col gap-2">
-                                            {/* Color Picker */}
-                                            <div className={`p-3 rounded-lg border space-y-2 ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-800/50 border-neutral-700'}`}>
-                                                <div className="flex justify-between text-xs font-medium opacity-70">
-                                                    <span>Accent Color</span>
-                                                </div>
-                                                <div className="flex gap-2 justify-between">
-                                                    <button
-                                                        onClick={() => setEmbedColor(null)}
-                                                        className={`w-6 h-6 rounded-full border-2 transition-all ${!embedColor ? 'border-white ring-2 ring-blue-500/50' : 'border-transparent hover:border-white/50'}`}
-                                                        style={{ background: 'linear-gradient(135deg, #3b82f6 50%, #22c55e 50%)' }} // Placeholder "Default" rainbow-ish or blue
-                                                        title="Default"
-                                                    />
-                                                    {BRAND_COLORS.map((color) => (
-                                                        <button
-                                                            key={color.name}
-                                                            onClick={() => setEmbedColor(color.value)}
-                                                            className={`w-6 h-6 rounded-full border-2 transition-all ${embedColor === color.value ? 'border-white ring-2 ring-white/20 scale-110' : 'border-transparent hover:scale-110'}`}
-                                                            style={{ backgroundColor: color.value }}
-                                                            title={color.name}
-                                                        />
-                                                    ))}
-                                                </div>
-                                            </div>
+
 
                                             <button
                                                 onClick={() => setEmbedTransparent(!embedTransparent)}

@@ -327,11 +327,7 @@ function App() {
           console.warn("Invalid orientation param", e);
         }
         // Accent Color
-        const colorParam = params.get('color');
-        if (colorParam) {
-          document.documentElement.style.setProperty('--brand-color', '#' + colorParam.replace('#', ''));
-          document.body.classList.add('embed-custom-color');
-        }
+
 
 
       }
