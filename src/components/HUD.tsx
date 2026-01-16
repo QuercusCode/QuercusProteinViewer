@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import type { ResidueInfo, PDBMetadata } from '../types';
 import type { PeerSession } from '../hooks/usePeerSession';
-import { Eye, Wrench } from 'lucide-react';
+import { Eye, Wrench, Lock, Unlock } from 'lucide-react';
 
 interface HUDProps {
     hoveredResidue: ResidueInfo | null;
@@ -15,9 +15,11 @@ interface HUDProps {
     remoteUserName?: string | null;
     peerNames?: Record<string, string>;
     controllerId?: string | null;
+    isCameraSynced?: boolean;
+    onToggleCameraSync?: () => void;
 }
 
-export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMode = false, peerSession, remoteHoveredResidue, isHost, remoteUserName, peerNames = {}, controllerId }: HUDProps) {
+export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMode = false, peerSession, remoteHoveredResidue, isHost, remoteUserName, peerNames = {}, controllerId, isCameraSynced, onToggleCameraSync }: HUDProps) {
     const textColor = isLightMode ? 'text-gray-800' : 'text-gray-200';
     const bgColor = isLightMode ? 'bg-white/80' : 'bg-black/80';
     const borderColor = isLightMode ? 'border-gray-200' : 'border-neutral-800';
@@ -135,13 +137,29 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
             {/* Bottom Center HUD Container */}
             <div className={`absolute bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none select-none transition-all duration-300 font-sans flex flex-col items-center gap-2`}>
 
-                {/* Restored Live Indicator (Bottom Center) */}
+                {/* Restored Live Indicator & View/Edit Toggle (Bottom Center) */}
                 {peerSession?.isConnected && (
                     <div className={`pointer-events-auto backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-3 py-1 flex items-center gap-2 mb-1 animate-in slide-in-from-bottom-2`}>
-                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
-                        <span className={`text-[10px] font-bold tracking-wider ${textColor}`}>
-                            LIVE • {peerSession.connections.length + 1} ACTIVE
-                        </span>
+                        <div className="flex items-center gap-2 pr-3 border-r border-gray-500/20">
+                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                            <span className={`text-[10px] font-bold tracking-wider ${textColor}`}>
+                                LIVE • {peerSession.connections.length + 1} ACTIVE
+                            </span>
+                        </div>
+
+                        {/* View/Edit Toggle for Guests */}
+                        {!isHost && onToggleCameraSync && (
+                            <button
+                                onClick={onToggleCameraSync}
+                                className={`text-[10px] font-bold px-1.5 py-0.5 rounded transition-colors flex items-center gap-1 ${isCameraSynced
+                                    ? (isLightMode ? 'text-indigo-600 bg-indigo-50 hover:bg-indigo-100' : 'text-indigo-300 bg-indigo-900/30 hover:bg-indigo-900/50')
+                                    : (isLightMode ? 'text-neutral-500 hover:text-neutral-700 bg-neutral-100 hover:bg-neutral-200' : 'text-neutral-400 hover:text-neutral-200 bg-neutral-800 hover:bg-neutral-700')
+                                    }`}
+                            >
+                                {isCameraSynced ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                                {isCameraSynced ? 'VIEW' : 'EDIT'}
+                            </button>
+                        )}
                     </div>
                 )}
 
