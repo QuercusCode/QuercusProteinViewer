@@ -165,6 +165,11 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         onHoverRef.current = onHover;
     }, [onHover]);
 
+    const onCameraChangeRef = useRef(onCameraChange);
+    useEffect(() => {
+        onCameraChangeRef.current = onCameraChange;
+    }, [onCameraChange]);
+
     const measurementsRef = useRef<MeasurementData[]>([]);
     const measurementRepsRef = useRef<any[]>([]); // Track NGL Representations for cleanup
     const contactLineRepRef = useRef<any>(null); // Track single contact line representation
@@ -1375,11 +1380,12 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                     // We only want to notify if the change came from user interaction,
                     // but NGL doesn't easily distinguish. 
                     // However, we can use a flag if we are setting it programmatically.
-                    if (onCameraChange && !stage.isProgrammaticRotate) {
+                    // However, we can use a flag if we are setting it programmatically.
+                    if (onCameraChangeRef.current && !stage.isProgrammaticRotate) {
                         const orientation = stage.viewerControls.getOrientation();
                         // Convert Matrix to array to be safe
                         const elements = Array.from(orientation.elements);
-                        onCameraChange(elements);
+                        onCameraChangeRef.current(elements);
                     }
                 });
             }
