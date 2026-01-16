@@ -12,6 +12,7 @@ export interface SessionState {
     orientation?: any[];
     isSpinning?: boolean;
     highlightedResidue?: any;
+    hoveredResidue?: any;
 }
 
 export interface PeerSession {

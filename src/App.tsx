@@ -82,6 +82,10 @@ function App() {
   const { history, addToHistory } = useHistory();
   const peerSession = usePeerSession();
 
+  // Peer Session UX State
+  const [isCameraSynced, setIsCameraSynced] = useState(true);
+  const [remoteHoveredResidue, setRemoteHoveredResidue] = useState<ResidueInfo | null>(null);
+
   // One-Click Join (Mount Logic)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -144,8 +148,12 @@ function App() {
       if (s.customColors !== undefined) ctrl.setCustomColors(s.customColors);
       if (s.measurements !== undefined) ctrl.setMeasurements(s.measurements);
       if (s.customBackgroundColor !== undefined) ctrl.setCustomBackgroundColor(s.customBackgroundColor);
+      if (s.hoveredResidue !== undefined) setRemoteHoveredResidue(s.hoveredResidue);
     }
   }, [peerSession.lastReceivedState]);
+
+  // State: Hovered Residue
+  const [hoveredResidue, setHoveredResidue] = useState<ResidueInfo | null>(null);
 
   // Connection Feedback (Toasts)
   useEffect(() => {
@@ -156,10 +164,10 @@ function App() {
 
   // Sync Incoming Camera
   useEffect(() => {
-    if (peerSession.lastReceivedCamera && viewerRefs[0].current) {
+    if (isCameraSynced && peerSession.lastReceivedCamera && viewerRefs[0].current) {
       viewerRefs[0].current.setOrientation(peerSession.lastReceivedCamera);
     }
-  }, [peerSession.lastReceivedCamera]);
+  }, [peerSession.lastReceivedCamera, isCameraSynced]);
 
 
   // Broadcast Outgoing State
@@ -182,7 +190,8 @@ function App() {
           (received.highlightedResidue === undefined || deepEqual(received.highlightedResidue, ctrl.highlightedResidue)) &&
           (received.customColors === undefined || deepEqual(received.customColors, ctrl.customColors)) &&
           (received.measurements === undefined || deepEqual(received.measurements, ctrl.measurements)) &&
-          (received.customBackgroundColor === undefined || received.customBackgroundColor === ctrl.customBackgroundColor);
+          (received.customBackgroundColor === undefined || received.customBackgroundColor === ctrl.customBackgroundColor) &&
+          (received.hoveredResidue === undefined || deepEqual(received.hoveredResidue, hoveredResidue));
 
         if (matchesReceived) {
           return;
@@ -197,7 +206,7 @@ function App() {
         highlightedResidue: ctrl.highlightedResidue,
         customColors: ctrl.customColors,
         measurements: ctrl.measurements,
-        customBackgroundColor: ctrl.customBackgroundColor
+        hoveredResidue: hoveredResidue
       });
     }
   }, [
@@ -210,6 +219,7 @@ function App() {
     controllers[0].customColors,
     controllers[0].measurements,
     controllers[0].customBackgroundColor,
+    hoveredResidue,
     peerSession.isConnected,
     peerSession.connections // Broadcast when new peers join
   ]);
@@ -1312,7 +1322,7 @@ function App() {
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
 
   // --- HUD STATE ---
-  const [hoveredResidue, setHoveredResidue] = useState<ResidueInfo | null>(null);
+
 
 
 
@@ -1881,6 +1891,10 @@ function App() {
             isLightMode={isLightMode}
             isEmbedMode={isEmbedMode}
             peerSession={peerSession}
+            remoteHoveredResidue={remoteHoveredResidue}
+            isCameraSynced={isCameraSynced}
+            onToggleCameraSync={() => setIsCameraSynced(!isCameraSynced)}
+            isHost={peerSession.isHost}
           />
 
           {isMeasurementPanelOpen && (

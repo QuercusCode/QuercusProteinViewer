@@ -9,9 +9,13 @@ interface HUDProps {
     isLightMode: boolean;
     isEmbedMode?: boolean; // Optional, defaults to false
     peerSession?: PeerSession;
+    remoteHoveredResidue?: ResidueInfo | null;
+    isCameraSynced?: boolean;
+    onToggleCameraSync?: () => void;
+    isHost?: boolean;
 }
 
-export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMode = false, peerSession }: HUDProps) {
+export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMode = false, peerSession, remoteHoveredResidue, isCameraSynced, onToggleCameraSync, isHost }: HUDProps) {
     const textColor = isLightMode ? 'text-gray-800' : 'text-gray-200';
     const bgColor = isLightMode ? 'bg-white/80' : 'bg-black/80';
     const borderColor = isLightMode ? 'border-gray-200' : 'border-neutral-800';
@@ -38,11 +42,40 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
 
             {/* Live Session Indicator */}
             {peerSession?.isConnected && (
-                <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-3 py-1 flex items-center gap-2 animate-in slide-in-from-bottom-2`}>
-                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
-                    <span className={`text-[10px] font-bold tracking-wider ${textColor}`}>
-                        LIVE • {peerSession.connections.length} PEER{peerSession.connections.length !== 1 ? 'S' : ''}
-                    </span>
+                <div className="flex flex-col items-center gap-1.5 animate-in slide-in-from-bottom-2">
+                    {/* Ghost Hover (Host's Pointer) */}
+                    {remoteHoveredResidue && !isHost && (
+                        <div className={`backdrop-blur-md rounded-full border ${borderColor} bg-indigo-500/90 text-white shadow-lg px-3 py-1 flex items-center gap-2 mb-1`}>
+                            <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">Host:</span>
+                            <span className="text-xs font-mono font-bold">
+                                {remoteHoveredResidue.resName} {remoteHoveredResidue.resNo}
+                            </span>
+                        </div>
+                    )}
+
+                    {/* Connection Status & Follow Toggle */}
+                    <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-3 py-1 flex items-center gap-2`}>
+                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                        <span className={`text-[10px] font-bold tracking-wider ${textColor}`}>
+                            LIVE • {peerSession.connections.length} PEER{peerSession.connections.length !== 1 ? 'S' : ''}
+                        </span>
+
+                        {/* Follow Mode Toggle (Guest Only) */}
+                        {!isHost && onToggleCameraSync && (
+                            <>
+                                <div className={`h-3 w-px ${isLightMode ? 'bg-black/10' : 'bg-white/20'}`} />
+                                <button
+                                    onClick={onToggleCameraSync}
+                                    className={`text-[10px] font-bold px-1.5 py-0.5 rounded transition-colors ${isCameraSynced
+                                        ? (isLightMode ? 'text-indigo-600 bg-indigo-50 hover:bg-indigo-100' : 'text-indigo-300 bg-indigo-900/30 hover:bg-indigo-900/50')
+                                        : (isLightMode ? 'text-neutral-400 hover:text-neutral-600' : 'text-neutral-500 hover:text-neutral-300')
+                                        }`}
+                                >
+                                    {isCameraSynced ? 'FOLLOWING' : 'UNSYNCED'}
+                                </button>
+                            </>
+                        )}
+                    </div>
                 </div>
             )}
 
