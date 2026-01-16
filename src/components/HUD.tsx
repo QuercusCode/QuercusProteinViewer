@@ -73,7 +73,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
                                         }`}
                                 >
                                     {isCameraSynced ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
-                                    {isCameraSynced ? 'FOLLOWING' : 'UNSYNCED'}
+                                    {isCameraSynced ? 'VIEW' : 'EDIT'}
                                 </button>
                             </>
                         )}
