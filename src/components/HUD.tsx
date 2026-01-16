@@ -45,17 +45,15 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
             {/* Live Session Indicator */}
             {peerSession?.isConnected && (
                 <div className="relative pointer-events-auto flex flex-col items-center animate-in slide-in-from-bottom-2">
-                    {/* Ghost Hover (Peer's Pointer) - Absolute formatted to avoid layout shift */}
-                    {remoteHoveredResidue && (
-                        <div className={`absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap backdrop-blur-md rounded-full border ${borderColor} bg-indigo-500/90 text-white shadow-lg px-3 py-1 flex items-center gap-2 transition-all duration-200`}>
-                            <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">
-                                {remoteUserName || (isHost ? 'GUEST' : 'HOST')}:
-                            </span>
-                            <span className="text-xs font-mono font-bold">
-                                {remoteHoveredResidue.resName} {remoteHoveredResidue.resNo}
-                            </span>
-                        </div>
-                    )}
+                    {/* Ghost Hover (Peer's Pointer) - Absolute formatted with opacity transition */}
+                    <div className={`absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap backdrop-blur-md rounded-full border ${borderColor} bg-indigo-500/90 text-white shadow-lg px-3 py-1 flex items-center gap-2 transition-all duration-300 ${remoteHoveredResidue ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
+                        <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">
+                            {remoteUserName || (isHost ? 'GUEST' : 'HOST')}:
+                        </span>
+                        <span className="text-xs font-mono font-bold">
+                            {remoteHoveredResidue?.resName || '...'} {remoteHoveredResidue?.resNo || ''}
+                        </span>
+                    </div>
 
                     {/* Connection Status & Follow Toggle */}
                     <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-3 py-1 flex items-center gap-2`}>
@@ -85,10 +83,10 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
             )}
 
             {/* Minimal Capsule */}
-            <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-4 md:px-6 py-2 flex items-center justify-center min-w-[200px] transition-all duration-200`}>
+            <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-4 md:px-6 py-2 flex items-center justify-center min-w-[240px] transition-all duration-500 ease-out`}>
 
                 {hoveredResidue ? (
-                    <div className="flex items-center gap-3 animate-in fade-in duration-200">
+                    <div className="flex items-center gap-3 animate-in fade-in zoom-in-95 duration-300">
                         {/* Logic: 
                             - Standard Residues (Protein/DNA): Show ResName + ResNo + Chain.
                             - Chemicals/Ligands: Show ONLY Atom details (Name + Serial). Hide ResName + Chain.
@@ -121,7 +119,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
                         )}
                     </div>
                 ) : (
-                    <div className={`text-xs font-medium tracking-wider ${textColor} uppercase text-center truncate max-w-[200px]`}>
+                    <div className={`text-xs font-medium tracking-wider ${textColor} uppercase text-center truncate max-w-[200px] animate-in fade-in zoom-in-95 duration-300`}>
                         {structTitle}
                     </div>
                 )}
