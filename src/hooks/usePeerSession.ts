@@ -32,6 +32,7 @@ export interface PeerSession {
     lastReceivedName: string | null;
     peerNames: Record<string, string>; // Map of Peer ID -> Name
     error: string | null;
+    disconnect: () => void;
 }
 
 export const usePeerSession = (initialState?: Partial<SessionState>): PeerSession => {
@@ -123,10 +124,39 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
 
     const connectToPeer = useCallback((remotePeerId: string) => {
         if (!peerRef.current) return;
+
+        // Smart Reconnect: Persist Host ID
+        sessionStorage.setItem('QUERCUS_LAST_HOST_ID', remotePeerId);
+
         const conn = peerRef.current.connect(remotePeerId);
         setupConnection(conn);
         setIsHost(false); // I am joining
     }, []);
+
+    const disconnect = useCallback(() => {
+        // Clear Smart Reconnect persistence
+        sessionStorage.removeItem('QUERCUS_LAST_HOST_ID');
+
+        connectionsRef.current.forEach(conn => conn.close());
+        setConnections([]);
+        setLastReceivedState(null);
+        setLastReceivedCamera(null);
+    }, []);
+
+    // Smart Reconnect: Auto-Join logic
+    useEffect(() => {
+        if (peerId && !connections.length && !isHost) {
+            const lastHostId = sessionStorage.getItem('QUERCUS_LAST_HOST_ID');
+            const urlParams = new URLSearchParams(window.location.search);
+            const isJoiningFromUrl = urlParams.has('join');
+
+            // Only auto-reconnect if we are not already trying to join via URL (App.tsx handles that)
+            if (lastHostId && !isJoiningFromUrl) {
+                console.log('Smart Reconnect: Restoring session with host', lastHostId);
+                connectToPeer(lastHostId);
+            }
+        }
+    }, [peerId, connections.length, isHost, connectToPeer]);
 
     const broadcastState = useCallback((state: Partial<SessionState>) => {
         connectionsRef.current.forEach(conn => {
@@ -181,6 +211,7 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
         lastReceivedCamera,
         lastReceivedName,
         peerNames,
-        error
+        error,
+        disconnect
     };
 };

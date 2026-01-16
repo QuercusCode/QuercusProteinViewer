@@ -58,9 +58,20 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
 
     // Generate QR Code
     useEffect(() => {
-        if (isOpen && shareUrl) {
-            console.log(`Generating QR for URL (${shareUrl.length} chars)`);
-            QRCode.toDataURL(shareUrl, {
+        if (!isOpen) return;
+
+        let targetUrl = shareUrl;
+
+        // If in Live Session mode, generate a Join Link QR
+        if (activeTab === 'live' && peerSession?.peerId) {
+            const url = new URL(window.location.href);
+            url.search = `?join=${peerSession.peerId}`;
+            targetUrl = url.toString();
+        }
+
+        if (targetUrl) {
+            console.log(`Generating QR for URL (${targetUrl.length} chars)`);
+            QRCode.toDataURL(targetUrl, {
                 margin: 2,
                 width: 400,
                 errorCorrectionLevel: 'L',
@@ -78,7 +89,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                     setGenerationError('URL too long for QR Code');
                 });
         }
-    }, [isOpen, shareUrl, isLightMode]);
+    }, [isOpen, shareUrl, isLightMode, activeTab, peerSession?.peerId]);
 
     const handleCopy = async () => {
         try {
@@ -660,6 +671,28 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                                     </button>
                                                 </div>
                                             </div>
+
+                                            {/* Scan to Join (New) */}
+                                            {peerSession.peerId && (
+                                                <div className={`col-span-1 md:col-span-2 p-4 rounded-xl border flex flex-col items-center gap-4 ${isLightMode ? 'bg-white border-neutral-200' : 'bg-neutral-950 border-neutral-800'}`}>
+                                                    <label className="text-xs font-bold uppercase tracking-wider text-green-500 flex items-center gap-2">
+                                                        <Camera className="w-3 h-3" />
+                                                        Scan to Join
+                                                    </label>
+                                                    <div className="flex items-center gap-6">
+                                                        <div className="bg-white p-2 rounded-lg">
+                                                            <img
+                                                                src={qrCodeDataUrl || ''}
+                                                                alt="Join Session QR"
+                                                                className="w-32 h-32"
+                                                            />
+                                                        </div>
+                                                        <div className={`text-sm ${isLightMode ? 'text-neutral-600' : 'text-neutral-400'} max-w-[200px]`}>
+                                                            <p>Scan with your phone or tablet to instantly join this session.</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
 
                                             {/* Join Session */}
                                             <div className={`p-4 rounded-xl border ${isLightMode ? 'bg-white border-neutral-200' : 'bg-neutral-950 border-neutral-800'}`}>
