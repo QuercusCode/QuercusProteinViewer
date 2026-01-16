@@ -7,6 +7,8 @@ export interface SessionState {
     representation: string;
     coloring: string;
     customColors: any[];
+    measurements?: any[];
+    customBackgroundColor?: string | null;
     orientation?: any[];
     isSpinning?: boolean;
     highlightedResidue?: any;

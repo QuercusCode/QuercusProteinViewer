@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, Copy, Download, Check, Linkedin, Settings2, Camera, Users, Radio, Globe } from 'lucide-react';
+import { X, Copy, Download, Check, Linkedin, Settings2, Camera, Users, Radio, Globe, Link } from 'lucide-react';
 import QRCode from 'qrcode';
 import { logEvent } from '../utils/analytics';
 import type { PeerSession } from '../hooks/usePeerSession';
@@ -95,6 +95,17 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
         if (!peerSession?.peerId) return;
         try {
             await navigator.clipboard.writeText(peerSession.peerId);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) { console.error(err); }
+    };
+
+    const handleCopyJoinLink = async () => {
+        if (!peerSession?.peerId) return;
+        const url = new URL(window.location.href);
+        url.search = `?join=${peerSession.peerId}`;
+        try {
+            await navigator.clipboard.writeText(url.toString());
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
         } catch (err) { console.error(err); }
@@ -635,8 +646,17 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                                         onClick={handleCopySessionId}
                                                         disabled={!peerSession.peerId}
                                                         className="p-2 rounded hover:bg-indigo-500/10 text-indigo-400 transition-colors"
+                                                        title="Copy ID"
                                                     >
                                                         {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                                    </button>
+                                                    <button
+                                                        onClick={handleCopyJoinLink}
+                                                        disabled={!peerSession.peerId}
+                                                        className="p-2 rounded hover:bg-indigo-500/10 text-indigo-400 transition-colors"
+                                                        title="Copy Join Link"
+                                                    >
+                                                        {copied ? <Check className="w-4 h-4" /> : <Link className="w-4 h-4" />}
                                                     </button>
                                                 </div>
                                             </div>

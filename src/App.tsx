@@ -82,6 +82,23 @@ function App() {
   const { history, addToHistory } = useHistory();
   const peerSession = usePeerSession();
 
+  // One-Click Join (Mount Logic)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const joinId = params.get('join') || params.get('live');
+    if (joinId) {
+      // Small delay to ensure Peer is ready
+      setTimeout(() => {
+        peerSession.connectToPeer(joinId);
+        // Clear param to clean URL (optional) but keeping it lets user know they are in live mode
+        const url = new URL(window.location.href);
+        url.searchParams.delete('join');
+        url.searchParams.delete('live');
+        window.history.replaceState({}, '', url);
+      }, 1000);
+    }
+  }, []);
+
   // Sync Incoming State
 
 
@@ -125,8 +142,17 @@ function App() {
       // For more complex objects, we might need deep comparison or just set it
       if (s.highlightedResidue !== undefined) ctrl.setHighlightedResidue(s.highlightedResidue);
       if (s.customColors !== undefined) ctrl.setCustomColors(s.customColors);
+      if (s.measurements !== undefined) ctrl.setMeasurements(s.measurements);
+      if (s.customBackgroundColor !== undefined) ctrl.setCustomBackgroundColor(s.customBackgroundColor);
     }
   }, [peerSession.lastReceivedState]);
+
+  // Connection Feedback (Toasts)
+  useEffect(() => {
+    if (peerSession.isConnected) {
+      success(`Connected to session! (${peerSession.connections.length} peer${peerSession.connections.length > 1 ? 's' : ''})`);
+    }
+  }, [peerSession.isConnected, peerSession.connections.length]);
 
   // Sync Incoming Camera
   useEffect(() => {
@@ -154,7 +180,9 @@ function App() {
           (received.coloring === undefined || received.coloring === ctrl.coloring) &&
           (received.isSpinning === undefined || received.isSpinning === ctrl.isSpinning) &&
           (received.highlightedResidue === undefined || deepEqual(received.highlightedResidue, ctrl.highlightedResidue)) &&
-          (received.customColors === undefined || deepEqual(received.customColors, ctrl.customColors));
+          (received.customColors === undefined || deepEqual(received.customColors, ctrl.customColors)) &&
+          (received.measurements === undefined || deepEqual(received.measurements, ctrl.measurements)) &&
+          (received.customBackgroundColor === undefined || received.customBackgroundColor === ctrl.customBackgroundColor);
 
         if (matchesReceived) {
           return;
@@ -167,7 +195,9 @@ function App() {
         coloring: ctrl.coloring,
         isSpinning: ctrl.isSpinning,
         highlightedResidue: ctrl.highlightedResidue,
-        customColors: ctrl.customColors
+        customColors: ctrl.customColors,
+        measurements: ctrl.measurements,
+        customBackgroundColor: ctrl.customBackgroundColor
       });
     }
   }, [
@@ -178,6 +208,8 @@ function App() {
     controllers[0].isSpinning,
     controllers[0].highlightedResidue,
     controllers[0].customColors,
+    controllers[0].measurements,
+    controllers[0].customBackgroundColor,
     peerSession.isConnected,
     peerSession.connections // Broadcast when new peers join
   ]);
@@ -1848,6 +1880,7 @@ function App() {
             pdbId={pdbId}
             isLightMode={isLightMode}
             isEmbedMode={isEmbedMode}
+            peerSession={peerSession}
           />
 
           {isMeasurementPanelOpen && (

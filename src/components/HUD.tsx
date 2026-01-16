@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import type { ResidueInfo, PDBMetadata } from '../types';
+import type { PeerSession } from '../hooks/usePeerSession';
 
 interface HUDProps {
     hoveredResidue: ResidueInfo | null;
@@ -7,9 +8,10 @@ interface HUDProps {
     pdbId: string | null;
     isLightMode: boolean;
     isEmbedMode?: boolean; // Optional, defaults to false
+    peerSession?: PeerSession;
 }
 
-export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMode = false }: HUDProps) {
+export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMode = false, peerSession }: HUDProps) {
     const textColor = isLightMode ? 'text-gray-800' : 'text-gray-200';
     const bgColor = isLightMode ? 'bg-white/80' : 'bg-black/80';
     const borderColor = isLightMode ? 'border-gray-200' : 'border-neutral-800';
@@ -32,7 +34,17 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
     if (!hoveredResidue && (!structTitle || isEmbedMode)) return null;
 
     return (
-        <div className={`absolute bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none select-none transition-all duration-300 font-sans`}>
+        <div className={`absolute bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none select-none transition-all duration-300 font-sans flex flex-col items-center gap-2`}>
+
+            {/* Live Session Indicator */}
+            {peerSession?.isConnected && (
+                <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-3 py-1 flex items-center gap-2 animate-in slide-in-from-bottom-2`}>
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                    <span className={`text-[10px] font-bold tracking-wider ${textColor}`}>
+                        LIVE • {peerSession.connections.length} PEER{peerSession.connections.length !== 1 ? 'S' : ''}
+                    </span>
+                </div>
+            )}
 
             {/* Minimal Capsule */}
             <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-3 md:px-4 py-1 md:py-1.5 flex items-center justify-center min-w-[100px] md:min-w-[120px]`}>
