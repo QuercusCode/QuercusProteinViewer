@@ -50,6 +50,18 @@ import { useStructureMetadata } from './hooks/useStructureMetadata';
 
 import { initGA, logPageView, logEvent } from './utils/analytics';
 
+const deepEqual = (a: any, b: any): boolean => {
+  if (a === b) return true;
+  if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return false;
+  const keysA = Object.keys(a);
+  const keysB = Object.keys(b);
+  if (keysA.length !== keysB.length) return false;
+  for (const key of keysA) {
+    if (!deepEqual(a[key], b[key])) return false;
+  }
+  return true;
+};
+
 function App() {
   // Initialize Analytics
   useEffect(() => {
@@ -140,7 +152,7 @@ function App() {
           (received.representation === undefined || received.representation === ctrl.representation) &&
           (received.coloring === undefined || received.coloring === ctrl.coloring) &&
           (received.isSpinning === undefined || received.isSpinning === ctrl.isSpinning) &&
-          (received.highlightedResidue === undefined || received.highlightedResidue === ctrl.highlightedResidue);
+          (received.highlightedResidue === undefined || deepEqual(received.highlightedResidue, ctrl.highlightedResidue));
 
         if (matchesReceived) {
           return;
