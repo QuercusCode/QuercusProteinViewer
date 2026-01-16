@@ -178,7 +178,8 @@ function App() {
     controllers[0].isSpinning,
     controllers[0].highlightedResidue,
     controllers[0].customColors,
-    peerSession.isConnected
+    peerSession.isConnected,
+    peerSession.connections // Broadcast when new peers join
   ]);
   const [isSuperpositionModalOpen, setIsSuperpositionModalOpen] = useState(false); // Contact/Feedback Modal
 
