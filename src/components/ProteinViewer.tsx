@@ -82,6 +82,9 @@ export interface ProteinViewerProps {
     disableScroll?: boolean; // New: Scroll Protection
 
     onCameraChange?: (orientation: any) => void;
+
+    // Interaction
+    isInteractive?: boolean;
 }
 
 export interface ProteinViewerRef {
@@ -144,9 +147,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     quality = 'medium',
     enableAmbientOcclusion = false,
     measurementTextColor = 'auto',
-    initialOrientation, // Destructure new prop
+    initialOrientation,
     disableScroll = false,
-    onCameraChange, // New prop
+    onCameraChange,
+    isInteractive = true
 }: ProteinViewerProps, ref: React.Ref<ProteinViewerRef>) => {
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -1322,11 +1326,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             });
             stageRef.current = stage;
 
-            // --- MOUSE CONTROLS ---
-            stage.mouseControls.add("drag-left", window.NGL.MouseActions.rotateDrag);
-            stage.mouseControls.add("scroll", window.NGL.MouseActions.zoomScroll);
-            stage.mouseControls.add("drag-right", window.NGL.MouseActions.panDrag);
-
             // --- HOVER HANDLING (HUD) ---
             let hoveredAtomIndex = -1;
             stage.signals.hovered.add((pickingProxy: any) => {
@@ -1392,14 +1391,33 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             };
         } catch (err) {
             console.error("Failed to init NGL Stage:", err);
-            setError("WebGL initialization failed.");
+            setError?.(err instanceof Error ? err.message : String(err));
         }
-    }, [onCameraChange]);
+    }, []); // Run once on mount
+
+    // --- INTERACTION CONTROL ---
+    useEffect(() => {
+        if (!stageRef.current) return;
+        const stage = stageRef.current;
+        const ngl = window.NGL;
+
+        if (isInteractive) {
+            // Restore Controls
+            stage.mouseControls.add("drag-left", ngl.MouseActions.rotateDrag);
+            stage.mouseControls.add("scroll", ngl.MouseActions.zoomScroll);
+            stage.mouseControls.add("drag-right", ngl.MouseActions.panDrag);
+        } else {
+            // Remove Manipulation Controls (Keep Hover/Signals)
+            stage.mouseControls.remove("drag-left");
+            stage.mouseControls.remove("scroll");
+            stage.mouseControls.remove("drag-right");
+        }
+    }, [isInteractive]);
 
     useEffect(() => {
         const loadStructure = async () => {
-            if (!stageRef.current) return;
             const stage = stageRef.current;
+            if (!stage) return;
 
             try {
                 if (stage.viewer) {

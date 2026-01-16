@@ -2184,7 +2184,9 @@ function App() {
                             file={ctrl.file || undefined}
                             fileType={ctrl.fileType}
                             isLightMode={isLightMode}
-                            isSpinning={ctrl.isSpinning}
+                            isSpinning={viewMode === 'single' ? controllers[0].isSpinning : false} // Only spin in single view for now
+                            // Interactive if: Not connected OR Is Host OR Not Synced
+                            isInteractive={!peerSession.isConnected || peerSession.isHost || !isCameraSynced}
                             representation={ctrl.representation}
                             showSurface={ctrl.showSurface}
                             showLigands={ctrl.showLigands}
