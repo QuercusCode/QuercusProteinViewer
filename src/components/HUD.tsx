@@ -69,8 +69,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
     if (!effectiveResidue && (!structTitle || isEmbedMode)) return null;
 
     return (
-        <div className={`absolute bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none select-none transition-all duration-300 font-sans flex flex-col items-center gap-2`}>
-
+        <>
             {/* Live Session Participants (Top Right) */}
             {peerSession?.isConnected && (
                 <div className="fixed top-20 right-4 z-40 flex flex-col gap-2 items-end pointer-events-auto">
@@ -133,44 +132,58 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
                 </div>
             )}
 
-            {/* Minimal Capsule (Bottom Center) */}
-            <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-4 md:px-6 py-2 flex items-center justify-center min-w-[240px] transition-all duration-300 ease-out overflow-hidden`}>
-                <div className="relative flex items-center justify-center">
-                    {/* Residue Info View - Fades In/Out */}
-                    <div className={`flex items-center gap-3 transition-opacity duration-300 ${effectiveResidue ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden absolute'}`}>
-                        {effectiveResidue && (
-                            <>
-                                {STANDARD_RESIDUES.has(effectiveResidue.resName.toUpperCase()) ? (
-                                    <>
-                                        <span className={`font-semibold ${textColor} whitespace-nowrap`}>
-                                            {effectiveResidue.resName} <span className="opacity-90">{effectiveResidue.resNo}</span>
-                                        </span>
-                                        <div className={`h-3 w-px ${isLightMode ? 'bg-black/10' : 'bg-white/20'}`} />
-                                        <span className={`text-xs uppercase tracking-wide opacity-80 ${textColor} whitespace-nowrap`}>
-                                            Chain {effectiveResidue.chain}
-                                        </span>
-                                    </>
-                                ) : (
-                                    (effectiveResidue.atomName) ? (
-                                        <span className={`font-mono font-semibold ${textColor} whitespace-nowrap`}>
-                                            {effectiveResidue.atomName} <span className="text-xs opacity-80">#{effectiveResidue.atomSerial}</span>
-                                        </span>
-                                    ) : (
-                                        <span className={`font-semibold ${textColor} whitespace-nowrap`}>
-                                            {effectiveResidue.resName}
-                                        </span>
-                                    )
-                                )}
-                            </>
-                        )}
-                    </div>
+            {/* Bottom Center HUD Container */}
+            <div className={`absolute bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none select-none transition-all duration-300 font-sans flex flex-col items-center gap-2`}>
 
-                    {/* Idle Title View - Fades In/Out */}
-                    <div className={`text-xs font-medium tracking-wider ${textColor} uppercase text-center truncate max-w-[240px] transition-opacity duration-300 ${!effectiveResidue ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden absolute'}`}>
-                        {structTitle}
+                {/* Restored Live Indicator (Bottom Center) */}
+                {peerSession?.isConnected && (
+                    <div className={`pointer-events-auto backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-3 py-1 flex items-center gap-2 mb-1 animate-in slide-in-from-bottom-2`}>
+                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                        <span className={`text-[10px] font-bold tracking-wider ${textColor}`}>
+                            LIVE • {peerSession.connections.length + 1} ACTIVE
+                        </span>
+                    </div>
+                )}
+
+                {/* Minimal Capsule (Bottom Center) */}
+                <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-4 md:px-6 py-2 flex items-center justify-center min-w-[240px] transition-all duration-300 ease-out overflow-hidden`}>
+                    <div className="relative flex items-center justify-center">
+                        {/* Residue Info View - Fades In/Out */}
+                        <div className={`flex items-center gap-3 transition-opacity duration-300 ${effectiveResidue ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden absolute'}`}>
+                            {effectiveResidue && (
+                                <>
+                                    {STANDARD_RESIDUES.has(effectiveResidue.resName.toUpperCase()) ? (
+                                        <>
+                                            <span className={`font-semibold ${textColor} whitespace-nowrap`}>
+                                                {effectiveResidue.resName} <span className="opacity-90">{effectiveResidue.resNo}</span>
+                                            </span>
+                                            <div className={`h-3 w-px ${isLightMode ? 'bg-black/10' : 'bg-white/20'}`} />
+                                            <span className={`text-xs uppercase tracking-wide opacity-80 ${textColor} whitespace-nowrap`}>
+                                                Chain {effectiveResidue.chain}
+                                            </span>
+                                        </>
+                                    ) : (
+                                        (effectiveResidue.atomName) ? (
+                                            <span className={`font-mono font-semibold ${textColor} whitespace-nowrap`}>
+                                                {effectiveResidue.atomName} <span className="text-xs opacity-80">#{effectiveResidue.atomSerial}</span>
+                                            </span>
+                                        ) : (
+                                            <span className={`font-semibold ${textColor} whitespace-nowrap`}>
+                                                {effectiveResidue.resName}
+                                            </span>
+                                        )
+                                    )}
+                                </>
+                            )}
+                        </div>
+
+                        {/* Idle Title View - Fades In/Out */}
+                        <div className={`text-xs font-medium tracking-wider ${textColor} uppercase text-center truncate max-w-[240px] transition-opacity duration-300 ${!effectiveResidue ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden absolute'}`}>
+                            {structTitle}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }
