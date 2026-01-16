@@ -72,11 +72,12 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
             {peerSession?.isConnected && (
                 <div className="relative pointer-events-auto flex flex-col items-center animate-in slide-in-from-bottom-2">
                     {/* Ghost Hover (Peer's Pointer) - Absolute formatted with opacity transition */}
-                    <div className={`absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap backdrop-blur-md rounded-full border ${borderColor} bg-indigo-500/90 text-white shadow-lg px-3 py-1 flex items-center gap-2 transition-all duration-300 ${effectiveRemoteResidue ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
-                        <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">
+                    {/* Ghost Hover (Peer's Pointer) - Absolute formatted with opacity transition */}
+                    <div className={`absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap backdrop-blur-md rounded-full border ${borderColor} bg-indigo-500/90 text-white shadow-lg px-2 py-1 flex items-center justify-between gap-2 min-w-[140px] transition-all duration-300 ${effectiveRemoteResidue ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
+                        <span className="text-[10px] font-bold uppercase tracking-wider opacity-80 flex-shrink-0 text-right w-[45%]">
                             {remoteUserName || (isHost ? 'GUEST' : 'HOST')}:
                         </span>
-                        <span className="text-xs font-mono font-bold">
+                        <span className="text-xs font-mono font-bold w-[55%] text-left truncate">
                             {effectiveRemoteResidue?.resName || '...'} {effectiveRemoteResidue?.resNo || ''}
                         </span>
                     </div>
