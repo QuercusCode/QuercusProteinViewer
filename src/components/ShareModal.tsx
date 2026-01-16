@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { X, Copy, Download, Check, Linkedin, Settings2, Camera } from 'lucide-react';
+import { X, Copy, Download, Check, Linkedin, Settings2, Camera, Users, Radio, Globe } from 'lucide-react';
 import QRCode from 'qrcode';
 import { logEvent } from '../utils/analytics';
+import type { PeerSession } from '../hooks/usePeerSession';
 
 interface ShareModalProps {
     isOpen: boolean;
@@ -9,13 +10,14 @@ interface ShareModalProps {
     shareUrl: string;
     isLightMode: boolean;
     warning?: string | null;
+    peerSession?: PeerSession; // Added PeerSession prop
 }
 
-export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUrl, isLightMode, warning }) => {
+export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUrl, isLightMode, warning, peerSession }) => {
     const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
     const [generationError, setGenerationError] = useState<string | null>(null);
-    const [activeTab, setActiveTab] = useState<'link' | 'embed'>('link');
+    const [activeTab, setActiveTab] = useState<'link' | 'embed' | 'live'>('link');
 
     // Embed Options State
     const [embedSpin, setEmbedSpin] = useState(false);
@@ -33,7 +35,8 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
     // const [embedLazy, setEmbedLazy] = useState(false); // REMOVED
     const [embedInteractionWrapper, setEmbedInteractionWrapper] = useState(false);
 
-
+    // Live Session State
+    const [remotePeerIdInput, setRemotePeerIdInput] = useState('');
 
     // Orientation Message Handler
     useEffect(() => {
@@ -46,8 +49,6 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
         window.addEventListener('message', handleMessage);
         return () => window.removeEventListener('message', handleMessage);
     }, []);
-
-
 
     const handleSetStartView = () => {
         console.log("ShareModal: handleSetStartView clicked. Sending REQUEST_ORIENTATION");
@@ -88,6 +89,15 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
         } catch (err) {
             console.error('Failed to copy', err);
         }
+    };
+
+    const handleCopySessionId = async () => {
+        if (!peerSession?.peerId) return;
+        try {
+            await navigator.clipboard.writeText(peerSession.peerId);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) { console.error(err); }
     };
 
     const handleDownloadQR = () => {
@@ -206,6 +216,15 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                             >
                                 Embed Widget
                             </button>
+                            <button
+                                onClick={() => setActiveTab('live')}
+                                className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'live'
+                                    ? (isLightMode ? 'bg-white shadow-sm text-neutral-900' : 'bg-neutral-700 shadow-sm text-white')
+                                    : (isLightMode ? 'text-neutral-500 hover:text-neutral-900' : 'text-neutral-400 hover:text-white')
+                                    }`}
+                            >
+                                Live Session
+                            </button>
                         </div>
 
                         {activeTab === 'link' ? (
@@ -282,7 +301,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                     </div>
                                 </div>
                             </>
-                        ) : (
+                        ) : activeTab === 'embed' ? (
                             /* Embed Tab */
                             <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-1">
                                 {/* Left Column: Controls */}
@@ -586,6 +605,85 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                         {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                                         {copied ? 'Copied to Clipboard!' : 'Copy Embed Code'}
                                     </button>
+                                </div>
+                            </div>
+                        ) : (
+                            /* Live Session Tab */
+                            <div className="flex flex-col gap-6 animate-in slide-in-from-right-4 duration-300">
+                                <div className="p-6 rounded-2xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 text-center">
+                                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-indigo-500/20 flex items-center justify-center">
+                                        <Users className="w-8 h-8 text-indigo-400" />
+                                    </div>
+                                    <h3 className="text-xl font-bold mb-2">Live Collaboration</h3>
+                                    <p className={`text-sm max-w-md mx-auto mb-6 ${isLightMode ? 'text-neutral-600' : 'text-neutral-400'}`}>
+                                        Share your session ID or join a friend to synchronize your view in real-time. Camera and structure changes are mirrored instantly.
+                                    </p>
+
+                                    {peerSession ? (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                                            {/* My Session ID */}
+                                            <div className={`p-4 rounded-xl border ${isLightMode ? 'bg-white border-neutral-200' : 'bg-neutral-950 border-neutral-800'}`}>
+                                                <label className="text-xs font-bold uppercase tracking-wider text-indigo-500 mb-2 block flex items-center gap-2">
+                                                    <Radio className="w-3 h-3" />
+                                                    Your Session ID
+                                                </label>
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`flex-1 font-mono text-sm truncate p-2 rounded ${isLightMode ? 'bg-neutral-100' : 'bg-neutral-900'}`}>
+                                                        {peerSession.peerId || 'Generating...'}
+                                                    </div>
+                                                    <button
+                                                        onClick={handleCopySessionId}
+                                                        disabled={!peerSession.peerId}
+                                                        className="p-2 rounded hover:bg-indigo-500/10 text-indigo-400 transition-colors"
+                                                    >
+                                                        {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {/* Join Session */}
+                                            <div className={`p-4 rounded-xl border ${isLightMode ? 'bg-white border-neutral-200' : 'bg-neutral-950 border-neutral-800'}`}>
+                                                <label className="text-xs font-bold uppercase tracking-wider text-purple-500 mb-2 block flex items-center gap-2">
+                                                    <Globe className="w-3 h-3" />
+                                                    Join Session
+                                                </label>
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Enter Peer ID..."
+                                                        value={remotePeerIdInput}
+                                                        onChange={(e) => setRemotePeerIdInput(e.target.value)}
+                                                        className={`flex-1 min-w-0 p-2 text-sm rounded outline-none border focus:border-purple-500 transition-colors ${isLightMode ? 'bg-neutral-100 border-neutral-200 text-neutral-900' : 'bg-neutral-900 border-neutral-800 text-white'
+                                                            }`}
+                                                    />
+                                                    <button
+                                                        onClick={() => peerSession.connectToPeer(remotePeerIdInput)}
+                                                        disabled={!remotePeerIdInput}
+                                                        className="px-4 py-2 text-sm font-bold rounded bg-purple-600 hover:bg-purple-500 text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                                    >
+                                                        Join
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="text-center text-red-400 p-4 border border-red-500/20 rounded-xl bg-red-500/10">
+                                            PeerJS Service Unavailable
+                                        </div>
+                                    )}
+
+                                    {/* Connection Status */}
+                                    {peerSession && (
+                                        <div className="mt-8 flex items-center justify-center gap-2">
+                                            <div className={`w-3 h-3 rounded-full ${peerSession.isConnected ? 'bg-green-500 animate-pulse' : 'bg-neutral-500'
+                                                }`} />
+                                            <span className={`text-sm font-medium ${isLightMode ? 'text-neutral-600' : 'text-neutral-400'}`}>
+                                                {peerSession.isConnected
+                                                    ? `Connected to ${peerSession.connections.length} peer(s)`
+                                                    : 'Waiting for connection...'}
+                                            </span>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         )}

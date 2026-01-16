@@ -80,6 +80,8 @@ export interface ProteinViewerProps {
     resetCamera?: number; // Increment to trigger reset
     className?: string;
     disableScroll?: boolean; // New: Scroll Protection
+
+    onCameraChange?: (orientation: any) => void;
 }
 
 export interface ProteinViewerRef {
@@ -144,6 +146,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     measurementTextColor = 'auto',
     initialOrientation, // Destructure new prop
     disableScroll = false,
+    onCameraChange, // New prop
 }: ProteinViewerProps, ref: React.Ref<ProteinViewerRef>) => {
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -720,8 +723,14 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         setOrientation: (orientation: any) => {
             if (!stageRef.current || !stageRef.current.viewerControls || !orientation) return;
             try {
-                // If it's a plain array, NGL should handle it, but we can verify
+                // If it's a plain array, NGL should handle it
+                // Mark as programmatic to avoid infinite loop with onCameraChange
+                stageRef.current.isProgrammaticRotate = true;
                 stageRef.current.viewerControls.orient(orientation);
+                // Reset flag after a short delay or next tick
+                setTimeout(() => {
+                    if (stageRef.current) stageRef.current.isProgrammaticRotate = false;
+                }, 50);
             } catch (e) {
                 console.warn("Failed to set orientation:", e);
             }
@@ -1361,6 +1370,21 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                 resizeObserver.observe(containerRef.current);
             }
 
+            // --- Camera Signal Logic ---
+            if (stage.viewerControls) {
+                stage.viewerControls.signals.changed.add(() => {
+                    // We only want to notify if the change came from user interaction,
+                    // but NGL doesn't easily distinguish. 
+                    // However, we can use a flag if we are setting it programmatically.
+                    if (onCameraChange && !stage.isProgrammaticRotate) {
+                        const orientation = stage.viewerControls.getOrientation();
+                        // Convert Matrix to array to be safe
+                        const elements = Array.from(orientation.elements);
+                        onCameraChange(elements);
+                    }
+                });
+            }
+
             return () => {
                 resizeObserver.disconnect();
                 try { stage.dispose(); } catch (e) { }
@@ -1370,7 +1394,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
             console.error("Failed to init NGL Stage:", err);
             setError("WebGL initialization failed.");
         }
-    }, []);
+    }, [onCameraChange]);
 
     useEffect(() => {
         const loadStructure = async () => {

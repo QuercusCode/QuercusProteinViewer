@@ -21,6 +21,7 @@ import type {
   PDBMetadata,
   Measurement,
   MeasurementTextColor,
+  RepresentationType,
   ColoringType,
   Snapshot,
   Movie,
@@ -43,6 +44,7 @@ import { useFavorites } from './hooks/useFavorites';
 import { useHistory } from './hooks/useHistory';
 import { useVisualStack, type VisualState } from './hooks/useVisualStack';
 import { useStructureController, type StructureController } from './hooks/useStructureController';
+import { usePeerSession } from './hooks/usePeerSession';
 import { useStructureMetadata } from './hooks/useStructureMetadata';
 
 
@@ -66,6 +68,10 @@ function App() {
   const { toasts, removeToast, success } = useToast();
   const { favorites, toggleFavorite, removeFavorite, isFavorite } = useFavorites();
   const { history, addToHistory } = useHistory();
+  const peerSession = usePeerSession();
+
+  // Sync Incoming State
+
 
   // Parse Global URL State Once
   const initialUrlState = parseURLState();
@@ -92,6 +98,52 @@ function App() {
 
   // --- Snapshot Modal State (unified viewport + quality selection) ---
   const [isSnapshotModalOpen, setIsSnapshotModalOpen] = useState(false);
+
+  // Sync Incoming State
+  useEffect(() => {
+    if (peerSession.lastReceivedState) {
+      const s = peerSession.lastReceivedState;
+      // We diligently sync Viewport 0
+      const ctrl = controllers[0];
+
+      if (s.pdbId && s.pdbId !== ctrl.pdbId) ctrl.setPdbId(s.pdbId);
+      if (s.representation && s.representation !== ctrl.representation) ctrl.setRepresentation(s.representation as RepresentationType);
+      if (s.coloring && s.coloring !== ctrl.coloring) ctrl.setColoring(s.coloring as ColoringType);
+      if (s.isSpinning !== undefined && s.isSpinning !== ctrl.isSpinning) ctrl.setIsSpinning(s.isSpinning);
+      // For more complex objects, we might need deep comparison or just set it
+      if (s.highlightedResidue !== undefined) ctrl.setHighlightedResidue(s.highlightedResidue);
+    }
+  }, [peerSession.lastReceivedState]);
+
+  // Sync Incoming Camera
+  useEffect(() => {
+    if (peerSession.lastReceivedCamera && viewerRefs[0].current) {
+      viewerRefs[0].current.setOrientation(peerSession.lastReceivedCamera);
+    }
+  }, [peerSession.lastReceivedCamera]);
+
+
+  // Broadcast Outgoing State
+  useEffect(() => {
+    if (peerSession.isConnected) {
+      const ctrl = controllers[0];
+      peerSession.broadcastState({
+        pdbId: ctrl.pdbId,
+        representation: ctrl.representation,
+        coloring: ctrl.coloring,
+        isSpinning: ctrl.isSpinning,
+        highlightedResidue: ctrl.highlightedResidue
+      });
+    }
+  }, [
+    // Dependency array includes everything we want to broadcast
+    controllers[0].pdbId,
+    controllers[0].representation,
+    controllers[0].coloring,
+    controllers[0].isSpinning,
+    controllers[0].highlightedResidue,
+    peerSession.isConnected
+  ]);
   const [isSuperpositionModalOpen, setIsSuperpositionModalOpen] = useState(false); // Contact/Feedback Modal
 
   // --- Residue-Specific Coloring State ---
@@ -265,11 +317,64 @@ function App() {
     // Users should explicitly select structures from the library or enter IDs
   }, [dataSource]);
 
-
-
   const [isLightMode, setIsLightMode] = useState(() => {
     return localStorage.getItem('theme') === 'light';
   });
+
+  useEffect(() => {
+    localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
+  }, [isLightMode]);
+
+
+  // Sync Incoming State
+  useEffect(() => {
+    if (peerSession.lastReceivedState) {
+      const s = peerSession.lastReceivedState;
+      // We diligently sync Viewport 0
+      const ctrl = controllers[0];
+
+      if (s.pdbId && s.pdbId !== ctrl.pdbId) ctrl.setPdbId(s.pdbId);
+      if (s.representation && s.representation !== ctrl.representation) ctrl.setRepresentation(s.representation as RepresentationType);
+      if (s.coloring && s.coloring !== ctrl.coloring) ctrl.setColoring(s.coloring as ColoringType);
+      if (s.isSpinning !== undefined && s.isSpinning !== ctrl.isSpinning) ctrl.setIsSpinning(s.isSpinning);
+      // For more complex objects, we might need deep comparison or just set it
+      if (s.highlightedResidue !== undefined) ctrl.setHighlightedResidue(s.highlightedResidue);
+    }
+  }, [peerSession.lastReceivedState]);
+
+  // Sync Incoming Camera
+  useEffect(() => {
+    if (peerSession.lastReceivedCamera && viewerRefs[0].current) {
+      viewerRefs[0].current.setOrientation(peerSession.lastReceivedCamera);
+    }
+  }, [peerSession.lastReceivedCamera]);
+
+
+  // Broadcast Outgoing State
+  useEffect(() => {
+    if (peerSession.isConnected) {
+      const ctrl = controllers[0];
+      peerSession.broadcastState({
+        pdbId: ctrl.pdbId,
+        representation: ctrl.representation,
+        coloring: ctrl.coloring,
+        isSpinning: ctrl.isSpinning,
+        highlightedResidue: ctrl.highlightedResidue
+      });
+    }
+  }, [
+    // Dependency array includes everything we want to broadcast
+    controllers[0].pdbId,
+    controllers[0].representation,
+    controllers[0].coloring,
+    controllers[0].isSpinning,
+    controllers[0].highlightedResidue,
+    peerSession.isConnected
+  ]);
+
+
+
+
 
   useEffect(() => {
     localStorage.setItem('theme', isLightMode ? 'light' : 'dark');
@@ -2006,7 +2111,10 @@ function App() {
                             backgroundColor={ctrl.customBackgroundColor || (isLightMode ? 'white' : 'black')}
                             measurementTextColor={measurementTextColorMode}
                             overlays={ctrl.overlays}
+
                             initialOrientation={index === 0 ? embedOrientation : undefined}
+                            // Live Session: Broadcast camera changes if active view and connected
+                            onCameraChange={index === 0 && peerSession.isConnected ? peerSession.broadcastCamera : undefined}
 
 
                             onStructureLoaded={(info) => handleLoad(info, ctrl)}
@@ -2192,6 +2300,7 @@ function App() {
           orientation: viewerRefs[index].current?.getOrientation()
         })))}
         isLightMode={isLightMode}
+        peerSession={peerSession}
       />
 
 
