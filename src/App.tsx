@@ -187,6 +187,19 @@ function App() {
   // Feature: 3D Annotations
   const [annotations, setAnnotations] = useState<any[]>([]);
 
+  const handleAddAnnotation = (ann: any) => {
+    // Add author info
+    const enrichedAnn = { ...ann, author: userName || (peerSession.isHost ? 'Host' : 'Guest') };
+    const newAnnotations = [...annotations, enrichedAnn];
+    setAnnotations(newAnnotations);
+
+    // Broadcast immediately if I am the controller or host
+    // Note: Regular broadcast loop will catch it, but instant is better for UX
+    if (peerSession.isConnected && (peerSession.isHost || controllerId === peerSession.peerId || !controllerId)) {
+      peerSession.broadcastState({ annotations: newAnnotations });
+    }
+  };
+
   // Connection Feedback (Toasts)
   useEffect(() => {
     if (peerSession.isConnected) {
@@ -2280,6 +2293,10 @@ function App() {
                               setActiveViewIndex(index);
                             }}
                             onHover={setHoveredResidue}
+                            // Live Session Features
+                            annotations={annotations}
+                            onAddAnnotation={handleAddAnnotation}
+                            remoteHoveredResidue={remoteHoveredResidue}
 
 
 

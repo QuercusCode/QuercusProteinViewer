@@ -79,8 +79,15 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
     const setupConnection = (conn: DataConnection) => {
         conn.on('open', () => {
             console.log('Connected to:', conn.peer);
-            connectionsRef.current = [...connectionsRef.current, conn];
-            setConnections([...connectionsRef.current]);
+
+            // Check for duplicate connection
+            const exists = connectionsRef.current.some(c => c.peer === conn.peer);
+            if (!exists) {
+                connectionsRef.current = [...connectionsRef.current, conn];
+                setConnections([...connectionsRef.current]);
+            } else {
+                console.warn('Duplicate connection ignored:', conn.peer);
+            }
 
             // If I have initial state, send it to the new peer
             if (initialState) {
