@@ -15,9 +15,12 @@ interface HUDProps {
     onToggleCameraSync?: () => void;
     isHost?: boolean;
     remoteUserName?: string | null;
+    peerNames?: Record<string, string>;
+    onGrantControl?: (peerId: string | null) => void;
+    controllerId?: string | null;
 }
 
-export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMode = false, peerSession, remoteHoveredResidue, isCameraSynced, onToggleCameraSync, isHost, remoteUserName }: HUDProps) {
+export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMode = false, peerSession, remoteHoveredResidue, isCameraSynced, onToggleCameraSync, isHost, remoteUserName, peerNames = {}, onGrantControl, controllerId }: HUDProps) {
     const textColor = isLightMode ? 'text-gray-800' : 'text-gray-200';
     const bgColor = isLightMode ? 'bg-white/80' : 'bg-black/80';
     const borderColor = isLightMode ? 'border-gray-200' : 'border-neutral-800';
@@ -63,6 +66,11 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
 
     // Position at bottom center to avoid interfering with any viewports
 
+    const [isRosterOpen, setIsRosterOpen] = useState(false);
+
+    // Close roster when clicking outside (simple check)
+    // For now, toggle-based is fine.
+
     if (!effectiveResidue && (!structTitle || isEmbedMode)) return null;
 
     return (
@@ -71,6 +79,65 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
             {/* Live Session Indicator */}
             {peerSession?.isConnected && (
                 <div className="relative pointer-events-auto flex flex-col items-center animate-in slide-in-from-bottom-2">
+
+                    {/* Roster Popover (Host Only) */}
+                    {isHost && isRosterOpen && (
+                        <div className="absolute bottom-full mb-4 bg-black/90 text-white rounded-xl backdrop-blur-md border border-neutral-700 p-2 min-w-[200px] flex flex-col gap-1 shadow-2xl animate-in slide-in-from-bottom-2 fade-in">
+                            <div className="px-2 py-1 text-[10px] uppercase font-bold text-neutral-400 border-b border-white/10 mb-1 flex justify-between items-center">
+                                <span>Classroom ({peerSession.connections.length})</span>
+                                <button onClick={() => setIsRosterOpen(false)} className="hover:text-white">×</button>
+                            </div>
+
+                            {/* Host (Me) */}
+                            <div className={`px-2 py-1.5 rounded flex items-center justify-between transition-colors ${!controllerId ? 'bg-green-500/20 text-green-300' : 'hover:bg-white/10'}`}>
+                                <div className="flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-current" />
+                                    <span className="text-xs font-medium">You (Host)</span>
+                                </div>
+                                {controllerId && (
+                                    <button
+                                        onClick={() => onGrantControl?.(null)}
+                                        className="text-[10px] bg-white/10 hover:bg-white/20 px-1.5 py-0.5 rounded ml-2"
+                                    >
+                                        Take Back
+                                    </button>
+                                )}
+                            </div>
+
+                            {/* Students */}
+                            {peerSession.connections.map(conn => {
+                                const isController = controllerId === conn.peer;
+                                const name = peerNames[conn.peer] || 'Student';
+
+                                return (
+                                    <div key={conn.peer} className={`px-2 py-1.5 rounded flex items-center justify-between transition-colors ${isController ? 'bg-indigo-500/20 text-indigo-300' : 'hover:bg-white/10'}`}>
+                                        <div className="flex items-center gap-2">
+                                            <div className={`w-1.5 h-1.5 rounded-full ${isController ? 'bg-indigo-400' : 'bg-neutral-600'}`} />
+                                            <span className="text-xs font-medium truncate max-w-[100px]">{name}</span>
+                                        </div>
+                                        {isController ? (
+                                            <span className="text-[10px] font-bold opacity-50">CONTROL</span>
+                                        ) : (
+                                            <button
+                                                onClick={() => onGrantControl?.(conn.peer)}
+                                                className="text-[10px] bg-indigo-500/20 hover:bg-indigo-500/40 text-indigo-300 px-2 py-0.5 rounded ml-2"
+                                            >
+                                                Grant
+                                            </button>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    {/* Controller Status Indicator (for Guests) */}
+                    {!isHost && controllerId && (
+                        <div className="absolute bottom-full mb-2 bg-indigo-500/90 text-white text-[10px] font-bold px-2 py-1 rounded-full backdrop-blur-md shadow-lg animate-pulse">
+                            Controlled by {controllerId === peerSession.peerId ? 'You' : (peerNames[controllerId] || 'Assistant')}
+                        </div>
+                    )}
+
                     {/* Ghost Hover (Peer's Pointer) - Absolute formatted with opacity transition */}
                     {/* Ghost Hover (Peer's Pointer) - Absolute formatted with opacity transition */}
                     <div className={`absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap backdrop-blur-md rounded-full border ${borderColor} bg-indigo-500/90 text-white shadow-lg px-2 py-1 flex items-center justify-between gap-2 min-w-[140px] transition-all duration-300 ${effectiveRemoteResidue ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'}`}>
@@ -84,10 +151,16 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
 
                     {/* Connection Status & Follow Toggle */}
                     <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-3 py-1 flex items-center gap-2`}>
-                        <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
-                        <span className={`text-[10px] font-bold tracking-wider ${textColor}`}>
-                            LIVE • {peerSession.connections.length} PEER{peerSession.connections.length !== 1 ? 'S' : ''}
-                        </span>
+                        {/* Host can click to open roster */}
+                        <button
+                            onClick={isHost ? () => setIsRosterOpen(!isRosterOpen) : undefined}
+                            className={`flex items-center gap-2 ${isHost ? 'cursor-pointer hover:opacity-80' : ''}`}
+                        >
+                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                            <span className={`text-[10px] font-bold tracking-wider ${textColor}`}>
+                                LIVE • {peerSession.connections.length} PEER{peerSession.connections.length !== 1 ? 'S' : ''}
+                            </span>
+                        </button>
 
                         {/* Follow Mode Toggle (Guest Only) */}
                         {!isHost && onToggleCameraSync && (

@@ -98,12 +98,21 @@ function App() {
     }
   }, [peerSession.isConnected, userName]);
 
-  // Broadcast name when changed or reconnected
   useEffect(() => {
     if (userName && peerSession.isConnected) {
       peerSession.broadcastName(userName);
     }
   }, [userName, peerSession.isConnected]);
+
+  // Feature: Pass the Chalk (Control Transfer)
+  const [controllerId, setControllerId] = useState<string | null>(null);
+
+  // Sync Controller ID
+  useEffect(() => {
+    if (peerSession.lastReceivedState?.controllerId !== undefined) {
+      setControllerId(peerSession.lastReceivedState.controllerId);
+    }
+  }, [peerSession.lastReceivedState]);
 
   // One-Click Join (Mount Logic)
   useEffect(() => {
@@ -168,11 +177,15 @@ function App() {
       if (s.measurements !== undefined) ctrl.setMeasurements(s.measurements);
       if (s.customBackgroundColor !== undefined) ctrl.setCustomBackgroundColor(s.customBackgroundColor);
       if (s.hoveredResidue !== undefined) setRemoteHoveredResidue(s.hoveredResidue);
+      if (s.annotations !== undefined) setAnnotations(s.annotations);
     }
   }, [peerSession.lastReceivedState]);
 
   // State: Hovered Residue
   const [hoveredResidue, setHoveredResidue] = useState<ResidueInfo | null>(null);
+
+  // Feature: 3D Annotations
+  const [annotations, setAnnotations] = useState<any[]>([]);
 
   // Connection Feedback (Toasts)
   useEffect(() => {
@@ -201,6 +214,17 @@ function App() {
       // I only broadcast if I have DEVIATED from the Host (User interaction).
       if (!peerSession.isHost && peerSession.lastReceivedState) {
         const received = peerSession.lastReceivedState;
+
+        // Pass the Chalk: If I am NOT the controller, I should NOT broadcast state changes (unless I am Host)
+        const myPeerId = peerSession.peerId;
+        const activeControllerId = controllerId; // From state
+
+        // If there is an active controller spread, and it's NOT me, stay silent.
+        // Host always allows relay, but Guests only if they are the controller.
+        if (activeControllerId && activeControllerId !== myPeerId) {
+          return;
+        }
+
         const matchesReceived =
           (received.pdbId === undefined || received.pdbId === ctrl.pdbId) &&
           (received.representation === undefined || received.representation === ctrl.representation) &&
@@ -225,7 +249,9 @@ function App() {
         highlightedResidue: ctrl.highlightedResidue,
         customColors: ctrl.customColors,
         measurements: ctrl.measurements,
-        hoveredResidue: hoveredResidue
+        hoveredResidue: hoveredResidue,
+        controllerId: controllerId, // Keep syncing the controller ID
+        annotations: annotations
       });
     }
   }, [
@@ -239,6 +265,8 @@ function App() {
     controllers[0].measurements,
     controllers[0].customBackgroundColor,
     hoveredResidue,
+    controllerId,
+    annotations,
     peerSession.isConnected,
     peerSession.connections // Broadcast when new peers join
   ]);
@@ -1916,6 +1944,9 @@ function App() {
             isHost={peerSession.isHost}
             // Nametags
             remoteUserName={peerSession.lastReceivedName}
+            peerNames={peerSession.peerNames}
+            onGrantControl={peerSession.grantControl}
+            controllerId={controllerId}
           />
 
           <IdentityModal
@@ -2217,8 +2248,8 @@ function App() {
                             fileType={ctrl.fileType}
                             isLightMode={isLightMode}
                             isSpinning={viewMode === 'single' ? controllers[0].isSpinning : false} // Only spin in single view for now
-                            // Interactive if: Not connected OR Is Host OR Not Synced
-                            isInteractive={!peerSession.isConnected || peerSession.isHost || !isCameraSynced}
+                            // Interactive if: Not connected OR Is Host OR Not Synced OR Is Active Controller
+                            isInteractive={!peerSession.isConnected || peerSession.isHost || !isCameraSynced || (!!controllerId && controllerId === peerSession.peerId)}
                             representation={ctrl.representation}
                             showSurface={ctrl.showSurface}
                             showLigands={ctrl.showLigands}
@@ -2232,7 +2263,11 @@ function App() {
 
                             initialOrientation={index === 0 ? embedOrientation : undefined}
                             // Live Session: Broadcast camera changes if active view and connected
-                            onCameraChange={index === 0 && peerSession.isConnected ? peerSession.broadcastCamera : undefined}
+                            onCameraChange={index === 0 && peerSession.isConnected ? (orient) => {
+                              // Pass the Chalk: Only broadcast if I am allowed
+                              if (controllerId && controllerId !== peerSession.peerId) return;
+                              peerSession.broadcastCamera(orient);
+                            } : undefined}
 
 
                             onStructureLoaded={(info) => handleLoad(info, ctrl)}

@@ -13,6 +13,8 @@ export interface SessionState {
     isSpinning?: boolean;
     highlightedResidue?: any;
     hoveredResidue?: any;
+    controllerId?: string | null; // ID of the peer who has control (defaults to Host if null)
+    annotations?: any[]; // Array of Annotation objects
 }
 
 export interface PeerSession {
@@ -24,9 +26,11 @@ export interface PeerSession {
     broadcastState: (state: Partial<SessionState>) => void;
     broadcastCamera: (orientation: any[]) => void;
     broadcastName: (name: string) => void;
+    grantControl: (targetPeerId: string | null) => void; // Host only
     lastReceivedState: Partial<SessionState> | null;
     lastReceivedCamera: any[] | null;
     lastReceivedName: string | null;
+    peerNames: Record<string, string>; // Map of Peer ID -> Name
     error: string | null;
 }
 
@@ -39,6 +43,7 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
     const [lastReceivedState, setLastReceivedState] = useState<Partial<SessionState> | null>(null);
     const [lastReceivedCamera, setLastReceivedCamera] = useState<any[] | null>(null);
     const [lastReceivedName, setLastReceivedName] = useState<string | null>(null);
+    const [peerNames, setPeerNames] = useState<Record<string, string>>({});
 
     const peerRef = useRef<Peer | null>(null);
     const connectionsRef = useRef<DataConnection[]>([]);
@@ -94,13 +99,18 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
         });
     };
 
-    const handleData = (data: any, _sender: DataConnection) => {
+    const handleData = (data: any, sender: DataConnection) => {
         if (data.type === 'SYNC_STATE') {
             setLastReceivedState(data.payload);
         } else if (data.type === 'SYNC_CAMERA') {
             setLastReceivedCamera(data.payload);
         } else if (data.type === 'SYNC_NAME') {
             setLastReceivedName(data.payload);
+            // Update name map
+            setPeerNames(prev => ({
+                ...prev,
+                [sender.peer]: data.payload
+            }));
         }
     };
 
@@ -141,6 +151,15 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
         });
     }, []);
 
+    const grantControl = useCallback((targetPeerId: string | null) => {
+        // Only Host controls this
+        if (!isHost) return;
+
+        // Broadcast the new controller ID to everyone
+        // If targetPeerId is null, it means Host is taking back control
+        broadcastState({ controllerId: targetPeerId });
+    }, [isHost, broadcastState]);
+
     return {
         peerId,
         isConnected: connections.length > 0,
@@ -150,9 +169,11 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
         broadcastState,
         broadcastCamera,
         broadcastName,
+        grantControl,
         lastReceivedState,
         lastReceivedCamera,
         lastReceivedName,
+        peerNames,
         error
     };
 };

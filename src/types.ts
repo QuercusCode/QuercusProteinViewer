@@ -129,3 +129,11 @@ export interface Measurement {
     atom1: ResidueInfo;
     atom2: ResidueInfo;
 }
+
+export interface Annotation {
+    id: string; // UUID
+    residue: ResidueInfo;
+    text: string;
+    position: { x: number, y: number, z: number }; // 3D coordinates
+    author?: string; // Optional author name
+}

@@ -12,7 +12,8 @@ import type {
     MeasurementTextColor,
     AtomInfo,
     CustomColorRule,
-    SuperposedStructure
+    SuperposedStructure,
+    Annotation
 } from '../types';
 import { type DataSource, getStructureUrl } from '../utils/pdbUtils';
 
@@ -84,7 +85,15 @@ export interface ProteinViewerProps {
     onCameraChange?: (orientation: any) => void;
 
     // Interaction
+    // Interaction
     isInteractive?: boolean;
+
+    // Annotations
+    annotations?: Annotation[];
+    onAddAnnotation?: (annotation: Annotation) => void;
+
+    // Remote Interaction
+    remoteHoveredResidue?: ResidueInfo | null;
 }
 
 export interface ProteinViewerRef {
@@ -150,7 +159,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     initialOrientation,
     disableScroll = false,
     onCameraChange,
-    isInteractive = true
+    isInteractive = true,
+    annotations,
+    onAddAnnotation,
+    remoteHoveredResidue
 }: ProteinViewerProps, ref: React.Ref<ProteinViewerRef>) => {
 
     const containerRef = useRef<HTMLDivElement>(null);
@@ -1836,6 +1848,63 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
 
 
+    // Laser Pointer Logic (Ghost Hover Visuals)
+    const laserPointerCompRef = useRef<any>(null);
+    const trailHistoryRef = useRef<{ x: number, y: number, z: number }[]>([]);
+
+    useEffect(() => {
+        if (!componentRef.current || !stageRef.current) return;
+        const stage = stageRef.current;
+        const component = componentRef.current;
+
+        // Remove old pointer
+        if (laserPointerCompRef.current) {
+            stage.removeComponent(laserPointerCompRef.current);
+            laserPointerCompRef.current = null;
+        }
+
+        if (!remoteHoveredResidue) {
+            trailHistoryRef.current = []; // Clear trail on disconnect
+            return;
+        }
+
+        // Find Position
+        const { chain, resNo } = remoteHoveredResidue;
+        let pos: { x: number, y: number, z: number } | null = null;
+
+        // Helper inline search
+        component.structure.eachResidue((res: any) => {
+            if (res.chain.name === chain && res.resno === resNo) {
+                const atom = res.getAtomByName('CA') || res.getAtomByIndex(0);
+                if (atom) pos = { x: atom.x, y: atom.y, z: atom.z };
+            }
+        });
+
+        if (pos) {
+            // Update Trail
+            trailHistoryRef.current.push(pos as { x: number, y: number, z: number });
+            if (trailHistoryRef.current.length > 8) trailHistoryRef.current.shift();
+
+            // Render Shape
+            const shape = new window.NGL.Shape("laser-pointer");
+
+            // Main Dot (Red/Pink Glowing)
+            shape.addSphere([pos.x, pos.y, pos.z], [1, 0, 0.5], 1.5);
+
+            // Trail (Fading)
+            trailHistoryRef.current.forEach((tPos: { x: number, y: number, z: number }, i: number) => {
+                const alpha = (i / trailHistoryRef.current.length);
+                const size = 0.5 + (alpha * 0.8);
+                shape.addSphere([tPos.x, tPos.y, tPos.z], [1, 1 - alpha, 0.5 + (alpha * 0.5)], size);
+            });
+
+            const shapeComp = stage.addComponentFromObject(shape);
+            shapeComp.addRepresentation("buffer", { opacity: 0.8 });
+            laserPointerCompRef.current = shapeComp;
+        }
+
+    }, [remoteHoveredResidue]);
+
     // --- MEASUREMENT RENDERING ---
     useEffect(() => {
         if (!stageRef.current) return;
@@ -2251,28 +2320,18 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         <div className={clsx("relative w-full h-full", className)} style={backgroundColor === 'transparent' ? { background: 'transparent' } : {}}>
             <div ref={containerRef} className="w-full h-full" style={backgroundColor === 'transparent' ? { background: 'transparent' } : {}} />
             {loading && (
-                <div className="absolute inset-0 bg-neutral-900 z-50 flex flex-col items-center justify-center">
-                    <div className="relative w-24 h-24 mb-6">
-                        <Skeleton variant="circular" className="absolute inset-0 border-4 border-neutral-800 bg-transparent animate-[spin_3s_linear_infinite]" />
-                        <Skeleton variant="circular" className="absolute inset-4 border-4 border-neutral-700 bg-transparent animate-[spin_2s_linear_infinite_reverse]" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <Skeleton variant="circular" className="w-4 h-4 bg-blue-500/50" />
-                        </div>
-                    </div>
-                    <div className="space-y-2 text-center">
-                        <Skeleton variant="text" className="w-32 h-4 mx-auto bg-neutral-800" />
-                        <Skeleton variant="text" className="w-24 h-3 mx-auto bg-neutral-800/50" />
-                    </div>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-10 transition-all duration-300">
+                    <Skeleton className="w-32 h-32 rounded-full opacity-50" />
                 </div>
             )}
             {error && (
-                <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                    <div className="bg-red-900/80 text-white px-4 py-2 rounded-lg border border-red-500 backdrop-blur-sm shadow-xl">
-                        {error}
+                <div className="absolute inset-0 flex items-center justify-center bg-black/80 backdrop-blur-md z-20 p-8">
+                    <div className="bg-red-500/10 border border-red-500/50 p-6 rounded-2xl max-w-md text-center">
+                        <h3 className="text-xl font-bold text-red-500 mb-2">Error Loading Structure</h3>
+                        <p className="text-red-200">{error}</p>
                     </div>
                 </div>
             )}
-
         </div>
     );
 });
