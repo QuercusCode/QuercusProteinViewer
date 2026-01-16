@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { ResidueInfo, PDBMetadata } from '../types';
 import type { PeerSession } from '../hooks/usePeerSession';
+import { Lock, Unlock } from 'lucide-react';
 
 interface HUDProps {
     hoveredResidue: ResidueInfo | null;
@@ -66,11 +67,12 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
                                 <div className={`h-3 w-px ${isLightMode ? 'bg-black/10' : 'bg-white/20'}`} />
                                 <button
                                     onClick={onToggleCameraSync}
-                                    className={`text-[10px] font-bold px-1.5 py-0.5 rounded transition-colors ${isCameraSynced
+                                    className={`text-[10px] font-bold px-1.5 py-0.5 rounded transition-colors flex items-center gap-1 ${isCameraSynced
                                         ? (isLightMode ? 'text-indigo-600 bg-indigo-50 hover:bg-indigo-100' : 'text-indigo-300 bg-indigo-900/30 hover:bg-indigo-900/50')
-                                        : (isLightMode ? 'text-neutral-400 hover:text-neutral-600' : 'text-neutral-500 hover:text-neutral-300')
+                                        : (isLightMode ? 'text-neutral-500 hover:text-neutral-700 bg-neutral-100 hover:bg-neutral-200' : 'text-neutral-400 hover:text-neutral-200 bg-neutral-800 hover:bg-neutral-700')
                                         }`}
                                 >
+                                    {isCameraSynced ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
                                     {isCameraSynced ? 'FOLLOWING' : 'UNSYNCED'}
                                 </button>
                             </>
