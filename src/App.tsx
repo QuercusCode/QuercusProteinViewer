@@ -1952,13 +1952,12 @@ function App() {
             isEmbedMode={isEmbedMode}
             peerSession={peerSession}
             remoteHoveredResidue={remoteHoveredResidue}
-            isCameraSynced={isCameraSynced}
-            onToggleCameraSync={() => setIsCameraSynced(!isCameraSynced)}
+
             isHost={peerSession.isHost}
             // Nametags
             remoteUserName={peerSession.lastReceivedName}
             peerNames={peerSession.peerNames}
-            onGrantControl={peerSession.grantControl}
+
             controllerId={controllerId}
           />
 
