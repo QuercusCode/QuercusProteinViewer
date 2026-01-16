@@ -118,7 +118,7 @@ function App() {
       // We diligently sync Viewport 0
       const ctrl = controllers[0];
 
-      if (s.pdbId && s.pdbId !== ctrl.pdbId) {
+      if (s.pdbId !== undefined && s.pdbId !== ctrl.pdbId) {
         // HOST AUTHORITY: If I am the Host, I am the source of truth for the PDB ID.
         // I should NEVER accept a PDB ID change from a Guest (which might be an echo).
         if (!peerSession.isHost) {
@@ -131,7 +131,7 @@ function App() {
       // For more complex objects, we might need deep comparison or just set it
       if (s.highlightedResidue !== undefined) ctrl.setHighlightedResidue(s.highlightedResidue);
     }
-  }, [peerSession.lastReceivedState]);
+  }, [peerSession.lastReceivedState, controllers, peerSession.isHost]);
 
   // Sync Incoming Camera
   useEffect(() => {
