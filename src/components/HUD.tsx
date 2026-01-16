@@ -14,9 +14,10 @@ interface HUDProps {
     isCameraSynced?: boolean;
     onToggleCameraSync?: () => void;
     isHost?: boolean;
+    remoteUserName?: string | null;
 }
 
-export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMode = false, peerSession, remoteHoveredResidue, isCameraSynced, onToggleCameraSync, isHost }: HUDProps) {
+export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMode = false, peerSession, remoteHoveredResidue, isCameraSynced, onToggleCameraSync, isHost, remoteUserName }: HUDProps) {
     const textColor = isLightMode ? 'text-gray-800' : 'text-gray-200';
     const bgColor = isLightMode ? 'bg-white/80' : 'bg-black/80';
     const borderColor = isLightMode ? 'border-gray-200' : 'border-neutral-800';
@@ -47,7 +48,9 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
                     {/* Ghost Hover (Host's Pointer) */}
                     {remoteHoveredResidue && !isHost && (
                         <div className={`backdrop-blur-md rounded-full border ${borderColor} bg-indigo-500/90 text-white shadow-lg px-3 py-1 flex items-center gap-2 mb-1`}>
-                            <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">Host:</span>
+                            <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">
+                                {remoteUserName || 'HOST'}:
+                            </span>
                             <span className="text-xs font-mono font-bold">
                                 {remoteHoveredResidue.resName} {remoteHoveredResidue.resNo}
                             </span>

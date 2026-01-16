@@ -15,6 +15,7 @@ import { CommandPalette, type CommandAction } from './components/CommandPalette'
 import { HUD } from './components/HUD';
 import { MeasurementPanel } from './components/MeasurementPanel';
 import { SuperpositionModal } from './components/SuperpositionModal';
+import { IdentityModal } from './components/IdentityModal';
 import { OFFLINE_LIBRARY } from './data/library';
 import { fetchPubChemMetadata } from './utils/pdbUtils';
 import type {
@@ -85,6 +86,24 @@ function App() {
   // Peer Session UX State
   const [isCameraSynced, setIsCameraSynced] = useState(true);
   const [remoteHoveredResidue, setRemoteHoveredResidue] = useState<ResidueInfo | null>(null);
+
+  // Feature: Nametags
+  const [userName, setUserName] = useState<string | null>(null);
+  const [isIdentityModalOpen, setIsIdentityModalOpen] = useState(false);
+
+  // Prompt for name when connecting (if not set)
+  useEffect(() => {
+    if (peerSession.isConnected && !userName && !isIdentityModalOpen) {
+      setIsIdentityModalOpen(true);
+    }
+  }, [peerSession.isConnected, userName]);
+
+  // Broadcast name when changed or reconnected
+  useEffect(() => {
+    if (userName && peerSession.isConnected) {
+      peerSession.broadcastName(userName);
+    }
+  }, [userName, peerSession.isConnected]);
 
   // One-Click Join (Mount Logic)
   useEffect(() => {
@@ -1895,6 +1914,19 @@ function App() {
             isCameraSynced={isCameraSynced}
             onToggleCameraSync={() => setIsCameraSynced(!isCameraSynced)}
             isHost={peerSession.isHost}
+            // Nametags
+            remoteUserName={peerSession.lastReceivedName}
+          />
+
+          <IdentityModal
+            isOpen={isIdentityModalOpen}
+            onConfirm={(name) => {
+              setUserName(name);
+              setIsIdentityModalOpen(false);
+              success(`Welcome, ${name}!`);
+            }}
+            currentName={userName || ''}
+            isLightMode={isLightMode}
           />
 
           {isMeasurementPanelOpen && (

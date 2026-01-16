@@ -23,8 +23,10 @@ export interface PeerSession {
     connectToPeer: (remotePeerId: string) => void;
     broadcastState: (state: Partial<SessionState>) => void;
     broadcastCamera: (orientation: any[]) => void;
+    broadcastName: (name: string) => void;
     lastReceivedState: Partial<SessionState> | null;
     lastReceivedCamera: any[] | null;
+    lastReceivedName: string | null;
     error: string | null;
 }
 
@@ -36,6 +38,7 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
 
     const [lastReceivedState, setLastReceivedState] = useState<Partial<SessionState> | null>(null);
     const [lastReceivedCamera, setLastReceivedCamera] = useState<any[] | null>(null);
+    const [lastReceivedName, setLastReceivedName] = useState<string | null>(null);
 
     const peerRef = useRef<Peer | null>(null);
     const connectionsRef = useRef<DataConnection[]>([]);
@@ -96,6 +99,8 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
             setLastReceivedState(data.payload);
         } else if (data.type === 'SYNC_CAMERA') {
             setLastReceivedCamera(data.payload);
+        } else if (data.type === 'SYNC_NAME') {
+            setLastReceivedName(data.payload);
         }
     };
 
@@ -128,6 +133,14 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
         }
     }, []);
 
+    const broadcastName = useCallback((name: string) => {
+        connectionsRef.current.forEach(conn => {
+            if (conn.open) {
+                conn.send({ type: 'SYNC_NAME', payload: name });
+            }
+        });
+    }, []);
+
     return {
         peerId,
         isConnected: connections.length > 0,
@@ -136,8 +149,10 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
         connectToPeer,
         broadcastState,
         broadcastCamera,
+        broadcastName,
         lastReceivedState,
         lastReceivedCamera,
+        lastReceivedName,
         error
     };
 };
