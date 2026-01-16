@@ -83,47 +83,42 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
             )}
 
             {/* Minimal Capsule */}
-            <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-4 md:px-6 py-2 flex items-center justify-center min-w-[240px] transition-all duration-500 ease-out`}>
-
-                {hoveredResidue ? (
-                    <div className="flex items-center gap-3 animate-in fade-in zoom-in-95 duration-300">
-                        {/* Logic: 
-                            - Standard Residues (Protein/DNA): Show ResName + ResNo + Chain.
-                            - Chemicals/Ligands: Show ONLY Atom details (Name + Serial). Hide ResName + Chain.
-                        */}
-
-                        {STANDARD_RESIDUES.has(hoveredResidue.resName.toUpperCase()) ? (
-                            // PROTEIN / NUCLEIC ACID VIEW
+            <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-4 md:px-6 py-2 flex items-center justify-center min-w-[240px] transition-all duration-300 ease-out overflow-hidden`}>
+                <div className="relative flex items-center justify-center">
+                    {/* Residue Info View - Fades In/Out */}
+                    <div className={`flex items-center gap-3 transition-opacity duration-300 ${hoveredResidue ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden absolute'}`}>
+                        {hoveredResidue && (
                             <>
-                                <span className={`font-semibold ${textColor}`}>
-                                    {hoveredResidue.resName} <span className="opacity-90">{hoveredResidue.resNo}</span>
-                                </span>
-                                <div className={`h-3 w-px ${isLightMode ? 'bg-black/10' : 'bg-white/20'}`} />
-                                <span className={`text-xs uppercase tracking-wide opacity-80 ${textColor}`}>
-                                    Chain {hoveredResidue.chain}
-                                </span>
+                                {STANDARD_RESIDUES.has(hoveredResidue.resName.toUpperCase()) ? (
+                                    <>
+                                        <span className={`font-semibold ${textColor} whitespace-nowrap`}>
+                                            {hoveredResidue.resName} <span className="opacity-90">{hoveredResidue.resNo}</span>
+                                        </span>
+                                        <div className={`h-3 w-px ${isLightMode ? 'bg-black/10' : 'bg-white/20'}`} />
+                                        <span className={`text-xs uppercase tracking-wide opacity-80 ${textColor} whitespace-nowrap`}>
+                                            Chain {hoveredResidue.chain}
+                                        </span>
+                                    </>
+                                ) : (
+                                    (hoveredResidue.atomName) ? (
+                                        <span className={`font-mono font-semibold ${textColor} whitespace-nowrap`}>
+                                            {hoveredResidue.atomName} <span className="text-xs opacity-80">#{hoveredResidue.atomSerial}</span>
+                                        </span>
+                                    ) : (
+                                        <span className={`font-semibold ${textColor} whitespace-nowrap`}>
+                                            {hoveredResidue.resName}
+                                        </span>
+                                    )
+                                )}
                             </>
-                        ) : (
-                            // CHEMICAL / LIGAND VIEW
-                            // Show only atom info relative to the chemical
-                            (hoveredResidue.atomName) ? (
-                                <span className={`font-mono font-semibold ${textColor}`}>
-                                    {hoveredResidue.atomName} <span className="text-xs opacity-80">#{hoveredResidue.atomSerial}</span>
-                                </span>
-                            ) : (
-                                // Fallback if no atom info (unlikely for NGL hover)
-                                <span className={`font-semibold ${textColor}`}>
-                                    {hoveredResidue.resName}
-                                </span>
-                            )
                         )}
                     </div>
-                ) : (
-                    <div className={`text-xs font-medium tracking-wider ${textColor} uppercase text-center truncate max-w-[200px] animate-in fade-in zoom-in-95 duration-300`}>
+
+                    {/* Idle Title View - Fades In/Out */}
+                    <div className={`text-xs font-medium tracking-wider ${textColor} uppercase text-center truncate max-w-[240px] transition-opacity duration-300 ${!hoveredResidue ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden absolute'}`}>
                         {structTitle}
                     </div>
-                )}
-
+                </div>
             </div>
         </div>
     );
