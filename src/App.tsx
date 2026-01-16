@@ -100,8 +100,11 @@ function App() {
   const [isSnapshotModalOpen, setIsSnapshotModalOpen] = useState(false);
 
   // Sync Incoming State
+  const isRemoteUpdate = useRef(false);
+
   useEffect(() => {
     if (peerSession.lastReceivedState) {
+      isRemoteUpdate.current = true;
       const s = peerSession.lastReceivedState;
       // We diligently sync Viewport 0
       const ctrl = controllers[0];
@@ -125,6 +128,18 @@ function App() {
 
   // Broadcast Outgoing State
   useEffect(() => {
+    // Echo Cancellation:
+    // If I am NOT the host (Guest), I should NOT broadcast updates that came from the Host.
+    // This breaks the infinite echo loop (Host -> Guest -> Host).
+    // If I AM the host, I must relay (Host -> Guest1 -> Host -> Guest2), so I continue to broadcast.
+    if (!peerSession.isHost && isRemoteUpdate.current) {
+      isRemoteUpdate.current = false;
+      return;
+    }
+
+    // Reset flag for next turn
+    isRemoteUpdate.current = false;
+
     if (peerSession.isConnected) {
       const ctrl = controllers[0];
       peerSession.broadcastState({
