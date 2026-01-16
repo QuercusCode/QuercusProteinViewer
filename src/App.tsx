@@ -84,7 +84,7 @@ function App() {
   const peerSession = usePeerSession();
 
   // Peer Session UX State
-  const [isCameraSynced, setIsCameraSynced] = useState(true);
+  const [isCameraSynced] = useState(true);
   const [remoteHoveredResidue, setRemoteHoveredResidue] = useState<ResidueInfo | null>(null);
 
   // Feature: Nametags
