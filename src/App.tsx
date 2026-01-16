@@ -118,7 +118,13 @@ function App() {
       // We diligently sync Viewport 0
       const ctrl = controllers[0];
 
-      if (s.pdbId && s.pdbId !== ctrl.pdbId) ctrl.setPdbId(s.pdbId);
+      if (s.pdbId && s.pdbId !== ctrl.pdbId) {
+        // HOST AUTHORITY: If I am the Host, I am the source of truth for the PDB ID.
+        // I should NEVER accept a PDB ID change from a Guest (which might be an echo).
+        if (!peerSession.isHost) {
+          ctrl.setPdbId(s.pdbId);
+        }
+      }
       if (s.representation && s.representation !== ctrl.representation) ctrl.setRepresentation(s.representation as RepresentationType);
       if (s.coloring && s.coloring !== ctrl.coloring) ctrl.setColoring(s.coloring as ColoringType);
       if (s.isSpinning !== undefined && s.isSpinning !== ctrl.isSpinning) ctrl.setIsSpinning(s.isSpinning);
