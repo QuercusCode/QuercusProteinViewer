@@ -44,12 +44,12 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
 
             {/* Live Session Indicator */}
             {peerSession?.isConnected && (
-                <div className="flex flex-col items-center gap-1.5 animate-in slide-in-from-bottom-2 pointer-events-auto">
-                    {/* Ghost Hover (Host's Pointer) */}
-                    {remoteHoveredResidue && !isHost && (
-                        <div className={`backdrop-blur-md rounded-full border ${borderColor} bg-indigo-500/90 text-white shadow-lg px-3 py-1 flex items-center gap-2 mb-1`}>
+                <div className="relative pointer-events-auto flex flex-col items-center animate-in slide-in-from-bottom-2">
+                    {/* Ghost Hover (Peer's Pointer) - Absolute formatted to avoid layout shift */}
+                    {remoteHoveredResidue && (
+                        <div className={`absolute bottom-full mb-2 left-1/2 -translate-x-1/2 whitespace-nowrap backdrop-blur-md rounded-full border ${borderColor} bg-indigo-500/90 text-white shadow-lg px-3 py-1 flex items-center gap-2 transition-all duration-200`}>
                             <span className="text-[10px] font-bold uppercase tracking-wider opacity-80">
-                                {remoteUserName || 'HOST'}:
+                                {remoteUserName || (isHost ? 'GUEST' : 'HOST')}:
                             </span>
                             <span className="text-xs font-mono font-bold">
                                 {remoteHoveredResidue.resName} {remoteHoveredResidue.resNo}
@@ -85,7 +85,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
             )}
 
             {/* Minimal Capsule */}
-            <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-3 md:px-4 py-1 md:py-1.5 flex items-center justify-center min-w-[100px] md:min-w-[120px]`}>
+            <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-4 md:px-6 py-2 flex items-center justify-center min-w-[200px] transition-all duration-200`}>
 
                 {hoveredResidue ? (
                     <div className="flex items-center gap-3 animate-in fade-in duration-200">
@@ -121,7 +121,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
                         )}
                     </div>
                 ) : (
-                    <div className={`text-xs font-medium tracking-wider ${textColor} uppercase`}>
+                    <div className={`text-xs font-medium tracking-wider ${textColor} uppercase text-center truncate max-w-[200px]`}>
                         {structTitle}
                     </div>
                 )}
