@@ -118,20 +118,15 @@ function App() {
       // We diligently sync Viewport 0
       const ctrl = controllers[0];
 
-      if (s.pdbId !== undefined && s.pdbId !== ctrl.pdbId) {
-        // HOST AUTHORITY: If I am the Host, I am the source of truth for the PDB ID.
-        // I should NEVER accept a PDB ID change from a Guest (which might be an echo).
-        if (!peerSession.isHost) {
-          ctrl.setPdbId(s.pdbId);
-        }
-      }
+      if (s.pdbId && s.pdbId !== ctrl.pdbId) ctrl.setPdbId(s.pdbId);
       if (s.representation && s.representation !== ctrl.representation) ctrl.setRepresentation(s.representation as RepresentationType);
       if (s.coloring && s.coloring !== ctrl.coloring) ctrl.setColoring(s.coloring as ColoringType);
       if (s.isSpinning !== undefined && s.isSpinning !== ctrl.isSpinning) ctrl.setIsSpinning(s.isSpinning);
       // For more complex objects, we might need deep comparison or just set it
       if (s.highlightedResidue !== undefined) ctrl.setHighlightedResidue(s.highlightedResidue);
+      if (s.customColors !== undefined) ctrl.setCustomColors(s.customColors);
     }
-  }, [peerSession.lastReceivedState, controllers, peerSession.isHost]);
+  }, [peerSession.lastReceivedState]);
 
   // Sync Incoming Camera
   useEffect(() => {
@@ -158,7 +153,8 @@ function App() {
           (received.representation === undefined || received.representation === ctrl.representation) &&
           (received.coloring === undefined || received.coloring === ctrl.coloring) &&
           (received.isSpinning === undefined || received.isSpinning === ctrl.isSpinning) &&
-          (received.highlightedResidue === undefined || deepEqual(received.highlightedResidue, ctrl.highlightedResidue));
+          (received.highlightedResidue === undefined || deepEqual(received.highlightedResidue, ctrl.highlightedResidue)) &&
+          (received.customColors === undefined || deepEqual(received.customColors, ctrl.customColors));
 
         if (matchesReceived) {
           return;
@@ -170,7 +166,8 @@ function App() {
         representation: ctrl.representation,
         coloring: ctrl.coloring,
         isSpinning: ctrl.isSpinning,
-        highlightedResidue: ctrl.highlightedResidue
+        highlightedResidue: ctrl.highlightedResidue,
+        customColors: ctrl.customColors
       });
     }
   }, [
@@ -180,6 +177,7 @@ function App() {
     controllers[0].coloring,
     controllers[0].isSpinning,
     controllers[0].highlightedResidue,
+    controllers[0].customColors,
     peerSession.isConnected
   ]);
   const [isSuperpositionModalOpen, setIsSuperpositionModalOpen] = useState(false); // Contact/Feedback Modal
