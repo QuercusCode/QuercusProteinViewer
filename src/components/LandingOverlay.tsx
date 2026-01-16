@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { ArrowRight, Upload, Play, BookOpen, Dna, Activity } from 'lucide-react';
+import React, { useEffect, useState, useMemo } from 'react';
+import { ArrowRight, Upload, Play, BookOpen, Dna, Activity, Shuffle } from 'lucide-react';
 import clsx from 'clsx';
-import { OFFLINE_LIBRARY } from '../data/library';
+import { FEATURED_MOLECULES } from '../data/featuredMolecules';
 
 interface LandingOverlayProps {
     isVisible: boolean;
@@ -15,6 +15,41 @@ export const LandingOverlay: React.FC<LandingOverlayProps> = ({ isVisible, onDis
     const [shouldRender, setShouldRender] = useState(isVisible);
     const [isFadingOut, setIsFadingOut] = useState(false);
 
+    // Day of year logic for consistent daily rotation
+    const dailyIndex = useMemo(() => {
+        const start = new Date(new Date().getFullYear(), 0, 0);
+        const diff = (new Date().getTime() - start.getTime()) + ((start.getTimezoneOffset() - new Date().getTimezoneOffset()) * 60 * 1000);
+        const oneDay = 1000 * 60 * 60 * 24;
+        const dayOfYear = Math.floor(diff / oneDay);
+        return dayOfYear % FEATURED_MOLECULES.length;
+    }, []);
+
+    const [selectedIndex, setSelectedIndex] = useState(dailyIndex);
+    const [isShuffling, setIsShuffling] = useState(false);
+
+    const moleculeOfTheDay = FEATURED_MOLECULES[selectedIndex];
+
+    const handleShuffle = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setIsShuffling(true);
+        // Animate shuffle
+        let count = 0;
+        const interval = setInterval(() => {
+            setSelectedIndex(prev => (prev + 1) % FEATURED_MOLECULES.length);
+            count++;
+            if (count > 5) {
+                clearInterval(interval);
+                // Pick a new random index that is different from current
+                let newIndex = Math.floor(Math.random() * FEATURED_MOLECULES.length);
+                while (newIndex === selectedIndex && FEATURED_MOLECULES.length > 1) {
+                    newIndex = Math.floor(Math.random() * FEATURED_MOLECULES.length);
+                }
+                setSelectedIndex(newIndex);
+                setIsShuffling(false);
+            }
+        }, 80);
+    };
+
     // Handle Animation Lifecycle
     useEffect(() => {
         if (isVisible) {
@@ -26,9 +61,6 @@ export const LandingOverlay: React.FC<LandingOverlayProps> = ({ isVisible, onDis
             return () => clearTimeout(timer);
         }
     }, [isVisible]);
-
-    // Molecule of the Day Logic (Pseudo-random based on date)
-    const moleculeOfTheDay = OFFLINE_LIBRARY[new Date().getDate() % OFFLINE_LIBRARY.length];
 
     if (!shouldRender) return null;
 
@@ -103,9 +135,21 @@ export const LandingOverlay: React.FC<LandingOverlayProps> = ({ isVisible, onDis
                                 <Activity size={20} className="text-blue-400" />
                                 Molecule of the Day
                             </h3>
-                            <span className="text-xs font-mono text-blue-400 px-2 py-1 rounded bg-blue-500/10 border border-blue-500/20">
-                                {moleculeOfTheDay.id}
-                            </span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs font-mono text-blue-400 px-2 py-1 rounded bg-blue-500/10 border border-blue-500/20">
+                                    {moleculeOfTheDay.id}
+                                </span>
+                                <button
+                                    onClick={handleShuffle}
+                                    className={clsx(
+                                        "p-1.5 rounded-full hover:bg-white/10 text-gray-400 hover:text-white transition-colors",
+                                        isShuffling && "animate-spin text-blue-400"
+                                    )}
+                                    title="Shuffle Molecule"
+                                >
+                                    <Shuffle size={14} />
+                                </button>
+                            </div>
                         </div>
 
                         <div className="h-64 mb-6 rounded-2xl bg-black/50 border border-white/5 flex items-center justify-center relative overflow-hidden group-hover:border-white/20 transition-colors shadow-inner">
@@ -119,12 +163,22 @@ export const LandingOverlay: React.FC<LandingOverlayProps> = ({ isVisible, onDis
                                 }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end p-5">
-                                <p className="text-white text-lg font-bold w-full shadow-black drop-shadow-md leading-tight line-clamp-2">{moleculeOfTheDay.title}</p>
+                                <div>
+                                    <span className="text-xs font-bold uppercase tracking-wider text-blue-400 mb-1 block">
+                                        {moleculeOfTheDay.category}
+                                    </span>
+                                    <p className="text-white text-lg font-bold w-full shadow-black drop-shadow-md leading-tight line-clamp-2">
+                                        {moleculeOfTheDay.title}
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
-                        <p className="text-gray-400 text-sm line-clamp-3 mb-6 leading-relaxed">
+                        <p className="text-gray-300 text-sm mb-2 font-medium">
                             {moleculeOfTheDay.description}
+                        </p>
+                        <p className="text-gray-400 text-xs mb-6 leading-relaxed line-clamp-3">
+                            {moleculeOfTheDay.details}
                         </p>
 
                         <button
