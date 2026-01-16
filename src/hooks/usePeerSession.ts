@@ -33,6 +33,8 @@ export interface PeerSession {
     peerNames: Record<string, string>; // Map of Peer ID -> Name
     error: string | null;
     disconnect: () => void;
+    broadcastReaction: (emoji: string) => void;
+    lastReaction: { emoji: string; senderId: string; timestamp: number } | null;
 }
 
 export const usePeerSession = (initialState?: Partial<SessionState>): PeerSession => {
@@ -44,6 +46,7 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
     const [lastReceivedState, setLastReceivedState] = useState<Partial<SessionState> | null>(null);
     const [lastReceivedCamera, setLastReceivedCamera] = useState<any[] | null>(null);
     const [lastReceivedName, setLastReceivedName] = useState<string | null>(null);
+    const [lastReaction, setLastReaction] = useState<{ emoji: string; senderId: string; timestamp: number } | null>(null);
     const [peerNames, setPeerNames] = useState<Record<string, string>>({});
 
     const peerRef = useRef<Peer | null>(null);
@@ -119,6 +122,12 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
                 ...prev,
                 [sender.peer]: data.payload
             }));
+        } else if (data.type === 'REACTION') {
+            setLastReaction({
+                emoji: data.payload.emoji,
+                senderId: sender.peer,
+                timestamp: Date.now()
+            });
         }
     };
 
@@ -188,6 +197,19 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
         });
     }, []);
 
+    const broadcastReaction = useCallback((emoji: string) => {
+        // Optimistic local update (show my own reaction)
+        if (peerId) {
+            setLastReaction({ emoji, senderId: peerId, timestamp: Date.now() });
+        }
+
+        connectionsRef.current.forEach(conn => {
+            if (conn.open) {
+                conn.send({ type: 'REACTION', payload: { emoji } });
+            }
+        });
+    }, [peerId]);
+
     const grantControl = useCallback((targetPeerId: string | null) => {
         // Only Host controls this
         if (!isHost) return;
@@ -212,6 +234,8 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
         lastReceivedName,
         peerNames,
         error,
-        disconnect
+        disconnect,
+        broadcastReaction,
+        lastReaction
     };
 };

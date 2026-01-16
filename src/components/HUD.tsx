@@ -143,22 +143,37 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
                         <div className="flex items-center gap-2 pr-3 border-r border-gray-500/20">
                             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
                             <span className={`text-[10px] font-bold tracking-wider ${textColor}`}>
-                                LIVE • {peerSession.connections.length + 1} ACTIVE
+                                LIVE • {peerSession.connections.length + 1}
                             </span>
+                        </div>
+
+                        {/* Reaction Buttons */}
+                        <div className="flex items-center gap-1">
+                            {['👍', '❤️', '👏', '🎉'].map(emoji => (
+                                <button
+                                    key={emoji}
+                                    onClick={() => peerSession.broadcastReaction?.(emoji)}
+                                    className={`w-6 h-6 flex items-center justify-center rounded-full text-sm hover:scale-125 transition-transform active:scale-90 ${isLightMode ? 'hover:bg-neutral-100' : 'hover:bg-white/10'}`}
+                                >
+                                    {emoji}
+                                </button>
+                            ))}
                         </div>
 
                         {/* View/Edit Toggle for Guests */}
                         {!isHost && onToggleCameraSync && (
-                            <button
-                                onClick={onToggleCameraSync}
-                                className={`text-[10px] font-bold px-1.5 py-0.5 rounded transition-colors flex items-center gap-1 ${isCameraSynced
-                                    ? (isLightMode ? 'text-indigo-600 bg-indigo-50 hover:bg-indigo-100' : 'text-indigo-300 bg-indigo-900/30 hover:bg-indigo-900/50')
-                                    : (isLightMode ? 'text-neutral-500 hover:text-neutral-700 bg-neutral-100 hover:bg-neutral-200' : 'text-neutral-400 hover:text-neutral-200 bg-neutral-800 hover:bg-neutral-700')
-                                    }`}
-                            >
-                                {isCameraSynced ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
-                                {isCameraSynced ? 'VIEW' : 'EDIT'}
-                            </button>
+                            <div className="pl-3 border-l border-gray-500/20">
+                                <button
+                                    onClick={onToggleCameraSync}
+                                    className={`text-[10px] font-bold px-1.5 py-0.5 rounded transition-colors flex items-center gap-1 ${isCameraSynced
+                                        ? (isLightMode ? 'text-indigo-600 bg-indigo-50 hover:bg-indigo-100' : 'text-indigo-300 bg-indigo-900/30 hover:bg-indigo-900/50')
+                                        : (isLightMode ? 'text-neutral-500 hover:text-neutral-700 bg-neutral-100 hover:bg-neutral-200' : 'text-neutral-400 hover:text-neutral-200 bg-neutral-800 hover:bg-neutral-700')
+                                        }`}
+                                >
+                                    {isCameraSynced ? <Lock className="w-3 h-3" /> : <Unlock className="w-3 h-3" />}
+                                    {isCameraSynced ? 'VIEW' : 'EDIT'}
+                                </button>
+                            </div>
                         )}
                     </div>
                 )}

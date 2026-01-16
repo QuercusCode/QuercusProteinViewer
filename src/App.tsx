@@ -13,6 +13,7 @@ import { SequenceTrack } from './components/SequenceTrack';
 import { DragDropOverlay } from './components/DragDropOverlay';
 import { CommandPalette, type CommandAction } from './components/CommandPalette';
 import { HUD } from './components/HUD';
+import { ReactionOverlay } from './components/ReactionOverlay';
 import { MeasurementPanel } from './components/MeasurementPanel';
 import { SuperpositionModal } from './components/SuperpositionModal';
 import { IdentityModal } from './components/IdentityModal';
@@ -1941,6 +1942,8 @@ function App() {
           </button>
         </div>
       )}
+      {/* HUD & Overlay */}
+      <ReactionOverlay lastReaction={peerSession.lastReaction} />
 
       {!showLanding && (
         <>
