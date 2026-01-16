@@ -19,7 +19,6 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
 
     // Embed Options State
     const [embedSpin, setEmbedSpin] = useState(false);
-    const [embedSpinSpeed, setEmbedSpinSpeed] = useState(0.005); // Default spin speed
     const [embedControls, setEmbedControls] = useState(true);
     const [embedTheme, setEmbedTheme] = useState<'dark' | 'light'>('dark');
     const [embedStatic, setEmbedStatic] = useState(false);
@@ -44,16 +43,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
         { name: 'Pink', value: '#ec4899' }, // pink-500
     ];
 
-    // Post spin speed updates to iframe
-    useEffect(() => {
-        const iframe = document.querySelector('iframe[title="Embed Preview"]') as HTMLIFrameElement;
-        if (iframe && iframe.contentWindow) {
-            iframe.contentWindow.postMessage({
-                type: 'UPDATE_SPIN_SPEED',
-                speed: embedSpinSpeed
-            }, '*');
-        }
-    }, [embedSpinSpeed]);
+
 
     // Orientation Message Handler
     useEffect(() => {
@@ -67,16 +57,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
         return () => window.removeEventListener('message', handleMessage);
     }, []);
 
-    // Post spin speed updates to iframe
-    useEffect(() => {
-        const iframe = document.querySelector('iframe[title="Quercus Viewer"]') as HTMLIFrameElement;
-        if (iframe && iframe.contentWindow) {
-            iframe.contentWindow.postMessage({
-                type: 'UPDATE_SPIN_SPEED',
-                speed: embedSpinSpeed
-            }, '*');
-        }
-    }, [embedSpinSpeed]);
+
 
     const handleSetStartView = () => {
         console.log("ShareModal: handleSetStartView clicked. Sending REQUEST_ORIENTATION");
@@ -135,7 +116,6 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
         let url = shareUrl.replace('?', '?embed=true&');
         if (embedSpin) {
             url += '&spin=true';
-            url += `&speed=${embedSpinSpeed}`;
         }
         if (!embedControls) url += '&ui=false';
         if (embedTheme === 'light') url += '&theme=light';
@@ -337,28 +317,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                                                 {embedSpin && <Check className="w-4 h-4" />}
                                             </button>
 
-                                            {/* Spin Speed Slider - Only show when Spin is enabled */}
-                                            {embedSpin && (
-                                                <div className="px-4 py-3 rounded-lg border space-y-2 animate-in slide-in-from-top-2 fade-in duration-200 bg-neutral-500/5 border-neutral-500/10">
-                                                    <div className="flex justify-between items-center">
-                                                        <span className={`text-xs font-medium ${isLightMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
-                                                            Spin Speed
-                                                        </span>
-                                                        <span className={`text-xs font-medium ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>
-                                                            {Math.round(embedSpinSpeed * 1000)}
-                                                        </span>
-                                                    </div>
-                                                    <input
-                                                        type="range"
-                                                        min="0.001"
-                                                        max="0.05"
-                                                        step="0.001"
-                                                        value={embedSpinSpeed}
-                                                        onChange={(e) => setEmbedSpinSpeed(parseFloat(e.target.value))}
-                                                        className="w-full h-1.5 bg-neutral-200 rounded-lg appearance-none cursor-pointer accent-blue-500 hover:accent-blue-400"
-                                                    />
-                                                </div>
-                                            )}
+
 
                                             <button
                                                 onClick={() => setEmbedScrollProtection(!embedScrollProtection)}

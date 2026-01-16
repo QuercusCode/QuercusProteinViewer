@@ -301,13 +301,6 @@ function App() {
       // Auto-Spin
       if (params.get('spin') === 'true') {
         setIsSpinning(true);
-        // Spin Speed
-        const speedParam = params.get('speed');
-        if (speedParam) {
-          // You might need a way to pass this down.
-          // For now, let's assume ProteinViewer can handle it eventually.
-          // We need a way to store this.
-        }
       }
       // Hide UI (Clean Mode)
       if (params.get('ui') === 'false') {
@@ -340,18 +333,10 @@ function App() {
           document.body.classList.add('embed-custom-color');
         }
 
-        // Spin Speed
-        const speedParam = params.get('speed');
-        if (speedParam) {
-          const speed = parseFloat(speedParam);
-          if (!isNaN(speed)) {
-            setEmbedSpinSpeed(speed);
-          }
-        }
+
       }
     }
 
-    // Listen for cross-origin messages (from ShareModal parent)
     // Listen for cross-origin messages (from ShareModal parent)
     const handleMessage = (event: MessageEvent) => {
       if (event.data?.type === 'REQUEST_ORIENTATION') {
@@ -370,11 +355,6 @@ function App() {
           }, '*');
         } else {
           console.warn("App: Orientation is null or ref missing");
-        }
-      } else if (event.data?.type === 'UPDATE_SPIN_SPEED') {
-        // Update spin speed dynamically from parent
-        if (typeof event.data.speed === 'number') {
-          setEmbedSpinSpeed(event.data.speed);
         }
       }
     };
@@ -416,7 +396,6 @@ function App() {
 
   // Accessibility: Dyslexic Font
   const [isDyslexicFont, setIsDyslexicFont] = useState(false);
-  const [embedSpinSpeed, setEmbedSpinSpeed] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     if (isDyslexicFont) {
@@ -2032,7 +2011,6 @@ function App() {
                             measurementTextColor={measurementTextColorMode}
                             overlays={ctrl.overlays}
                             initialOrientation={index === 0 ? embedOrientation : undefined}
-                            spinSpeed={index === 0 ? embedSpinSpeed : undefined}
 
 
                             onStructureLoaded={(info) => handleLoad(info, ctrl)}

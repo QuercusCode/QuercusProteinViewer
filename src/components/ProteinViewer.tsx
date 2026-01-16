@@ -40,14 +40,14 @@ export interface ProteinViewerProps {
     // Appearance
     isLightMode: boolean;
     isSpinning: boolean;
-    spinSpeed?: number; // New prop
+    theme?: 'light' | 'dark';
+    backgroundColor?: string;
     representation: RepresentationType;
     showSurface: boolean;
     showLigands?: boolean;  // Optional, defaults to true
     showIons?: boolean;     // New prop
     coloring: ColoringType;
     palette: ColorPalette;
-    backgroundColor: string;
     customColors?: CustomColorRule[];
     measurementTextColor?: MeasurementTextColor; // Added prop
     overlays?: SuperposedStructure[];
@@ -133,7 +133,6 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     showLigands = false,
     showIons = false,
     isSpinning = false,
-    spinSpeed,
     isMeasurementMode = false,
     measurements,
     onAddMeasurement,
@@ -1282,23 +1281,9 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
 
     useEffect(() => {
         if (stageRef.current) {
-            if (isSpinning) {
-                // Determine speed (default is approx 0.01)
-                const speed = (typeof spinSpeed === 'number') ? spinSpeed : 0.01;
-
-                // Update internal parameters if available
-                if (stageRef.current.spinAnimation) {
-                    stageRef.current.spinAnimation.axis.set(0, 1, 0);
-                    stageRef.current.spinAnimation.angle = speed;
-                }
-
-                // Ensure spinning is enabled
-                stageRef.current.setSpin(true);
-            } else {
-                stageRef.current.setSpin(false);
-            }
+            stageRef.current.setSpin(isSpinning);
         }
-    }, [isSpinning, spinSpeed]);
+    }, [isSpinning]);
 
     // Handle Window Resize
     useEffect(() => {
