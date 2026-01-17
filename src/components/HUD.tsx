@@ -256,13 +256,20 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
                                             </>
                                         ) : (
                                             (effectiveResidue.atomName) ? (
-                                                <span className={`font-mono font-semibold ${textColor} whitespace-nowrap`}>
-                                                    {effectiveResidue.atomName} <span className="text-xs opacity-80">#{effectiveResidue.atomSerial}</span>
+                                                <span className={`font-mono font-bold ${textColor} whitespace-nowrap text-lg`}>
+                                                    {effectiveResidue.atomName} <span className="text-sm opacity-60">#{effectiveResidue.atomSerial}</span>
                                                 </span>
                                             ) : (
-                                                <span className={`font-semibold ${textColor} whitespace-nowrap`}>
-                                                    {effectiveResidue.resName}
-                                                </span>
+                                                // Fallback for chemical with no atom name: Show Element + Serial
+                                                (effectiveResidue.element && effectiveResidue.atomSerial) ? (
+                                                    <span className={`font-mono font-bold ${textColor} whitespace-nowrap text-lg`}>
+                                                        {effectiveResidue.element}{effectiveResidue.atomSerial} <span className="text-sm opacity-60">#{effectiveResidue.atomSerial}</span>
+                                                    </span>
+                                                ) : (
+                                                    <span className={`font-semibold ${textColor} whitespace-nowrap`}>
+                                                        {effectiveResidue.resName} <span className="opacity-90">{effectiveResidue.resNo}</span>
+                                                    </span>
+                                                )
                                             )
                                         )}
                                     </>
