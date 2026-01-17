@@ -149,7 +149,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
 
                         {/* Reaction Buttons */}
                         <div className="flex items-center gap-1">
-                            {['👍', '❤️', '👏', '🎉'].map(emoji => (
+                            {['👍', '👎', '❤️', '👏', '🎉'].map(emoji => (
                                 <button
                                     key={emoji}
                                     onClick={() => peerSession.broadcastReaction?.(emoji)}

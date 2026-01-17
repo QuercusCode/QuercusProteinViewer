@@ -1943,7 +1943,11 @@ function App() {
         </div>
       )}
       {/* HUD & Overlay */}
-      <ReactionOverlay lastReaction={peerSession.lastReaction} />
+      <ReactionOverlay
+        lastReaction={peerSession.lastReaction}
+        peerNames={peerSession.peerNames}
+        myPeerId={peerSession.peerId || undefined}
+      />
 
       {!showLanding && (
         <>
