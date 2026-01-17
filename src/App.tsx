@@ -941,12 +941,12 @@ function App() {
     const totalResidues = info.chains.reduce((acc, c) => acc + c.sequence.length, 0);
 
     // Smart Representation Switching
-    if (!hasPolymer || totalResidues < 5) {
+    if (info.isSmallMolecule || !hasPolymer || totalResidues < 5) {
       // Small Molecule Logic
-      if (totalResidues > 200) {
+      if (totalResidues > 500) { // Increased threshold
         // "Large" Chemical (e.g. complex natural product or supramolecular assembly)
         console.log("App: Detected large non-polymer. Switching to Licorice for performance.");
-        ctrl.setRepresentation('line'); // 'line' is fastest, 'licorice' is nicer but heavier
+        ctrl.setRepresentation('line');
         ctrl.setColoring('element');
       } else {
         console.log("App: Detected small molecule. Switching to Ball+Stick.");

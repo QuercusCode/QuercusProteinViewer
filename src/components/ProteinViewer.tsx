@@ -1706,9 +1706,10 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                                 }
                             });
                             const ligands = Array.from(ligandSet).sort();
+                            const isSmallMolecule = chains.every(c => c.type === 'unknown'); // Naive but effective for PDB/SDF parsing
 
                             if (onStructureLoaded) {
-                                onStructureLoaded({ chains, ligands });
+                                onStructureLoaded({ chains, ligands, isSmallMolecule });
                             }
                         } catch (e) { console.warn("Chain parsing error", e); }
                     }

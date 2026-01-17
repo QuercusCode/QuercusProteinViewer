@@ -37,6 +37,7 @@ export interface ChainInfo {
 export interface StructureInfo {
     chains: ChainInfo[];
     ligands: string[];
+    isSmallMolecule?: boolean;
 }
 
 export interface Snapshot {
