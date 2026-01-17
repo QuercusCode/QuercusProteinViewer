@@ -2503,160 +2503,161 @@ function App() {
 
           {/* End Main Content Flex Container */}
 
+        </>
+      )}
+
+
+      <ContactMap
+
+        isOpen={showContactMap}
+        onClose={() => setShowContactMap(false)}
+        chains={chains}
+        getContactData={getAtomDataWrapper}
+        onHighlightResidue={(chain, resNo) => handleHighlightResidue(chain, resNo)}
+        onPixelClick={handlePixelClick}
+        isLightMode={isLightMode}
+        colorPalette={colorPalette}
+        proteinName={proteinTitle || (file ? file.name.replace(/\.[^/.]+$/, "") : pdbId)}
+        pdbAccession={pdbId}
+        getSnapshot={async () => {
+          if (!viewerRef.current) return null;
+          const blob = await viewerRef.current.getSnapshotBlob();
+          if (!blob) return null;
+          return new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.readAsDataURL(blob);
+          });
+        }}
+        getShareableLink={() => {
+          return getShareableURL(viewMode, controllers.map((ctrl, index) => ({
+            pdbId: ctrl.pdbId,
+            representation: ctrl.representation,
+            coloring: ctrl.coloring,
+            isSpinning: ctrl.isSpinning,
+            showLigands: ctrl.showLigands,
+            showSurface: ctrl.showSurface,
+            showIons: ctrl.showIons,
+            customColors: ctrl.customColors,
+            customBackgroundColor: ctrl.customBackgroundColor,
+            dataSource: ctrl.dataSource,
+            orientation: viewerRefs[index].current?.getOrientation()
+          })));
+        }}
+        pdbMetadata={pdbMetadata}
+        getLigandInteractions={async () => {
+          if (viewerRef.current) {
+            return await viewerRef.current.getLigandInteractions();
+          }
+          return [];
+        }}
+      />
 
 
 
-          <ContactMap
 
-            isOpen={showContactMap}
-            onClose={() => setShowContactMap(false)}
-            chains={chains}
-            getContactData={getAtomDataWrapper}
-            onHighlightResidue={(chain, resNo) => handleHighlightResidue(chain, resNo)}
-            onPixelClick={handlePixelClick}
-            isLightMode={isLightMode}
-            colorPalette={colorPalette}
-            proteinName={proteinTitle || (file ? file.name.replace(/\.[^/.]+$/, "") : pdbId)}
-            pdbAccession={pdbId}
-            getSnapshot={async () => {
-              if (!viewerRef.current) return null;
-              const blob = await viewerRef.current.getSnapshotBlob();
-              if (!blob) return null;
-              return new Promise<string>((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result as string);
-                reader.readAsDataURL(blob);
-              });
-            }}
-            getShareableLink={() => {
-              return getShareableURL(viewMode, controllers.map((ctrl, index) => ({
-                pdbId: ctrl.pdbId,
-                representation: ctrl.representation,
-                coloring: ctrl.coloring,
-                isSpinning: ctrl.isSpinning,
-                showLigands: ctrl.showLigands,
-                showSurface: ctrl.showSurface,
-                showIons: ctrl.showIons,
-                customColors: ctrl.customColors,
-                customBackgroundColor: ctrl.customBackgroundColor,
-                dataSource: ctrl.dataSource,
-                orientation: viewerRefs[index].current?.getOrientation()
-              })));
-            }}
-            pdbMetadata={pdbMetadata}
-            getLigandInteractions={async () => {
-              if (viewerRef.current) {
-                return await viewerRef.current.getLigandInteractions();
-              }
-              return [];
-            }}
-          />
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        warning={
+          // Check if any visible viewport relies on a local file (no PDB ID/PubChem CID but has a file)
+          // For single view:
+          (viewMode === 'single' && !activeController.pdbId && activeController.file) ||
+            // For multi view:
+            (viewMode !== 'single' && controllers.some(c => !c.pdbId && c.file))
+            ? "Sharing is not available for local files. Please use a PDB ID or PubChem Code to generate a shareable link."
+            : null
+        }
+        shareUrl={getShareableURL(viewMode, controllers.map((ctrl, index) => ({
+          pdbId: ctrl.pdbId,
+          representation: ctrl.representation,
+          coloring: ctrl.coloring,
+          isSpinning: ctrl.isSpinning,
+          showLigands: ctrl.showLigands,
+          showSurface: ctrl.showSurface,
+          showIons: ctrl.showIons,
+          customColors: ctrl.customColors,
+          customBackgroundColor: ctrl.customBackgroundColor,
+          dataSource: ctrl.dataSource,
+          orientation: viewerRefs[index].current?.getOrientation()
+        })))}
+        isLightMode={isLightMode}
+        peerSession={peerSession}
+      />
 
 
 
-
-          <ShareModal
-            isOpen={showShareModal}
-            onClose={() => setShowShareModal(false)}
-            warning={
-              // Check if any visible viewport relies on a local file (no PDB ID/PubChem CID but has a file)
-              // For single view:
-              (viewMode === 'single' && !activeController.pdbId && activeController.file) ||
-                // For multi view:
-                (viewMode !== 'single' && controllers.some(c => !c.pdbId && c.file))
-                ? "Sharing is not available for local files. Please use a PDB ID or PubChem Code to generate a shareable link."
-                : null
+      <LandingOverlay
+        isVisible={showLanding}
+        onDismiss={() => setShowLanding(false)}
+        onUpload={() => {
+          setShowLanding(false);
+          document.getElementById('file-upload')?.click();
+        }}
+        onStartTour={() => {
+          setShowLanding(false);
+          setTimeout(() => startOnboardingTour(() => { }), 500);
+        }}
+        onLoadPdb={(id, fileUrl) => {
+          if (activeController) {
+            if (fileUrl) {
+              activeController.setPdbId(id);
+            } else {
+              activeController.setPdbId(id);
             }
-            shareUrl={getShareableURL(viewMode, controllers.map((ctrl, index) => ({
-              pdbId: ctrl.pdbId,
-              representation: ctrl.representation,
-              coloring: ctrl.coloring,
-              isSpinning: ctrl.isSpinning,
-              showLigands: ctrl.showLigands,
-              showSurface: ctrl.showSurface,
-              showIons: ctrl.showIons,
-              customColors: ctrl.customColors,
-              customBackgroundColor: ctrl.customBackgroundColor,
-              dataSource: ctrl.dataSource,
-              orientation: viewerRefs[index].current?.getOrientation()
-            })))}
-            isLightMode={isLightMode}
-            peerSession={peerSession}
-          />
-
-
-
-          <LandingOverlay
-            isVisible={showLanding}
-            onDismiss={() => setShowLanding(false)}
-            onUpload={() => {
-              setShowLanding(false);
-              document.getElementById('file-upload')?.click();
-            }}
-            onStartTour={() => {
-              setShowLanding(false);
-              setTimeout(() => startOnboardingTour(() => { }), 500);
-            }}
-            onLoadPdb={(id, fileUrl) => {
-              if (activeController) {
-                if (fileUrl) {
-                  activeController.setPdbId(id);
-                } else {
-                  activeController.setPdbId(id);
-                }
-              }
-              if (id) sendSystemLog(`Loaded Structure: ${id}`);
-              setShowLanding(false);
-            }}
-          />
-
-          {/* Hidden File Input for Landing Overlay Upload Action */}
-          <input
-            type="file"
-            id="file-upload"
-            className="hidden"
-            accept=".pdb,.cif,.mmcif,.ent,.gro,.mol2,.sdf"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file && activeController) {
-                // Determine format
-                // We use setFile to load local files
-                activeController.setFile(file);
-                // Also update title
-                activeController.setProteinTitle(file.name);
-                // Remove PDB ID/URL to ensure we render the file
-                activeController.setPdbId('');
-              }
-            }}
-          />
-
-          <ToastContainer toasts={toasts} onRemove={removeToast} />
-
-          {
-            !isEmbedMode && (
-              <HelpGuide isVisible={!isCleanMode} isLightMode={isLightMode} hasSequence={chains.length > 0} />
-            )
           }
+          if (id) sendSystemLog(`Loaded Structure: ${id}`);
+          setShowLanding(false);
+        }}
+      />
 
-          {/* Embed Mode Attribution - Viral Loop - Mobile Optimized */}
-          {
-            isEmbedMode && (
-              <a
-                href="https://quercuscode.github.io/QuercusViewer/"
-                target="_blank"
-                rel="noopener noreferrer" // Moved to bottom-left, smaller size, logo icon
-                className="fixed bottom-2 left-2 md:bottom-3 md:left-3 z-50 px-1.5 py-0.5 md:px-2 md:py-1 bg-black/80 backdrop-blur-md text-white text-[9px] md:text-[10px] font-bold rounded-full shadow-lg border border-white/20 hover:scale-105 transition-transform flex items-center gap-1 md:gap-1.5"
-              >
-                <img src="logo/icon-white.png" alt="Q" className="w-3 h-3 md:w-3.5 md:h-3.5" />
-                Powered by Quercus
-              </a>
-            )
+      {/* Hidden File Input for Landing Overlay Upload Action */}
+      <input
+        type="file"
+        id="file-upload"
+        className="hidden"
+        accept=".pdb,.cif,.mmcif,.ent,.gro,.mol2,.sdf"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file && activeController) {
+            // Determine format
+            // We use setFile to load local files
+            activeController.setFile(file);
+            // Also update title
+            activeController.setProteinTitle(file.name);
+            // Remove PDB ID/URL to ensure we render the file
+            activeController.setPdbId('');
           }
+        }}
+      />
 
-          {/* Background Gradient */}
-          <div className={`absolute inset-0 pointer-events-none transition-opacity duration-300 ${isLightMode ? 'opacity-0' : 'opacity-100 bg-[radial-gradient(circle_at_50%_50%,rgba(50,50,80,0.2),rgba(0,0,0,0))]'}`} />
-        </main >
-      );
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
+
+      {
+        !isEmbedMode && (
+          <HelpGuide isVisible={!isCleanMode} isLightMode={isLightMode} hasSequence={chains.length > 0} />
+        )
+      }
+
+      {/* Embed Mode Attribution - Viral Loop - Mobile Optimized */}
+      {
+        isEmbedMode && (
+          <a
+            href="https://quercuscode.github.io/QuercusViewer/"
+            target="_blank"
+            rel="noopener noreferrer" // Moved to bottom-left, smaller size, logo icon
+            className="fixed bottom-2 left-2 md:bottom-3 md:left-3 z-50 px-1.5 py-0.5 md:px-2 md:py-1 bg-black/80 backdrop-blur-md text-white text-[9px] md:text-[10px] font-bold rounded-full shadow-lg border border-white/20 hover:scale-105 transition-transform flex items-center gap-1 md:gap-1.5"
+          >
+            <img src="logo/icon-white.png" alt="Q" className="w-3 h-3 md:w-3.5 md:h-3.5" />
+            Powered by Quercus
+          </a>
+        )
+      }
+
+      {/* Background Gradient */}
+      <div className={`absolute inset-0 pointer-events-none transition-opacity duration-300 ${isLightMode ? 'opacity-0' : 'opacity-100 bg-[radial-gradient(circle_at_50%_50%,rgba(50,50,80,0.2),rgba(0,0,0,0))]'}`} />
+    </main >
+  );
 }
 
-      export default App;
+export default App;
