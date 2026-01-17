@@ -2143,7 +2143,7 @@ function App() {
                 (file && /\.(sdf|mol|cif)$/i.test(file.name));
 
               return (
-                <div className={`relative h-full transition-all duration-300 ease-in-out border-r border-white/10 ${isSidebarCollapsed ? 'w-0 overflow-hidden opacity-0' : 'w-80 opacity-100'}`}>
+                <div className={`hidden md:block relative h-full transition-all duration-300 ease-in-out border-r border-white/10 ${isSidebarCollapsed ? 'w-0 overflow-hidden opacity-0' : 'w-80 opacity-100'}`}>
                   <Controls
                     pdbId={pdbId}
                     setPdbId={handlePdbIdChange}
