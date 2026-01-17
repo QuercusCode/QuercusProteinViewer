@@ -49,12 +49,12 @@ export function SessionChat({ messages, onSendMessage, myPeerId, isOpen, setIsOp
         return (
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-6 right-24 z-[100] p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg transition-all transform hover:scale-105"
+                className="fixed bottom-6 left-6 md:left-[22rem] z-[50] p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-blue-500/20 transition-all transform hover:scale-105 active:scale-95"
             >
                 <div className="relative">
-                    <MessageSquare className="w-6 h-6" />
+                    <MessageSquare className="w-5 h-5" />
                     {unreadCount > 0 && (
-                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-[#121212]">
+                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white dark:border-black">
                             {unreadCount}
                         </span>
                     )}
@@ -64,7 +64,7 @@ export function SessionChat({ messages, onSendMessage, myPeerId, isOpen, setIsOp
     }
 
     return (
-        <div className="fixed bottom-20 right-24 z-[100] w-80 md:w-96 bg-white/90 dark:bg-black/90 backdrop-blur-md rounded-xl shadow-2xl border border-neutral-200 dark:border-neutral-800 flex flex-col overflow-hidden transition-all h-[500px] max-h-[80vh]">
+        <div className="fixed bottom-20 left-6 md:left-[22rem] z-[50] w-80 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 flex flex-col overflow-hidden transition-all duration-300 ease-in-out h-[450px] max-h-[70vh]">
             {/* Header */}
             <div className="flex items-center justify-between p-3 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-white/5">
                 <div className="flex items-center gap-2">
