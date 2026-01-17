@@ -359,6 +359,8 @@ function App() {
 
   // --- Multi-View Tool Actions Implementation ---
 
+
+
   const handleToolAction = (type: 'snapshot' | 'record' | 'reset' | 'save' | 'load' | 'share', args?: any) => {
     if (type === 'share') {
       // Share is global or context-aware but we just open the modal with the global state
@@ -534,9 +536,15 @@ function App() {
   }, [isLightMode]);
 
 
+  // Ref to prevent "echo" loops (receiving state -> updating local -> triggering broadcast -> sending back)
+  const isApplyingRemoteUpdate = useRef(false);
+
   // Sync Incoming State
   useEffect(() => {
     if (peerSession.lastReceivedState) {
+      // Set flag to prevent broadcast loop
+      isApplyingRemoteUpdate.current = true;
+
       const s = peerSession.lastReceivedState;
 
       // Handle Multi-View State
@@ -544,13 +552,8 @@ function App() {
         if (viewMode !== s.viewMode) setViewMode(s.viewMode);
 
         s.viewports.forEach((vp: any, index: number) => {
-          // Should we respect "empty" viewports?
-          // If incoming is empty {}, it means "hidden/not shared".
-          // We should probably clear our local viewport if it was previously showing shared content?
-          // Or just ignore? If we ignore, ghosts might remain.
-          // Let's plain Apply whatever we get.
           const ctrl = controllers[index];
-          if (!ctrl) return; // Should not happen if viewMode synced
+          if (!ctrl) return;
 
           if (vp.pdbId && vp.pdbId !== ctrl.pdbId) ctrl.setPdbId(vp.pdbId);
           if (vp.representation && vp.representation !== ctrl.representation) ctrl.setRepresentation(vp.representation as RepresentationType);
@@ -559,16 +562,9 @@ function App() {
           if (vp.customColors) ctrl.setCustomColors(vp.customColors);
           if (vp.measurements) ctrl.setMeasurements(vp.measurements);
           if (vp.customBackgroundColor) ctrl.setCustomBackgroundColor(vp.customBackgroundColor);
-
-          // Handle "Empty" case (e.g. host unselected this view)
-          // If vp has no pdbId, maybe we should clear local?
-          // Only if local currently has a PDB ID that presumably came from host?
-          // Hard to distinguish "my local file" vs "host content".
-          // For now, let's NOT auto-clear to avoid deleting local work casually.
-          // But if viewMode switches, we definitely see empty slots.
         });
       }
-      // Fallback: Legacy Single View Sync (if older client or single view mode)
+      // Fallback: Legacy Single View Sync
       else {
         const ctrl = controllers[0];
         if (s.pdbId && s.pdbId !== ctrl.pdbId) ctrl.setPdbId(s.pdbId);
@@ -578,8 +574,13 @@ function App() {
         if (s.highlightedResidue !== undefined) ctrl.setHighlightedResidue(s.highlightedResidue);
         if (s.measurements) ctrl.setMeasurements(s.measurements);
       }
+
+      // Reset flag after render
+      setTimeout(() => {
+        isApplyingRemoteUpdate.current = false;
+      }, 300);
     }
-  }, [peerSession.lastReceivedState, viewMode, controllers]); // Added dependencies
+  }, [peerSession.lastReceivedState, viewMode, controllers]);
 
   // Sync Incoming Camera
   useEffect(() => {
@@ -776,21 +777,17 @@ function App() {
 
   // BROADCAST STATE EFFECT
   // This broadcasts visual state changes to peers
+
   useEffect(() => {
     if (!peerSession.isConnected) return;
 
-    // Construct broadcasteable viewports based on SELECTION
-    // We map controllers to state objects, but ONLY if they are in sharedViewportIndices
-    // AND they have content.
-    // We must preserve the array structure (index 0 is viewport 0).
-    // So unselected viewports become {} (empty).
-
-    // NOTE: This runs whenever controllers/activeViewIndex changes
-    // Debouncing might be handled inside usePeerSession or here if needed.
+    // ECHO CANCELLATION: If this update was caused by a remote message, DO NOT broadcast it back.
+    if (isApplyingRemoteUpdate.current) {
+      // console.log("Skipping broadcast due to remote update application");
+      return;
+    }
 
     const viewportsState = controllers.map((ctrl, index) => {
-      // If NOT shared, send empty object.
-      // This effectively "hides" it for the guest (guest wrapper renders nothing if no pdbId).
       if (!sharedViewportIndices.includes(index)) return {};
 
       return {
@@ -802,63 +799,23 @@ function App() {
         showSurface: ctrl.showSurface,
         showIons: ctrl.showIons,
         customColors: ctrl.customColors,
-        // Send file only if needed? File sharing is separate event usually.
-        // But state sync might need to know "I have a file".
-        // Current logic relies on 'pdbId' for sync usually.
-        // If it's a local file, we can't easily sync it via state object unless we send blob repeatedly (bad).
-        // Local file sync is handled via broadcastFile event.
         dataSource: ctrl.dataSource,
         measurements: ctrl.measurements,
-        // Orientation is heavy, maybe throttle?
-        // Actually camera is broadcast separately via broadcastCamera often?
-        // Let's see... broadcastState sends generic state.
       };
     });
-
-
-
-    // WE NEED TO UPDATE usePeerSession TO SUPPORT MULTI-VIEW
-    // Current SessionState interface likely only has single view props.
-    // I need to check usePeerSession.ts (Step 10790 showed it).
-    // It has: pdbId, representation, coloring... etc. (Single View).
-    // It does NOT have 'viewports'.
-
-    // CRITICAL: The current peer session logic is SINGLE VIEW only.
-    // To support Multi-View sync, I either need to:
-    // A) Refactor SessionState to have `viewports: [...]`
-    // B) Hack it by sending `viewports` as a custom field if the hook allows partial state.
-
-    // Given the task is "Fix", and previous task added Multi-View *Layout*, 
-    // it likely didn't update the *P2P Sync* logic for multi-view yet?
-    // User said "It's working for the sharing part but not for the live session".
-    // "Sharing part" = URL/Link (which I just fixed).
-    // "Live Session" = P2P.
-    // So yes, I likely need to send `viewports` array.
-
-    // Let's assume broadcastState accepts Partial<SessionState> and SessionState is defined in usePeerSession.
-    // I need to update SessionState interface in usePeerSession.ts first?
-    // Or just cast it here if it's loose?
-    // Step 10790 showed explicit interface. I should update it.
-
-    // For now, I'll prepare the logic here, but I need to update usePeerSession.ts too.
-
-    // Let's add the state logic here first.
 
     const multiViewState = {
       viewMode: viewMode,
       viewports: viewportsState
     };
 
-    // @ts-ignore - We will update interface next
+    // @ts-ignore
     peerSession.broadcastState(multiViewState);
 
   }, [
     peerSession.isConnected,
     viewMode,
-    sharedViewportIndices, // TRIGGER BROADCAST WHEN SELECTION CHANGES
-    // Deep dependencies on controllers...?
-    // Using JSON stringify to compare changes might be safer to avoid loop?
-    // For now, let's depend on controllers changes.
+    sharedViewportIndices,
     controllers.map(c => c.pdbId).join(','),
     controllers.map(c => c.representation).join(','),
     controllers.map(c => c.coloring).join(','),
@@ -2865,5 +2822,8 @@ function App() {
     </main >
   );
 }
+
+
+
 
 export default App;

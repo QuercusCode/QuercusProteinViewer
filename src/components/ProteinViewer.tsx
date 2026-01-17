@@ -108,6 +108,7 @@ export interface ProteinViewerRef {
     getAtomPositionByIndex: (atomIndex: number) => { x: number, y: number, z: number } | null;
     addResidue: (chainName: string, resType: string) => Promise<Blob | null>;
     recordTurntable: (duration?: number) => Promise<Blob>;
+    recordMovie: (duration: number) => Promise<Blob>; // Added
     resetCamera: () => void;
     clearMeasurements: () => void;
     getMeasurements: () => MeasurementData[];
@@ -370,6 +371,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
     };
 
     useImperativeHandle(ref, () => ({
+        recordMovie: performVideoRecord, // Exposed
         highlightRegion: (selection: string, _label?: string) => {
             if (!componentRef.current) return;
             const component = componentRef.current;
