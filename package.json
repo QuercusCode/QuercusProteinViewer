@@ -20,10 +20,12 @@
     "lucide-react": "^0.562.0",
     "molstar": "^5.4.2",
     "ngl": "^2.4.0",
+    "pdfjs-dist": "^5.4.530",
     "peerjs": "^1.5.5",
     "qrcode": "^1.5.4",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "react-pdf": "^10.3.0",
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {

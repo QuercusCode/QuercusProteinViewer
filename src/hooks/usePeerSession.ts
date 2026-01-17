@@ -50,6 +50,11 @@ export interface PeerSession {
     // Chat
     broadcastChat: (message: ChatMessage) => void;
     lastReceivedChat: ChatMessage | null;
+    // PDF Sharing
+    broadcastPdf: (file: File) => void;
+    broadcastPdfScroll: (page: number, scale: number, scrollTop: number) => void;
+    lastReceivedPdf: { name: string; data: ArrayBuffer } | null;
+    lastReceivedPdfScroll: { page: number; scale: number; scrollTop: number } | null;
 }
 
 export const usePeerSession = (initialState?: Partial<SessionState>): PeerSession => {
@@ -65,6 +70,8 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
     const [peerNames, setPeerNames] = useState<Record<string, string>>({});
     const [lastReceivedFile, setLastReceivedFile] = useState<{ name: string; data: ArrayBuffer } | null>(null);
     const [lastReceivedChat, setLastReceivedChat] = useState<ChatMessage | null>(null);
+    const [lastReceivedPdf, setLastReceivedPdf] = useState<{ name: string; data: ArrayBuffer } | null>(null);
+    const [lastReceivedPdfScroll, setLastReceivedPdfScroll] = useState<{ page: number; scale: number; scrollTop: number } | null>(null);
 
     // Audio State
     const [myStream, setMyStream] = useState<MediaStream | null>(null);
@@ -194,12 +201,41 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
                 });
             }
         } else if (data.type === 'SYNC_CHAT') {
-            setLastReceivedChat(data.payload);
+            setLastReceivedChat(data.message); // Changed from data.payload to data.message
 
             if (isHost) {
                 connectionsRef.current.forEach(conn => {
                     if (conn.open && conn.peer !== sender.peer) {
-                        conn.send({ type: 'SYNC_CHAT', payload: data.payload });
+                        conn.send({ type: 'SYNC_CHAT', message: data.message }); // Changed from data.payload to data.message
+                    }
+                });
+            }
+        } else if (data.type === 'SYNC_PDF_FILE') {
+            console.log('Received PDF file:', data.file.name);
+            setLastReceivedPdf(data.file);
+
+            if (isHost) {
+                connectionsRef.current.forEach(conn => {
+                    if (conn.open && conn.peer !== sender.peer) {
+                        conn.send({
+                            type: 'SYNC_PDF_FILE',
+                            file: data.file
+                        });
+                    }
+                });
+            }
+        } else if (data.type === 'SYNC_PDF_SCROLL') {
+            setLastReceivedPdfScroll({ page: data.page, scale: data.scale, scrollTop: data.scrollTop });
+
+            if (isHost) {
+                connectionsRef.current.forEach(conn => {
+                    if (conn.open && conn.peer !== sender.peer) {
+                        conn.send({
+                            type: 'SYNC_PDF_SCROLL',
+                            page: data.page,
+                            scale: data.scale,
+                            scrollTop: data.scrollTop
+                        });
                     }
                 });
             }
@@ -390,6 +426,32 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
         broadcastState({ controllerId: targetPeerId });
     }, [isHost, broadcastState]);
 
+    const broadcastPdf = useCallback((file: File) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            const data = {
+                name: file.name,
+                data: reader.result as ArrayBuffer
+            };
+            connectionsRef.current.forEach(conn => {
+                if (conn.open) {
+                    conn.send({ type: 'SYNC_PDF_FILE', file: data });
+                }
+            });
+            // Local update (for host)
+            setLastReceivedPdf(data);
+        };
+        reader.readAsArrayBuffer(file);
+    }, []);
+
+    const broadcastPdfScroll = useCallback((page: number, scale: number, scrollTop: number) => {
+        connectionsRef.current.forEach(conn => {
+            if (conn.open) {
+                conn.send({ type: 'SYNC_PDF_SCROLL', page, scale, scrollTop });
+            }
+        });
+    }, []);
+
     return {
         peerId,
         isConnected: connections.length > 0,
@@ -417,6 +479,11 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
         broadcastFile,
         lastReceivedFile,
         broadcastChat,
-        lastReceivedChat
+        lastReceivedChat,
+        // PDF
+        broadcastPdf,
+        broadcastPdfScroll,
+        lastReceivedPdf,
+        lastReceivedPdfScroll
     };
 };
