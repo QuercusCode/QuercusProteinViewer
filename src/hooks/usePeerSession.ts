@@ -5,18 +5,23 @@ import type { DataConnection, MediaConnection } from 'peerjs';
 import type { ChatMessage } from '../types';
 
 export interface SessionState {
-    pdbId: string;
-    representation: string;
-    coloring: string;
-    customColors: any[];
+    // Single View Props (Legacy/Fallback)
+    pdbId?: string;
+    representation?: string;
+    coloring?: string;
+    customColors?: any[];
     measurements?: any[];
     customBackgroundColor?: string | null;
     orientation?: any[];
     isSpinning?: boolean;
     highlightedResidue?: any;
     hoveredResidue?: any;
-    controllerId?: string | null; // ID of the peer who has control (defaults to Host if null)
-    annotations?: any[]; // Array of Annotation objects
+    controllerId?: string | null;
+    annotations?: any[];
+
+    // Multi-View Props
+    viewMode?: 'single' | 'dual' | 'triple' | 'quad';
+    viewports?: Partial<SessionState>[]; // Recursive definition for per-viewport state
 }
 
 export interface PeerSession {

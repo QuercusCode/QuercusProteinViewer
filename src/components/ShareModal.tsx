@@ -14,27 +14,29 @@ interface ShareModalProps {
     viewMode: 'single' | 'dual' | 'triple' | 'quad';
     viewports: { index: number; title: string; hasContent: boolean }[];
     onGenerateLink: (indices: number[]) => string;
+    // New Props for Lifting State
+    selectedIndices: number[];
+    onSelectionChange: (indices: number[]) => void;
 }
 
-export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, isLightMode, warning, peerSession, viewMode, viewports, onGenerateLink }) => {
+export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, isLightMode, warning, peerSession, viewMode, viewports, onGenerateLink, selectedIndices, onSelectionChange }) => {
     const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
     const [generationError, setGenerationError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<'link' | 'embed' | 'live'>('link');
 
-    // Multi-View Selection State
-    const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
+    // Multi-View Selection State REMOVED (Lifted to Parent)
+    // const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
 
     // Initialize selection when modal opens or viewMode changes
-    useEffect(() => {
+    // MOVED initialization logic to parent (App.tsx)
+    /* useEffect(() => {
         if (isOpen) {
-            // Default: Select all viewports that have content
             const activeIndices = viewports.filter(v => v.hasContent).map(v => v.index);
-            // If no content (shouldn't happen), select viewport 0
             if (activeIndices.length === 0) setSelectedIndices([0]);
             else setSelectedIndices(activeIndices);
         }
-    }, [isOpen, viewports]); // viewports dependence ensures update if content changes
+    }, [isOpen, viewports]); */
 
     // Memoized Share URL based on selection
     const shareUrl = React.useMemo(() => {
@@ -251,13 +253,13 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, isLight
                                         <label
                                             key={vp.index}
                                             className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${selectedIndices.includes(vp.index)
-                                                    ? (isLightMode ? 'bg-white border-blue-500 shadow-sm' : 'bg-neutral-900 border-blue-500 shadow-sm')
-                                                    : (isLightMode ? 'bg-transparent border-transparent hover:bg-neutral-100' : 'bg-transparent border-transparent hover:bg-neutral-800')
+                                                ? (isLightMode ? 'bg-white border-blue-500 shadow-sm' : 'bg-neutral-900 border-blue-500 shadow-sm')
+                                                : (isLightMode ? 'bg-transparent border-transparent hover:bg-neutral-100' : 'bg-transparent border-transparent hover:bg-neutral-800')
                                                 } ${!vp.hasContent ? 'opacity-50' : ''}`}
                                         >
                                             <div className={`w-5 h-5 rounded flex items-center justify-center border transition-colors ${selectedIndices.includes(vp.index)
-                                                    ? 'bg-blue-600 border-blue-600 text-white'
-                                                    : (isLightMode ? 'border-neutral-300 bg-white' : 'border-neutral-700 bg-neutral-950')
+                                                ? 'bg-blue-600 border-blue-600 text-white'
+                                                : (isLightMode ? 'border-neutral-300 bg-white' : 'border-neutral-700 bg-neutral-950')
                                                 }`}>
                                                 {selectedIndices.includes(vp.index) && <Check className="w-3.5 h-3.5" />}
                                             </div>
@@ -265,16 +267,16 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, isLight
                                                 type="checkbox"
                                                 className="hidden"
                                                 checked={selectedIndices.includes(vp.index)}
-                                                disabled={!vp.hasContent && !selectedIndices.includes(vp.index)} // Allow unchecking, but maybe prevent checking empty?
+                                                disabled={!vp.hasContent && !selectedIndices.includes(vp.index)}
                                                 onChange={() => {
-                                                    setSelectedIndices(prev => {
-                                                        if (prev.includes(vp.index)) {
-                                                            // Uncheck: Don't allow unchecking strictly everything? Maybe allow.
-                                                            return prev.filter(i => i !== vp.index);
-                                                        } else {
-                                                            return [...prev, vp.index];
-                                                        }
-                                                    });
+                                                    // Use Parent's Handler
+                                                    if (selectedIndices.includes(vp.index)) {
+                                                        // Uncheck
+                                                        onSelectionChange(selectedIndices.filter((i: number) => i !== vp.index));
+                                                    } else {
+                                                        // Check
+                                                        onSelectionChange([...selectedIndices, vp.index]);
+                                                    }
                                                 }}
                                             />
                                             <div className="flex flex-col min-w-0">
