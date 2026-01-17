@@ -198,7 +198,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
                         )}
 
                         {/* Audio Controls */}
-                        <div className="flex items-center gap-2 md:pr-2 shrink-0">
+                        <div className={`flex items-center gap-2 shrink-0 ${!isHost && onToggleCameraSync ? 'md:pr-2 md:border-r md:border-gray-500/20' : ''}`}>
                             {!peerSession.isAudioConnected ? (
                                 <button
                                     onClick={() => peerSession.joinAudio?.()}
@@ -235,7 +235,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
 
                         {/* View/Edit Toggle for Guests */}
                         {!isHost && onToggleCameraSync && (
-                            <div className="pl-3 border-l border-gray-500/20">
+                            <div className="">
                                 <button
                                     onClick={onToggleCameraSync}
                                     className={`text-[10px] font-bold px-2 py-1 md:py-0.5 rounded transition-colors flex items-center gap-1.5 ${isCameraSynced
