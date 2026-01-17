@@ -291,6 +291,7 @@ interface ControlsProps {
     measurements: Measurement[]; // Use imported Measurement type
     onDeleteMeasurement: (id: string) => void;
     onClearMeasurements: () => void;
+    isSharedSession: boolean; // Added prop
     onOpenSuperposition?: () => void;
     pdbMetadata: PDBMetadata | null;
 
@@ -390,6 +391,7 @@ export const Controls: React.FC<ControlsProps> = ({
     setIsMeasurementMode,
     onToggleMeasurement,
     onClearMeasurements,
+    isSharedSession, // Destructure prop
     onOpenSuperposition,
     measurements,
     onDeleteMeasurement,
@@ -1361,31 +1363,32 @@ export const Controls: React.FC<ControlsProps> = ({
                     </SidebarSection>
 
 
-                    {/* ACCORDION X: JOINT MEASUREMENTS */}
-                    <SidebarSection
-                        title="Joint Measurements"
-                        icon={Ruler}
-                        isOpen={openSections['measurements']}
-                        onToggle={() => toggleSection('measurements')}
-                        isLightMode={isLightMode}
-                        id="measurements-section"
-                    >
-                        <MeasurementTable
-                            measurements={measurements}
-                            onDelete={onDeleteMeasurement}
+                    {/* ACCORDION X: JOINT MEASUREMENTS - Only in Shared Session */}
+                    {isSharedSession && (
+                        <SidebarSection
+                            title="Joint Measurements"
+                            icon={Ruler}
+                            isOpen={openSections['measurements']}
+                            onToggle={() => toggleSection('measurements')}
                             isLightMode={isLightMode}
-                        />
-                        <div className="mt-2 pt-2 border-t border-white/5 flex justify-end">
-                            <button
-                                onClick={onClearMeasurements}
-                                className="text-[10px] text-red-500 hover:underline flex items-center gap-1"
-                            >
-                                <Trash2 className="w-3 h-3" /> Clear All
-                            </button>
-                        </div>
-                    </SidebarSection>
+                            id="measurements-section"
+                        >
+                            <MeasurementTable
+                                measurements={measurements}
+                                onDelete={onDeleteMeasurement}
+                                isLightMode={isLightMode}
+                            />
+                            <div className="mt-2 pt-2 border-t border-white/5 flex justify-end">
+                                <button
+                                    onClick={onClearMeasurements}
+                                    className="text-[10px] text-red-500 hover:underline flex items-center gap-1"
+                                >
+                                    <Trash2 className="w-3 h-3" /> Clear All
+                                </button>
+                            </div>
+                        </SidebarSection>
 
-
+                    )}
                     {/* ACCORDION 2: ANALYSIS */}
                     <SidebarSection
                         title="Analysis"

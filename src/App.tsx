@@ -2089,7 +2089,7 @@ function App() {
             isLightMode={isLightMode}
           />
 
-          {isMeasurementPanelOpen && (
+          {isMeasurementPanelOpen && !peerSession.isConnected && (
             <MeasurementPanel
               isOpen={isMeasurementPanelOpen}
               measurements={measurements}
@@ -2163,6 +2163,7 @@ function App() {
                   }}
                   onDeleteMeasurement={handleDeleteMeasurement}
                   measurements={measurements}
+                  isSharedSession={peerSession.isConnected}
                   isLightMode={isLightMode}
                   setIsLightMode={setIsLightMode}
                   highlightedResidue={highlightedResidue}
