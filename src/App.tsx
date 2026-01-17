@@ -2258,17 +2258,18 @@ function App() {
             <div className="relative flex-1 flex w-full h-full overflow-hidden bg-black">
 
               {/* Collapse Button - Positioned on top of viewport */}
+              {/* Collapse Button - Positioned on top of viewport - hidden on mobile */}
               {!isEmbedMode && (
                 <button
                   onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                  className={`absolute top-1/2 left-0 -translate-y-1/2 z-50 
-                        p-1 bg-[#1a1a1a] border border-white/10 rounded-r-md text-white/50 hover:text-white 
-                        shadow-xl transition-all hover:w-6 w-3 overflow-hidden group items-center justify-center flex
+                  className={`absolute top-1/2 left-0 -translate-y-1/2 z-50 hidden md:flex
+                        pl-1 pr-2 h-16 bg-[#1a1a1a] border-y border-r border-white/10 rounded-r-xl text-white/50 hover:text-white 
+                        shadow-2xl transition-all w-6 hover:w-8 overflow-hidden group items-center justify-start
                         ${isSidebarCollapsed ? 'translate-x-0' : 'translate-x-0'}
                     `}
                   title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
                 >
-                  {isSidebarCollapsed ? <ChevronRight size={14} className="min-w-[14px]" /> : <ChevronLeft size={14} className="min-w-[14px]" />}
+                  {isSidebarCollapsed ? <ChevronRight size={20} className="min-w-[20px]" /> : <ChevronLeft size={20} className="min-w-[20px]" />}
                 </button>
               )}
               {(() => {
