@@ -19,7 +19,6 @@ import { MeasurementPanel } from './components/MeasurementPanel';
 import { SuperpositionModal } from './components/SuperpositionModal';
 import { IdentityModal } from './components/IdentityModal';
 import { SessionChat } from './components/SessionChat';
-import { PdfViewer } from './components/PdfViewer';
 import { OFFLINE_LIBRARY } from './data/library';
 import { fetchPubChemMetadata } from './utils/pdbUtils';
 import type {
@@ -38,7 +37,7 @@ import type {
 import {
   Camera, RefreshCw, Upload,
   Settings, Zap, Activity, Grid3X3, Palette,
-  Share2, Save, FolderOpen, Video, Ruler, Maximize2, Star, Undo2, Redo2, BookOpen, X
+  Share2, Save, FolderOpen, Video, Ruler, Maximize2, Star, Undo2, Redo2, BookOpen
 } from 'lucide-react';
 import { startOnboardingTour } from './components/TourGuide';
 import { ViewportSelector } from './components/ViewportSelector';
@@ -112,9 +111,7 @@ function App() {
   // Feature: Pass the Chalk (Control Transfer)
   const [controllerId, setControllerId] = useState<string | null>(null);
 
-  // PDF State
-  const [isPdfOpen, setIsPdfOpen] = useState(false);
-  const [pdfFile, setPdfFile] = useState<{ name: string; data: ArrayBuffer } | null>(null);
+
 
   // Chat State
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -200,23 +197,6 @@ function App() {
       }, 1000);
     }
   }, []);
-
-  // Sync Incoming PDF
-  useEffect(() => {
-    if (peerSession.lastReceivedPdf) {
-      setPdfFile(peerSession.lastReceivedPdf);
-      setIsPdfOpen(true);
-      success(`Received PDF: ${peerSession.lastReceivedPdf.name}`);
-    }
-  }, [peerSession.lastReceivedPdf]);
-
-  // Handle PDF Scroll Broadcast
-  const handlePdfScroll = (page: number, scale: number, scrollTop: number) => {
-    // Only broadcast if I am the host (or controller)
-    if (peerSession.isConnected && peerSession.isHost) {
-      peerSession.broadcastPdfScroll(page, scale, scrollTop);
-    }
-  };
 
 
   // Sync Incoming State
@@ -604,33 +584,13 @@ function App() {
   // --- P2P FILE SHARING ---
   // 1. File Upload Wrapper (Triggered by Host)
   const handleFileUploadWithSync = useCallback((file: File) => {
-    // Check if PDF
-    if (file.name.toLowerCase().endsWith('.pdf')) {
-      setPdfFile({ name: file.name, data: file.arrayBuffer() as any }); // We need buffer usually, but let's check PdfViewer expectation. 
-      // Wait, setPdfFile expects {name, data: ArrayBuffer}. File has arrayBuffer() method but it's async.
-      // PdfViewer supports File object too? 
-      // Looking at App.tsx state: const [pdfFile, setPdfFile] = useState<{ name: string; data: ArrayBuffer } | null>(null);
-      // The PdfViewer component props: file: File | { name: string; data: ArrayBuffer } | null;
-      // So state should ideally support File too, but the state definition says {name, data}.
-
-      // Let's coerce for now or strictly read buffer.
-      // Reading buffer is better for broadcast consistency?
-      // Actually broadcast happens below.
-
-      // Let's read buffer to be consistent with state type.
-      file.arrayBuffer().then(buffer => {
-        setPdfFile({ name: file.name, data: buffer });
-        setIsPdfOpen(true);
-      });
-    } else {
-      // Load locally as structure
-      handleUpload(file);
-    }
+    // Load locally
+    handleUpload(file);
 
     // Broadcast if Host
     if (peerSession.isHost) {
       console.log('Broadcasting File:', file.name);
-      peerSession.broadcastFile(file); // peerSession handles reading buffer
+      peerSession.broadcastFile(file);
       sendSystemLog(`Shared file: ${file.name}`);
     }
   }, [handleUpload, peerSession, sendSystemLog]);
@@ -646,14 +606,7 @@ function App() {
       console.log(`[App] P2P Received File: ${name} | Size: ${receivedFile.size} | Type: ${receivedFile.type}`);
 
       // Load it!
-      // Load it!
-      if (name.toLowerCase().endsWith('.pdf')) {
-        setPdfFile({ name, data });
-        setIsPdfOpen(true);
-        success(`Received PDF: ${name}`);
-      } else {
-        handleUpload(receivedFile);
-      }
+      handleUpload(receivedFile);
     }
   }, [peerSession.lastReceivedFile, peerSession.isHost, handleUpload]);
 
@@ -1109,20 +1062,7 @@ function App() {
     }
   };
 
-  // Handle PDB Click from PDF
-  const handlePdbClickFromPdf = (id: string) => {
-    // Find the primary controller (index 0 for now, or activeViewIndex)
-    // Since `controllers` are derived inside the render, we can't easily access them here directly
-    // UNLESS we move `useStructureController` mapping to top level.
 
-    // However, `pdbId` state for the FIRST viewer is available as `pdbId` (if single view logic holds).
-    // But we have `useVisualStack` and `useStructureController`.
-
-    // Let's use the `pdbId` state setter if in single mode, or just set it globally.
-    // Actually `handlePdbIdChange` is available.
-    handlePdbIdChange(id);
-    success(`Loading structure from PDF: ${id}`);
-  };
 
 
   const [isRecording, setIsRecording] = useState(false);
@@ -1529,7 +1469,7 @@ function App() {
     const files = e.dataTransfer.files;
     if (files && files.length > 0) {
       const droppedFile = files[0];
-      const validExtensions = ['.pdb', '.cif', '.ent', '.mol', '.sdf', '.mol2', '.xyz', '.pdf'];
+      const validExtensions = ['.pdb', '.cif', '.ent', '.mol', '.sdf', '.mol2', '.xyz'];
       const fileExt = droppedFile.name.substring(droppedFile.name.lastIndexOf('.')).toLowerCase();
 
       if (validExtensions.includes(fileExt)) {
@@ -2188,27 +2128,6 @@ function App() {
 
           {/* Main Content: Flex Container for Sidebars and Viewports */}
           <div className="flex flex-1 w-full h-full overflow-hidden">
-
-            {/* PDF Split Screen */}
-            {isPdfOpen && (
-              <div className="w-1/2 h-full border-r border-gray-300 dark:border-neutral-800 relative z-10 transition-all duration-300">
-                <PdfViewer
-                  file={pdfFile}
-                  isHost={peerSession.isHost}
-                  syncScroll={peerSession.lastReceivedPdfScroll}
-                  onScroll={handlePdfScroll}
-                  onPdbClick={handlePdbClickFromPdf}
-                />
-                {/* Close Button */}
-                <button
-                  onClick={() => setIsPdfOpen(false)}
-                  className="absolute top-4 right-4 bg-red-500 text-white p-1 rounded-full shadow hover:bg-red-600 z-50"
-                  title="Close PDF"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            )}
 
             {/* Logic to determine if we are looking at a Chemical */}
             {(() => {
