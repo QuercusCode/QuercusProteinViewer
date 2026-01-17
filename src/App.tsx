@@ -2290,7 +2290,10 @@ function App() {
 
                   {/* Mobile Hamburger - Top Left */}
                   <button
-                    onClick={() => setIsMobileMenuOpen(true)}
+                    onClick={() => {
+                      setIsMobileMenuOpen(true);
+                      setIsSidebarCollapsed(false);
+                    }}
                     className="absolute top-4 left-4 z-40 md:hidden p-2 bg-black/50 backdrop-blur-sm rounded-lg border border-white/10 text-white shadow-lg"
                   >
                     <Menu size={24} />
