@@ -38,7 +38,7 @@ import type {
 import {
   Camera, RefreshCw, Upload,
   Settings, Zap, Activity, Grid3X3, Palette,
-  Share2, Save, FolderOpen, Video, Ruler, Maximize2, Star, Undo2, Redo2, BookOpen
+  Share2, Save, FolderOpen, Video, Ruler, Maximize2, Star, Undo2, Redo2, BookOpen, X
 } from 'lucide-react';
 import { startOnboardingTour } from './components/TourGuide';
 import { ViewportSelector } from './components/ViewportSelector';
@@ -200,6 +200,24 @@ function App() {
       }, 1000);
     }
   }, []);
+
+  // Sync Incoming PDF
+  useEffect(() => {
+    if (peerSession.lastReceivedPdf) {
+      setPdfFile(peerSession.lastReceivedPdf);
+      setIsPdfOpen(true);
+      success(`Received PDF: ${peerSession.lastReceivedPdf.name}`);
+    }
+  }, [peerSession.lastReceivedPdf]);
+
+  // Handle PDF Scroll Broadcast
+  const handlePdfScroll = (page: number, scale: number, scrollTop: number) => {
+    // Only broadcast if I am the host (or controller)
+    if (peerSession.isConnected && peerSession.isHost) {
+      peerSession.broadcastPdfScroll(page, scale, scrollTop);
+    }
+  };
+
 
   // Sync Incoming State
 
@@ -1049,6 +1067,7 @@ function App() {
   }, [addToHistory, controllers, initialUrlState]);
 
   const handlePdbIdChange = (id: string) => {
+
     activeController.setPdbId(id);
     activeController.setFile(null);
     activeController.setProteinTitle(null);
@@ -1061,6 +1080,21 @@ function App() {
     if (activeController.representation === 'ball+stick') {
       activeController.setRepresentation('cartoon');
     }
+  };
+
+  // Handle PDB Click from PDF
+  const handlePdbClickFromPdf = (id: string) => {
+    // Find the primary controller (index 0 for now, or activeViewIndex)
+    // Since `controllers` are derived inside the render, we can't easily access them here directly
+    // UNLESS we move `useStructureController` mapping to top level.
+
+    // However, `pdbId` state for the FIRST viewer is available as `pdbId` (if single view logic holds).
+    // But we have `useVisualStack` and `useStructureController`.
+
+    // Let's use the `pdbId` state setter if in single mode, or just set it globally.
+    // Actually `handlePdbIdChange` is available.
+    handlePdbIdChange(id);
+    success(`Loading structure from PDF: ${id}`);
   };
 
 
@@ -2127,6 +2161,27 @@ function App() {
 
           {/* Main Content: Flex Container for Sidebars and Viewports */}
           <div className="flex flex-1 w-full h-full overflow-hidden">
+
+            {/* PDF Split Screen */}
+            {isPdfOpen && (
+              <div className="w-1/2 h-full border-r border-gray-300 dark:border-neutral-800 relative z-10 transition-all duration-300">
+                <PdfViewer
+                  file={pdfFile}
+                  isHost={peerSession.isHost}
+                  syncScroll={peerSession.lastReceivedPdfScroll}
+                  onScroll={handlePdfScroll}
+                  onPdbClick={handlePdbClickFromPdf}
+                />
+                {/* Close Button */}
+                <button
+                  onClick={() => setIsPdfOpen(false)}
+                  className="absolute top-4 right-4 bg-red-500 text-white p-1 rounded-full shadow hover:bg-red-600 z-50"
+                  title="Close PDF"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
 
             {/* Logic to determine if we are looking at a Chemical */}
             {(() => {

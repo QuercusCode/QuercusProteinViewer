@@ -110,7 +110,7 @@ export function PdfViewer({ file, syncScroll, onScroll, onPdbClick, isHost }: Pd
                     onLoadSuccess={onDocumentLoadSuccess}
                     className="shadow-xl"
                 >
-                    {Array.from(new Array(numPages), (el, index) => (
+                    {Array.from(new Array(numPages), (_, index) => (
                         <div key={`page_${index + 1}`} className="mb-4">
                             <Page
                                 pageNumber={index + 1}
