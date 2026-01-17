@@ -49,7 +49,7 @@ export function SessionChat({ messages, onSendMessage, myPeerId, isOpen, setIsOp
         return (
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-6 left-6 z-50 p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg transition-all transform hover:scale-105"
+                className="fixed bottom-6 right-24 z-[100] p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg transition-all transform hover:scale-105"
             >
                 <div className="relative">
                     <MessageSquare className="w-6 h-6" />
@@ -64,7 +64,7 @@ export function SessionChat({ messages, onSendMessage, myPeerId, isOpen, setIsOp
     }
 
     return (
-        <div className="fixed bottom-6 left-6 z-50 w-80 md:w-96 bg-white/90 dark:bg-black/90 backdrop-blur-md rounded-xl shadow-2xl border border-neutral-200 dark:border-neutral-800 flex flex-col overflow-hidden transition-all h-[500px] max-h-[80vh]">
+        <div className="fixed bottom-20 right-24 z-[100] w-80 md:w-96 bg-white/90 dark:bg-black/90 backdrop-blur-md rounded-xl shadow-2xl border border-neutral-200 dark:border-neutral-800 flex flex-col overflow-hidden transition-all h-[500px] max-h-[80vh]">
             {/* Header */}
             <div className="flex items-center justify-between p-3 border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-white/5">
                 <div className="flex items-center gap-2">
