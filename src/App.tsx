@@ -500,7 +500,8 @@ function App() {
         representation: ctrl.representation,
         coloring: ctrl.coloring,
         isSpinning: ctrl.isSpinning,
-        highlightedResidue: ctrl.highlightedResidue
+        highlightedResidue: ctrl.highlightedResidue,
+        hoveredResidue: hoveredResidue // Sync transient hover
       });
     }
   }, [
@@ -510,6 +511,7 @@ function App() {
     controllers[0].coloring,
     controllers[0].isSpinning,
     controllers[0].highlightedResidue,
+    hoveredResidue, // Trigger broadcast on hover change
     peerSession.isConnected
   ]);
 
