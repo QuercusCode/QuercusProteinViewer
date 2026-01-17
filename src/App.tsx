@@ -862,7 +862,9 @@ function App() {
     controllers.map(c => c.pdbId).join(','),
     controllers.map(c => c.representation).join(','),
     controllers.map(c => c.coloring).join(','),
-    // ... other props
+    controllers.map(c => c.isSpinning).join(','),
+    controllers.map(c => c.highlightedResidue).join(','),
+    hoveredResidue
   ]);
   // Accessibility: Dyslexic Font
   const [isDyslexicFont, setIsDyslexicFont] = useState(false);

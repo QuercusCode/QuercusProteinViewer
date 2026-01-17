@@ -382,7 +382,7 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
         // We just send.
         connectionsRef.current.forEach(conn => {
             if (conn.open) {
-                conn.send({ type: 'SYNC_CHAT', payload: message });
+                conn.send({ type: 'SYNC_CHAT', message: message }); // Changed payload to message
             }
         });
     }, []);
