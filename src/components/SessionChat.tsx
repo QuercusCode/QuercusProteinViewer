@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquare, Send, X, Minimize2, Maximize2, ExternalLink } from 'lucide-react';
+import { MessageSquare, Send, Minimize2 } from 'lucide-react';
 import type { ChatMessage } from '../types';
 
 interface SessionChatProps {
