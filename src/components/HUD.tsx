@@ -164,7 +164,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
                     <div className={`pointer-events-auto backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-lg px-4 py-2 flex items-center justify-center gap-2 animate-in slide-in-from-bottom-2 mx-auto`}>
 
                         {/* Desktop: Reactions Inline */}
-                        <div className="hidden md:flex items-center gap-1 border-r border-gray-500/20 pr-2 mr-2">
+                        <div className="hidden md:flex items-center gap-1 border-r border-gray-500/20 pr-2">
                             {['👍', '👎', '❤️', '👏', '🎉'].map(emoji => (
                                 <button
                                     key={emoji}
