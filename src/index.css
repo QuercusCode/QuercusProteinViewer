@@ -41,4 +41,22 @@
   .embed-custom-color .border-blue-600 {
     border-color: var(--brand-color) !important;
   }
+
+  /* Scrollbar Utilities */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
+  /* Masks */
+  .mask-fade-right {
+    mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+  }
 }

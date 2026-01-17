@@ -140,21 +140,22 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
 
                 {/* Restored Live Indicator & View/Edit Toggle (Bottom Center) */}
                 {peerSession?.isConnected && (
-                    <div className={`pointer-events-auto backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-3 py-1 flex items-center gap-2 mb-1 animate-in slide-in-from-bottom-2`}>
-                        <div className="flex items-center gap-2 pr-3 border-r border-gray-500/20">
+                    <div className={`pointer-events-auto backdrop-blur-md rounded-2xl md:rounded-full border ${borderColor} ${bgColor} shadow-sm p-2 md:px-3 md:py-1 flex flex-wrap md:flex-nowrap items-center justify-center gap-2 mb-1 animate-in slide-in-from-bottom-2 max-w-[95vw]`}>
+                        <div className="flex items-center gap-2 pr-3 border-r border-gray-500/20 shrink-0">
                             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
-                            <span className={`text-[10px] font-bold tracking-wider ${textColor}`}>
-                                LIVE • {peerSession.connections.length + 1}
+                            <span className={`text-[10px] font-bold tracking-wider ${textColor} whitespace-nowrap`}>
+                                LIVE
+                                <span className="hidden sm:inline"> • {peerSession.connections.length + 1}</span>
                             </span>
                         </div>
 
-                        {/* Reaction Buttons */}
-                        <div className="flex items-center gap-1 border-r border-gray-500/20 pr-3 mr-3">
+                        {/* Reaction Buttons - Scrollable on mobile */}
+                        <div className="flex items-center gap-1 border-r border-gray-500/20 pr-3 mr-3 overflow-x-auto no-scrollbar max-w-[150px] sm:max-w-none mask-fade-right">
                             {['👍', '👎', '❤️', '👏', '🎉'].map(emoji => (
                                 <button
                                     key={emoji}
                                     onClick={() => peerSession.broadcastReaction?.(emoji, userName || 'Guest')}
-                                    className={`w-6 h-6 flex items-center justify-center rounded-full text-sm hover:scale-125 transition-transform active:scale-90 ${isLightMode ? 'hover:bg-neutral-100' : 'hover:bg-white/10'}`}
+                                    className={`w-8 h-8 md:w-6 md:h-6 flex items-center justify-center rounded-full text-base md:text-sm shrink-0 hover:scale-125 transition-transform active:scale-90 ${isLightMode ? 'hover:bg-neutral-100' : 'hover:bg-white/10'}`}
                                 >
                                     {emoji}
                                 </button>
@@ -162,7 +163,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
                         </div>
 
                         {/* Audio Controls */}
-                        <div className="flex items-center gap-2 pr-3 border-r border-gray-500/20">
+                        <div className="flex items-center gap-2 pr-3 border-r border-gray-500/20 shrink-0">
                             {!peerSession.isAudioConnected ? (
                                 <button
                                     onClick={() => peerSession.joinAudio?.()}
