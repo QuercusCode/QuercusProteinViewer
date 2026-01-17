@@ -1307,6 +1307,8 @@ function App() {
         // Restore custom/overlay if present in legacy object
         if (session.customColors) ctrl.setCustomColors(session.customColors);
         if (session.overlays) ctrl.setOverlays(session.overlays);
+        if (session.measurements) ctrl.setMeasurements(session.measurements); // Sync received measurements
+        if (session.highlightedResidue) ctrl.setHighlightedResidue(session.highlightedResidue);
 
         // Restore orientation
         if (session.orientation) {
@@ -2159,6 +2161,8 @@ function App() {
                     setMeasurements([]);
                     viewerRef.current?.clearMeasurements();
                   }}
+                  onDeleteMeasurement={handleDeleteMeasurement}
+                  measurements={measurements}
                   isLightMode={isLightMode}
                   setIsLightMode={setIsLightMode}
                   highlightedResidue={highlightedResidue}

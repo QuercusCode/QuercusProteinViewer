@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Skeleton } from './Skeleton';
 import { GalleryModal } from './GalleryModal';
+import { MeasurementTable } from './MeasurementTable';
 import {
     Activity,
     BookOpen,
@@ -35,7 +36,7 @@ import {
     Wrench,
     X
 } from 'lucide-react';
-import type { RepresentationType, ColoringType, ChainInfo, Snapshot, Movie, ColorPalette, PDBMetadata, CustomColorRule } from '../types';
+import type { RepresentationType, ColoringType, ChainInfo, Snapshot, Movie, ColorPalette, PDBMetadata, CustomColorRule, Measurement } from '../types';
 import type { DataSource } from '../utils/pdbUtils';
 import type { HistoryItem } from '../hooks/useHistory';
 import { formatChemicalId } from '../utils/pdbUtils';
@@ -287,9 +288,12 @@ interface ControlsProps {
     onTogglePublicationMode: () => void;
     onShare: () => void;
     onToggleMeasurement?: () => void;
+    measurements: Measurement[]; // Use imported Measurement type
+    onDeleteMeasurement: (id: string) => void;
     onClearMeasurements: () => void;
-    onOpenSuperposition?: () => void; // Added prop
+    onOpenSuperposition?: () => void;
     pdbMetadata: PDBMetadata | null;
+
 
     isLightMode: boolean;
     setIsLightMode: (mode: boolean) => void;
@@ -387,6 +391,8 @@ export const Controls: React.FC<ControlsProps> = ({
     onToggleMeasurement,
     onClearMeasurements,
     onOpenSuperposition,
+    measurements,
+    onDeleteMeasurement,
     isPublicationMode,
     onTogglePublicationMode,
     pdbMetadata,
@@ -1351,6 +1357,31 @@ export const Controls: React.FC<ControlsProps> = ({
                             </p>
 
                             {/* Custom Rules */}
+                        </div>
+                    </SidebarSection>
+
+
+                    {/* ACCORDION X: JOINT MEASUREMENTS */}
+                    <SidebarSection
+                        title="Joint Measurements"
+                        icon={Ruler}
+                        isOpen={openSections['measurements']}
+                        onToggle={() => toggleSection('measurements')}
+                        isLightMode={isLightMode}
+                        id="measurements-section"
+                    >
+                        <MeasurementTable
+                            measurements={measurements}
+                            onDelete={onDeleteMeasurement}
+                            isLightMode={isLightMode}
+                        />
+                        <div className="mt-2 pt-2 border-t border-white/5 flex justify-end">
+                            <button
+                                onClick={onClearMeasurements}
+                                className="text-[10px] text-red-500 hover:underline flex items-center gap-1"
+                            >
+                                <Trash2 className="w-3 h-3" /> Clear All
+                            </button>
                         </div>
                     </SidebarSection>
 
