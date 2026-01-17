@@ -768,7 +768,23 @@ export const Controls: React.FC<ControlsProps> = ({
                                     <input
                                         type="text"
                                         value={localPdbId}
-                                        onChange={(e) => setLocalPdbId(e.target.value)}
+                                        onChange={(e) => {
+                                            const val = e.target.value;
+                                            setLocalPdbId(val);
+
+                                            // Smart Database Detection
+                                            const clean = val.trim();
+                                            if (clean) {
+                                                // Heuristic: PDB IDs are 4 chars, start with digit 1-9, and usually contain a letter.
+                                                // Everything else (Pure numbers, Names, longer IDs) is likely PubChem.
+                                                const isPdbLikely = /^[1-9][a-zA-Z0-9]{3}$/.test(clean) && /[a-zA-Z]/.test(clean);
+                                                if (isPdbLikely) {
+                                                    setDataSource('pdb');
+                                                } else {
+                                                    setDataSource('pubchem');
+                                                }
+                                            }
+                                        }}
                                         onFocus={() => setIsSearchFocused(true)}
                                         onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
                                         placeholder={
