@@ -187,7 +187,7 @@ export const SequenceTrack: React.FC<SequenceTrackProps> = ({
                     </div>
                 )}
 
-                <div className="text-[9px] text-neutral-500 font-mono font-bold text-center w-full mt-1 border-t border-neutral-800/30 pt-1 w-3/4 mx-auto">
+                <div className="text-[10px] text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 rounded-full px-2 py-0.5 font-mono font-bold text-center mt-2 mx-auto shadow-sm shadow-indigo-500/5">
                     {isAtomView ? `${activeChain.atoms?.length} atoms` : `${activeChain.sequence.length} res`}
                 </div>
             </div>
