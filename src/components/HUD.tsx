@@ -236,44 +236,46 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
                     </div>
                 )}
 
-                {/* Minimal Capsule (Bottom Center) */}
-                <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-4 md:px-6 py-2 flex items-center justify-center min-w-[240px] transition-all duration-300 ease-out overflow-hidden mt-1`}>
-                    <div className="relative flex items-center justify-center">
-                        {/* Residue Info View - Fades In/Out */}
-                        <div className={`flex items-center gap-3 transition-opacity duration-300 ${effectiveResidue ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden absolute'}`}>
-                            {effectiveResidue && (
-                                <>
-                                    {STANDARD_RESIDUES.has(effectiveResidue.resName.toUpperCase()) ? (
-                                        <>
-                                            <span className={`font-semibold ${textColor} whitespace-nowrap`}>
-                                                {effectiveResidue.resName} <span className="opacity-90">{effectiveResidue.resNo}</span>
-                                            </span>
-                                            <div className={`h-3 w-px ${isLightMode ? 'bg-black/10' : 'bg-white/20'}`} />
-                                            <span className={`text-xs uppercase tracking-wide opacity-80 ${textColor} whitespace-nowrap`}>
-                                                Chain {effectiveResidue.chain}
-                                            </span>
-                                        </>
-                                    ) : (
-                                        (effectiveResidue.atomName) ? (
-                                            <span className={`font-mono font-semibold ${textColor} whitespace-nowrap`}>
-                                                {effectiveResidue.atomName} <span className="text-xs opacity-80">#{effectiveResidue.atomSerial}</span>
-                                            </span>
+                {/* Minimal Capsule (Bottom Center) - Only show if we have content */}
+                {(effectiveResidue || structTitle) && (
+                    <div className={`backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-sm px-4 md:px-6 py-2 flex items-center justify-center min-w-[240px] transition-all duration-300 ease-out overflow-hidden mt-1`}>
+                        <div className="relative flex items-center justify-center">
+                            {/* Residue Info View - Fades In/Out */}
+                            <div className={`flex items-center gap-3 transition-opacity duration-300 ${effectiveResidue ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden absolute'}`}>
+                                {effectiveResidue && (
+                                    <>
+                                        {STANDARD_RESIDUES.has(effectiveResidue.resName.toUpperCase()) ? (
+                                            <>
+                                                <span className={`font-semibold ${textColor} whitespace-nowrap`}>
+                                                    {effectiveResidue.resName} <span className="opacity-90">{effectiveResidue.resNo}</span>
+                                                </span>
+                                                <div className={`h-3 w-px ${isLightMode ? 'bg-black/10' : 'bg-white/20'}`} />
+                                                <span className={`text-xs uppercase tracking-wide opacity-80 ${textColor} whitespace-nowrap`}>
+                                                    Chain {effectiveResidue.chain}
+                                                </span>
+                                            </>
                                         ) : (
-                                            <span className={`font-semibold ${textColor} whitespace-nowrap`}>
-                                                {effectiveResidue.resName}
-                                            </span>
-                                        )
-                                    )}
-                                </>
-                            )}
-                        </div>
+                                            (effectiveResidue.atomName) ? (
+                                                <span className={`font-mono font-semibold ${textColor} whitespace-nowrap`}>
+                                                    {effectiveResidue.atomName} <span className="text-xs opacity-80">#{effectiveResidue.atomSerial}</span>
+                                                </span>
+                                            ) : (
+                                                <span className={`font-semibold ${textColor} whitespace-nowrap`}>
+                                                    {effectiveResidue.resName}
+                                                </span>
+                                            )
+                                        )}
+                                    </>
+                                )}
+                            </div>
 
-                        {/* Idle Title View - Fades In/Out */}
-                        <div className={`text-xs font-medium tracking-wider ${textColor} uppercase text-center truncate max-w-[240px] transition-opacity duration-300 ${!effectiveResidue ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden absolute'}`}>
-                            {structTitle}
+                            {/* Idle Title View - Fades In/Out */}
+                            <div className={`text-xs font-medium tracking-wider ${textColor} uppercase text-center truncate max-w-[240px] transition-opacity duration-300 ${!effectiveResidue ? 'opacity-100' : 'opacity-0 w-0 overflow-hidden absolute'}`}>
+                                {structTitle}
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
             </div>
         </>
     );
