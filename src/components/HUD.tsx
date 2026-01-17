@@ -69,7 +69,9 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
     // Close roster when clicking outside (simple check)
     // For now, toggle-based is fine.
 
-    if (!effectiveResidue && (!structTitle || isEmbedMode)) return null;
+    // Always show if connecting/connected to a peer session, even if title is missing (local file)
+    const isSessionActive = peerSession?.isConnected;
+    if (!isSessionActive && !effectiveResidue && (!structTitle || isEmbedMode)) return null;
 
     return (
         <>
