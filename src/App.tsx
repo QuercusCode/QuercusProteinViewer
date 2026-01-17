@@ -114,6 +114,13 @@ function App() {
   // Chat State
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  // Clear unread on open
+  useEffect(() => {
+    if (isChatOpen) setUnreadCount(0);
+  }, [isChatOpen]);
+
 
   // Handlers
   const handleSendChat = (text: string) => {
@@ -157,8 +164,12 @@ function App() {
         if (prev.some(m => m.id === peerSession.lastReceivedChat?.id)) return prev;
         return [...prev, peerSession.lastReceivedChat!];
       });
+
+      if (!isChatOpen) {
+        setUnreadCount(prev => prev + 1);
+      }
     }
-  }, [peerSession.lastReceivedChat]);
+  }, [peerSession.lastReceivedChat, isChatOpen]);
 
 
   // Sync Controller ID
@@ -2053,6 +2064,10 @@ function App() {
             peerNames={peerSession.peerNames}
             userName={userName}
             controllerId={controllerId}
+            // Chat Integration
+            unreadCount={unreadCount}
+            isChatOpen={isChatOpen}
+            onToggleChat={() => setIsChatOpen(!isChatOpen)}
           />
 
           <IdentityModal

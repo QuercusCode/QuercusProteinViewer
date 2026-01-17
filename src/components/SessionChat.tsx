@@ -13,7 +13,6 @@ interface SessionChatProps {
 export function SessionChat({ messages, onSendMessage, myPeerId, isOpen, setIsOpen }: SessionChatProps) {
     const [inputText, setInputText] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const [unreadCount, setUnreadCount] = useState(0);
 
     // Auto-scroll to bottom
     const scrollToBottom = () => {
@@ -21,22 +20,10 @@ export function SessionChat({ messages, onSendMessage, myPeerId, isOpen, setIsOp
     };
 
     useEffect(() => {
-        scrollToBottom();
-        if (!isOpen) {
-            // Simple unread logic: If closed, increment. 
-            // Real logic requires tracking last read time, but this handles "new since closed".
-            // Actually, we can't detect "new" easily without previous length.
-            // Simplified: We'll just rely on the badge being cleared when opened.
+        if (isOpen) {
+            scrollToBottom();
         }
     }, [messages, isOpen]);
-
-    useEffect(() => {
-        if (!isOpen && messages.length > 0) {
-            setUnreadCount(prev => prev + 1);
-        } else {
-            setUnreadCount(0);
-        }
-    }, [messages.length, isOpen]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -45,23 +32,7 @@ export function SessionChat({ messages, onSendMessage, myPeerId, isOpen, setIsOp
         setInputText('');
     };
 
-    if (!isOpen) {
-        return (
-            <button
-                onClick={() => setIsOpen(true)}
-                className="fixed bottom-6 left-6 md:left-[22rem] z-[50] p-3 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg hover:shadow-blue-500/20 transition-all transform hover:scale-105 active:scale-95"
-            >
-                <div className="relative">
-                    <MessageSquare className="w-5 h-5" />
-                    {unreadCount > 0 && (
-                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white dark:border-black">
-                            {unreadCount}
-                        </span>
-                    )}
-                </div>
-            </button>
-        );
-    }
+    if (!isOpen) return null;
 
     return (
         <div className="fixed bottom-20 left-6 md:left-[22rem] z-[50] w-80 bg-white/95 dark:bg-neutral-900/95 backdrop-blur-md rounded-2xl shadow-2xl border border-neutral-200 dark:border-neutral-800 flex flex-col overflow-hidden transition-all duration-300 ease-in-out h-[450px] max-h-[70vh]">

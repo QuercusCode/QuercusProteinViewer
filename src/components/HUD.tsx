@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import type { ResidueInfo, PDBMetadata } from '../types';
 import type { PeerSession } from '../hooks/usePeerSession';
-import { Eye, Wrench, Lock, Unlock, Mic, MicOff, PhoneOff } from 'lucide-react';
+import { Eye, Wrench, Lock, Unlock, Mic, MicOff, PhoneOff, MessageSquare } from 'lucide-react';
 
 interface HUDProps {
     hoveredResidue: ResidueInfo | null;
@@ -18,9 +18,13 @@ interface HUDProps {
     isCameraSynced?: boolean;
     onToggleCameraSync?: () => void;
     userName?: string | null; // Added local user name
+    // Chat Props
+    unreadCount?: number;
+    isChatOpen?: boolean;
+    onToggleChat?: () => void;
 }
 
-export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMode = false, peerSession, remoteHoveredResidue, isHost, remoteUserName, peerNames = {}, controllerId, isCameraSynced, onToggleCameraSync, userName }: HUDProps) {
+export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMode = false, peerSession, remoteHoveredResidue, isHost, remoteUserName, peerNames = {}, controllerId, isCameraSynced, onToggleCameraSync, userName, unreadCount = 0, isChatOpen = false, onToggleChat }: HUDProps) {
     const textColor = isLightMode ? 'text-gray-800' : 'text-gray-200';
     const bgColor = isLightMode ? 'bg-white/80' : 'bg-black/80';
     const borderColor = isLightMode ? 'border-gray-200' : 'border-neutral-800';
@@ -179,6 +183,26 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
                                 </button>
                             ))}
                         </div>
+
+                        {/* Chat Toggle */}
+                        {onToggleChat && (
+                            <div className="flex items-center border-r border-gray-500/20 pr-3 mr-3">
+                                <button
+                                    onClick={onToggleChat}
+                                    className={`relative p-2 md:p-1.5 rounded-full transition-colors flex items-center justify-center ${isChatOpen
+                                        ? 'bg-blue-600 text-white shadow-md'
+                                        : (isLightMode ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-white/10 text-white hover:bg-white/20')
+                                        }`}
+                                >
+                                    <MessageSquare className="w-4 h-4" />
+                                    {unreadCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full border-2 border-white dark:border-black">
+                                            {unreadCount}
+                                        </span>
+                                    )}
+                                </button>
+                            </div>
+                        )}
 
                         {/* Audio Controls */}
                         <div className="flex items-center gap-3 md:gap-2 md:pr-4 md:border-r md:border-gray-500/20 shrink-0">
