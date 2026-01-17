@@ -5,9 +5,10 @@ import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
 // Set worker source
-// IMPORTANT: We need to use a CDN or local worker. 
-// For Vite, usually we import the worker script. But to be safe and quick:
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+// Use Vite's ?url import to get the resolved asset path
+import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+
+pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 interface PdfViewerProps {
     file: File | { name: string; data: ArrayBuffer } | null;
