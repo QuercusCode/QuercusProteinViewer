@@ -2146,11 +2146,10 @@ function App() {
               return (
                 // Mobile: Absolute Overlay | Desktop: Relative Flow
                 <div className={`
-                    fixed inset-y-0 left-0 z-50 bg-neutral-900/95 backdrop-blur-md transition-transform duration-300 ease-in-out border-r border-white/10
+                    fixed inset-y-0 left-0 z-50 bg-neutral-900/95 backdrop-blur-md transition-transform duration-300 ease-in-out border-r border-white/10 w-80 
                     md:relative md:bg-transparent md:backdrop-blur-none md:translate-x-0
-                    ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+                    ${isMobileMenuOpen ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-100 md:translate-x-0'}
                     ${isSidebarCollapsed ? 'md:w-0 md:overflow-hidden md:opacity-0' : 'md:w-80 md:opacity-100'}
-                    w-80
                 `}>
                   {/* Mobile Close Button */}
                   <div className="md:hidden absolute top-4 right-4 z-50">
@@ -2290,10 +2289,7 @@ function App() {
 
                   {/* Mobile Hamburger - Top Left */}
                   <button
-                    onClick={() => {
-                      setIsMobileMenuOpen(true);
-                      setIsSidebarCollapsed(false);
-                    }}
+                    onClick={() => setIsMobileMenuOpen(true)}
                     className="absolute top-4 left-4 z-40 md:hidden p-2 bg-black/50 backdrop-blur-sm rounded-lg border border-white/10 text-white shadow-lg"
                   >
                     <Menu size={24} />
