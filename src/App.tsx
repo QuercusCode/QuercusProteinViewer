@@ -2487,6 +2487,16 @@ function App() {
                       </>
                     );
 
+                  case 'quad':
+                    return (
+                      <div className="grid grid-cols-2 grid-rows-2 w-full h-full">
+                        {renderViewport(0, 'border-r border-b border-[#333]')}
+                        {renderViewport(1, 'border-b border-[#333]')}
+                        {renderViewport(2, 'border-r border-[#333]')}
+                        {renderViewport(3)}
+                      </div>
+                    );
+
                   case 'triple':
                     return (
                       <div className="flex flex-col w-full h-full">
@@ -2495,7 +2505,6 @@ function App() {
                           {renderViewport(1, 'w-1/2 border-r border-[#333]')}
                           {renderViewport(2, 'w-1/2')}
                         </div>
-                        {renderViewport(3, 'w-1/2')}
                       </div>
                     );
 
