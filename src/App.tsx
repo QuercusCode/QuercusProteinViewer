@@ -38,7 +38,7 @@ import {
   Camera, RefreshCw, Upload,
   Settings, Zap, Activity, Grid3X3, Palette,
   Share2, Save, FolderOpen, Video, Ruler, Maximize2, Star, Undo2, Redo2, BookOpen,
-  ChevronLeft, ChevronRight
+  ChevronLeft, ChevronRight, Menu, X
 } from 'lucide-react';
 import { startOnboardingTour } from './components/TourGuide';
 import { ViewportSelector } from './components/ViewportSelector';
@@ -734,6 +734,7 @@ function App() {
 
   // Sidebar Collapse State
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [colorPalette, setColorPalette] = useState<ColorPalette>('standard');
 
@@ -2143,7 +2144,20 @@ function App() {
                 (file && /\.(sdf|mol|cif)$/i.test(file.name));
 
               return (
-                <div className={`hidden md:block relative h-full transition-all duration-300 ease-in-out border-r border-white/10 ${isSidebarCollapsed ? 'w-0 overflow-hidden opacity-0' : 'w-80 opacity-100'}`}>
+                // Mobile: Absolute Overlay | Desktop: Relative Flow
+                <div className={`
+                    fixed inset-y-0 left-0 z-50 bg-neutral-900/95 backdrop-blur-md transition-transform duration-300 ease-in-out border-r border-white/10
+                    md:relative md:bg-transparent md:backdrop-blur-none md:translate-x-0
+                    ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
+                    ${isSidebarCollapsed ? 'md:w-0 md:overflow-hidden md:opacity-0' : 'md:w-80 md:opacity-100'}
+                    w-80
+                `}>
+                  {/* Mobile Close Button */}
+                  <div className="md:hidden absolute top-4 right-4 z-50">
+                    <button onClick={() => setIsMobileMenuOpen(false)} className="p-2 text-white/50 hover:text-white">
+                      <X size={24} />
+                    </button>
+                  </div>
                   <Controls
                     pdbId={pdbId}
                     setPdbId={handlePdbIdChange}
@@ -2260,17 +2274,28 @@ function App() {
               {/* Collapse Button - Positioned on top of viewport */}
               {/* Collapse Button - Positioned on top of viewport - hidden on mobile */}
               {!isEmbedMode && (
-                <button
-                  onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                  className={`absolute top-1/2 left-0 -translate-y-1/2 z-50 hidden md:flex
-                        pl-1 pr-2 h-16 bg-[#1a1a1a] border-y border-r border-white/10 rounded-r-xl text-white/50 hover:text-white 
-                        shadow-2xl transition-all w-6 hover:w-8 overflow-hidden group items-center justify-start
-                        ${isSidebarCollapsed ? 'translate-x-0' : 'translate-x-0'}
-                    `}
-                  title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-                >
-                  {isSidebarCollapsed ? <ChevronRight size={20} className="min-w-[20px]" /> : <ChevronLeft size={20} className="min-w-[20px]" />}
-                </button>
+                <>
+                  {/* Desktop Toggle */}
+                  <button
+                    onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                    className={`absolute top-1/2 left-0 -translate-y-1/2 z-50 hidden md:flex
+                            pl-1 pr-2 h-16 bg-[#1a1a1a] border-y border-r border-white/10 rounded-r-xl text-white/50 hover:text-white 
+                            shadow-2xl transition-all w-6 hover:w-8 overflow-hidden group items-center justify-start
+                            ${isSidebarCollapsed ? 'translate-x-0' : 'translate-x-0'}
+                        `}
+                    title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+                  >
+                    {isSidebarCollapsed ? <ChevronRight size={20} className="min-w-[20px]" /> : <ChevronLeft size={20} className="min-w-[20px]" />}
+                  </button>
+
+                  {/* Mobile Hamburger - Top Left */}
+                  <button
+                    onClick={() => setIsMobileMenuOpen(true)}
+                    className="absolute top-4 left-4 z-40 md:hidden p-2 bg-black/50 backdrop-blur-sm rounded-lg border border-white/10 text-white shadow-lg"
+                  >
+                    <Menu size={24} />
+                  </button>
+                </>
               )}
               {(() => {
                 // Helper: Render single viewport
