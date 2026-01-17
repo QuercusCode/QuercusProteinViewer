@@ -37,7 +37,8 @@ import type {
 import {
   Camera, RefreshCw, Upload,
   Settings, Zap, Activity, Grid3X3, Palette,
-  Share2, Save, FolderOpen, Video, Ruler, Maximize2, Star, Undo2, Redo2, BookOpen
+  Share2, Save, FolderOpen, Video, Ruler, Maximize2, Star, Undo2, Redo2, BookOpen,
+  ChevronLeft, ChevronRight
 } from 'lucide-react';
 import { startOnboardingTour } from './components/TourGuide';
 import { ViewportSelector } from './components/ViewportSelector';
@@ -730,6 +731,9 @@ function App() {
 
   const [isFavoritesOpen, setIsFavoritesOpen] = useState(false);
   const [favoritesTab, setFavoritesTab] = useState<'favorites' | 'history'>('favorites');
+
+  // Sidebar Collapse State
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [colorPalette, setColorPalette] = useState<ColorPalette>('standard');
 
@@ -2139,117 +2143,134 @@ function App() {
                 (file && /\.(sdf|mol|cif)$/i.test(file.name));
 
               return (
-                <Controls
-                  pdbId={pdbId}
-                  setPdbId={handlePdbIdChange}
-                  dataSource={dataSource}
-                  setDataSource={setDataSource}
-                  isChemical={!!isChemical}
-                  onUpload={handleFileUploadWithSync}
-                  representation={representation}
-                  setRepresentation={setRepresentation}
-                  coloring={coloring}
-                  setColoring={setColoring}
-                  onResetView={() => handleToolAction('reset')}
-                  chains={chains}
-                  ligands={ligands}
-                  isMeasurementMode={isMeasurementMode}
-                  setIsMeasurementMode={setIsMeasurementMode}
-                  isPublicationMode={isPublicationMode}
-                  onTogglePublicationMode={togglePublicationMode}
-                  onClearMeasurements={() => {
-                    setMeasurements([]);
-                    viewerRef.current?.clearMeasurements();
-                  }}
-                  onDeleteMeasurement={handleDeleteMeasurement}
-                  measurements={measurements}
-                  isSharedSession={peerSession.isConnected}
-                  isLightMode={isLightMode}
-                  setIsLightMode={setIsLightMode}
-                  highlightedResidue={highlightedResidue}
-                  onResidueClick={handleSequenceResidueClick}
-                  showSurface={showSurface}
-                  setShowSurface={setShowSurface}
-                  showLigands={showLigands}
-                  setShowLigands={setShowLigands}
-                  showIons={showIons}
-                  setShowIons={setShowIons}
-                  onFocusLigands={handleFocusLigands}
-                  onRecordMovie={handleRecordMovie}
-                  isRecording={isRecording}
-                  proteinTitle={proteinTitle}
-                  snapshots={snapshots}
-                  onSnapshot={handleSnapshot}
-                  onDownloadSnapshot={handleDownloadSnapshot}
-                  onDeleteSnapshot={handleDeleteSnapshot}
-                  isSpinning={isSpinning}
-                  setIsSpinning={setIsSpinning}
-                  onSaveSession={() => handleToolAction('save')}
-                  onLoadSession={handleLoadSession}
-                  onDownloadPDB={handleDownloadPDB}
-                  onDownloadSequence={handleDownloadSequence}
-                  onToggleContactMap={() => setShowContactMap(!showContactMap)}
-                  onTakeSnapshot={handleSnapshot}
-                  movies={movies}
-                  onDownloadMovie={handleDownloadMovie}
-                  onDeleteMovie={handleDeleteMovie}
-                  isCleanMode={isCleanMode}
-                  setIsCleanMode={setIsCleanMode}
-                  onShare={() => handleToolAction('share')}
-                  onToggleShare={() => handleToolAction('share')}
-                  onToggleLibrary={() => setIsLibraryOpen(!isLibraryOpen)}
-                  onToggleMeasurement={() => setIsMeasurementMode(!isMeasurementMode)}
-                  onOpenSuperposition={() => setIsSuperpositionModalOpen(true)} // Added prop
-                  colorPalette={colorPalette}
-                  setColorPalette={setColorPalette}
-                  isDyslexicFont={isDyslexicFont}
-                  setIsDyslexicFont={setIsDyslexicFont}
-                  customBackgroundColor={customBackgroundColor}
-                  setCustomBackgroundColor={setCustomBackgroundColor}
-                  pdbMetadata={pdbMetadata}
-                  onHighlightRegion={(selection, label) => {
-                    viewerRef.current?.highlightRegion(selection, label);
-                  }}
-                  onStartTour={handleStartTour}
-                  openSections={openSections}
-                  onToggleSection={handleToggleSection}
-                  isMobileSidebarOpen={isMobileSidebarOpen}
-                  onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
-                  onToggleFavorite={() => toggleFavorite(pdbId, dataSource, proteinTitle || undefined)}
-                  isFavorite={isFavorite(pdbId, dataSource)}
-                  onOpenFavorites={() => {
-                    setFavoritesTab('favorites');
-                    setIsFavoritesOpen(true);
-                  }}
-                  onOpenHistory={() => {
-                    setFavoritesTab('history');
-                    setIsFavoritesOpen(true);
-                  }}
-                  history={history}
+                <div className={`relative h-full transition-all duration-300 ease-in-out border-r border-white/10 ${isSidebarCollapsed ? 'w-0 overflow-hidden opacity-0' : 'w-80 opacity-100'}`}>
+                  <Controls
+                    pdbId={pdbId}
+                    setPdbId={handlePdbIdChange}
+                    dataSource={dataSource}
+                    setDataSource={setDataSource}
+                    isChemical={!!isChemical}
+                    onUpload={handleFileUploadWithSync}
+                    representation={representation}
+                    setRepresentation={setRepresentation}
+                    coloring={coloring}
+                    setColoring={setColoring}
+                    onResetView={() => handleToolAction('reset')}
+                    chains={chains}
+                    ligands={ligands}
+                    isMeasurementMode={isMeasurementMode}
+                    setIsMeasurementMode={setIsMeasurementMode}
+                    isPublicationMode={isPublicationMode}
+                    onTogglePublicationMode={togglePublicationMode}
+                    onClearMeasurements={() => {
+                      setMeasurements([]);
+                      viewerRef.current?.clearMeasurements();
+                    }}
+                    onDeleteMeasurement={handleDeleteMeasurement}
+                    measurements={measurements}
+                    isSharedSession={peerSession.isConnected}
+                    isLightMode={isLightMode}
+                    setIsLightMode={setIsLightMode}
+                    highlightedResidue={highlightedResidue}
+                    onResidueClick={handleSequenceResidueClick}
+                    showSurface={showSurface}
+                    setShowSurface={setShowSurface}
+                    showLigands={showLigands}
+                    setShowLigands={setShowLigands}
+                    showIons={showIons}
+                    setShowIons={setShowIons}
+                    onFocusLigands={handleFocusLigands}
+                    onRecordMovie={handleRecordMovie}
+                    isRecording={isRecording}
+                    proteinTitle={proteinTitle}
+                    snapshots={snapshots}
+                    onSnapshot={handleSnapshot}
+                    onDownloadSnapshot={handleDownloadSnapshot}
+                    onDeleteSnapshot={handleDeleteSnapshot}
+                    isSpinning={isSpinning}
+                    setIsSpinning={setIsSpinning}
+                    onSaveSession={() => handleToolAction('save')}
+                    onLoadSession={handleLoadSession}
+                    onDownloadPDB={handleDownloadPDB}
+                    onDownloadSequence={handleDownloadSequence}
+                    onToggleContactMap={() => setShowContactMap(!showContactMap)}
+                    onTakeSnapshot={handleSnapshot}
+                    movies={movies}
+                    onDownloadMovie={handleDownloadMovie}
+                    onDeleteMovie={handleDeleteMovie}
+                    isCleanMode={isCleanMode}
+                    setIsCleanMode={setIsCleanMode}
+                    onShare={() => handleToolAction('share')}
+                    onToggleShare={() => handleToolAction('share')}
+                    onToggleLibrary={() => setIsLibraryOpen(!isLibraryOpen)}
+                    onToggleMeasurement={() => setIsMeasurementMode(!isMeasurementMode)}
+                    onOpenSuperposition={() => setIsSuperpositionModalOpen(true)} // Added prop
+                    colorPalette={colorPalette}
+                    setColorPalette={setColorPalette}
+                    isDyslexicFont={isDyslexicFont}
+                    setIsDyslexicFont={setIsDyslexicFont}
+                    customBackgroundColor={customBackgroundColor}
+                    setCustomBackgroundColor={setCustomBackgroundColor}
+                    pdbMetadata={pdbMetadata}
+                    onHighlightRegion={(selection, label) => {
+                      viewerRef.current?.highlightRegion(selection, label);
+                    }}
+                    onStartTour={handleStartTour}
+                    openSections={openSections}
+                    onToggleSection={handleToggleSection}
+                    isMobileSidebarOpen={isMobileSidebarOpen}
+                    onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+                    onToggleFavorite={() => toggleFavorite(pdbId, dataSource, proteinTitle || undefined)}
+                    isFavorite={isFavorite(pdbId, dataSource)}
+                    onOpenFavorites={() => {
+                      setFavoritesTab('favorites');
+                      setIsFavoritesOpen(true);
+                    }}
+                    onOpenHistory={() => {
+                      setFavoritesTab('history');
+                      setIsFavoritesOpen(true);
+                    }}
+                    history={history}
 
 
 
-                  // Undo/Redo
-                  onUndo={undo}
-                  onRedo={redo}
-                  canUndo={canUndo}
-                  canRedo={canRedo}
+                    // Undo/Redo
+                    onUndo={undo}
+                    onRedo={redo}
+                    canUndo={canUndo}
+                    canRedo={canRedo}
 
-                  // Custom Colors
-                  customColors={customColors}
-                  setCustomColors={setCustomColors}
+                    // Custom Colors
+                    customColors={customColors}
+                    setCustomColors={setCustomColors}
 
-                  // Multi-View Mode
-                  viewMode={viewMode}
-                  onSetViewMode={setViewMode}
+                    // Multi-View Mode
+                    viewMode={viewMode}
+                    onSetViewMode={setViewMode}
 
 
-                />
+                  />
+                </div>
               );
             })()}
 
             {/* Multi-View Layout */}
             <div className="relative flex-1 flex w-full h-full overflow-hidden bg-black">
+
+              {/* Collapse Button - Positioned on top of viewport */}
+              {!isEmbedMode && (
+                <button
+                  onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                  className={`absolute top-1/2 left-0 -translate-y-1/2 z-50 
+                        p-1 bg-[#1a1a1a] border border-white/10 rounded-r-md text-white/50 hover:text-white 
+                        shadow-xl transition-all hover:w-6 w-3 overflow-hidden group items-center justify-center flex
+                        ${isSidebarCollapsed ? 'translate-x-0' : 'translate-x-0'}
+                    `}
+                  title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+                >
+                  {isSidebarCollapsed ? <ChevronRight size={14} className="min-w-[14px]" /> : <ChevronLeft size={14} className="min-w-[14px]" />}
+                </button>
+              )}
               {(() => {
                 // Helper: Render single viewport
                 const renderViewport = (index: number, extraClasses = '') => {
