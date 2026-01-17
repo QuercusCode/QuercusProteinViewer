@@ -189,12 +189,13 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
                             <div className="flex items-center border-r border-gray-500/20 pr-3 mr-3">
                                 <button
                                     onClick={onToggleChat}
-                                    className={`relative p-2 md:p-1.5 rounded-full transition-colors flex items-center justify-center ${isChatOpen
+                                    className={`relative text-[10px] font-bold px-4 py-1.5 md:px-2 md:py-1 rounded-full flex items-center gap-2 transition-colors ${isChatOpen
                                         ? 'bg-blue-600 text-white shadow-md'
-                                        : (isLightMode ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-white/10 text-white hover:bg-white/20')
+                                        : (isLightMode ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' : 'bg-blue-500/20 text-blue-300 hover:bg-blue-500/30')
                                         }`}
                                 >
-                                    <MessageSquare className="w-4 h-4" />
+                                    <MessageSquare className="w-4 h-4 md:w-3 md:h-3" />
+                                    CHAT
                                     {unreadCount > 0 && (
                                         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full border-2 border-white dark:border-black">
                                             {unreadCount}
