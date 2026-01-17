@@ -1457,6 +1457,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                         console.log("Loading from file:", currentFile.name);
                         // Detect extension
                         const rawExt = currentFile.name.split('.').pop()?.toLowerCase() || 'pdb';
+                        console.log(`[ProteinViewer] Loading File: ${currentFile.name} | Size: ${currentFile.size} | Ext: ${rawExt}`);
                         let ext = rawExt;
 
                         // Normalize extensions
@@ -1514,6 +1515,7 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
                             if (!comp) throw new Error("NGL returned null component");
 
                             // CRITICAL: Check if structure is actually populated
+                            console.log(`[ProteinViewer] Loaded Component. AtomCount: ${comp.structure ? comp.structure.atomCount : 'N/A'}`);
                             if (comp.structure && comp.structure.atomCount === 0) {
                                 // If 3D structure is empty, trigger fallback
                                 comp.structure.dispose(); // Cleanup

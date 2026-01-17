@@ -534,6 +534,7 @@ function App() {
 
       // Create File object from ArrayBuffer
       const receivedFile = new File([data], name);
+      console.log(`[App] P2P Received File: ${name} | Size: ${receivedFile.size} | Type: ${receivedFile.type}`);
 
       // Load it!
       handleUpload(receivedFile);
