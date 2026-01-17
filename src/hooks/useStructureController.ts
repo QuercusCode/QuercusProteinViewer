@@ -11,7 +11,7 @@ export interface StructureController {
     setDataSource: (source: DataSource) => void;
     file: File | null;
     setFile: (file: File | null) => void;
-    fileType: 'pdb' | 'mmcif';
+    fileType: 'pdb' | 'mmcif' | 'sdf' | 'mol' | 'mol2';
 
     // Visualization
     representation: RepresentationType;
@@ -68,7 +68,7 @@ export const useStructureController = (initialState: any = {}): StructureControl
     const [pdbId, setPdbId] = useState<string>(initialState.pdbId || '');
     const [dataSource, setDataSource] = useState<DataSource>(initialState.dataSource || 'rcsb');
     const [file, setFile] = useState<File | null>(null);
-    const [fileType, setFileType] = useState<'pdb' | 'mmcif'>('pdb');
+    const [fileType, setFileType] = useState<'pdb' | 'mmcif' | 'sdf' | 'mol' | 'mol2'>('pdb');
 
     // Visuals
     const [representation, setRepresentation] = useState<RepresentationType>(initialState.representation || 'cartoon');
@@ -105,7 +105,11 @@ export const useStructureController = (initialState: any = {}): StructureControl
 
     const handleUpload = useCallback((uploadedFile: File, isCif?: boolean, preservePdbId?: boolean) => {
         setFile(uploadedFile);
-        setFileType(isCif ? 'mmcif' : 'pdb');
+        // Detect type from extension
+        const ext = uploadedFile.name.split('.').pop()?.toLowerCase();
+        if (isCif || ext === 'cif' || ext === 'bcif') setFileType('mmcif');
+        else if (['sdf', 'mol', 'mol2'].includes(ext || '')) setFileType(ext as any);
+        else setFileType('pdb');
         if (!preservePdbId) {
             setPdbId('');
             // Only switch to url if not preserving. Actually handleUpload usually implies local file so 'url' mode is confusing naming but acceptable?
@@ -128,8 +132,8 @@ export const useStructureController = (initialState: any = {}): StructureControl
         setProteinTitle(filenameTitle);
 
         // Basic chemical title extraction
-        const ext = uploadedFile.name.split('.').pop()?.toLowerCase();
-        if (ext === 'sdf' || ext === 'mol') {
+        const fileExt = uploadedFile.name.split('.').pop()?.toLowerCase();
+        if (fileExt === 'sdf' || fileExt === 'mol') {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const content = e.target?.result as string;

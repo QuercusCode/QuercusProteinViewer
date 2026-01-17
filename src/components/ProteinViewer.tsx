@@ -36,7 +36,7 @@ export interface ProteinViewerProps {
     pdbId: string;
     dataSource?: DataSource; // Added source
     file?: File;
-    fileType?: 'pdb' | 'mmcif';
+    fileType?: 'pdb' | 'mmcif' | 'sdf' | 'mol' | 'mol2';
 
     // Appearance
     isLightMode: boolean;
