@@ -17,9 +17,10 @@ interface HUDProps {
     controllerId?: string | null;
     isCameraSynced?: boolean;
     onToggleCameraSync?: () => void;
+    userName?: string | null; // Added local user name
 }
 
-export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMode = false, peerSession, remoteHoveredResidue, isHost, remoteUserName, peerNames = {}, controllerId, isCameraSynced, onToggleCameraSync }: HUDProps) {
+export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMode = false, peerSession, remoteHoveredResidue, isHost, remoteUserName, peerNames = {}, controllerId, isCameraSynced, onToggleCameraSync, userName }: HUDProps) {
     const textColor = isLightMode ? 'text-gray-800' : 'text-gray-200';
     const bgColor = isLightMode ? 'bg-white/80' : 'bg-black/80';
     const borderColor = isLightMode ? 'border-gray-200' : 'border-neutral-800';
@@ -152,7 +153,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
                             {['👍', '👎', '❤️', '👏', '🎉'].map(emoji => (
                                 <button
                                     key={emoji}
-                                    onClick={() => peerSession.broadcastReaction?.(emoji)}
+                                    onClick={() => peerSession.broadcastReaction?.(emoji, userName || 'Guest')}
                                     className={`w-6 h-6 flex items-center justify-center rounded-full text-sm hover:scale-125 transition-transform active:scale-90 ${isLightMode ? 'hover:bg-neutral-100' : 'hover:bg-white/10'}`}
                                 >
                                     {emoji}

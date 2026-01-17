@@ -33,8 +33,8 @@ export interface PeerSession {
     peerNames: Record<string, string>; // Map of Peer ID -> Name
     error: string | null;
     disconnect: () => void;
-    broadcastReaction: (emoji: string) => void;
-    lastReaction: { emoji: string; senderId: string; timestamp: number } | null;
+    broadcastReaction: (emoji: string, senderName?: string) => void;
+    lastReaction: { emoji: string; senderId: string; senderName?: string; timestamp: number } | null;
 }
 
 export const usePeerSession = (initialState?: Partial<SessionState>): PeerSession => {
@@ -46,7 +46,7 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
     const [lastReceivedState, setLastReceivedState] = useState<Partial<SessionState> | null>(null);
     const [lastReceivedCamera, setLastReceivedCamera] = useState<any[] | null>(null);
     const [lastReceivedName, setLastReceivedName] = useState<string | null>(null);
-    const [lastReaction, setLastReaction] = useState<{ emoji: string; senderId: string; timestamp: number } | null>(null);
+    const [lastReaction, setLastReaction] = useState<{ emoji: string; senderId: string; senderName?: string; timestamp: number } | null>(null);
     const [peerNames, setPeerNames] = useState<Record<string, string>>({});
 
     const peerRef = useRef<Peer | null>(null);
@@ -123,11 +123,28 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
                 [sender.peer]: data.payload
             }));
         } else if (data.type === 'REACTION') {
+            const reactionSenderName = data.payload.senderName || peerNames[sender.peer] || 'Guest';
             setLastReaction({
                 emoji: data.payload.emoji,
                 senderId: sender.peer,
+                senderName: reactionSenderName,
                 timestamp: Date.now()
             });
+
+            // If I am the Host, I must re-broadcast this reaction to other guests
+            if (isHost) {
+                connectionsRef.current.forEach(conn => {
+                    if (conn.open && conn.peer !== sender.peer) {
+                        conn.send({
+                            type: 'REACTION',
+                            payload: {
+                                emoji: data.payload.emoji,
+                                senderName: reactionSenderName // Pass the resolved name along
+                            }
+                        });
+                    }
+                });
+            }
         }
     };
 
@@ -197,15 +214,15 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
         });
     }, []);
 
-    const broadcastReaction = useCallback((emoji: string) => {
+    const broadcastReaction = useCallback((emoji: string, senderName?: string) => {
         // Optimistic local update (show my own reaction)
         if (peerId) {
-            setLastReaction({ emoji, senderId: peerId, timestamp: Date.now() });
+            setLastReaction({ emoji, senderId: peerId, senderName: senderName || 'You', timestamp: Date.now() });
         }
 
         connectionsRef.current.forEach(conn => {
             if (conn.open) {
-                conn.send({ type: 'REACTION', payload: { emoji } });
+                conn.send({ type: 'REACTION', payload: { emoji, senderName } });
             }
         });
     }, [peerId]);

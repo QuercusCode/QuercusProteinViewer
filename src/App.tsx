@@ -1965,7 +1965,7 @@ function App() {
             // Nametags
             remoteUserName={peerSession.lastReceivedName}
             peerNames={peerSession.peerNames}
-
+            userName={userName}
             controllerId={controllerId}
           />
 
