@@ -161,18 +161,10 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
 
                 {/* Main Control Pill */}
                 {peerSession?.isConnected && (
-                    <div className={`pointer-events-auto backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-lg px-4 py-2 flex items-center justify-center gap-3 md:gap-4 animate-in slide-in-from-bottom-2 mx-auto`}>
-                        {/* Live Indicator */}
-                        <div className="flex items-center gap-2 pr-4 md:pr-4 border-r border-gray-500/20 shrink-0">
-                            <div className="w-2.5 h-2.5 md:w-2 md:h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
-                            <span className={`text-[10px] md:text-[10px] font-bold tracking-wider ${textColor} whitespace-nowrap`}>
-                                <span className="md:hidden text-xs">LIVE • {peerSession.connections.length + 1}</span>
-                                <span className="hidden md:inline">LIVE • {peerSession.connections.length + 1}</span>
-                            </span>
-                        </div>
+                    <div className={`pointer-events-auto backdrop-blur-md rounded-full border ${borderColor} ${bgColor} shadow-lg px-4 py-2 flex items-center justify-center gap-2 animate-in slide-in-from-bottom-2 mx-auto`}>
 
                         {/* Desktop: Reactions Inline */}
-                        <div className="hidden md:flex items-center gap-1 border-r border-gray-500/20 pr-3 mr-3">
+                        <div className="hidden md:flex items-center gap-1 border-r border-gray-500/20 pr-2 mr-2">
                             {['👍', '👎', '❤️', '👏', '🎉'].map(emoji => (
                                 <button
                                     key={emoji}
@@ -186,7 +178,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
 
                         {/* Chat Toggle */}
                         {onToggleChat && (
-                            <div className="flex items-center border-r border-gray-500/20 pr-3 mr-3">
+                            <div className="flex items-center border-r border-gray-500/20 pr-2">
                                 <button
                                     onClick={onToggleChat}
                                     className={`relative text-[10px] font-bold px-4 py-1.5 md:px-2 md:py-1 rounded-full flex items-center gap-2 transition-colors ${isChatOpen
@@ -206,7 +198,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
                         )}
 
                         {/* Audio Controls */}
-                        <div className="flex items-center gap-3 md:gap-2 md:pr-4 md:border-r md:border-gray-500/20 shrink-0">
+                        <div className="flex items-center gap-2 md:pr-2 md:border-r md:border-gray-500/20 shrink-0">
                             {!peerSession.isAudioConnected ? (
                                 <button
                                     onClick={() => peerSession.joinAudio?.()}
