@@ -757,15 +757,12 @@ function App() {
   const [hasInteracted, setHasInteracted] = useState(false);
   const params = new URLSearchParams(window.location.search);
 
-  // Sidebar Sections State (Lifted from Controls)
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     'appearance': true,
     'analysis': false,
     'tools': false,
     'motif-search': false
   });
-
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const handleToggleSection = (section: string) => {
     setOpenSections(prev => ({
@@ -2231,8 +2228,8 @@ function App() {
                     onStartTour={handleStartTour}
                     openSections={openSections}
                     onToggleSection={handleToggleSection}
-                    isMobileSidebarOpen={isMobileSidebarOpen}
-                    onToggleMobileSidebar={() => setIsMobileSidebarOpen(!isMobileSidebarOpen)}
+                    isMobileSidebarOpen={isMobileMenuOpen}
+                    onToggleMobileSidebar={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                     onToggleFavorite={() => toggleFavorite(pdbId, dataSource, proteinTitle || undefined)}
                     isFavorite={isFavorite(pdbId, dataSource)}
                     onOpenFavorites={() => {
