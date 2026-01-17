@@ -604,13 +604,33 @@ function App() {
   // --- P2P FILE SHARING ---
   // 1. File Upload Wrapper (Triggered by Host)
   const handleFileUploadWithSync = useCallback((file: File) => {
-    // Load locally
-    handleUpload(file);
+    // Check if PDF
+    if (file.name.toLowerCase().endsWith('.pdf')) {
+      setPdfFile({ name: file.name, data: file.arrayBuffer() as any }); // We need buffer usually, but let's check PdfViewer expectation. 
+      // Wait, setPdfFile expects {name, data: ArrayBuffer}. File has arrayBuffer() method but it's async.
+      // PdfViewer supports File object too? 
+      // Looking at App.tsx state: const [pdfFile, setPdfFile] = useState<{ name: string; data: ArrayBuffer } | null>(null);
+      // The PdfViewer component props: file: File | { name: string; data: ArrayBuffer } | null;
+      // So state should ideally support File too, but the state definition says {name, data}.
+
+      // Let's coerce for now or strictly read buffer.
+      // Reading buffer is better for broadcast consistency?
+      // Actually broadcast happens below.
+
+      // Let's read buffer to be consistent with state type.
+      file.arrayBuffer().then(buffer => {
+        setPdfFile({ name: file.name, data: buffer });
+        setIsPdfOpen(true);
+      });
+    } else {
+      // Load locally as structure
+      handleUpload(file);
+    }
 
     // Broadcast if Host
     if (peerSession.isHost) {
       console.log('Broadcasting File:', file.name);
-      peerSession.broadcastFile(file);
+      peerSession.broadcastFile(file); // peerSession handles reading buffer
       sendSystemLog(`Shared file: ${file.name}`);
     }
   }, [handleUpload, peerSession, sendSystemLog]);
@@ -626,7 +646,14 @@ function App() {
       console.log(`[App] P2P Received File: ${name} | Size: ${receivedFile.size} | Type: ${receivedFile.type}`);
 
       // Load it!
-      handleUpload(receivedFile);
+      // Load it!
+      if (name.toLowerCase().endsWith('.pdf')) {
+        setPdfFile({ name, data });
+        setIsPdfOpen(true);
+        success(`Received PDF: ${name}`);
+      } else {
+        handleUpload(receivedFile);
+      }
     }
   }, [peerSession.lastReceivedFile, peerSession.isHost, handleUpload]);
 
@@ -1502,7 +1529,7 @@ function App() {
     const files = e.dataTransfer.files;
     if (files && files.length > 0) {
       const droppedFile = files[0];
-      const validExtensions = ['.pdb', '.cif', '.ent', '.mol', '.sdf', '.mol2', '.xyz'];
+      const validExtensions = ['.pdb', '.cif', '.ent', '.mol', '.sdf', '.mol2', '.xyz', '.pdf'];
       const fileExt = droppedFile.name.substring(droppedFile.name.lastIndexOf('.')).toLowerCase();
 
       if (validExtensions.includes(fileExt)) {
