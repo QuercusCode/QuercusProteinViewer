@@ -2618,27 +2618,45 @@ function App() {
         isOpen={showShareModal}
         onClose={() => setShowShareModal(false)}
         warning={
-          // Check if any visible viewport relies on a local file (no PDB ID/PubChem CID but has a file)
-          // For single view:
-          (viewMode === 'single' && !activeController.pdbId && activeController.file) ||
-            // For multi view:
-            (viewMode !== 'single' && controllers.some(c => !c.pdbId && c.file))
+          // Check if any visible VIEWPORT relies on a local file...
+          // Actually, we can just let the user try to share. The URL generator will filter out local files automatically (no PDB ID).
+          // But maybe we should warn if ALL selected are local?
+          // For now, keep simple: Warn if NO shareable content exists at all in the session?
+          // Or just let the generic warning handle it.
+          // The current warning logic was specific to single view local files.
+          // Let's refine: Warn if the user is trying to share a local file (no PDB ID).
+          (viewMode === 'single' && !activeController.pdbId && activeController.file)
             ? "Sharing is not available for local files. Please use a PDB ID or PubChem Code to generate a shareable link."
             : null
         }
-        shareUrl={getShareableURL(viewMode, controllers.map((ctrl, index) => ({
-          pdbId: ctrl.pdbId,
-          representation: ctrl.representation,
-          coloring: ctrl.coloring,
-          isSpinning: ctrl.isSpinning,
-          showLigands: ctrl.showLigands,
-          showSurface: ctrl.showSurface,
-          showIons: ctrl.showIons,
-          customColors: ctrl.customColors,
-          customBackgroundColor: ctrl.customBackgroundColor,
-          dataSource: ctrl.dataSource,
-          orientation: viewerRefs[index].current?.getOrientation()
-        })))}
+        viewMode={viewMode}
+        viewports={controllers.map((c, i) => ({
+          index: i,
+          title: c.proteinTitle || c.pdbId || (c.file ? c.file.name : "Empty"),
+          hasContent: !!(c.pdbId || c.file)
+        }))}
+        onGenerateLink={(selectedIndices) => {
+          // Filter viewports based on selection
+          // We MUST preserve the array length/indices to keep layout slots correct (e.g. Quad view)
+          // So we map non-selected to EMPTY state.
+          const selectedViewports = controllers.map((ctrl, index) => {
+            if (!selectedIndices.includes(index)) return {} as any; // Return empty object for unselected
+            return {
+              pdbId: ctrl.pdbId,
+              representation: ctrl.representation,
+              coloring: ctrl.coloring,
+              isSpinning: ctrl.isSpinning,
+              showLigands: ctrl.showLigands,
+              showSurface: ctrl.showSurface,
+              showIons: ctrl.showIons,
+              customColors: ctrl.customColors,
+              customBackgroundColor: ctrl.customBackgroundColor,
+              dataSource: ctrl.dataSource,
+              orientation: viewerRefs[index].current?.getOrientation()
+            };
+          });
+          return getShareableURL(viewMode, selectedViewports);
+        }}
         isLightMode={isLightMode}
         peerSession={peerSession}
       />

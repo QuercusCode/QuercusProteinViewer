@@ -7,17 +7,39 @@ import type { PeerSession } from '../hooks/usePeerSession';
 interface ShareModalProps {
     isOpen: boolean;
     onClose: () => void;
-    shareUrl: string;
+    // shareUrl: string; // REMOVED: Now generated dynamically
     isLightMode: boolean;
     warning?: string | null;
     peerSession?: PeerSession; // Added PeerSession prop
+    viewMode: 'single' | 'dual' | 'triple' | 'quad';
+    viewports: { index: number; title: string; hasContent: boolean }[];
+    onGenerateLink: (indices: number[]) => string;
 }
 
-export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUrl, isLightMode, warning, peerSession }) => {
+export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, isLightMode, warning, peerSession, viewMode, viewports, onGenerateLink }) => {
     const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
     const [generationError, setGenerationError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<'link' | 'embed' | 'live'>('link');
+
+    // Multi-View Selection State
+    const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
+
+    // Initialize selection when modal opens or viewMode changes
+    useEffect(() => {
+        if (isOpen) {
+            // Default: Select all viewports that have content
+            const activeIndices = viewports.filter(v => v.hasContent).map(v => v.index);
+            // If no content (shouldn't happen), select viewport 0
+            if (activeIndices.length === 0) setSelectedIndices([0]);
+            else setSelectedIndices(activeIndices);
+        }
+    }, [isOpen, viewports]); // viewports dependence ensures update if content changes
+
+    // Memoized Share URL based on selection
+    const shareUrl = React.useMemo(() => {
+        return onGenerateLink(selectedIndices);
+    }, [selectedIndices, onGenerateLink]);
 
     // Embed Options State
     const [embedSpin, setEmbedSpin] = useState(false);
@@ -218,6 +240,57 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, shareUr
                     </div>
                 ) : (
                     <>
+                        {/* Multi-View Selection */}
+                        {viewMode !== 'single' && (
+                            <div className={`p-4 mb-6 rounded-xl border ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-950 border-neutral-800'}`}>
+                                <h3 className={`text-xs font-bold uppercase tracking-wider mb-3 ${isLightMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
+                                    Select Views to Share
+                                </h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    {viewports.map((vp) => (
+                                        <label
+                                            key={vp.index}
+                                            className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${selectedIndices.includes(vp.index)
+                                                    ? (isLightMode ? 'bg-white border-blue-500 shadow-sm' : 'bg-neutral-900 border-blue-500 shadow-sm')
+                                                    : (isLightMode ? 'bg-transparent border-transparent hover:bg-neutral-100' : 'bg-transparent border-transparent hover:bg-neutral-800')
+                                                } ${!vp.hasContent ? 'opacity-50' : ''}`}
+                                        >
+                                            <div className={`w-5 h-5 rounded flex items-center justify-center border transition-colors ${selectedIndices.includes(vp.index)
+                                                    ? 'bg-blue-600 border-blue-600 text-white'
+                                                    : (isLightMode ? 'border-neutral-300 bg-white' : 'border-neutral-700 bg-neutral-950')
+                                                }`}>
+                                                {selectedIndices.includes(vp.index) && <Check className="w-3.5 h-3.5" />}
+                                            </div>
+                                            <input
+                                                type="checkbox"
+                                                className="hidden"
+                                                checked={selectedIndices.includes(vp.index)}
+                                                disabled={!vp.hasContent && !selectedIndices.includes(vp.index)} // Allow unchecking, but maybe prevent checking empty?
+                                                onChange={() => {
+                                                    setSelectedIndices(prev => {
+                                                        if (prev.includes(vp.index)) {
+                                                            // Uncheck: Don't allow unchecking strictly everything? Maybe allow.
+                                                            return prev.filter(i => i !== vp.index);
+                                                        } else {
+                                                            return [...prev, vp.index];
+                                                        }
+                                                    });
+                                                }}
+                                            />
+                                            <div className="flex flex-col min-w-0">
+                                                <span className={`text-xs font-bold uppercase tracking-wider ${isLightMode ? 'text-neutral-500' : 'text-neutral-500'}`}>
+                                                    Viewport {vp.index + 1}
+                                                </span>
+                                                <span className={`text-sm font-medium truncate ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>
+                                                    {vp.title || "Empty"}
+                                                </span>
+                                            </div>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         {/* Tabs */}
                         <div className={`flex p-1 mb-4 rounded-lg ${isLightMode ? 'bg-neutral-100' : 'bg-neutral-800'}`}>
                             <button
