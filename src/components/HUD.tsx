@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import type { ResidueInfo, PDBMetadata } from '../types';
 import type { PeerSession } from '../hooks/usePeerSession';
-import { Eye, Wrench, Lock, Unlock } from 'lucide-react';
+import { Eye, Wrench, Lock, Unlock, Mic, MicOff, PhoneOff } from 'lucide-react';
 
 interface HUDProps {
     hoveredResidue: ResidueInfo | null;
@@ -149,7 +149,7 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
                         </div>
 
                         {/* Reaction Buttons */}
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1 border-r border-gray-500/20 pr-3 mr-3">
                             {['👍', '👎', '❤️', '👏', '🎉'].map(emoji => (
                                 <button
                                     key={emoji}
@@ -159,6 +159,42 @@ export function HUD({ hoveredResidue, pdbMetadata, pdbId, isLightMode, isEmbedMo
                                     {emoji}
                                 </button>
                             ))}
+                        </div>
+
+                        {/* Audio Controls */}
+                        <div className="flex items-center gap-2 pr-3 border-r border-gray-500/20">
+                            {!peerSession.isAudioConnected ? (
+                                <button
+                                    onClick={() => peerSession.joinAudio?.()}
+                                    className={`text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1.5 transition-colors ${isLightMode
+                                        ? 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                                        : 'bg-blue-500/20 text-blue-300 hover:bg-blue-500/30'
+                                        }`}
+                                >
+                                    <div className="w-1.5 h-1.5 rounded-full bg-current" />
+                                    JOIN VOICE
+                                </button>
+                            ) : (
+                                <>
+                                    <button
+                                        onClick={() => peerSession.toggleMute?.()}
+                                        className={`p-1.5 rounded-full transition-colors ${peerSession.isMuted
+                                            ? 'bg-red-500 text-white hover:bg-red-600'
+                                            : (isLightMode ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-white/10 text-white hover:bg-white/20')
+                                            }`}
+                                        title={peerSession.isMuted ? "Unmute" : "Mute"}
+                                    >
+                                        {peerSession.isMuted ? <MicOff className="w-3 h-3" /> : <Mic className="w-3 h-3" />}
+                                    </button>
+                                    <button
+                                        onClick={() => peerSession.leaveAudio?.()}
+                                        className="p-1.5 rounded-full bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
+                                        title="Leave Voice"
+                                    >
+                                        <PhoneOff className="w-3 h-3" />
+                                    </button>
+                                </>
+                            )}
                         </div>
 
                         {/* View/Edit Toggle for Guests */}

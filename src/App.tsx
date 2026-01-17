@@ -14,6 +14,7 @@ import { DragDropOverlay } from './components/DragDropOverlay';
 import { CommandPalette, type CommandAction } from './components/CommandPalette';
 import { HUD } from './components/HUD';
 import { ReactionOverlay } from './components/ReactionOverlay';
+import { AudioRoom } from './components/AudioRoom';
 import { MeasurementPanel } from './components/MeasurementPanel';
 import { SuperpositionModal } from './components/SuperpositionModal';
 import { IdentityModal } from './components/IdentityModal';
@@ -1948,6 +1949,8 @@ function App() {
         peerNames={peerSession.peerNames}
         myPeerId={peerSession.peerId || undefined}
       />
+      {/* Audio Room (Invisible) */}
+      <AudioRoom remoteStreams={peerSession.remoteStreams} />
 
       {!showLanding && (
         <>

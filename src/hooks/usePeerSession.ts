@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react';
 import Peer from 'peerjs';
-import type { DataConnection } from 'peerjs';
+import type { DataConnection, MediaConnection } from 'peerjs';
 
 export interface SessionState {
     pdbId: string;
@@ -35,6 +35,13 @@ export interface PeerSession {
     disconnect: () => void;
     broadcastReaction: (emoji: string, senderName?: string) => void;
     lastReaction: { emoji: string; senderId: string; senderName?: string; timestamp: number } | null;
+    // Audio
+    joinAudio: () => Promise<void>;
+    leaveAudio: () => void;
+    toggleMute: () => void;
+    isAudioConnected: boolean;
+    isMuted: boolean;
+    remoteStreams: Map<string, MediaStream>;
 }
 
 export const usePeerSession = (initialState?: Partial<SessionState>): PeerSession => {
@@ -49,8 +56,15 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
     const [lastReaction, setLastReaction] = useState<{ emoji: string; senderId: string; senderName?: string; timestamp: number } | null>(null);
     const [peerNames, setPeerNames] = useState<Record<string, string>>({});
 
+    // Audio State
+    const [myStream, setMyStream] = useState<MediaStream | null>(null);
+    const [remoteStreams, setRemoteStreams] = useState<Map<string, MediaStream>>(new Map());
+    const [isMuted, setIsMuted] = useState(false);
+    const [incomingCalls, setIncomingCalls] = useState<MediaConnection[]>([]);
+
     const peerRef = useRef<Peer | null>(null);
     const connectionsRef = useRef<DataConnection[]>([]);
+    const mediaConnectionsRef = useRef<MediaConnection[]>([]); // Keep specific track of calls
 
     // Initialize Peer
     useEffect(() => {
@@ -66,6 +80,18 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
             console.log('Incoming connection from:', conn.peer);
             setupConnection(conn);
             setIsHost(true); // If someone connects to me, I'm effectively a host (or just a peer)
+        });
+
+        // Handle Incoming Calls (Voice)
+        peer.on('call', (call) => {
+            console.log('Incoming call from:', call.peer);
+            setIncomingCalls(prev => [...prev, call]);
+
+            // Auto-answer if we are already in audio mode
+            // (Note: we need to access the current myStream value. State in callbacks handles is tricky)
+            // But since 'call' listener is established once at mount, we might need a ref for myStream
+            // Or easier: If user has 'joined audio', they answer.
+            // We'll handle this in a separate useEffect that watches incomingCalls.
         });
 
         peer.on('error', (err) => {
@@ -184,6 +210,106 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
         }
     }, [peerId, connections.length, isHost, connectToPeer]);
 
+
+
+    // Audio Logic -----------------------------------------
+
+    // Auto-answer incoming calls if we have a stream active
+    useEffect(() => {
+        if (!myStream) return;
+
+        incomingCalls.forEach(call => {
+            // Check if already answered? call.open doesn't exist on incoming before answer
+            // We just answer it. peerjs handles duplicate answers gracefully usually?
+            // Better: Filter processed calls.
+            // For now, simple:
+            console.log('Answering incoming call from', call.peer);
+            call.answer(myStream);
+            handleCall(call);
+        });
+        setIncomingCalls([]); // Clear processed queue
+    }, [myStream, incomingCalls]);
+
+    const handleCall = (call: MediaConnection) => {
+        call.on('stream', (remoteStream) => {
+            console.log('Received remote stream from', call.peer);
+            setRemoteStreams(prev => {
+                const newMap = new Map(prev);
+                newMap.set(call.peer, remoteStream);
+                return newMap;
+            });
+        });
+
+        call.on('close', () => {
+            setRemoteStreams(prev => {
+                const newMap = new Map(prev);
+                newMap.delete(call.peer);
+                return newMap;
+            });
+        });
+
+        call.on('error', (err) => console.error('Call error:', err));
+
+        mediaConnectionsRef.current.push(call);
+    };
+
+    const joinAudio = useCallback(async () => {
+        if (myStream) return;
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+            setMyStream(stream);
+
+            // Call all existing peers (MESH)
+            // Note: peerNames keys are a good proxy for known peers, usually we rely on connectionsRef
+            // But connectionsRef are DataConnections. We need to open MediaConnections alongside them.
+            connectionsRef.current.forEach(dataConn => {
+                if (peerRef.current) {
+                    console.log('Calling peer:', dataConn.peer);
+                    const call = peerRef.current.call(dataConn.peer, stream);
+                    handleCall(call);
+                }
+            });
+
+        } catch (err) {
+            console.error('Failed to join audio:', err);
+            setError('Microphone access denied');
+        }
+    }, [myStream, peerNames]); // peerNames/connectionsRef stable enough
+
+    const leaveAudio = useCallback(() => {
+        if (myStream) {
+            myStream.getTracks().forEach(track => track.stop());
+            setMyStream(null);
+        }
+
+        // Close all media calls
+        mediaConnectionsRef.current.forEach(call => call.close());
+        mediaConnectionsRef.current = [];
+        setRemoteStreams(new Map());
+    }, [myStream]);
+
+    const toggleMute = useCallback(() => {
+        if (myStream) {
+            const audioTrack = myStream.getAudioTracks()[0];
+            if (audioTrack) {
+                audioTrack.enabled = !audioTrack.enabled;
+                setIsMuted(!audioTrack.enabled);
+            }
+        }
+    }, [myStream]);
+
+    // Ensure we leave audio on unmount
+    useEffect(() => {
+        return () => {
+            if (myStream) {
+                myStream.getTracks().forEach(track => track.stop());
+            }
+        };
+    }, []);
+
+    // -----------------------------------------------------
+
     const broadcastState = useCallback((state: Partial<SessionState>) => {
         connectionsRef.current.forEach(conn => {
             if (conn.open) {
@@ -253,6 +379,12 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
         error,
         disconnect,
         broadcastReaction,
-        lastReaction
+        lastReaction,
+        joinAudio,
+        leaveAudio,
+        toggleMute,
+        isAudioConnected: !!myStream,
+        isMuted,
+        remoteStreams
     };
 };
