@@ -513,6 +513,33 @@ function App() {
     peerSession.isConnected
   ]);
 
+  // --- P2P FILE SHARING ---
+  // 1. File Upload Wrapper (Triggered by Host)
+  const handleFileUploadWithSync = useCallback((file: File) => {
+    // Load locally
+    handleUpload(file);
+
+    // Broadcast if Host
+    if (peerSession.isHost) {
+      console.log('Broadcasting File:', file.name);
+      peerSession.broadcastFile(file);
+    }
+  }, [handleUpload, peerSession]);
+
+  // 2. File Receiver (Guests)
+  useEffect(() => {
+    if (peerSession.lastReceivedFile && !peerSession.isHost) {
+      const { name, data } = peerSession.lastReceivedFile;
+      console.log('Auto-loading shared file:', name);
+
+      // Create File object from ArrayBuffer
+      const receivedFile = new File([data], name);
+
+      // Load it!
+      handleUpload(receivedFile);
+    }
+  }, [peerSession.lastReceivedFile, peerSession.isHost, handleUpload]);
+
 
 
 
@@ -1373,7 +1400,7 @@ function App() {
       const fileExt = droppedFile.name.substring(droppedFile.name.lastIndexOf('.')).toLowerCase();
 
       if (validExtensions.includes(fileExt)) {
-        handleUpload(droppedFile); // Reuse existing upload handler
+        handleFileUploadWithSync(droppedFile); // Use wrapper for sync
       } else {
         alert("Invalid file type. Please drop a valid structure file (.pdb, .cif, .mol, .sdf, etc.)");
       }
@@ -2039,7 +2066,7 @@ function App() {
                   dataSource={dataSource}
                   setDataSource={setDataSource}
                   isChemical={!!isChemical}
-                  onUpload={handleUpload}
+                  onUpload={handleFileUploadWithSync}
                   representation={representation}
                   setRepresentation={setRepresentation}
                   coloring={coloring}
@@ -2248,7 +2275,7 @@ function App() {
                                         // Set this viewport as active
                                         setActiveViewIndex(index);
                                         // Use the specific controller for this viewport
-                                        ctrl.handleUpload(e.target.files[0]);
+                                        handleFileUploadWithSync(e.target.files[0]);
                                       }
                                     }}
                                   />

@@ -42,6 +42,9 @@ export interface PeerSession {
     isAudioConnected: boolean;
     isMuted: boolean;
     remoteStreams: Map<string, MediaStream>;
+    // File Sharing
+    broadcastFile: (file: File) => void;
+    lastReceivedFile: { name: string; data: ArrayBuffer } | null;
 }
 
 export const usePeerSession = (initialState?: Partial<SessionState>): PeerSession => {
@@ -55,6 +58,7 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
     const [lastReceivedName, setLastReceivedName] = useState<string | null>(null);
     const [lastReaction, setLastReaction] = useState<{ emoji: string; senderId: string; senderName?: string; timestamp: number } | null>(null);
     const [peerNames, setPeerNames] = useState<Record<string, string>>({});
+    const [lastReceivedFile, setLastReceivedFile] = useState<{ name: string; data: ArrayBuffer } | null>(null);
 
     // Audio State
     const [myStream, setMyStream] = useState<MediaStream | null>(null);
@@ -171,8 +175,44 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
                     }
                 });
             }
+        } else if (data.type === 'SYNC_FILE') {
+            console.log('Received file:', data.payload.name);
+            setLastReceivedFile(data.payload);
+
+            // Host Logic: Re-broadcast file to other guests
+            if (isHost) {
+                connectionsRef.current.forEach(conn => {
+                    if (conn.open && conn.peer !== sender.peer) {
+                        conn.send({
+                            type: 'SYNC_FILE',
+                            payload: data.payload
+                        });
+                    }
+                });
+            }
         }
     };
+
+    const broadcastFile = useCallback((file: File) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const buffer = e.target?.result as ArrayBuffer;
+            if (buffer) {
+                const payload = {
+                    name: file.name,
+                    data: buffer
+                };
+
+                // Broadcast to all
+                connectionsRef.current.forEach(conn => {
+                    if (conn.open) {
+                        conn.send({ type: 'SYNC_FILE', payload });
+                    }
+                });
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    }, []);
 
     const connectToPeer = useCallback((remotePeerId: string) => {
         if (!peerRef.current) return;
@@ -385,6 +425,8 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
         toggleMute,
         isAudioConnected: !!myStream,
         isMuted,
-        remoteStreams
+        remoteStreams,
+        broadcastFile,
+        lastReceivedFile
     };
 };
