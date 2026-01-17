@@ -1970,9 +1970,24 @@ export const ProteinViewer = forwardRef<ProteinViewerRef, ProteinViewerProps>(({
         let pos: { x: number, y: number, z: number } | null = null;
 
         // Helper inline search
+        // Helper inline search
         component.structure.eachResidue((res: any) => {
             if (res.chain.name === chain && res.resno === resNo) {
-                const atom = res.getAtomByName('CA') || res.getAtomByIndex(0);
+                let atom;
+                // High-precision atom targeting
+                if (remoteHoveredResidue.atomSerial) {
+                    res.eachAtom((a: any) => {
+                        if (a.serial === remoteHoveredResidue.atomSerial) atom = a;
+                    });
+                } else if (remoteHoveredResidue.atomName) {
+                    atom = res.getAtomByName(remoteHoveredResidue.atomName);
+                }
+
+                // Fallback
+                if (!atom) {
+                    atom = res.getAtomByName('CA') || res.getAtomByIndex(0);
+                }
+
                 if (atom) {
                     pos = { x: atom.x, y: atom.y, z: atom.z };
                 }
