@@ -18,6 +18,7 @@ import { AudioRoom } from './components/AudioRoom';
 import { MeasurementPanel } from './components/MeasurementPanel';
 import { SuperpositionModal } from './components/SuperpositionModal';
 import { IdentityModal } from './components/IdentityModal';
+import { SessionChat } from './components/SessionChat';
 import { OFFLINE_LIBRARY } from './data/library';
 import { fetchPubChemMetadata } from './utils/pdbUtils';
 import type {
@@ -30,7 +31,8 @@ import type {
   Movie,
   ColorPalette,
   ResidueInfo,
-  StructureInfo
+  StructureInfo,
+  ChatMessage
 } from './types';
 import {
   Camera, RefreshCw, Upload,
@@ -108,6 +110,56 @@ function App() {
 
   // Feature: Pass the Chalk (Control Transfer)
   const [controllerId, setControllerId] = useState<string | null>(null);
+
+  // Chat State
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+
+  // Handlers
+  const handleSendChat = (text: string) => {
+    if (!peerSession.peerId) return; // Should be connected
+
+    const msg: ChatMessage = {
+      id: crypto.randomUUID(),
+      senderId: peerSession.peerId,
+      senderName: userName || (peerSession.isHost ? 'Host' : 'Guest'),
+      content: text,
+      timestamp: Date.now(),
+      type: 'text'
+    };
+    // Add locally
+    setChatMessages(prev => [...prev, msg]);
+    // Broadcast
+    peerSession.broadcastChat(msg);
+  };
+
+  const sendSystemLog = useCallback((content: string) => {
+    // Only log if connected to a session
+    if (!peerSession.isConnected) return;
+
+    const msg: ChatMessage = {
+      id: crypto.randomUUID(),
+      senderId: 'SYSTEM',
+      senderName: 'System',
+      content,
+      timestamp: Date.now(),
+      type: 'system'
+    };
+    setChatMessages(prev => [...prev, msg]);
+    peerSession.broadcastChat(msg);
+  }, [peerSession]);
+
+  // Sync Incoming Chat
+  useEffect(() => {
+    if (peerSession.lastReceivedChat) {
+      setChatMessages(prev => {
+        // Prevent duplicates just in case (though IDs are random)
+        if (prev.some(m => m.id === peerSession.lastReceivedChat?.id)) return prev;
+        return [...prev, peerSession.lastReceivedChat!];
+      });
+    }
+  }, [peerSession.lastReceivedChat]);
+
 
   // Sync Controller ID
   useEffect(() => {
@@ -525,8 +577,9 @@ function App() {
     if (peerSession.isHost) {
       console.log('Broadcasting File:', file.name);
       peerSession.broadcastFile(file);
+      sendSystemLog(`Shared file: ${file.name}`);
     }
-  }, [handleUpload, peerSession]);
+  }, [handleUpload, peerSession, sendSystemLog]);
 
   // 2. File Receiver (Guests)
   useEffect(() => {
@@ -2426,9 +2479,21 @@ function App() {
           <SnapshotModal
             isOpen={isSnapshotModalOpen}
             viewMode={viewMode}
-            onConfirm={handleSnapshotConfirm}
+            onConfirm={(indices, factor, transparent) => {
+              handleSnapshotConfirm(indices, factor, transparent);
+              sendSystemLog(`Captured Snapshot (Quality: ${factor}x)`);
+            }}
             onCancel={() => setIsSnapshotModalOpen(false)}
           />
+
+          <SessionChat
+            messages={chatMessages}
+            onSendMessage={handleSendChat}
+            myPeerId={peerSession.peerId}
+            isOpen={isChatOpen}
+            setIsOpen={setIsChatOpen}
+          />
+
           {/* End Main Content Flex Container */}
 
 
@@ -2528,13 +2593,13 @@ function App() {
         }}
         onLoadPdb={(id, fileUrl) => {
           if (activeController) {
-            // If a manual file URL is provided (local library), load it
             if (fileUrl) {
               activeController.setPdbId(id);
             } else {
               activeController.setPdbId(id);
             }
           }
+          if (id) sendSystemLog(`Loaded Structure: ${id}`);
           setShowLanding(false);
         }}
       />

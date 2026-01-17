@@ -138,3 +138,12 @@ export interface Annotation {
     position: { x: number, y: number, z: number }; // 3D coordinates
     author?: string; // Optional author name
 }
+
+export interface ChatMessage {
+    id: string;
+    senderId: string;
+    senderName: string;
+    content: string;
+    timestamp: number;
+    type: 'text' | 'system' | 'link';
+}

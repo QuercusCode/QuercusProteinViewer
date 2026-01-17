@@ -2,6 +2,8 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import Peer from 'peerjs';
 import type { DataConnection, MediaConnection } from 'peerjs';
 
+import type { ChatMessage } from '../types';
+
 export interface SessionState {
     pdbId: string;
     representation: string;
@@ -45,6 +47,9 @@ export interface PeerSession {
     // File Sharing
     broadcastFile: (file: File) => void;
     lastReceivedFile: { name: string; data: ArrayBuffer } | null;
+    // Chat
+    broadcastChat: (message: ChatMessage) => void;
+    lastReceivedChat: ChatMessage | null;
 }
 
 export const usePeerSession = (initialState?: Partial<SessionState>): PeerSession => {
@@ -59,6 +64,7 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
     const [lastReaction, setLastReaction] = useState<{ emoji: string; senderId: string; senderName?: string; timestamp: number } | null>(null);
     const [peerNames, setPeerNames] = useState<Record<string, string>>({});
     const [lastReceivedFile, setLastReceivedFile] = useState<{ name: string; data: ArrayBuffer } | null>(null);
+    const [lastReceivedChat, setLastReceivedChat] = useState<ChatMessage | null>(null);
 
     // Audio State
     const [myStream, setMyStream] = useState<MediaStream | null>(null);
@@ -147,7 +153,6 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
             setLastReceivedCamera(data.payload);
         } else if (data.type === 'SYNC_NAME') {
             setLastReceivedName(data.payload);
-            // Update name map
             setPeerNames(prev => ({
                 ...prev,
                 [sender.peer]: data.payload
@@ -161,7 +166,6 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
                 timestamp: Date.now()
             });
 
-            // If I am the Host, I must re-broadcast this reaction to other guests
             if (isHost) {
                 connectionsRef.current.forEach(conn => {
                     if (conn.open && conn.peer !== sender.peer) {
@@ -169,7 +173,7 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
                             type: 'REACTION',
                             payload: {
                                 emoji: data.payload.emoji,
-                                senderName: reactionSenderName // Pass the resolved name along
+                                senderName: reactionSenderName
                             }
                         });
                     }
@@ -179,7 +183,6 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
             console.log('Received file:', data.payload.name);
             setLastReceivedFile(data.payload);
 
-            // Host Logic: Re-broadcast file to other guests
             if (isHost) {
                 connectionsRef.current.forEach(conn => {
                     if (conn.open && conn.peer !== sender.peer) {
@@ -187,6 +190,16 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
                             type: 'SYNC_FILE',
                             payload: data.payload
                         });
+                    }
+                });
+            }
+        } else if (data.type === 'SYNC_CHAT') {
+            setLastReceivedChat(data.payload);
+
+            if (isHost) {
+                connectionsRef.current.forEach(conn => {
+                    if (conn.open && conn.peer !== sender.peer) {
+                        conn.send({ type: 'SYNC_CHAT', payload: data.payload });
                     }
                 });
             }
@@ -203,7 +216,6 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
                     data: buffer
                 };
 
-                // Broadcast to all
                 connectionsRef.current.forEach(conn => {
                     if (conn.open) {
                         conn.send({ type: 'SYNC_FILE', payload });
@@ -216,33 +228,25 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
 
     const connectToPeer = useCallback((remotePeerId: string) => {
         if (!peerRef.current) return;
-
-        // Smart Reconnect: Persist Host ID
         sessionStorage.setItem('QUERCUS_LAST_HOST_ID', remotePeerId);
-
         const conn = peerRef.current.connect(remotePeerId);
         setupConnection(conn);
-        setIsHost(false); // I am joining
+        setIsHost(false);
     }, []);
 
     const disconnect = useCallback(() => {
-        // Clear Smart Reconnect persistence
         sessionStorage.removeItem('QUERCUS_LAST_HOST_ID');
-
         connectionsRef.current.forEach(conn => conn.close());
         setConnections([]);
         setLastReceivedState(null);
         setLastReceivedCamera(null);
     }, []);
 
-    // Smart Reconnect: Auto-Join logic
     useEffect(() => {
         if (peerId && !connections.length && !isHost) {
             const lastHostId = sessionStorage.getItem('QUERCUS_LAST_HOST_ID');
             const urlParams = new URLSearchParams(window.location.search);
             const isJoiningFromUrl = urlParams.has('join');
-
-            // Only auto-reconnect if we are not already trying to join via URL (App.tsx handles that)
             if (lastHostId && !isJoiningFromUrl) {
                 console.log('Smart Reconnect: Restoring session with host', lastHostId);
                 connectToPeer(lastHostId);
@@ -250,24 +254,15 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
         }
     }, [peerId, connections.length, isHost, connectToPeer]);
 
-
-
-    // Audio Logic -----------------------------------------
-
-    // Auto-answer incoming calls if we have a stream active
+    // Audio Logic
     useEffect(() => {
         if (!myStream) return;
-
         incomingCalls.forEach(call => {
-            // Check if already answered? call.open doesn't exist on incoming before answer
-            // We just answer it. peerjs handles duplicate answers gracefully usually?
-            // Better: Filter processed calls.
-            // For now, simple:
             console.log('Answering incoming call from', call.peer);
             call.answer(myStream);
             handleCall(call);
         });
-        setIncomingCalls([]); // Clear processed queue
+        setIncomingCalls([]);
     }, [myStream, incomingCalls]);
 
     const handleCall = (call: MediaConnection) => {
@@ -279,7 +274,6 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
                 return newMap;
             });
         });
-
         call.on('close', () => {
             setRemoteStreams(prev => {
                 const newMap = new Map(prev);
@@ -287,22 +281,15 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
                 return newMap;
             });
         });
-
         call.on('error', (err) => console.error('Call error:', err));
-
         mediaConnectionsRef.current.push(call);
     };
 
     const joinAudio = useCallback(async () => {
         if (myStream) return;
-
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
             setMyStream(stream);
-
-            // Call all existing peers (MESH)
-            // Note: peerNames keys are a good proxy for known peers, usually we rely on connectionsRef
-            // But connectionsRef are DataConnections. We need to open MediaConnections alongside them.
             connectionsRef.current.forEach(dataConn => {
                 if (peerRef.current) {
                     console.log('Calling peer:', dataConn.peer);
@@ -310,20 +297,17 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
                     handleCall(call);
                 }
             });
-
         } catch (err) {
             console.error('Failed to join audio:', err);
             setError('Microphone access denied');
         }
-    }, [myStream, peerNames]); // peerNames/connectionsRef stable enough
+    }, [myStream, peerNames]);
 
     const leaveAudio = useCallback(() => {
         if (myStream) {
             myStream.getTracks().forEach(track => track.stop());
             setMyStream(null);
         }
-
-        // Close all media calls
         mediaConnectionsRef.current.forEach(call => call.close());
         mediaConnectionsRef.current = [];
         setRemoteStreams(new Map());
@@ -339,7 +323,6 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
         }
     }, [myStream]);
 
-    // Ensure we leave audio on unmount
     useEffect(() => {
         return () => {
             if (myStream) {
@@ -347,8 +330,6 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
             }
         };
     }, []);
-
-    // -----------------------------------------------------
 
     const broadcastState = useCallback((state: Partial<SessionState>) => {
         connectionsRef.current.forEach(conn => {
@@ -358,11 +339,10 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
         });
     }, []);
 
-    // Throttle camera updates to avoid flooding
     const lastBroadcastTime = useRef(0);
     const broadcastCamera = useCallback((orientation: any[]) => {
         const now = Date.now();
-        if (now - lastBroadcastTime.current > 50) { // Max 20fps
+        if (now - lastBroadcastTime.current > 50) {
             connectionsRef.current.forEach(conn => {
                 if (conn.open) {
                     conn.send({ type: 'SYNC_CAMERA', payload: orientation });
@@ -381,17 +361,25 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
     }, []);
 
     const broadcastReaction = useCallback((emoji: string, senderName?: string) => {
-        // Optimistic local update (show my own reaction)
         if (peerId) {
             setLastReaction({ emoji, senderId: peerId, senderName: senderName || 'You', timestamp: Date.now() });
         }
-
         connectionsRef.current.forEach(conn => {
             if (conn.open) {
                 conn.send({ type: 'REACTION', payload: { emoji, senderName } });
             }
         });
     }, [peerId]);
+
+    const broadcastChat = useCallback((message: ChatMessage) => {
+        // Optimistic update? Actually caller should handle optimistic add to list.
+        // We just send.
+        connectionsRef.current.forEach(conn => {
+            if (conn.open) {
+                conn.send({ type: 'SYNC_CHAT', payload: message });
+            }
+        });
+    }, []);
 
     const grantControl = useCallback((targetPeerId: string | null) => {
         // Only Host controls this
@@ -427,6 +415,8 @@ export const usePeerSession = (initialState?: Partial<SessionState>): PeerSessio
         isMuted,
         remoteStreams,
         broadcastFile,
-        lastReceivedFile
+        lastReceivedFile,
+        broadcastChat,
+        lastReceivedChat
     };
 };
