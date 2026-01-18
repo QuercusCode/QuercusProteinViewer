@@ -2743,7 +2743,19 @@ function App() {
         }}
         // Pass lifted state for Live Session sync
         selectedIndices={sharedViewportIndices}
-        onSelectionChange={setSharedViewportIndices}
+        onSelectionChange={(indices) => {
+          setSharedViewportIndices(indices);
+          // Auto-switch viewMode based on max index to ensure visibility
+          if (indices.length > 0) {
+            const maxIndex = Math.max(...indices);
+            if (maxIndex === 3) setViewMode('quad');
+            else if (maxIndex === 2) setViewMode('triple');
+            else if (maxIndex === 1) setViewMode('dual');
+            else setViewMode('single');
+          } else {
+            setViewMode('single');
+          }
+        }}
         isLightMode={isLightMode}
         peerSession={peerSession}
       />

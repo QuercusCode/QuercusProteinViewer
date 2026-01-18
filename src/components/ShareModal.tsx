@@ -19,7 +19,7 @@ interface ShareModalProps {
     onSelectionChange: (indices: number[]) => void;
 }
 
-export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, isLightMode, warning, peerSession, viewMode, viewports, onGenerateLink, selectedIndices, onSelectionChange }) => {
+export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, isLightMode, warning, peerSession, viewports, onGenerateLink, selectedIndices, onSelectionChange }) => {
     const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
     const [generationError, setGenerationError] = useState<string | null>(null);
@@ -243,55 +243,54 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, isLight
                 ) : (
                     <>
                         {/* Multi-View Selection */}
-                        {viewMode !== 'single' && (
-                            <div className={`p-4 mb-6 rounded-xl border ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-950 border-neutral-800'}`}>
-                                <h3 className={`text-xs font-bold uppercase tracking-wider mb-3 ${isLightMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
-                                    Select Views to Share
-                                </h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                                    {viewports.map((vp) => (
-                                        <label
-                                            key={vp.index}
-                                            className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${selectedIndices.includes(vp.index)
-                                                ? (isLightMode ? 'bg-white border-blue-500 shadow-sm' : 'bg-neutral-900 border-blue-500 shadow-sm')
-                                                : (isLightMode ? 'bg-transparent border-transparent hover:bg-neutral-100' : 'bg-transparent border-transparent hover:bg-neutral-800')
-                                                } ${!vp.hasContent ? 'opacity-50' : ''}`}
-                                        >
-                                            <div className={`w-5 h-5 rounded flex items-center justify-center border transition-colors ${selectedIndices.includes(vp.index)
-                                                ? 'bg-blue-600 border-blue-600 text-white'
-                                                : (isLightMode ? 'border-neutral-300 bg-white' : 'border-neutral-700 bg-neutral-950')
-                                                }`}>
-                                                {selectedIndices.includes(vp.index) && <Check className="w-3.5 h-3.5" />}
-                                            </div>
-                                            <input
-                                                type="checkbox"
-                                                className="hidden"
-                                                checked={selectedIndices.includes(vp.index)}
-                                                disabled={!vp.hasContent && !selectedIndices.includes(vp.index)}
-                                                onChange={() => {
-                                                    // Use Parent's Handler
-                                                    if (selectedIndices.includes(vp.index)) {
-                                                        // Uncheck
-                                                        onSelectionChange(selectedIndices.filter((i: number) => i !== vp.index));
-                                                    } else {
-                                                        // Check
-                                                        onSelectionChange([...selectedIndices, vp.index]);
-                                                    }
-                                                }}
-                                            />
-                                            <div className="flex flex-col min-w-0">
-                                                <span className={`text-xs font-bold uppercase tracking-wider ${isLightMode ? 'text-neutral-500' : 'text-neutral-500'}`}>
-                                                    Viewport {vp.index + 1}
-                                                </span>
-                                                <span className={`text-sm font-medium truncate ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>
-                                                    {vp.title || "Empty"}
-                                                </span>
-                                            </div>
-                                        </label>
-                                    ))}
-                                </div>
+                        <div className={`p-4 mb-6 rounded-xl border ${isLightMode ? 'bg-neutral-50 border-neutral-200' : 'bg-neutral-950 border-neutral-800'}`}>
+                            <h3 className={`text-xs font-bold uppercase tracking-wider mb-3 ${isLightMode ? 'text-neutral-500' : 'text-neutral-400'}`}>
+                                Select Views to Share
+                            </h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                {viewports.map((vp) => (
+                                    <label
+                                        key={vp.index}
+                                        className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${selectedIndices.includes(vp.index)
+                                            ? (isLightMode ? 'bg-white border-blue-500 shadow-sm' : 'bg-neutral-900 border-blue-500 shadow-sm')
+                                            : (isLightMode ? 'bg-transparent border-transparent hover:bg-neutral-100' : 'bg-transparent border-transparent hover:bg-neutral-800')
+                                            } ${!vp.hasContent ? 'opacity-50' : ''}`}
+                                    >
+                                        <div className={`w-5 h-5 rounded flex items-center justify-center border transition-colors ${selectedIndices.includes(vp.index)
+                                            ? 'bg-blue-600 border-blue-600 text-white'
+                                            : (isLightMode ? 'border-neutral-300 bg-white' : 'border-neutral-700 bg-neutral-950')
+                                            }`}>
+                                            {selectedIndices.includes(vp.index) && <Check className="w-3.5 h-3.5" />}
+                                        </div>
+                                        <input
+                                            type="checkbox"
+                                            className="hidden"
+                                            checked={selectedIndices.includes(vp.index)}
+                                            disabled={!vp.hasContent && !selectedIndices.includes(vp.index)}
+                                            onChange={() => {
+                                                // Use Parent's Handler
+                                                if (selectedIndices.includes(vp.index)) {
+                                                    // Uncheck
+                                                    onSelectionChange(selectedIndices.filter((i: number) => i !== vp.index));
+                                                } else {
+                                                    // Check
+                                                    onSelectionChange([...selectedIndices, vp.index]);
+                                                }
+                                            }}
+                                        />
+                                        <div className="flex flex-col min-w-0">
+                                            <span className={`text-xs font-bold uppercase tracking-wider ${isLightMode ? 'text-neutral-500' : 'text-neutral-500'}`}>
+                                                Viewport {vp.index + 1}
+                                            </span>
+                                            <span className={`text-sm font-medium truncate ${isLightMode ? 'text-neutral-900' : 'text-white'}`}>
+                                                {vp.title || "Empty"}
+                                            </span>
+                                        </div>
+                                    </label>
+                                ))}
                             </div>
-                        )}
+                        </div>
+
 
                         {/* Tabs */}
                         <div className={`flex p-1 mb-4 rounded-lg ${isLightMode ? 'bg-neutral-100' : 'bg-neutral-800'}`}>
@@ -853,6 +852,6 @@ export const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, isLight
                     </div>
                 )}
             </div>
-        </div>
+        </div >
     );
 };
